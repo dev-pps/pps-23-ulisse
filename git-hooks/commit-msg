@@ -7,7 +7,7 @@ COMMIT_MSG_FILE=$1
 COMMIT_MSG=$(head -n 1 "$COMMIT_MSG_FILE")
 
 # Define a regex for semantic commit messages
-SEMANTIC_REGEX="^(feat|fix|docs|style|refactor|test|chore)(\([a-zA-Z0-9:_-]+\))?(\!)?: .{1,50}$"
+SEMANTIC_REGEX="^(build|chore|ci|docs|style|refactor|feat|fix|test)(\([a-zA-Z0-9:_-]+\))?(\!)?: .{1,100}$"
 
 
 if [[ ! $COMMIT_MSG =~ $SEMANTIC_REGEX ]]; then
