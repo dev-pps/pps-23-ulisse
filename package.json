@@ -1,0 +1,31 @@
+{
+  "name": "pps-23-ulisse",
+  "version": "1.0.0",
+  "description": "Awesome Train Simulator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-pps/pps-23-ulisse.git"
+  },
+  "keywords": [
+    "train",
+    "simulator"
+  ],
+  "author": "dev-pps",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/dev-pps/pps-23-ulisse/issues"
+  },
+  "homepage": "https://github.com/dev-pps/pps-23-ulisse#readme",
+  "preset": "conventionalcommits",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    "@semantic-release/github",
+    "@semantic-release/git"
+  ]
+}
