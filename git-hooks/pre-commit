@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "Running WartRemover..."
+sbt compile
+#sbt scalafmt
+#sbt wartremover
+#sbt clean coverage test
+#sbt coverageReport
+#sbt doc
+
+#shellcheck disable=SC2181
+if [ $? -ne 0 ]; then
+  echo "WartRemover found issues. Please fix them before committing."
+  exit 1
+fi
+echo "All checks passed!"
