@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Commit message file passed by Git
+COMMIT_MSG_FILE=$1
+
+# Read the first line of the commit message
+COMMIT_MSG=$(head -n 1 "$COMMIT_MSG_FILE")
+
+# Define a regex for semantic commit messages
+SEMANTIC_REGEX="^(feat|fix|docs|style|refactor|test|chore)(\([a-zA-Z0-9:_-]+\))?(\!)?: .{1,50}$"
+
+
+if [[ ! $COMMIT_MSG =~ $SEMANTIC_REGEX ]]; then
+    echo "ERROR: Commit message does not follow the Semantic Commit Message convention."
+    echo ""
+    echo "Examples of valid commit messages:"
+    echo "  feat(parser): add ability to parse arrays"
+    echo "  fix(login): handle edge case for password validation"
+    echo "  docs: update README with usage examples"
+    echo ""
+    echo "Please use the format: <type>(<scope>): <description>"
+    echo "Valid types: feat, fix, docs, style, refactor, test, chore"
+    exit 1
+fi
