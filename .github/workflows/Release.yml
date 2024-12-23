@@ -1,0 +1,46 @@
+name: Make new release
+on:
+#  push:
+#    branches:
+#      - main
+  workflow_dispatch:
+
+
+env:
+  JAVA_VERSION: 21
+
+jobs:
+  release:
+    concurrency:
+      group: release-${{ github.event.number || github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.SEM_RELEASE_APPBOT_ID }}
+          private-key: ${{ secrets.SEM_RELEASE_APPBOT_KEY }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: "temurin"
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+      - name: Install dependencies
+        run: npm install
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: npx semantic-release

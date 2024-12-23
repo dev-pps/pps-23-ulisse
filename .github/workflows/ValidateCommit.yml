@@ -1,0 +1,21 @@
+name: Validate commit
+on:
+  pull_request:
+      branches:
+        - main
+
+jobs:
+  check-commits:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: check-conventional-commits
+        uses: webiny/action-conventional-commits@v1.3.0
+      - name: check-signed-commits
+        uses: 1Password/check-signed-commits-action@v1
+        with:
+          comment: |
+            Customized comment in the PR
