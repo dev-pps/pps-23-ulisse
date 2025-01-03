@@ -45,16 +45,16 @@ o guasti imprevisti.
 
 ### Glossario
 - Stazione: punto di partenza e arrivo di un treno
-- Treno: struttura mobile che trasporta persone o merci
+- Treno: veicolo su rotaia che trasporta persone o merci
 - Binario: rotaia all'interno della stazione
 - Rotaia: struttura su cui si muove il treno
-- Punto di scambio: elemento di gestione del traffico che permette lo spostamento da una rotaia ad un altra
 - Incorcio: punto in cui due o più rotaie s'incrociano (può esserci un punto di scambio)
-- Bivio: punto di scambio con due o più rotaie in uscita (e viceversa)
+- Deviatoio/scambio: è un componente meccanico che permette di spostare un treno da una rotaia a un altra.
+- Punto di scambio: è un'area più ampia della rete ferroviaria che comprende uno o più deviatoi.
+- Bivio*: punto di scambio con due o più rotaie in uscita (e viceversa)
 - Deposito: binario morto o capolinea
-- Percorso: l'insime delle stazioni in cui passa un treno, includendo anche quelle dove non si ferma
-- Linea: rappresenta l'intero percorso di collegamento tra due o più località principali, 
-includendo varie stazioni e tratte
+- Linea: l'infrastruttura fisica costituita da binari, stazioni, segnali e altre strutture che collega due o più località.
+- Percorso: itinerario seguito dal treno su una o piu linee ferroviarie
 - Tratta: collegamento tra due stazioni
 
 ## Funzionali
