@@ -102,13 +102,14 @@ varie stazioni e tratte, definendo i treni e lo scheduling(tratte valide + orari
 - JDK 17+
 - Prolog v.v.v
 - ScalaSwing v.v.v
-- Cucumber v.v.v
+- Cucumber 8.25.1
 - TDD (BDD vedendo quando abbiamo usato cucumber?)
 - DSL
 - SBT as automation tool 1.10.1
 - SBT assembly (FAT jar) 2.3.0 
 - Scaladoc
 - Scalafmt 2.5.2
+- archUnit 1.2.0
 - wartremover 3.2.5
 - semantic release & conventional commit/branch
 - Scoverage 2.2.2
