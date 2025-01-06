@@ -2,6 +2,7 @@
 
 echo "Running WartRemover..."
 sbt compile
+git add -u
 #sbt scalafmt
 #sbt wartremover
 #sbt clean coverage test
