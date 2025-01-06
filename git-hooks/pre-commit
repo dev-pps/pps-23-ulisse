@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Running WartRemover..."
-sbt compile
+sbt "Test / compile"
 git add -u
 #sbt scalafmt
 #sbt wartremover
