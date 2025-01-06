@@ -1,24 +1,53 @@
-﻿Feature: As a user, I want creare nuove stazioni, so that poter collegare tra di loro le stazioni (lato visivo anche)
+﻿Feature: As a user, I want to create new station so then i can build a railway system
 
-  Scenario: Crea una stazione
-    Given sono nella pagina dell'editing della rete
-    When clicco bottone nuova stazione
-    Then appare la finestra di creazione stazione
-    And inserisco nome stazione
-    And seleziono luogo stazione
-    And quanti binari ha la stazione
+  Background:
+    Given i am in the StationEditor page
 
+  Scenario: Open the stationForm
+    Given the stationEditorMenu is shown
+    When i click on the create button
+    Then the stationForm shows up
+
+  #FORM V1
+  Scenario: Insert station name
+    Given the stationForm is shown
+    When I insert the station name
+    Then the station name is inserted
+
+  ...
+
+  Scenario: Fill the stationForm
+    Given the stationForm is shown
+    When the station name is inserted
+    And the station latitude is inserted
+    And the station longitude is inserted
+    And the station tracks are inserted
+    Then the stationForm is filled
+  ###
+
+  #FORM V2
+  Scenario: Fill the stationForm
+      Given the stationForm is shown
+      When i insert the station
+      And the latitude
+      And the longitude
+      And the station tracks
+      Then the stationForm is filled
+  ###
+
+  Scenario: Make a station
+    Given the stationForm is shown
+    And the stationForm is filled
+    When i click ok
+    Then the station is created
+    And (the station) is visualized in the WorldMap
+
+  #TODO
   Scenario: Selezione del luogo
     Given sono nella creazione della stazione
     When clicco un punto sulla mappa o la inserisco a mano
     Then si riempiono i campi di latitudine e longitudine
     And anteprima sulla mappa della stazione
-
-  Scenario: Salvataggio della stazione
-    Given tutti i campi sono riempiti
-    When inserisco nome, luogo e binari
-    Then la stazione viene creata
-    And viene visualizzata sulla mappa
 
   Scenario: Seleziono una stazione gia esistente
     Given sono nella pagina dell'editing della stazione
