@@ -24,8 +24,12 @@ final case class SelectableStation(station: Station, selected: Boolean)
 final case class StationEditorController():
   def createStation(
       name: String,
-      latitude: Double,
-      longitude: Double,
-      capacity: Int
+      latitude: String,
+      longitude: String,
+      capacity: String
   ): Station =
-    Station(name, Location(latitude, longitude), capacity)
+    Station(
+      name,
+      Location(latitude.toDouble, longitude.toDouble),
+      capacity.toInt
+    )

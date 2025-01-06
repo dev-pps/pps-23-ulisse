@@ -1,6 +1,20 @@
-import javax.swing.JTextField
+import cats.implicits.catsSyntaxEq
+
 import scala.swing.*
 import scala.swing.event.*
+
+final case class StationCard(station: Station) extends GridPanel(3, 1):
+  contents += new Label(s"Name: ${station.name}")
+  contents += new Label(s"Location: ${station.location}")
+  contents += new Label(s"Capacity: ${station.capacity}")
+
+final case class StationMapView() extends GridPanel(5, 5):
+  private val labels = for {
+    x <- 0 until 5
+    y <- 0 until 5
+    station = model.stationMap.find(_.location === Location(x, y))
+  } yield station.map(StationCard.apply).getOrElse(Label("Empty"))
+  contents ++= labels
 
 final case class StationEditorMenu(onCreateClick: () => Unit)
     extends GridBagPanel:
@@ -39,6 +53,11 @@ final case class StationForm(
     controller: StationEditorController,
     onOkClick: () => Unit
 ) extends GridBagPanel:
+  private val stationName = new TextField(5)
+  private val latitude    = new TextField(5)
+  private val longitude   = new TextField(5)
+  private val capacity    = new TextField(5)
+
   private val c = new Constraints
   c.anchor = GridBagPanel.Anchor.Center
   c.gridx = 0
@@ -57,11 +76,11 @@ final case class StationForm(
   c.gridx = 0
   c.gridy = 2
   c.weighty = 0.1
-  layout(new Label("Name: ")) = c
+  layout(new Label("Station Name: ")) = c
 
   c.gridx = 1
   c.weighty = 0.1
-  layout(new TextField(5)) = c
+  layout(stationName) = c
 
   c.gridx = 0
   c.gridy = 3
@@ -70,7 +89,7 @@ final case class StationForm(
 
   c.gridx = 1
   c.weighty = 0.1
-  layout(new TextField(5)) = c
+  layout(latitude) = c
 
   c.gridx = 0
   c.gridy = 4
@@ -79,7 +98,7 @@ final case class StationForm(
 
   c.gridx = 1
   c.weighty = 0.1
-  layout(new TextField(5)) = c
+  layout(longitude) = c
 
   c.gridx = 0
   c.gridy = 5
@@ -88,7 +107,7 @@ final case class StationForm(
 
   c.gridx = 1
   c.weighty = 0.1
-  layout(new TextField(5)) = c
+  layout(capacity) = c
 
   c.gridwidth = 2
   c.gridx = 0
@@ -98,6 +117,12 @@ final case class StationForm(
     text = "Ok"
     reactions += {
       case ButtonClicked(_) =>
+        model.addStation(controller.createStation(
+          stationName.text,
+          latitude.text,
+          longitude.text,
+          capacity.text
+        ))
         onOkClick()
     }
   }) = c
@@ -112,17 +137,15 @@ final case class StationEditorContent(
 
 final case class StationEditorPage(controller: StationEditorController)
     extends BorderPanel:
-  private val worldMap: Panel = new Panel:
-    background = java.awt.Color.BLUE
   private val createMenu: StationForm = StationForm(
     controller,
     () =>
-      updateContent(StationEditorContent(worldMap, editMenu))
+      updateContent(StationEditorContent(StationMapView(), editMenu))
   )
   private val editMenu: StationEditorMenu = StationEditorMenu: () =>
-    updateContent(StationEditorContent(worldMap, createMenu))
+    updateContent(StationEditorContent(StationMapView(), createMenu))
 
-  updateContent(StationEditorContent(worldMap, editMenu))
+  updateContent(StationEditorContent(StationMapView(), editMenu))
 
   private def makeContent(content: StationEditorContent): GridBagPanel =
     new GridBagPanel:
@@ -149,6 +172,8 @@ final case class AppFrame() extends MainFrame:
   contents = StationEditorPage(StationEditorController())
   pack()
   centerOnScreen()
+
+val model: Model = Model()
 
 @main def run(): Unit =
   AppFrame().open()

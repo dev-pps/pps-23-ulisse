@@ -1,6 +1,6 @@
 import cats.implicits.catsSyntaxEq
 
-final case class WorldMap(stations: List[SelectableStation]):
+final case class StationMap(stations: List[Station]):
   require(
     stations.map(_.name).distinct.size === stations.size,
     "station names must be unique"
