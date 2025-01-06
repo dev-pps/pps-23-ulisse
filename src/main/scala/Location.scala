@@ -1,5 +1,8 @@
+import cats.Eq
+
 object Location:
   opaque type Location = (Double, Double)
+  given Eq[Location] = Eq.fromUniversalEquals
   def apply(latitude: Double, longitude: Double): Location =
     require(
       latitude >= -90.0 && latitude <= 90.0,
