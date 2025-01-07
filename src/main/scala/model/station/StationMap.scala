@@ -1,3 +1,5 @@
+package model.station
+
 import cats.implicits.catsSyntaxEq
 
 final case class StationMap(stations: List[Station]):

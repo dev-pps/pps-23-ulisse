@@ -1,3 +1,4 @@
+import model.station.{Location, Station, StationMap}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -9,7 +10,7 @@ class StationMapTest extends AnyWordSpec with Matchers:
     Station("StationC", Location(2.0, 2.0), 100)
   )
 
-  "A WorldMap" when:
+  "A StationMap" when:
     "created with unique station names and locations" should:
       "be created successfully" in:
         noException should be thrownBy:
