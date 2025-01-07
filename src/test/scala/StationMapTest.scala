@@ -1,7 +1,7 @@
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 
-class WorldMapTest extends AnyWordSpec with Matchers:
+class StationMapTest extends AnyWordSpec with Matchers:
 
   val stations: List[Station] = List(
     Station("StationA", Location(0.0, 0.0), 100),
