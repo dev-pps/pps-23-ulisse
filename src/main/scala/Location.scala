@@ -13,3 +13,6 @@ object Location:
       s"invalid longitude: $longitude"
     )
     (latitude, longitude)
+  extension (location: Location)
+    def latitude: Double  = location._1
+    def longitude: Double = location._2
