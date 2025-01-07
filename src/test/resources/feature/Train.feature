@@ -1,39 +1,39 @@
 ﻿# Created by buizo at 03/01/2025
-Feature: As a user, I want creare nuovi treni alla rete, so that saranno disponibili per l'assegnazione di un percorso
+Feature: As a user, I want create new trains, so they will be assignable to a path
 
-  Scenario: Creo un treno
-    Given sono nella pagina dell'editing dei treni
-    When clicco bottone nuovo treno
+  Scenario: Create a train
+    Given i'm in train editing page
+    When i click on "new train" button
     Then appare la finestra di creazione treno
-    And inserisco nome treno
-    And inserisco le carrozze, con calcolo della lunghezza del treno
-    And inserisco tipo normale o AV, con visualizzazione della velocità massima del treno
-    And inserisco la capacità massima del treno
+    And insert train name
+    And insert amount of carriage and calculate train lenght
+    And insert train type (nomral or high-speed), it is showed max speed reachable by train
+    And insert max train capacity
 
-  Scenario: Salvataggio del treno
-    Given tutti i campi sono riempiti
-    When clicco il bottone salva
-    Then il treno viene creato
+  Scenario: Save train
+    Given that all field are filled
+    When click on save button
+    Then train is saved/created
 
-  Scenario: Seleziono un treno gia esistente
-    Given sono nella pagina dell'editing dei treni
-    When clicco sul treno
-    Then viene visualizzato le informazioni del treno
-    And entro in modalità di modifica
+  Scenario: Select existing train
+    Given i'm in train editing page
+    When click on train
+    Then shows train info
+    And starts edit mode of train
 
-  Scenario: modifico informazioni del treno
-    Given ho modificato le informazioni del treno
-    When clicco sul bottone salva
-    Then il treno viene aggiornato
+  Scenario: Edit train info
+    Given that I edited some train info
+    When i click on save button
+    Then train infos are updated/saved
 
-  Scenario: Elimino un treno
-    Given sono nella modalità di modifica del treno
-    When clicco sul bottone elimina
-    Then il treno viene eliminato
+  Scenario: Delete a train
+    Given i'm in train editing page
+    When I click on delete button
+    Then train is deleted
 
-  Scenario: Esco dall'editing dei treni
-    Given sono nella pagina dell'editing dei treni
-    When clicco sul bottone back
-    Then torno alla pagina home
+  Scenario: Close edit train page
+    Given i'm in train editing page
+    When I click back button
+    Then I back to homepage
 
 
