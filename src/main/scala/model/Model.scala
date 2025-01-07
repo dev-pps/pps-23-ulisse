@@ -1,4 +1,7 @@
+package model
+
 import cats.implicits.catsSyntaxEq
+import station.*
 
 final case class Model():
 

@@ -1,3 +1,4 @@
+import model.station.{Location, Station}
 import org.scalatest.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

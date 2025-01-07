@@ -1,3 +1,5 @@
+package model.station
+
 import cats.Eq
 
 object Location:
