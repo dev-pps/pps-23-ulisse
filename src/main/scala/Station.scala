@@ -20,16 +20,3 @@ final case class StationImpl(name: String, location: Location, capacity: Int)
 final case class SelectableStation(station: Station, selected: Boolean)
     extends Station with Selectable:
   export station.*
-
-final case class StationEditorController():
-  def createStation(
-      name: String,
-      latitude: String,
-      longitude: String,
-      capacity: String
-  ): Station =
-    Station(
-      name,
-      Location(latitude.toDouble, longitude.toDouble),
-      capacity.toInt
-    )

@@ -63,8 +63,7 @@ final case class StationEditorMenu(onCreateClick: () => Unit)
   layout(Swing.VGlue) = c
 
 final case class StationForm(
-    controller: StationEditorController,
-    onOkClick: () => Unit,
+    onBackClick: () => Unit,
     station: Option[Station]
 ) extends GridBagPanel:
   private val stationName = new TextField(5)
@@ -77,12 +76,23 @@ final case class StationForm(
     longitude.text = s.location.longitude.toString
     capacity.text = s.capacity.toString
 
+  private def createStation(
+      name: String,
+      latitude: String,
+      longitude: String,
+      capacity: String
+  ): Station =
+    Station(
+      name,
+      Location(latitude.toDouble, longitude.toDouble),
+      capacity.toInt
+    )
   private val c = new Constraints
   c.anchor = GridBagPanel.Anchor.Center
   c.gridx = 0
   c.weightx = 1
 
-  c.gridwidth = 2
+  c.gridwidth = 3
   c.gridy = 0
   c.weighty = 1
   layout(Swing.VGlue) = c
@@ -91,7 +101,7 @@ final case class StationForm(
   c.weighty = 0.1
   layout(new Label("Station")) = c
 
-  c.gridwidth = 1
+  c.gridwidth = 2
   c.gridx = 0
   c.gridy = 2
   c.weighty = 0.1
@@ -128,7 +138,7 @@ final case class StationForm(
   c.weighty = 0.1
   layout(capacity) = c
 
-  c.gridwidth = 2
+  c.gridwidth = 1
   c.gridx = 0
   c.gridy = 6
   c.weighty = 0.1
@@ -136,25 +146,53 @@ final case class StationForm(
     text = "Ok"
     reactions += {
       case ButtonClicked(_) =>
-        model.updateStation(controller.createStation(
+        val stationFromForm: Station = createStation(
           stationName.text,
           latitude.text,
           longitude.text,
           capacity.text
-        ))
-        onOkClick()
+        )
+        for s <- station do model.removeStation(s)
+        model.addStation(stationFromForm)
+        onBackClick()
     }
   }) = c
-
+  c.gridx = 1
+  c.gridy = 6
+  c.weighty = 0.1
+  layout(new Button {
+    text = "Remove"
+    station match
+      case Some(s) =>
+        reactions += {
+          case ButtonClicked(_) =>
+            model.removeStation(s)
+            onBackClick()
+        }
+      case _ =>
+        enabled = false
+  }) = c
+  c.gridx = 2
+  c.gridy = 6
+  c.weighty = 0.1
+  layout(new Button {
+    text = "Back"
+    reactions += {
+      case ButtonClicked(_) =>
+        onBackClick()
+    }
+  }) = c
+  c.gridx = 0
   c.gridy = 7
   c.weighty = 1.0
   layout(Swing.VGlue) = c
+
 final case class StationEditorContent(
     worldMap: Panel,
     stationEditorPanel: Panel
 )
 
-final case class StationEditorPage(controller: StationEditorController)
+final case class StationEditorPage()
     extends BorderPanel:
 
   private val updateContentTemplate: Panel => Unit =
@@ -169,7 +207,7 @@ final case class StationEditorPage(controller: StationEditorController)
   private val openStationForm: Option[Station] => Unit =
     station =>
       updateContentTemplate(
-        StationForm(controller, openStationMenu, station)
+        StationForm(openStationMenu, station)
       )
 
   private val openStationMenu: () => Unit = () =>
@@ -201,7 +239,7 @@ final case class AppFrame() extends MainFrame:
   title = "Station Editor"
   minimumSize = new Dimension(400, 300)
   preferredSize = new Dimension(800, 600)
-  contents = StationEditorPage(StationEditorController())
+  contents = StationEditorPage()
   pack()
   centerOnScreen()
 
