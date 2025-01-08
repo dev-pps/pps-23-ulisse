@@ -1,16 +1,14 @@
-package view
+package views.station
 
-import cats.implicits.catsSyntaxEq
+import controllers.station.StationEditorController
+import model.station.*
+import model.station.Location.Location
+import views.*
 
 import java.awt.Color
 import scala.swing.*
 import scala.swing.Swing.LineBorder
 import scala.swing.event.*
-import model.Model
-import model.station.*
-import model.station.Location.Location
-
-val appModel: Model = Model()
 
 final case class StationCard(
     station: Station,
@@ -24,7 +22,6 @@ final case class StationCard(
   reactions += {
     case MouseClicked(_, _, _, _, _) =>
       openStationForm(Option(station))
-      print(s"Name: ${station.name}")
   }
 
 final case class EmptyMapCard(
@@ -40,13 +37,14 @@ final case class EmptyMapCard(
   }
 
 final case class StationMapView(
+    controller: StationEditorController,
     openStationForm: Option[Station] => Unit,
     stationForm: Option[StationForm]
 ) extends GridPanel(5, 5):
   private val labels = for {
     x <- 0 until 5
     y <- 0 until 5
-    station = appModel.stationMap.find(_.location === Location(x, y))
+    station = controller.findStationAt(Location(x, y))
   } yield station.map(StationCard(_, openStationForm)).getOrElse(EmptyMapCard(Location(x, y), stationForm))
   contents ++= labels
 
@@ -84,6 +82,7 @@ final case class StationEditorMenu(onCreateClick: () => Unit)
   layout(Swing.VGlue) = c
 
 final case class StationForm(
+    controller: StationEditorController,
     onBackClick: () => Unit,
     station: Option[Station]
 ) extends GridBagPanel:
@@ -97,21 +96,12 @@ final case class StationForm(
     longitude.text = s.location.longitude.toString
     numberOfTrack.text = s.numberOfTrack.toString
 
-  private def createStation(
-      name: String,
-      latitude: String,
-      longitude: String,
-      numberOfTrack: String
-  ): Station =
-    Station(
-      name,
-      Location(latitude.toDouble, longitude.toDouble),
-      numberOfTrack.toInt
-    )
-
   def setLocation(location: Location): Unit =
     this.latitude.text = location.latitude.toString
     this.longitude.text = location.longitude.toString
+
+  def data: (String, String, String, String) =
+    (stationName.text, latitude.text, longitude.text, numberOfTrack.text)
 
   private val c = new Constraints
   c.anchor = GridBagPanel.Anchor.Center
@@ -172,14 +162,13 @@ final case class StationForm(
     text = "Ok"
     reactions += {
       case ButtonClicked(_) =>
-        val stationFromForm: Station = createStation(
+        controller.onOkClick(
           stationName.text,
           latitude.text,
           longitude.text,
-          numberOfTrack.text
+          numberOfTrack.text,
+          station
         )
-        for s <- station do appModel.removeStation(s)
-        appModel.addStation(stationFromForm)
         onBackClick()
     }
   }) = c
@@ -192,7 +181,7 @@ final case class StationForm(
       case Some(s) =>
         reactions += {
           case ButtonClicked(_) =>
-            appModel.removeStation(s)
+            controller.removeStation(s)
             onBackClick()
         }
       case _ =>
@@ -218,7 +207,7 @@ final case class StationEditorContent(
     stationEditorPanel: Panel
 )
 
-final case class StationEditorPage()
+final case class StationEditorView(controller: StationEditorController)
     extends BorderPanel:
 
   private val updateContentTemplate: Panel => Unit =
@@ -226,18 +215,18 @@ final case class StationEditorPage()
       updateContent(
         StationEditorContent(
           stationEditorPanel match
-            case p: StationForm => StationMapView(openStationForm, Option(p))
-            case _              => StationMapView(openStationForm, Option.empty)
+            case p: StationForm =>
+              StationMapView(controller, openStationForm, Option(p))
+            case _ => StationMapView(controller, openStationForm, Option.empty)
           ,
           stationEditorPanel
         )
       )
 
   private val openStationForm: Option[Station] => Unit =
-    station =>
-      updateContentTemplate(
-        StationForm(openStationMenu, station)
-      )
+    station => {
+      updateContentTemplate(StationForm(controller, openStationMenu, station))
+    }
 
   private val openStationMenu: () => Unit = () =>
     updateContentTemplate(StationEditorMenu(() =>

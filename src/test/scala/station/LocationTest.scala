@@ -1,3 +1,5 @@
+package station
+
 import model.station.Location
 import org.scalatest.*
 import org.scalatest.flatspec.AnyFlatSpec

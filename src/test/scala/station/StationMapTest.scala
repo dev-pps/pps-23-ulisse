@@ -1,6 +1,8 @@
+package station
+
 import model.station.{Location, Station, StationMap}
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 class StationMapTest extends AnyWordSpec with Matchers:
 
@@ -18,16 +20,14 @@ class StationMapTest extends AnyWordSpec with Matchers:
 
     "created with duplicate station names" should:
       "throw an IllegalArgumentException" in:
-        intercept[IllegalArgumentException] {
+        intercept[IllegalArgumentException]:
           StationMap(
             Station("StationA", Location(3.0, 3.0), 100) +: stations
           )
-        }
 
     "created with duplicate station locations" should:
       "throw an IllegalArgumentException" in:
-        intercept[IllegalArgumentException] {
+        intercept[IllegalArgumentException]:
           StationMap(
             Station("StationD", Location(2.0, 2.0), 100) +: stations
           )
-        }
