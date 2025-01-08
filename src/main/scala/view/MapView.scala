@@ -8,7 +8,7 @@ object MapView extends SimpleSwingApplication {
 
   def top: MainFrame = new MainFrame {
     title = "Border Layout Example"
-    
+
     // grandezza
     preferredSize = new Dimension(400, 300)
 
@@ -61,9 +61,10 @@ object MapView extends SimpleSwingApplication {
           case ButtonClicked(_) =>
             Dialog.showMessage(
               parent = this,
-              message = s"Tratta: ${trattaField.selection.item}, Rotaie: ${rotaieField.text}, Partenza: ${partenzaField.text}, Arrivo: ${arrivoField.text}",
+              message =
+                s"Tratta: ${trattaField.selection.item}, Rotaie: ${rotaieField.text}, Partenza: ${partenzaField.text}, Arrivo: ${arrivoField.text}",
               title = "Form Data"
-              )
+            )
         }
       }) = c
     }
