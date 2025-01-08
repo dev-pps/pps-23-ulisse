@@ -6,7 +6,7 @@ import org.scalatest.matchers.{must, should}
 import must.Matchers.be
 import should.Matchers.should
 import train.Trains.Train
-import train.Trains.TrainType.{HIGH_SPEED, NORMAL}
+import train.Trains.TrainType.{HighSpeed, Normal}
 
 class TrainTest extends AnyFunSuite:
   val REGIONAL_TRAIN_SPEED   = 130
@@ -16,7 +16,7 @@ class TrainTest extends AnyFunSuite:
     val train: Train =
       Trains.makeRegionalTrain(name = "3905", carriages = 5, capacity = 400)
     train.maxSpeed should be(REGIONAL_TRAIN_SPEED)
-    train.trainType should be(NORMAL)
+    train.trainType should be(Normal)
     train.name should be("3905")
     train.carriages should be(5)
     train.capacity should be(400)
@@ -29,7 +29,7 @@ class TrainTest extends AnyFunSuite:
         capacity = 900
       )
     train.maxSpeed should be(HIGH_SPEED_TRAIN_SPEED)
-    train.trainType should be(HIGH_SPEED)
+    train.trainType should be(HighSpeed)
     train.name should be("Frecciarossa")
     train.carriages should be(12)
     train.capacity should be(900)
