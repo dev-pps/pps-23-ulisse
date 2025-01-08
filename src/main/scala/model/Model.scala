@@ -4,20 +4,51 @@ import cats.implicits.catsSyntaxEq
 import model.station.Location.Location
 import station.*
 
+/** The application model containing the application mutable state.
+  *
+  * @constructor
+  *   create a new Model.
+  */
 final case class Model():
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private var _stationMap: StationMap = StationMap(List[Station]())
 
+  /** Retrieves all the stations in the model as a sequence.
+    *
+    * @return
+    *   A sequence of `Station` objects representing the stations currently
+    *   stored in the model.
+    */
   def stationMap: Seq[Station] = _stationMap.stations
 
+  /** Adds a station to the model.
+    *
+    * @param station
+    *   The station to add to the model.
+    * @throws IllegalArgumentException
+    *   If the station name or location is not unique.
+    */
   def addStation(station: Station): Unit =
     _stationMap = StationMap(station +: _stationMap.stations)
 
+  /** Removes a station from the model. If the station is not part of the model,
+    * nothing happens.
+    * @param station
+    *   The station to remove from the model.
+    */
   def removeStation(station: Station): Unit =
     val updatedStations =
       _stationMap.stations.filterNot(_.location === station.location)
     _stationMap = StationMap(updatedStations)
 
+  /** Searches for a station at the specified location.
+    *
+    * @param location
+    *   The location to search for.
+    * @return
+    *   An `Option[Station]`, which contains the station at the given location
+    *   if found, or `None` if no station exists at that location.
+    */
   def findStationAt(location: Location): Option[Station] =
     _stationMap.find(_.location === location)

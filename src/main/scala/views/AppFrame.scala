@@ -6,6 +6,11 @@ import views.station.StationEditorView
 
 import scala.swing.*
 
+/** The MainFrame of the application.
+  *
+  * @constructor
+  *   create a new Application.
+  */
 final case class AppFrame() extends MainFrame:
   private val model: Model = Model()
   private lazy val stationEditorController: StationEditorController =

@@ -10,6 +10,16 @@ import scala.swing.*
 import scala.swing.Swing.LineBorder
 import scala.swing.event.*
 
+/** A Card displaying station information.
+  *
+  * @constructor
+  *   Creates a new StationCard with station details.
+  * @param station
+  *   The associated station.
+  * @param openStationForm
+  *   A function that opens the station form to modify the station when the card
+  *   is clicked.
+  */
 final case class StationCard(
     station: Station,
     openStationForm: Option[Station] => Unit
@@ -24,8 +34,17 @@ final case class StationCard(
       openStationForm(Option(station))
   }
 
+/** A Card representing an empty station location.
+  *
+  * @constructor
+  *   Creates a new EmptyMapCard.
+  * @param mapLocation
+  *   The location of the card.
+  * @param stationForm
+  *   The form where the location will be set upon card click.
+  */
 final case class EmptyMapCard(
-    stationLocation: Location,
+    mapLocation: Location,
     stationForm: Option[StationForm]
 ) extends Label:
   text = "Empty"
@@ -33,9 +52,21 @@ final case class EmptyMapCard(
   listenTo(mouse.clicks)
   reactions += {
     case MouseClicked(_, _, _, _, _) =>
-      for form <- stationForm do form.setLocation(stationLocation)
+      for form <- stationForm do form.setLocation(mapLocation)
   }
 
+/** A GridPanel that displays the station map, consisting of StationCard and
+  * EmptyMapCard components.
+  *
+  * @constructor
+  *   Creates a new StationMapView.
+  * @param controller
+  *   The associated StationEditorController.
+  * @param openStationForm
+  *   A function to open the station form when a StationCard is clicked.
+  * @param stationForm
+  *   The form where location details are added when an EmptyMapCard is clicked.
+  */
 final case class StationMapView(
     controller: StationEditorController,
     openStationForm: Option[Station] => Unit,
@@ -48,6 +79,14 @@ final case class StationMapView(
   } yield station.map(StationCard(_, openStationForm)).getOrElse(EmptyMapCard(Location(x, y), stationForm))
   contents ++= labels
 
+/** A GridBagPanel displaying the station editor menu.
+  *
+  * @constructor
+  *   Creates a new StationEditorMenu.
+  * @param onCreateClick
+  *   A function that opens the station creation panel when the create button is
+  *   clicked.
+  */
 final case class StationEditorMenu(onCreateClick: () => Unit)
     extends GridBagPanel:
   private val c = new Constraints
@@ -81,6 +120,17 @@ final case class StationEditorMenu(onCreateClick: () => Unit)
   c.weighty = 1.0
   layout(Swing.VGlue) = c
 
+/** A GridBagPanel displaying the station editor form.
+  *
+  * @constructor
+  *   Creates a new StationForm.
+  * @param controller
+  *   The associated StationEditorController.
+  * @param onBackClick
+  *   A function that navigates back to the station editor menu.
+  * @param station
+  *   The station to be edited.
+  */
 final case class StationForm(
     controller: StationEditorController,
     onBackClick: () => Unit,
@@ -96,12 +146,17 @@ final case class StationForm(
     longitude.text = s.location.longitude.toString
     numberOfTrack.text = s.numberOfTrack.toString
 
+  /** Sets the location in the StationForm.
+    *
+    * This method updates the latitude and longitude fields in the form with the
+    * provided location's values.
+    *
+    * @param location
+    *   The location to set.
+    */
   def setLocation(location: Location): Unit =
     this.latitude.text = location.latitude.toString
     this.longitude.text = location.longitude.toString
-
-  def data: (String, String, String, String) =
-    (stationName.text, latitude.text, longitude.text, numberOfTrack.text)
 
   private val c = new Constraints
   c.anchor = GridBagPanel.Anchor.Center
@@ -202,11 +257,27 @@ final case class StationForm(
   c.weighty = 1.0
   layout(Swing.VGlue) = c
 
+/** The content of the StationEditorView.
+  *
+  * @constructor
+  *   Creates a new StationEditorContent.
+  * @param worldMap
+  *   The map displaying the stations.
+  * @param stationEditorPanel
+  *   The panel of the station editor menu or the station form.
+  */
 final case class StationEditorContent(
     worldMap: Panel,
     stationEditorPanel: Panel
 )
 
+/** The view of the StationEditor.
+  *
+  * @constructor
+  *   Creates a new StationEditorView.
+  * @param controller
+  *   The associated StationEditorController.
+  */
 final case class StationEditorView(controller: StationEditorController)
     extends BorderPanel:
 
