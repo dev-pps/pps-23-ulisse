@@ -1,12 +1,12 @@
-package train
+package train.model
 
 import org.scalatest.*
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers.be
+import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.matchers.{must, should}
-import must.Matchers.be
-import should.Matchers.should
-import train.Trains.Train
-import train.Trains.TrainType.{HighSpeed, Normal}
+import train.model.Trains.Train
+import train.model.Trains.TrainType.{HighSpeed, Normal}
 
 class TrainTest extends AnyFunSuite:
   val REGIONAL_TRAIN_SPEED   = 130
