@@ -1,6 +1,6 @@
-package train
+package train.model
 
-import train.Trains.TrainType.{HighSpeed, Normal}
+import train.model.Trains.TrainType.{HighSpeed, Normal}
 
 object Trains:
 

@@ -1,4 +1,4 @@
-package train
+package train.model
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.*

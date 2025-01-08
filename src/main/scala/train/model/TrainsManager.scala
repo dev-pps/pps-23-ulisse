@@ -1,6 +1,6 @@
-package train
+package train.model
 
-import train.Trains.{Train, TrainType}
+import train.model.Trains.{Train, TrainType}
 
 object TrainsManager:
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
