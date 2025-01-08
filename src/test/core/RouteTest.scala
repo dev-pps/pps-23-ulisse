@@ -22,12 +22,3 @@ class RouteTest extends AnyFlatSpec with Matchers:
 
   "compute route length" should "be from path" in:
     route.length must be (Points.computePointsDistance(riminiStation._2, cesenaStation._2))
-
-
-
-
-
-
-
-
-    
