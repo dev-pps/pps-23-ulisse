@@ -32,7 +32,9 @@ object Route:
       Points.computePointsDistance(path._1._2, path._2._2)
 
     override def has(id: Id): Boolean =
-      (this.id._1 canEqual id._1) && (this.id._2 canEqual id._2)
+      (this.id._1 canEqual id._1)
+        && (this.id._2._1._1 equalsIgnoreCase id._2._1._1)
+        && (this.id._2._2._1 equalsIgnoreCase id._2._2._1)
 
     override def equals(obj: Any): Boolean =
       obj match
