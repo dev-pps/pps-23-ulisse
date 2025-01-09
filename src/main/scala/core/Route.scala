@@ -23,3 +23,11 @@ object Route:
       extends Route:
     override def length: Double =
       Points.computePointsDistance(path._1._2, path._2._2)
+
+    override def equals(obj: Any): Boolean =
+      obj match
+        case that: Route =>
+          (this.typology canEqual that.typology) && (this.path canEqual that.path)
+        case _ => false
+
+    override def hashCode(): Int = typology.hashCode() + path.hashCode()

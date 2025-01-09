@@ -4,6 +4,7 @@ import scala.core.Route
 import scala.collection.immutable.{ArraySeq, List}
 
 trait RouteBank:
+
   def save(route: Route): RouteBank
   def contains(route: Route): Boolean
 
@@ -14,5 +15,10 @@ object RouteBank:
   opaque type Bank = List[Route]
 
   private case class RouteBankImpl(bank: Bank) extends RouteBank:
-    override def save(route: Route): RouteBank = RouteBank(bank.appended(route))
+    private val containsFunction: PartialFunction[Route, Bank] =
+      case x if contains(x) => bank
+
+    override def save(route: Route): RouteBank =
+      RouteBank(containsFunction.applyOrElse(route, bank.appended))
+
     override def contains(route: Route): Boolean = bank.contains(route)
