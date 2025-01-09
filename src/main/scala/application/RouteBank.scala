@@ -5,10 +5,10 @@ import scala.core.Route
 import scala.core.Route.Id
 
 trait RouteBank:
-
+  def size: Int
+  def route(id: Id): Option[Route]
   def save(route: Route): RouteBank
   def contains(route: Route): Boolean
-  def route(id: Id): Option[Route]
 
 object RouteBank:
   def apply(bank: Bank): RouteBank = RouteBankImpl(bank)
@@ -19,6 +19,7 @@ object RouteBank:
   opaque type Bank = Map[Id, Route]
 
   private case class RouteBankImpl(bank: Bank) extends RouteBank:
+    override def size: Int = bank.size
 
     override def save(route: Route): RouteBank =
       RouteBank(bank + (route.id -> route))

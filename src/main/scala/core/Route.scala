@@ -25,8 +25,7 @@ object Route:
 
   private case class RouteImpl(id: Id, railsCount: Int) extends Route:
     override def typology: TypeRoute = id._1
-    override def path
-        : ((String, (Double, Double)), (String, (Double, Double))) = id._2
+    override def path: Path          = id._2
 
     override def length: Double =
       Points.computePointsDistance(path._1._2, path._2._2)
