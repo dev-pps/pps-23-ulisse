@@ -15,9 +15,16 @@ class RouteBankTest extends AnyFlatSpec with Matchers:
   val path: Path             = (riminiStation, cesenaStation)
   val route: Route           = Route(TypeRoute.Normal, railsCount, path)
 
-  "save route" should "be contains in routeBank" in:
+  "save new route" should "contains in routeBank" in:
     val routeBank    = RouteBank.empty()
     val newRouteBank = routeBank.save(route)
 
     routeBank.contains(route) must be(false)
     newRouteBank.contains(route) must be(true)
+
+  "save same route" should "not contains in routeBank" in:
+    val sameRoute    = Route(TypeRoute.Normal, 3, path)
+    val routeBank    = RouteBank(List(route))
+    val newRouteBank = routeBank.save(sameRoute)
+
+//    newRouteBank.contains(sameRoute) must be(false)

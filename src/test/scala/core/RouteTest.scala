@@ -24,3 +24,9 @@ class RouteTest extends AnyFlatSpec with Matchers:
       riminiStation._2,
       cesenaStation._2
     ))
+
+  "check equals route" should "same typology and path" in:
+    val sameRoute      = Route(TypeRoute.Normal, 1, path)
+    val differentRoute = Route(TypeRoute.AV, railsCount, path)
+    route must be(sameRoute)
+    route must not be differentRoute
