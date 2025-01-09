@@ -1,6 +1,6 @@
 package scala.view
 
-import scala.swing.*
+import scala.swing.{Panel, *}
 import scala.swing.BorderPanel.Position.*
 import scala.swing.event.*
 
@@ -12,76 +12,44 @@ object MapView:
   private case class MapViewImpl() extends MainFrame, MapView:
     title = "Map"
     visible = true
-    preferredSize = new Dimension(400, 300)
+    preferredSize = new Dimension(800, 800)
 
     // Main content pane with BorderLayout
     val contentPane  = new BorderPanel
+    val glassPane    = new BorderPanel
     val createButton = new Button("Create")
 
-    contentPane.layout(createButton) = North
-
-    // GlassPane setup with BorderLayout
-    val glassPane = new BorderPanel
-    glassPane.visible = false // Initially invisible
+    glassPane.visible = true
+    glassPane.opaque = false
 
     // Panel to appear on glassPane with form fields
-    val formPanel: GridBagPanel = new GridBagPanel {
-      val c = new Constraints
+    val typeRoute: PairPanel[Component, Component] =
+      PairPanel(Label("Route Type"), ComboBox(Seq("Normale", "AV")))
+    val railsCount: PairPanel[Component, Component] =
+      PairPanel(Label("Rails Count"), TextField())
+    val departureStation: PairPanel[Component, Component] =
+      PairPanel(Label("Departure Station"), TextField())
+    val arrivalStation: PairPanel[Component, Component] =
+      PairPanel(Label("Arrival Station"), TextField())
 
-      c.fill = GridBagPanel.Fill.Horizontal
-      c.gridx = 0; c.gridy = 0
-      layout(new Label("Tipo di Tratta:")) = c
-
-      c.gridx = 1; c.gridy = 0
-      val trattaField = new ComboBox(Seq("Normale", "AV"))
-      layout(trattaField) = c
-
-      c.gridx = 0; c.gridy = 1
-      layout(new Label("Numero di Rotaie:")) = c
-
-      c.gridx = 1; c.gridy = 1
-      val rotaieField = new TextField(10)
-      layout(rotaieField) = c
-
-      c.gridx = 0; c.gridy = 2
-      layout(new Label("Stazione di Partenza:")) = c
-
-      c.gridx = 1; c.gridy = 2
-      val partenzaField = new TextField(10)
-      layout(partenzaField) = c
-
-      c.gridx = 0; c.gridy = 3
-      layout(new Label("Stazione di Arrivo:")) = c
-
-      c.gridx = 1; c.gridy = 3
-      val arrivoField = new TextField(10)
-      layout(arrivoField) = c
-
-      c.gridx = 0; c.gridy = 4; c.gridwidth = 2
-      layout(new Button("Submit") {
-        reactions += {
-          case ButtonClicked(_) =>
-            Dialog.showMessage(
-              parent = this,
-              message =
-                s"Tratta: ${trattaField.selection.item}, Rotaie: ${rotaieField.text}, Partenza: ${partenzaField.text}, Arrivo: ${arrivoField.text}",
-              title = "Form Data"
-            )
-        }
-      }) = c
-    }
-
-    glassPane.layout(formPanel) = Center
+    val formPanel: FormPanel[_] = FormPanel(Orientation.Vertical)(List(
+      typeRoute,
+      railsCount,
+      departureStation,
+      arrivalStation
+    ))
+    formPanel.visible = false
 
     // Create button action
     listenTo(createButton)
     reactions += {
       case ButtonClicked(`createButton`) =>
-        glassPane.visible = true
-        contentPane.visible = false
+        formPanel.visible = true
     }
 
-    contents = new BorderPanel {
-      layout(contentPane) = Center
-      layout(glassPane) = North // GlassPane appears above
-    }
+    contentPane.layout(createButton) = North
+    glassPane.layout(formPanel) = West
+
+    contents = contentPane
+    peer.setGlassPane(glassPane.peer)
+    peer.getGlassPane.setVisible(true)
