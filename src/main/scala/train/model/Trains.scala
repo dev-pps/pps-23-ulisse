@@ -23,7 +23,10 @@ object Trains:
     def name: String
     def maxSpeed: Int
 
-  case class Technology(name: String, maxSpeed: Int) extends TechnologyType
+  object TechnologyType:
+    def apply(name: String, maxSpeed: Int): TechnologyType = Technology(name: String, maxSpeed: Int)
+
+  private case class Technology(name: String, maxSpeed: Int) extends TechnologyType
 
   trait Train:
     val name: String
