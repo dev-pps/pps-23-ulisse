@@ -32,7 +32,7 @@ object Trains:
     TrainImpl(name, carriages, capacity, trainType)
 
   def makeRegionalTrain(name: String, carriages: Int, capacity: Int): Train =
-    TrainImpl(name, carriages, capacity, Normal)
+    makeTrain(name, Normal, carriages, capacity)
 
   def makeHighSpeedTrain(name: String, carriages: Int, capacity: Int): Train =
-    TrainImpl(name, carriages, capacity, HighSpeed)
+    makeTrain(name, HighSpeed, carriages, capacity)
