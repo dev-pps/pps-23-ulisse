@@ -4,6 +4,7 @@ import scala.swing.{FlowPanel, Label, TextField}
 
 trait FieldPanel:
   def setLabel(text: String): FieldPanel
+  def text: String
 
 object FieldPanel:
   def apply(text: String): FieldPanel = FieldPanelImpl(text)
@@ -17,3 +18,5 @@ object FieldPanel:
     contents += label
 
     override def setLabel(text: String): FieldPanel = FieldPanel(text)
+
+    override def text: String = field.text
