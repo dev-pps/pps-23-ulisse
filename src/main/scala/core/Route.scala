@@ -31,11 +31,12 @@ object Route:
     override def length: Double =
       Points.computePointsDistance(path._1._2, path._2._2)
 
-    override def has(id: Id): Boolean = this.id canEqual id
+    override def has(id: Id): Boolean =
+      (this.id._1 canEqual id._1) && (this.id._2 canEqual id._2)
 
     override def equals(obj: Any): Boolean =
       obj match
-        case that: Route => id canEqual that.id
+        case that: Route => has(that.id)
         case _           => false
 
     override def hashCode(): Int = id.hashCode()
