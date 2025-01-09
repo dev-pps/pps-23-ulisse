@@ -8,4 +8,4 @@ object RouteCreationPanel:
   def apply(): RouteCreationPanel = RouteCreationPanelImpl()
 
   private case class RouteCreationPanelImpl() extends BorderPanel,
-        RouteCreationPanel:
+        RouteCreationPanel
