@@ -1,22 +1,24 @@
-package main.scala.view
+package scala.view
 
 import scala.swing.*
 import scala.swing.BorderPanel.Position.*
 import scala.swing.event.*
 
-object MapView extends SimpleSwingApplication {
+trait MapView
 
-  def top: MainFrame = new MainFrame {
-    title = "Border Layout Example"
+object MapView:
+  def apply(): MapView = MapViewImpl()
 
-    // grandezza
+  private case class MapViewImpl() extends MainFrame, MapView:
+    title = "Map"
+    visible = true
     preferredSize = new Dimension(400, 300)
 
     // Main content pane with BorderLayout
     val contentPane  = new BorderPanel
     val createButton = new Button("Create")
 
-    contentPane.layout(createButton) = Center
+    contentPane.layout(createButton) = North
 
     // GlassPane setup with BorderLayout
     val glassPane = new BorderPanel
@@ -83,5 +85,3 @@ object MapView extends SimpleSwingApplication {
       layout(contentPane) = Center
       layout(glassPane) = North // GlassPane appears above
     }
-  }
-}
