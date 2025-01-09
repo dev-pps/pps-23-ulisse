@@ -28,7 +28,7 @@ class RouteBankTest extends AnyFlatSpec with Matchers:
       case Some(newRoute) => newRoute must be(route)
       case _              => fail("route is empty")
 
-  "save route with same id" should "change route" in:
+  "save route with same id" should "change route railsCount" in:
     val sameRoute    = Route(TypeRoute.Normal, 3, path)
     val newRouteBank = routeBank.save(sameRoute)
 
