@@ -1,7 +1,7 @@
 package scala.application
 
+import scala.collection.immutable.Map
 import scala.core.Route
-import scala.collection.immutable.{ArraySeq, List}
 import scala.core.Route.Id
 
 trait RouteBank:
@@ -11,18 +11,18 @@ trait RouteBank:
   def route(id: Id): Option[Route]
 
 object RouteBank:
-  def apply(routes: List[Route]): RouteBank = RouteBankImpl(routes)
-  def empty(): RouteBank                    = RouteBankImpl(List.empty[Route])
+  def apply(bank: Bank): RouteBank = RouteBankImpl(bank)
+  def fromList(routes: List[Route]): RouteBank =
+    RouteBankImpl(routes.map(route => (route.id, route)).toMap)
+  def empty(): RouteBank = RouteBankImpl(Map.empty)
 
-  opaque type Bank = List[Route]
+  opaque type Bank = Map[Id, Route]
 
   private case class RouteBankImpl(bank: Bank) extends RouteBank:
-    private val containsFunction: PartialFunction[Route, Bank] =
-      case x if contains(x) => bank
 
     override def save(route: Route): RouteBank =
-      RouteBank(containsFunction.applyOrElse(route, bank.appended))
+      RouteBank(bank + (route.id -> route))
 
-    override def contains(route: Route): Boolean = bank.contains(route)
+    override def route(id: Id): Option[Route] = bank.get(id)
 
-    override def route(id: Id): Option[Route] = bank.find(_ has id)
+    override def contains(route: Route): Boolean = bank.contains(route.id)

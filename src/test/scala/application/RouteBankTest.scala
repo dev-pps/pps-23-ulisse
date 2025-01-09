@@ -22,15 +22,23 @@ class RouteBankTest extends AnyFlatSpec with Matchers:
     newRouteBank.contains(route) must be(true)
 
   "read route" should "from id" in:
-    val routeBank = RouteBank(List(route))
+    val routeBank = RouteBank.fromList(List(route))
     val optRoute  = routeBank.route(route.id)
     optRoute match
       case Some(newRoute) => newRoute must be(route)
       case _              => fail("route is empty")
 
-  "save same route" should "not contains in routeBank" in:
+  "save route with same id" should "change route" in:
     val sameRoute    = Route(TypeRoute.Normal, 3, path)
-    val routeBank    = RouteBank(List(route))
+    val routeBank    = RouteBank.fromList(List(route))
     val newRouteBank = routeBank.save(sameRoute)
 
-//    newRouteBank.contains(sameRoute) must be(false)
+    val optRoute     = routeBank.route(route.id)
+    val optSameRoute = newRouteBank.route(sameRoute.id)
+
+    optRoute match
+      case Some(route) => optSameRoute match
+          case Some(sameRoute) =>
+            route.railsCount must not be sameRoute.railsCount
+          case None => fail("route is empty")
+      case None => fail("route is empty")
