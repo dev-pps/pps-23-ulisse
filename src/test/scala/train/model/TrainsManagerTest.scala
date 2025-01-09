@@ -14,7 +14,7 @@ class TrainsManagerTest extends AnyFlatSpec:
 
   "A TrainsManager" should "create new train given name, type, carriages and capacity" in:
     tm.createTrain(name, trainType, carriages, capacity)
-    val addedTrain = tm.listTrains.find(_.name == name)
+    val addedTrain = tm.listTrains.find(_.name.contentEquals(name))
     addedTrain.map(t =>
       t.name should be(name)
       t.trainType should be(trainType)
@@ -45,7 +45,7 @@ class TrainsManagerTest extends AnyFlatSpec:
       carriages = 1,
       capacity
     )
-    tm.listTrains.find(_.name == newTrainName).map(t =>
+    tm.listTrains.find(_.name.contentEquals(newTrainName)).map(t =>
       t.name should be(newTrainName)
       t.trainType should be(Trains.TrainType.HighSpeed)
       t.carriages should be(1)

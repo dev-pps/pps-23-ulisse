@@ -34,7 +34,7 @@ object TrainsManager:
 
   def delete(name: String): Unit =
     require(trainExist(name), s"train called '$name' not exist")
-    _trains = _trains.filterNot(t => t.name == name)
+    _trains = _trains.filterNot(_.name.contentEquals(name))
 
   def update(name: String)(
       trainType: TrainType,
