@@ -10,6 +10,8 @@ trait Route:
   def path: Path
   def length: Double
 
+  def has(id: Id): Boolean
+
 object Route:
   def apply(typeRoute: TypeRoute, railsCount: Int, path: Path): Route =
     RouteImpl((typeRoute, path), railsCount)
@@ -28,6 +30,8 @@ object Route:
 
     override def length: Double =
       Points.computePointsDistance(path._1._2, path._2._2)
+
+    override def has(id: Id): Boolean = this.id canEqual id
 
     override def equals(obj: Any): Boolean =
       obj match
