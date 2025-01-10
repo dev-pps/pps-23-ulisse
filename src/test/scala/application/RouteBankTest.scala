@@ -3,9 +3,9 @@ package application
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 
-import scala.core.Route
-import scala.core.Route.{Path, Station, TypeRoute}
-import scala.application.RouteBank
+import core.Route
+import core.Route.{Path, Station, TypeRoute}
+import application.RouteBank
 
 class RouteBankTest extends AnyFlatSpec with Matchers:
   val railsCount             = 1

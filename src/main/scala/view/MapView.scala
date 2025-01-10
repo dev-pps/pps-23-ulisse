@@ -2,13 +2,16 @@ package view
 
 import scala.swing.{
   BorderPanel,
+  BoxPanel,
   Button,
   ComboBox,
   Component,
   Dimension,
+  FlowPanel,
   Label,
   MainFrame,
   Orientation,
+  Panel,
   TextField
 }
 import scala.swing.BorderPanel.Position.*
@@ -32,33 +35,42 @@ object MapView:
     glassPane.visible = true
     glassPane.opaque = false
 
-    // Panel to appear on glassPane with form fields
-    val typeRoute: PairPanel[Component, Component] =
-      PairPanel(Label("Route Type"), ComboBox(Seq("Normale", "AV")))
-    val railsCount: PairPanel[Component, Component] =
-      PairPanel(Label("Rails Count"), TextField())
-    val departureStation: PairPanel[Component, Component] =
-      PairPanel(Label("Departure Station"), TextField())
-    val arrivalStation: PairPanel[Component, Component] =
-      PairPanel(Label("Arrival Station"), TextField())
+    given transparentPanel: Boolean = false
 
-    val formPanel: FormPanel[_] = FormPanel(Orientation.Vertical)(List(
-      typeRoute,
-      railsCount,
-      departureStation,
-      arrivalStation
-    ))
-    formPanel.visible = false
+    // Panel to appear on glassPane with form fields
+    val typeRoute: PairPanel[Panel, Component, Component] =
+      PairPanel(
+        WrapPanel.flow,
+        Label("Route Type"),
+        ComboBox(Seq("Normale", "AV"))
+      )
+    val railsCount: PairPanel[Panel, Component, Component] =
+      PairPanel(WrapPanel.flow, Label("Rails Count"), TextField())
+    val departureStation: PairPanel[Panel, Component, Component] =
+      PairPanel(WrapPanel.flow, Label("Departure Station"), TextField())
+    val arrivalStation: PairPanel[Panel, Component, Component] =
+      PairPanel(WrapPanel.flow, Label("Arrival Station"), TextField())
+
+    val formPanel: FormPanel[Panel, Panel, Component, Component] = FormPanel(
+      WrapPanel.box(Orientation.Vertical),
+      List(
+        typeRoute,
+        railsCount,
+        departureStation,
+        arrivalStation
+      )
+    )
+    formPanel.setVisible(false)
 
     // Create button action
     listenTo(createButton)
     reactions += {
       case ButtonClicked(`createButton`) =>
-        formPanel.visible = true
+        formPanel.setVisible(true)
     }
 
     contentPane.layout(createButton) = North
-    glassPane.layout(formPanel) = West
+    glassPane.layout(formPanel.panel) = West
 
     contents = contentPane
     peer.setGlassPane(glassPane.peer)
