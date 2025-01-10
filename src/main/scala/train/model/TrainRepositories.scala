@@ -3,7 +3,7 @@ package train.model
 import train.model.TrainRepositories.Errors.{TrainAlreadyExists, TrainNotExists}
 import train.model.Trains.Carriages.Carriage
 import train.model.Trains.{TechnologyType, Train}
-
+import scala.util.Either
 object TrainRepositories:
 
   /** @param description
@@ -74,17 +74,19 @@ object TrainRepositories:
 
     def add(train: Train): Either[Errors, Train] =
       findTrain(train.name) match
-        case Some(t) => Left(TrainAlreadyExists(t.name))
+        case Some(t) =>
+          Left[Errors.TrainAlreadyExists, Train](TrainAlreadyExists(t.name))
         case None =>
           _trains = train :: _trains
-          Right(train)
+          Right[Errors, Train](train)
 
     def remove(name: String): Either[Errors, List[Train]] =
       findTrain(name) match
-        case Some(t) =>
+        case Some(_) =>
           _trains = _trains.filterNot(_.name.contentEquals(name))
-          Right(_trains)
-        case None => Left(TrainNotExists(name))
+          Right[Errors, List[Train]](_trains)
+        case None =>
+          Left[Errors.TrainNotExists, List[Train]](TrainNotExists(name))
 
     def update(name: String)(
         technology: TechnologyType,
@@ -100,10 +102,15 @@ object TrainRepositories:
             carriageCount
           )
           remove(n) match
-            case Left(e)  => Left(TrainNotExists(s"$e during update call"))
+            case Left(e) => Left[Errors.TrainNotExists, Train](
+                TrainNotExists(s"$e during update call")
+              )
             case Right(_) => add(train)
-        case None => Left(Errors.TrainNotExists(name))
+        case None =>
+          Left[Errors.TrainNotExists, Train](Errors.TrainNotExists(name))
         case _ =>
-          Left(Errors.Unclassified("train not recognized in match case"))
+          Left[Errors.Unclassified, Train](
+            Errors.Unclassified("train not recognized in match case")
+          )
 
     def trains: List[Train] = _trains
