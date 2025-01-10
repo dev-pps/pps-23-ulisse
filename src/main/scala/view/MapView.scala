@@ -2,12 +2,10 @@ package view
 
 import scala.swing.{
   BorderPanel,
-  BoxPanel,
   Button,
   ComboBox,
   Component,
   Dimension,
-  FlowPanel,
   Label,
   MainFrame,
   Orientation,
@@ -35,7 +33,7 @@ object MapView:
     glassPane.visible = true
     glassPane.opaque = false
 
-    given transparentPanel: Boolean = false
+    given transparentPanel: Boolean = true
 
     // Panel to appear on glassPane with form fields
     val typeRoute: PairPanel[Panel, Component, Component] =
@@ -45,14 +43,14 @@ object MapView:
         ComboBox(Seq("Normale", "AV"))
       )
     val railsCount: PairPanel[Panel, Component, Component] =
-      PairPanel(WrapPanel.flow, Label("Rails Count"), TextField())
+      PairPanel(WrapPanel.flow, Label("Rails Count"), TextField(10))
     val departureStation: PairPanel[Panel, Component, Component] =
-      PairPanel(WrapPanel.flow, Label("Departure Station"), TextField())
+      PairPanel(WrapPanel.flow, Label("Departure Station"), TextField(10))
     val arrivalStation: PairPanel[Panel, Component, Component] =
-      PairPanel(WrapPanel.flow, Label("Arrival Station"), TextField())
+      PairPanel(WrapPanel.flow, Label("Arrival Station"), TextField(10))
 
     val formPanel: FormPanel[Panel, Panel, Component, Component] = FormPanel(
-      WrapPanel.box(Orientation.Vertical),
+      WrapPanel.border,
       List(
         typeRoute,
         railsCount,

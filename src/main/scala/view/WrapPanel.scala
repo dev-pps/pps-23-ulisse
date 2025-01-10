@@ -1,7 +1,13 @@
 package view
 
-import scala.collection.Seq
-import scala.swing.{BoxPanel, Component, FlowPanel, Label, Orientation, Panel}
+import scala.swing.{
+  BorderPanel,
+  BoxPanel,
+  Component,
+  FlowPanel,
+  Orientation,
+  Panel
+}
 
 trait WrapPanel[+P <: Panel]:
   def panel: P
@@ -19,6 +25,9 @@ object WrapPanel:
       opaque: Boolean
   ): WrapPanel[BoxPanel] =
     WrapPanel(BoxPanel(orientation))
+
+  def border(using opaque: Boolean): WrapPanel[BorderPanel] =
+    WrapPanel(BorderPanel())
 
   private case class WrapPanelImpl[+P <: Panel](panel: P, opaque: Boolean)
       extends WrapPanel[P]:

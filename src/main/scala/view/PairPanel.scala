@@ -1,6 +1,8 @@
 package view
 
-import scala.swing.{Component, FlowPanel, Panel}
+import java.awt.Color
+import javax.swing.BorderFactory
+import scala.swing.{Component, Dimension, Panel}
 
 trait PairPanel[+P <: Panel, +A <: Component, +B <: Component]
     extends WrapPanel[P]
@@ -23,7 +25,6 @@ object PairPanel:
   ) extends PairPanel[P, A, B]:
     mainPanel.addComponent(first)
     mainPanel.addComponent(second)
+    mainPanel.panel.maximumSize = new Dimension(400, 40)
 
     export mainPanel.panel, mainPanel.addComponent, mainPanel.setVisible
-
-//    panel.contents += Seq(first, second)
