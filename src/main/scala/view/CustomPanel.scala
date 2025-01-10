@@ -6,7 +6,7 @@ trait CustomPanel[P <: Panel]
 
 object CustomPanel:
 
-  def apply[P <: Panel](panel: P, opaque: Boolean): CustomPanel[P] =
+  def apply[P <: Panel](panel: P)(using opaque: Boolean): CustomPanel[P] =
     CustomPanelImpl(panel, opaque)
 
   private case class CustomPanelImpl[P <: Panel](panel: P, opaque: Boolean)
