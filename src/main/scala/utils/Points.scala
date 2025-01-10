@@ -1,4 +1,4 @@
-package scala.utils
+package utils
 
 import scala.math.{pow, sqrt}
 
