@@ -13,6 +13,7 @@ trait WrapPanel[+P <: Panel]:
   def panel: P
   def setVisible(visible: Boolean): Unit
   def addComponent(component: Component): Unit
+  def visible: Boolean
 
 object WrapPanel:
 
@@ -37,6 +38,8 @@ object WrapPanel:
 
     override def addComponent(component: Component): Unit =
       panel.peer.add(component.peer)
+
+    override def visible: Boolean = panel.visible
 
 //  private case class Wrap[+P <: Panel](panel: P):
 //    export panel.{contents, visible}

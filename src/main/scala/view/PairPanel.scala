@@ -27,4 +27,4 @@ object PairPanel:
     mainPanel.addComponent(second)
     mainPanel.panel.maximumSize = new Dimension(400, 40)
 
-    export mainPanel.panel, mainPanel.addComponent, mainPanel.setVisible
+    export mainPanel.*
