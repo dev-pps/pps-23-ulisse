@@ -11,7 +11,9 @@ scalafmtOnCompile := true
 coverageEnabled := true
 
 wartremoverErrors ++= Warts.unsafe
-
+wartremoverErrors --= Seq(
+  Wart.ImplicitConversion
+)
 wartremoverWarnings ++= Warts.all
 wartremoverWarnings --= Seq(
   Wart.Nothing
