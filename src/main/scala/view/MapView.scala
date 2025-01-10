@@ -1,26 +1,16 @@
 package view
 
-import scala.swing.{
-  BorderPanel,
-  Button,
-  ComboBox,
-  Component,
-  Dimension,
-  Label,
-  MainFrame,
-  Orientation,
-  Panel,
-  TextField
-}
 import scala.swing.BorderPanel.Position.*
 import scala.swing.event.*
+import scala.swing.*
 
 trait MapView
 
 object MapView:
-  def apply(): MapView = MapViewImpl()
+  def apply(listener: ListenerAdapter): MapView = MapViewImpl(listener)
 
-  private case class MapViewImpl() extends MainFrame, MapView:
+  private case class MapViewImpl(listener: ListenerAdapter) extends MainFrame,
+        MapView:
     title = "Map"
     visible = true
     preferredSize = new Dimension(800, 800)
@@ -65,6 +55,10 @@ object MapView:
     reactions += {
       case ButtonClicked(`createButton`) =>
         formPanel.setVisible(!formPanel.visible)
+    }
+
+    formPanel.buttonForm().reactions += {
+      case event.ButtonClicked(_) => println("Il bottone è stato cliccato!")
     }
 
     contentPane.layout(createButton) = North

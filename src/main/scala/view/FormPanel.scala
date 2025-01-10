@@ -8,7 +8,8 @@ trait FormPanel[
     +P <: Panel,
     +A <: Component,
     +B <: Component
-] extends WrapPanel[MP]
+] extends WrapPanel[MP]:
+  def buttonForm(): Button
 
 object FormPanel:
 
@@ -39,8 +40,9 @@ object FormPanel:
     boxPanel.contents ++= pairPanels.map(_.panel)
     boxPanel.contents += Swing.Glue
 
-//    mainPanel.panel.layout(Label("Creation Form")) = North
     mainPanel.panel.layout(boxPanel) = Center
     mainPanel.panel.layout(submit) = South
 
     export mainPanel.*
+
+    override def buttonForm(): Button = submit
