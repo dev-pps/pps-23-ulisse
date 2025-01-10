@@ -1,6 +1,16 @@
 package scala.view
 
-import scala.swing.{Panel, *}
+import scala.swing.{
+  BorderPanel,
+  Button,
+  ComboBox,
+  Component,
+  Dimension,
+  Label,
+  MainFrame,
+  Orientation,
+  TextField
+}
 import scala.swing.BorderPanel.Position.*
 import scala.swing.event.*
 

@@ -14,5 +14,6 @@ object PairPanel:
       first: A,
       second: B
   ) extends FlowPanel, PairPanel[A, B]:
+    this.opaque = false
     contents += first
     contents += second
