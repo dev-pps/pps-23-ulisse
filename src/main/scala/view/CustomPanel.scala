@@ -1,10 +1,14 @@
-package scala.view
+package view
 
-import scala.swing.Panel
+import scala.swing.{FlowPanel, Panel}
 
 trait CustomPanel[P <: Panel]
 
 object CustomPanel:
+
+  given transparentPanel: Boolean = false
+
+  val p = CustomPanel(FlowPanel())
 
   def apply[P <: Panel](panel: P)(using opaque: Boolean): CustomPanel[P] =
     CustomPanelImpl(panel, opaque)

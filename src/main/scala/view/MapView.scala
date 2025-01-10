@@ -1,4 +1,4 @@
-package scala.view
+package view
 
 import scala.swing.{
   BorderPanel,

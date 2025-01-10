@@ -1,7 +1,7 @@
-package scala.core
+package core
 
-import scala.core.Route.{Id, Path, TypeRoute}
-import scala.utils.Points
+import core.Route.{Id, Path, TypeRoute}
+import utils.Points
 
 trait Route:
   def id: Id
