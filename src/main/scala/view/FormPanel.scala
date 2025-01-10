@@ -43,4 +43,4 @@ object FormPanel:
     mainPanel.panel.layout(boxPanel) = Center
     mainPanel.panel.layout(submit) = South
 
-    export mainPanel.panel, mainPanel.addComponent, mainPanel.setVisible
+    export mainPanel.*

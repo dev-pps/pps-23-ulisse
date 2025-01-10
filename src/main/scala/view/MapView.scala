@@ -64,7 +64,7 @@ object MapView:
     listenTo(createButton)
     reactions += {
       case ButtonClicked(`createButton`) =>
-        formPanel.setVisible(true)
+        formPanel.setVisible(!formPanel.visible)
     }
 
     contentPane.layout(createButton) = North
