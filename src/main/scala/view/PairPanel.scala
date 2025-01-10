@@ -2,18 +2,28 @@ package view
 
 import scala.swing.{Component, FlowPanel, Panel}
 
-trait PairPanel[A <: Component, B <: Component] extends Panel
+trait PairPanel[+P <: Panel, +A <: Component, +B <: Component]
+    extends WrapPanel[P]
 
 object PairPanel:
-  def apply[A <: Component, B <: Component](
+  def apply[P <: Panel, A <: Component, B <: Component](
+      panel: WrapPanel[P],
       first: A,
       second: B
-  ): PairPanel[A, B] = PairPanelImpl(first, second)
+  ): PairPanel[P, A, B] = PairPanelImpl(panel, first, second)
 
-  private case class PairPanelImpl[A <: Component, B <: Component](
+  private case class PairPanelImpl[
+      +P <: Panel,
+      +A <: Component,
+      +B <: Component
+  ](
+      mainPanel: WrapPanel[P],
       first: A,
       second: B
-  ) extends FlowPanel, PairPanel[A, B]:
-    this.opaque = false
-    contents += first
-    contents += second
+  ) extends PairPanel[P, A, B]:
+    mainPanel.addComponent(first)
+    mainPanel.addComponent(second)
+
+    export mainPanel.panel, mainPanel.addComponent, mainPanel.setVisible
+
+//    panel.contents += Seq(first, second)
