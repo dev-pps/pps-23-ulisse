@@ -10,8 +10,14 @@ hooks := {
 scalafmtOnCompile := true
 coverageEnabled := true
 
+wartremoverWarnings ++= Warts.all
+wartremoverWarnings --= Seq(
+  Wart.ImplicitConversion
+)
+
 wartremoverErrors ++= Warts.unsafe
 wartremoverErrors --= Seq(
+  Wart.DefaultArguments,
   Wart.ImplicitConversion
 )
 wartremoverWarnings ++= Warts.all
@@ -24,11 +30,12 @@ lazy val root = (project in file("."))
     name := "pps-23-ulisse",
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
-      "org.scalatest" %% "scalatest" % "3.2.19" % Test,
-      "io.cucumber" %% "cucumber-scala" % "8.25.1" % Test,
-      "com.tngtech.archunit" % "archunit" % "1.3.0" % Test,
       "org.typelevel" %% "cats-core" % "2.12.0",
       "org.scalatestplus" %% "mockito-5-10" % "3.2.18.0" % Test,
+      "org.scala-lang.modules" %% "scala-swing"    % "3.0.0",
+      "org.scalatest"          %% "scalatest"      % "3.2.19" % Test,
+      "io.cucumber"            %% "cucumber-scala" % "8.25.1" % Test,
+      "com.tngtech.archunit"    % "archunit"       % "1.3.0"  % Test
     ),
     Global / onLoad ~= (_ andThen ("hooks" :: _)),
   )
