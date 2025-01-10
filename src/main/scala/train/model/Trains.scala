@@ -48,6 +48,9 @@ object Trains:
     ): Train =
       TrainImpl(name, techType, carriage, carriageCount)
 
+    def unapply(train: Train): Option[(String, TechnologyType, Carriage, Int)] =
+      Some(train.name, train.techType, train.carriage, train.carriageCount)
+
   private class TrainImpl(
       val name: String,
       val techType: TechnologyType,
