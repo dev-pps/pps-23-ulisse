@@ -1,20 +1,19 @@
 package view
 
-import scala.swing.{FlowPanel, Panel}
+import scala.swing.Panel
 
-trait CustomPanel[P <: Panel]
+trait WrapPanel[P <: Panel]:
+  def panel: P
 
-object CustomPanel:
+object WrapPanel:
+
+  def apply[P <: Panel](panel: P)(using opaque: Boolean): WrapPanel[P] =
+    WrapPanelImpl(panel, opaque)
 
   given transparentPanel: Boolean = false
 
-  val p = CustomPanel(FlowPanel())
-
-  def apply[P <: Panel](panel: P)(using opaque: Boolean): CustomPanel[P] =
-    CustomPanelImpl(panel, opaque)
-
-  private case class CustomPanelImpl[P <: Panel](panel: P, opaque: Boolean)
-      extends CustomPanel[P]:
+  private case class WrapPanelImpl[P <: Panel](panel: P, opaque: Boolean)
+      extends WrapPanel[P]:
     panel.opaque = opaque
 
 //  abstract class Flow(using opaque: Boolean) extends CustomPanel[FlowPanel]
