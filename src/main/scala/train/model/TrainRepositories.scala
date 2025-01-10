@@ -61,6 +61,11 @@ object TrainRepositories:
       */
     def trains: List[Train]
 
+  /** Companion object of the trait `TrainRepository`.
+    *
+    * @see
+    *   [[TrainRepository]] for more detailed behaviour definition.
+    */
   object TrainRepository:
     private var _trains: List[Train] = List.empty
 
