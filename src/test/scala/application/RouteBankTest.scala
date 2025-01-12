@@ -3,8 +3,8 @@ package application
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 
-import core.Route
-import core.Route.{Path, Station, TypeRoute}
+import entities.Route
+import entities.Route.{Path, Station, TypeRoute}
 import application.RouteBank
 
 class RouteBankTest extends AnyFlatSpec with Matchers:

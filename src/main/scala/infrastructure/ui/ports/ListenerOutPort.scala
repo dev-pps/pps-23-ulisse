@@ -1,17 +1,17 @@
-package view
+package infrastructure.ui.ports
 
 import application.RouteBank
 
-trait ListenerAdapter:
+trait ListenerOutPort:
   def onSubmit(values: List[String]): Unit
 
-object ListenerAdapter:
+object ListenerOutPort:
 
-  def apply(routeBank: RouteBank): ListenerAdapter =
-    ListenerAdapterImpl(routeBank)
+  def apply(routeBank: RouteBank): ListenerOutPort =
+    ListenerOutPortImpl(routeBank)
 
-  private case class ListenerAdapterImpl(routeBank: RouteBank)
-      extends ListenerAdapter:
+  private case class ListenerOutPortImpl(routeBank: RouteBank)
+      extends ListenerOutPort:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var bank: RouteBank = routeBank
 

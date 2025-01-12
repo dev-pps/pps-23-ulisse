@@ -1,4 +1,4 @@
-package scala.view
+package infrastructure.ui
 
 import scala.swing.BorderPanel
 
