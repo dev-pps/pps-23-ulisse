@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/scala/infrastructure/ui/PairPanel.scala
-package infrastructure.ui
-========
 package infrastructures.ui
->>>>>>>> 87a158c (refactor: create hexagonal hierarchy packages):src/main/scala/infrastructures/ui/PairPanel.scala
 
 import java.awt.Color
 import javax.swing.BorderFactory
