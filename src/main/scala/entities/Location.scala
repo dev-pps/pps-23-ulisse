@@ -2,6 +2,7 @@ package entities
 
 sealed trait Location
 
+/** Factory for [[Location]] instances. */
 object Location:
 
   /** Represents a location in the form of latitude and longitude. */
