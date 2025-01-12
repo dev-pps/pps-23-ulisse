@@ -1,7 +1,6 @@
 package entities
 
 import entities.Location
-import org.scalatest.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
