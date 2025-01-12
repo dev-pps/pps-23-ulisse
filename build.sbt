@@ -13,14 +13,11 @@ coverageEnabled := true
 wartremoverWarnings ++= Warts.all
 wartremoverWarnings --= Seq(
   Wart.ImplicitParameter,
+  Wart.Nothing
 )
 
 wartremoverErrors ++= Warts.unsafe
 wartremoverErrors --= Seq(
-)
-wartremoverWarnings ++= Warts.all
-wartremoverWarnings --= Seq(
-  Wart.Nothing
 )
 
 lazy val root = (project in file("."))

@@ -1,6 +1,6 @@
-package infrastructure.ui.ports
+package infrastructures.ui.ports
 
-import application.RouteBank
+import applications.RouteBank
 
 trait ListenerOutPort:
   def onSubmit(values: List[String]): Unit
