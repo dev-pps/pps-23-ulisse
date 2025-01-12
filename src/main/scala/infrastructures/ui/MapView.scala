@@ -1,10 +1,4 @@
-<<<<<<<< HEAD:src/main/scala/infrastructure/ui/MapView.scala
-package infrastructure.ui
-
-import infrastructure.ui.ports.ListenerOutPort
-========
 package infrastructures.ui
->>>>>>>> 87a158c (refactor: create hexagonal hierarchy packages):src/main/scala/infrastructures/ui/MapView.scala
 
 import infrastructures.ui.ports.ListenerOutPort
 import scala.swing.BorderPanel.Position.*
