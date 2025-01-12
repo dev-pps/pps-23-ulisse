@@ -2,7 +2,8 @@ package view
 
 import application.RouteBank
 
-trait ListenerAdapter
+trait ListenerAdapter:
+  def onSubmit(values: List[String]): Unit
 
 object ListenerAdapter:
 
@@ -10,4 +11,8 @@ object ListenerAdapter:
     ListenerAdapterImpl(routeBank)
 
   private case class ListenerAdapterImpl(routeBank: RouteBank)
-      extends ListenerAdapter
+      extends ListenerAdapter:
+    private var bank: RouteBank = routeBank
+
+    override def onSubmit(values: List[String]): Unit = println("submit")
+//      bank.save(Route(values(0), values(1), values(2)))

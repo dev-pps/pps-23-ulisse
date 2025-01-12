@@ -58,7 +58,7 @@ object MapView:
     }
 
     formPanel.buttonForm().reactions += {
-      case event.ButtonClicked(_) => println("Il bottone è stato cliccato!")
+      case event.ButtonClicked(_) => listener.onSubmit(formPanel.form())
     }
 
     contentPane.layout(createButton) = North
