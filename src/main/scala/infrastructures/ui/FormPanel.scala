@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/scala/infrastructure/ui/FormPanel.scala
 package infrastructure.ui
+========
+package infrastructures.ui
+>>>>>>>> 87a158c (refactor: create hexagonal hierarchy packages):src/main/scala/infrastructures/ui/FormPanel.scala
 
 import scala.swing.*
 import scala.swing.BorderPanel.Position.{Center, North, South}
