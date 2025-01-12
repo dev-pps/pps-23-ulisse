@@ -60,15 +60,22 @@ object Station:
       location: L,
       numberOfTrack: Int
   ) extends Station[L]
-//
-///** Defines a Selectable Object. */
-//trait Selectable:
-//  val selected: Boolean
-//
 
-//
-//final case class SelectableStation[L <: Location](
-//    station: Station[L],
-//    selected: Boolean
-//) extends Station[L] with Selectable:
-//  export station.*
+/** Defines a Selectable Object. */
+trait Selectable:
+  val selected: Boolean
+
+/** Represents a selectable station.
+  *
+  * @param station
+  *   the station instance of type `Station[L]` to be wrapped
+  * @param selected
+  *   a boolean flag indicating whether the station is selected
+  * @tparam L
+  *   The type of the location associated with the station.
+  */
+final case class SelectableStation[L <: Location](
+    station: Station[L],
+    selected: Boolean
+) extends Station[L] with Selectable:
+  export station.*

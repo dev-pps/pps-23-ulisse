@@ -11,10 +11,11 @@ scalafmtOnCompile := true
 coverageEnabled := true
 
 wartremoverErrors ++= Warts.unsafe
-wartremoverErrors --= Seq(
-  Wart.DefaultArguments,
-)
+
 wartremoverWarnings ++= Warts.all
+wartremoverWarnings --= Seq(
+  Wart.Nothing
+)
 
 lazy val root = (project in file("."))
   .settings(
