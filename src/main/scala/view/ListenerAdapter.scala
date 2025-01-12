@@ -12,6 +12,7 @@ object ListenerAdapter:
 
   private case class ListenerAdapterImpl(routeBank: RouteBank)
       extends ListenerAdapter:
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var bank: RouteBank = routeBank
 
     override def onSubmit(values: List[String]): Unit = println("submit")
