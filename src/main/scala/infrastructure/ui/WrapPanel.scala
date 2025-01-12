@@ -1,4 +1,4 @@
-package view
+package infrastructure.ui
 
 import scala.swing.{
   BorderPanel,

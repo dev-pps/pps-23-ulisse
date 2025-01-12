@@ -1,10 +1,10 @@
-package core
+package entities
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 
-import core.Route
-import core.Route.{Path, Station, TypeRoute}
+import entities.Route
+import entities.Route.{Path, Station, TypeRoute}
 import utils.Points
 
 class RouteTest extends AnyFlatSpec with Matchers:

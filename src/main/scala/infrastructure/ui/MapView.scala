@@ -1,4 +1,6 @@
-package view
+package infrastructure.ui
+
+import infrastructure.ui.ports.ListenerOutPort
 
 import scala.swing.BorderPanel.Position.*
 import scala.swing.event.*
@@ -7,9 +9,9 @@ import scala.swing.*
 trait MapView
 
 object MapView:
-  def apply(listener: ListenerAdapter): MapView = MapViewImpl(listener)
+  def apply(listener: ListenerOutPort): MapView = MapViewImpl(listener)
 
-  private case class MapViewImpl(listener: ListenerAdapter) extends MainFrame,
+  private case class MapViewImpl(listener: ListenerOutPort) extends MainFrame,
         MapView:
     title = "Map"
     visible = true

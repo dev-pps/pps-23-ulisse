@@ -1,8 +1,8 @@
 package application
 
 import scala.collection.immutable.Map
-import core.Route
-import core.Route.Id
+import entities.Route
+import entities.Route.Id
 
 trait RouteBank:
   def size: Int

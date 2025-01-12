@@ -1,6 +1,6 @@
-package core
+package entities
 
-import core.Route.{Id, Path, TypeRoute}
+import entities.Route.{Id, Path, TypeRoute}
 import utils.Points
 
 trait Route:
