@@ -5,7 +5,9 @@ import javax.swing.BorderFactory
 import scala.swing.{Component, Dimension, Panel}
 
 trait PairPanel[+P <: Panel, +A <: Component, +B <: Component]
-    extends WrapPanel[P]
+    extends WrapPanel[P]:
+  def key: String
+  def value: String
 
 object PairPanel:
   def apply[P <: Panel, A <: Component, B <: Component](
@@ -28,3 +30,7 @@ object PairPanel:
     mainPanel.panel.maximumSize = new Dimension(400, 40)
 
     export mainPanel.*
+
+    override def key: String = first.toString
+
+    override def value: String = second.toString

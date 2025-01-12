@@ -10,6 +10,7 @@ trait FormPanel[
     +B <: Component
 ] extends WrapPanel[MP]:
   def buttonForm(): Button
+  def form(): List[String]
 
 object FormPanel:
 
@@ -46,3 +47,5 @@ object FormPanel:
     export mainPanel.*
 
     override def buttonForm(): Button = submit
+
+    override def form(): List[String] = pairPanels.map(_.value)
