@@ -1,37 +1,71 @@
-//package entities.station
-//
-//import entities.Location
-//import Location.*
-//
-///** Defines a Station. */
-//trait Station[L <: Location]:
-//  /** The name of the station. Must not be empty or blank. */
-//  val name: String
-//  require(!name.isBlank, "name must not be empty or blank")
-//  val location: L
-//
-//  /** The number of tracks of the station. Must be greater than 0. */
-//  val numberOfTrack: Int
-//  require(numberOfTrack > 0, "numberOfTrack must be greater than 0")
-//
-///** Factory for [[Station]] instances. */
-//object Station:
-//  def apply[L <: Location](
-//      name: String,
-//      location: L,
-//      numberOfTrack: Int
-//  ): Station[L] =
-//    StationImpl(name, location, numberOfTrack)
+package entities.station
+
+import entities.Location
+
+/** Defines a Station.
+  *
+  * A Station represents a location with tracks and associated metadata.
+  *
+  * **Requirements**:
+  *   - The `name` must not be empty or blank.
+  *   - The `numberOfTrack` must be greater than 0.
+  *
+  * @tparam L
+  *   The type of the location associated with the station.
+  */
+trait Station[L <: Location]:
+  val name: String
+  val location: L
+  val numberOfTrack: Int
+
+/** Factory for [[Station]] instances. */
+object Station:
+
+  /** Represents errors that can occur during station creation. */
+  enum Error:
+    case InvalidName, InvalidNumberOfTrack
+
+  private def validateName(value: String, error: Error): Either[Error, String] =
+    Either.cond(!value.isBlank, value, error)
+  private def validateNumberOfTrack(
+      value: Int,
+      error: Error
+  ): Either[Error, Int] =
+    Either.cond(value > 0, value, error)
+
+  /** Creates a `Station` instance with validation.
+    *
+    * @param name
+    *   The name of the station. Must not be empty or blank.
+    * @param location
+    *   The location of the station.
+    * @param numberOfTrack
+    *   The number of tracks. Must be greater than 0.
+    * @return
+    *   Either a `Station` instance or an `Error` indicating the issue.
+    */
+  def apply[L <: Location](
+      name: String,
+      location: L,
+      numberOfTrack: Int
+  ): Either[Error, Station[L]] =
+    for
+      validName <- validateName(name, Error.InvalidName)
+      validNumberOfTrack <-
+        validateNumberOfTrack(numberOfTrack, Error.InvalidNumberOfTrack)
+    yield StationImpl(validName, location, validNumberOfTrack)
+
+  private final case class StationImpl[L <: Location](
+      name: String,
+      location: L,
+      numberOfTrack: Int
+  ) extends Station[L]
 //
 ///** Defines a Selectable Object. */
 //trait Selectable:
 //  val selected: Boolean
 //
-//final case class StationImpl[L <: Location](
-//    name: String,
-//    location: L,
-//    numberOfTrack: Int
-//) extends Station[L]
+
 //
 //final case class SelectableStation[L <: Location](
 //    station: Station[L],
