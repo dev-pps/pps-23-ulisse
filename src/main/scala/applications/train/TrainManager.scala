@@ -110,7 +110,9 @@ object TrainManager:
     def apply(): TrainModel = DefaultModel()
 
   private class DefaultModel extends TrainModel:
-    private var _trains: List[Train]                   = List.empty
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
+    private var _trains: List[Train] = List.empty
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _technologies: Map[String, Technology] = Map.empty
 
     private def findTrain(name: String): Option[Train] =
