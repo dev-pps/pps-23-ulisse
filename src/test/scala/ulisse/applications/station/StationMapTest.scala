@@ -9,45 +9,68 @@ import ulisse.entities.station.Station
 
 class StationMapTest extends AnyWordSpec with Matchers:
 
-  val stations: List[Station[Grid]] = (for
-    station1 <-
-      Location.createGrid(0, 0).flatMap(Station("StationA", _, 1)).toOption
-    station2 <-
-      Location.createGrid(1, 1).flatMap(Station("StationB", _, 1)).toOption
-    station3 <-
-      Location.createGrid(2, 2).flatMap(Station("StationC", _, 1)).toOption
-  yield List(station1, station2, station3)).fold(List.empty)(identity)
-
-  "Station list correct initialization" in:
-    stations.size shouldBe 3
-
   "A StationMap" when:
-    "created with unique station names and locations" should:
-      "be created successfully" in:
-        StationMap[Grid, List[Station[Grid]]](stations) shouldBe a[Right[_, _]]
+    "created" should:
+      "be empty" in:
+        StationMap[Grid]().stations shouldBe empty
 
-    "created with duplicate station names" should:
-      "not be created successfully" in:
-        val newStations = Location.createGrid(3, 3).flatMap(Station(
-          "StationA",
-          _,
-          1
-        )).toOption.map(_ +: stations).fold(stations)(identity)
-        newStations.size shouldBe stations.size + 1
-        StationMap[Grid, List[Station[Grid]]](newStations) shouldBe a[Left[
-          _,
-          _
-        ]]
+    "a new station is added" should:
+      "contain the new station" in:
+        Location.createGrid(0, 0).flatMap(
+          Station("StationA", _, 1)
+        ).toOption match
+          case Some(value) =>
+            StationMap[Grid]().addStation(value).map(_.stations) match
+              case Right(stations) => stations should contain only value
+              case Left(_)         => fail()
+          case None => fail()
 
-    "created with duplicate station locations" should:
-      "not be created successfully" in:
-        val newStations = Location.createGrid(2, 2).flatMap(Station(
-          "StationD",
-          _,
-          1
-        )).toOption.map(_ +: stations).fold(stations)(identity)
-        newStations.size shouldBe stations.size + 1
-        StationMap[Grid, List[Station[Grid]]](newStations) shouldBe a[Left[
-          _,
-          _
-        ]]
+    "another station with same name is added" should:
+      "not be added and returns error" in:
+        val station1 =
+          Location.createGrid(0, 0).flatMap(Station("StationA", _, 1)).toOption
+        val station2 =
+          Location.createGrid(1, 1).flatMap(Station("StationA", _, 1)).toOption
+        (station1, station2) match
+          case (Some(s1), Some(s2)) =>
+            StationMap[Grid]().addStation(s1).flatMap(
+              _.addStation(s2)
+            ) shouldBe Left(StationMap.Error.DuplicateStationName)
+          case (_, _) => fail()
+
+    "another station with same location is added" should:
+      "not be added and returns error" in:
+        val station1 =
+          Location.createGrid(0, 0).flatMap(Station("StationA", _, 1)).toOption
+        val station2 =
+          Location.createGrid(0, 0).flatMap(Station("StationB", _, 1)).toOption
+        (station1, station2) match
+          case (Some(s1), Some(s2)) =>
+            StationMap[Grid]().addStation(s1).flatMap(
+              _.addStation(s2)
+            ) shouldBe Left(StationMap.Error.DuplicateStationLocation)
+          case (_, _) => fail()
+
+    "existing station is removed" should:
+      "no longer be present" in:
+        Location.createGrid(0, 0).flatMap(
+          Station("StationA", _, 1)
+        ).toOption match
+          case Some(value) =>
+            StationMap[Grid]().addStation(value).flatMap(
+              _.removeStation(value)
+            ).map(_.stations) match
+              case Right(stations) => stations should not contain value
+              case Left(_)         => fail()
+          case None => fail()
+
+    "non-existing station is removed" should:
+      "return error" in:
+        Location.createGrid(0, 0).flatMap(
+          Station("StationA", _, 1)
+        ).toOption match
+          case Some(value) =>
+            StationMap[Grid]().removeStation(value) shouldBe Left(
+              StationMap.Error.StationNotFound
+            )
+          case None => fail()
