@@ -1,13 +1,13 @@
 package train.model
 
-import train.model.TrainModels.Errors.{TrainAlreadyExists, TrainNotExists}
+import train.model.TrainManager.Errors.{TrainAlreadyExists, TrainNotExists}
 import train.model.domain.Trains.Train
-import train.model.domain.Wagons.Wagon
+import train.model.domain.Wagons.{UseType, Wagon}
 import train.model.domain.Technology
 
 import scala.util.Either
 
-object TrainModels:
+object TrainManager:
 
   /** @param description
     *   Error description
@@ -87,7 +87,15 @@ object TrainModels:
       */
     def trains: List[Train]
 
+    /** @return
+      *   Returns list of train technologies
+      */
     def technologies: List[Technology]
+
+    /** @return
+      *   Returns List of wagons [[UseType]]
+      */
+    def wagonTypes: List[UseType]
 
   /** Companion object of the trait `TrainModel`.
     *
@@ -95,13 +103,17 @@ object TrainModels:
     *   [[TrainModel]] for more detailed behaviour definition.
     */
   object TrainModel:
+
+    def apply(): TrainModel = DefaultModel()
+
+  private class DefaultModel extends TrainModel:
     private var _trains: List[Train]                   = List.empty
     private var _technologies: Map[String, Technology] = Map.empty
 
     private def findTrain(name: String): Option[Train] =
       _trains.find(_.name.contentEquals(name))
 
-    def add(train: Train): Either[Errors, Train] =
+    override def add(train: Train): Either[Errors, Train] =
       findTrain(train.name) match
         case Some(t) =>
           Left[Errors.TrainAlreadyExists, Train](TrainAlreadyExists(t.name))
@@ -110,7 +122,8 @@ object TrainModels:
           _trains = train :: _trains
           Right[Errors, Train](train)
 
-    def addTechnology(technology: Technology): Either[Errors, Technology] =
+    override def addTechnology(technology: Technology)
+        : Either[Errors, Technology] =
       import Errors.TechnologyAlreadyExists
       _technologies.get(technology.name) match
         case Some(t) =>
@@ -121,7 +134,7 @@ object TrainModels:
           _technologies = _technologies.updated(technology.name, technology)
           Right[Errors, Technology](technology)
 
-    def remove(name: String): Either[Errors, List[Train]] =
+    override def remove(name: String): Either[Errors, List[Train]] =
       findTrain(name) match
         case Some(_) =>
           _trains = _trains.filterNot(_.name.contentEquals(name))
@@ -129,7 +142,8 @@ object TrainModels:
         case None =>
           Left[Errors.TrainNotExists, List[Train]](TrainNotExists(name))
 
-    def removeTechnology(name: String): Either[Errors, List[Technology]] =
+    override def removeTechnology(name: String)
+        : Either[Errors, List[Technology]] =
       import Errors.TechnologyNotExists
       _technologies.get(name) match
         case Some(t) =>
@@ -137,7 +151,7 @@ object TrainModels:
           Right[Errors, List[Technology]](technologies)
         case None => Left[Errors, List[Technology]](TechnologyNotExists(name))
 
-    def update(name: String)(
+    override def update(name: String)(
         technology: Technology,
         wagon: Wagon,
         wagonCount: Int
@@ -162,5 +176,6 @@ object TrainModels:
             Errors.Unclassified("train not recognized in match case")
           )
 
-    def trains: List[Train]            = _trains
-    def technologies: List[Technology] = _technologies.values.toList
+    override def trains: List[Train]            = _trains
+    override def technologies: List[Technology] = _technologies.values.toList
+    override def wagonTypes: List[UseType]      = UseType.values.toList

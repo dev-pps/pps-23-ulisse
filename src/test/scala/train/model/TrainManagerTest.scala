@@ -5,14 +5,14 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
-import train.model.TrainModels.Errors
-import train.model.TrainModels.Errors.TechnologyAlreadyExists
+import train.model.TrainManager.Errors
+import train.model.TrainManager.Errors.TechnologyAlreadyExists
 import train.model.domain.{Trains, Wagons}
 import train.model.domain.Wagons.UseType
 import train.model.domain.Technology
 import train.model.domain.Trains.Train
 
-class TrainModelTest extends AnyFeatureSpec with GivenWhenThen:
+class TrainManagerTest extends AnyFeatureSpec with GivenWhenThen:
 
   info("As Ulisse simulator user")
   info(
@@ -30,9 +30,9 @@ class TrainModelTest extends AnyFeatureSpec with GivenWhenThen:
     )
     Scenario("Fill all train fields and save edits"):
       Given("that there are no train saved")
-      val trainRepo = TrainModels.TrainModel
+      val model = TrainManager.TrainModel()
       When("I fill all fields and I click add button")
-      val res = trainRepo.add(train)
+      val res = model.add(train)
       Then("the train should be saved")
       res match
         case Right(Train(n, _, _, _)) => assert(n.contentEquals("FR-200"))
@@ -41,7 +41,7 @@ class TrainModelTest extends AnyFeatureSpec with GivenWhenThen:
 
     Scenario("Fill name fields with an already existing train name"):
       Given("that there is one train saved")
-      val model = TrainModels.TrainModel
+      val model = TrainManager.TrainModel()
       model.add(train)
       When("I click add button")
       val sameNameTrain = Trains.Train(
@@ -60,7 +60,7 @@ class TrainModelTest extends AnyFeatureSpec with GivenWhenThen:
 
     Scenario("Update train information"):
       Given("that there is train we wants update")
-      val model = TrainModels.TrainModel
+      val model = TrainManager.TrainModel()
       model.add(train)
       When("I edit train info and I click update button")
       val res = model.update(train.name)(
@@ -85,7 +85,7 @@ class TrainModelTest extends AnyFeatureSpec with GivenWhenThen:
 
     Scenario("Remove train"):
       Given("that there are two train saved with names RE-8089 and FR-200")
-      val model = TrainModels.TrainModel
+      val model = TrainManager.TrainModel()
       model.add(train)
       model.add(Train(
         "RE-8089",
@@ -106,7 +106,7 @@ class TrainModelTest extends AnyFeatureSpec with GivenWhenThen:
 
   Feature("Managing train technologies (add, remove)"):
     Scenario("Add new train technology"):
-      val domain = TrainModels.TrainModel
+      val domain = TrainManager.TrainModel()
       Given("there are no technologies saved yet")
       domain.technologies.size should be(0)
       When("I add technology with a given name and max speed value")
@@ -116,7 +116,7 @@ class TrainModelTest extends AnyFeatureSpec with GivenWhenThen:
       res should be(Right[Errors, Technology](Technology("Standard", 130)))
 
     Scenario("Try to add technology with already existing one (same name)"):
-      val domain = TrainModels.TrainModel
+      val domain = TrainManager.TrainModel()
       Given("some technologies are saved")
       domain.addTechnology(Technology("Standard", 130))
       When("I add technology with an already saved technology name")
@@ -127,7 +127,7 @@ class TrainModelTest extends AnyFeatureSpec with GivenWhenThen:
       )
 
     Scenario("Try to remove technology"):
-      val domain = TrainModels.TrainModel
+      val domain = TrainManager.TrainModel()
       Given("there is one technologies saved")
       domain.addTechnology(Technology("Standard", 130))
       domain.technologies.size should be(1)
