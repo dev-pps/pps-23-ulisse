@@ -1,7 +1,6 @@
-package train.model.domain
+package entities.domain.train
 
-import train.model.domain.Wagons.Wagon
-import train.model.domain.Technology
+import Wagons.Wagon
 
 object Trains:
 

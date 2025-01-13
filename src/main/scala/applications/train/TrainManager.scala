@@ -1,9 +1,12 @@
-package train.model
+package applications.train
 
-import train.model.TrainManager.Errors.{TrainAlreadyExists, TrainNotExists}
-import train.model.domain.Trains.Train
-import train.model.domain.Wagons.{UseType, Wagon}
-import train.model.domain.Technology
+import applications.train.TrainManager.Errors.{
+  TrainAlreadyExists,
+  TrainNotExists
+}
+import entities.domain.train.Technology
+import entities.domain.train.Trains.Train
+import entities.domain.train.Wagons.{UseType, Wagon}
 
 import scala.util.Either
 

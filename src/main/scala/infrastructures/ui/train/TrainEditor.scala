@@ -1,20 +1,10 @@
-package train.view
+package infrastructures.ui.train
 
-import train.controller.TrainsControllers.TrainEditorController
-import train.model.TrainManager
+import applications.train.TrainManager
+import applications.train.TrainsControllers.TrainEditorController
 
+import scala.swing.*
 import scala.swing.event.SelectionChanged
-import scala.swing.{
-  BorderPanel,
-  Button,
-  ComboBox,
-  Component,
-  FlowPanel,
-  Frame,
-  Label,
-  TextField,
-  Window
-}
 
 object TrainEditor:
   object ViewModel:
