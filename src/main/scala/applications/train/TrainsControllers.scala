@@ -1,7 +1,7 @@
-package train.controller
+package applications.train
 
-import train.model.TrainManager.TrainModel
-import train.view.TrainEditor.ViewModel.TrainData
+import applications.train.TrainManager.TrainModel
+import infrastructures.ui.train.TrainEditor.ViewModel.TrainData
 
 object TrainsControllers:
 

@@ -1,4 +1,4 @@
-package train.model.domain
+package entities.domain.train
 
 object Wagons:
   private type Capacity = Int
