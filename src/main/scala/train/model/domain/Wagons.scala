@@ -5,9 +5,9 @@ object Wagons:
   private case class WagonImpl(use: UseType, capacity: Capacity)
       extends Wagon
 
-  enum UseType:
-    case Passenger
-    case Other
+  enum UseType(val name: String):
+    case Passenger extends UseType("Passenger")
+    case Other     extends UseType("Other")
 
   /** A train wagon (a.k.a. train wagon, train car, railroad car) that is part
     * of a train.
