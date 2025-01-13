@@ -20,12 +20,30 @@
     "url": "https://github.com/dev-pps/pps-23-ulisse/issues"
   },
   "homepage": "https://github.com/dev-pps/pps-23-ulisse#readme",
-  "preset": "conventionalcommits",
-  "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    "@semantic-release/changelog",
-    "@semantic-release/github",
-    "@semantic-release/git"
-  ]
+  "devDependencies": {
+    "semantic-release-preconfigured-conventional-commits": "latest"
+  },
+  "release": {
+    "branches": [
+      "main",
+      {
+        "name": "develop",
+        "prerelease": true
+      }
+    ],
+    "preset": "conventionalcommits",
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/github",
+      [
+        "@semantic-release/git",
+        {
+          "assets": ["CHANGELOG.md", "package.json"],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ]
+    ]
+  }
 }
