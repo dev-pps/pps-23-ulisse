@@ -1,6 +1,14 @@
 package ulisse.entities
 
-sealed trait Location
+import cats.Eq
+import cats.implicits.catsSyntaxEq
+
+import scala.annotation.targetName
+
+sealed trait Location:
+  @targetName("equals")
+  def ===(that: Location): Boolean =
+    Eq.fromUniversalEquals[Location].eqv(this, that)
 
 /** Factory for [[Location]] instances. */
 object Location:
