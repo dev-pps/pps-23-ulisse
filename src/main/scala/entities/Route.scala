@@ -1,7 +1,7 @@
 package entities
 
+import entities.Coordinate.Geo
 import entities.Route.{Id, Path, TypeRoute}
-import utils.Points
 
 trait Route:
   def id: Id
@@ -17,7 +17,7 @@ object Route:
     RouteImpl((typeRoute, path), railsCount)
 
   opaque type Id = (TypeRoute, Path)
-  type Station   = (String, (Double, Double))
+  type Station   = (String, Geo)
   type Path      = (Station, Station)
 
   enum TypeRoute:
@@ -27,8 +27,7 @@ object Route:
     override def typology: TypeRoute = id._1
     override def path: Path          = id._2
 
-    override def length: Double =
-      Points.computePointsDistance(path._1._2, path._2._2)
+    override def length: Double = path._1._2.distance(path._2._2)
 
     override def has(id: Id): Boolean =
       (this.id._1 canEqual id._1)
