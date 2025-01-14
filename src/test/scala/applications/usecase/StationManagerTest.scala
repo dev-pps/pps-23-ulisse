@@ -46,11 +46,12 @@ class StationManagerTest extends AnyWordSpec with Matchers:
         Station("Station1", _, 1)
       ).toOption match
         case Some(value) =>
-          stationManager.addStation(value).flatMap(
-            _.removeStation(value)
-          ) match
-            case Right(_) => stationManager.stationMap.stations shouldBe empty
-            case Left(_)  => fail()
+          stationManager.addStation(value) match
+            case Right(_) => stationManager.removeStation(value) match
+                case Right(_) =>
+                  stationManager.stationMap.stations shouldBe empty
+                case Left(_) => fail()
+            case Left(value) => fail()
         case None => fail()
 
     "not remove an absent station from the station map" in:
