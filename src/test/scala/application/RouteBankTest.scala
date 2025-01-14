@@ -3,14 +3,13 @@ package application
 import applications.RouteBank
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-
-import entities.Route
+import entities.{Coordinate, Route}
 import entities.Route.{Path, Station, TypeRoute}
 
 class RouteBankTest extends AnyFlatSpec with Matchers:
   val railsCount             = 1
-  val riminiStation: Station = ("Cesena", (20d, 20d))
-  val cesenaStation: Station = ("Rimini", (10d, 10d))
+  val riminiStation: Station = ("Cesena", Coordinate.createGeo(20d, 20d))
+  val cesenaStation: Station = ("Rimini", Coordinate.createGeo(10d, 10d))
   val path: Path             = (riminiStation, cesenaStation)
   val route: Route           = Route(TypeRoute.Normal, railsCount, path)
   val routeBank              = RouteBank.fromList(List(route))
