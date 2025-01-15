@@ -1,4 +1,4 @@
-package train.model
+package entities.train
 
 import org.scalatest.*
 import org.scalatest.flatspec.AnyFlatSpec
