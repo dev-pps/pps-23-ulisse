@@ -4,11 +4,11 @@ import scala.swing.*
 import scala.swing.event.*
 import scala.swing.{Dimension, FlowPanel, ListView, ScrollPane}
 import scala.util.Try
+import model.{TrainViewModel, TrainViewModelAdapter}
+import applications.train.TrainPorts
 
-object TrainEditor:
-
-  private final val DEFAULT_WAGON_COUNT = 4
-
+object TrainEditorView:
+  private val DEFAULT_WAGON_COUNT = 4
   extension (c: Component)
     private def onLeftOf(c1: Component) =
       new FlowPanel() {
@@ -16,15 +16,15 @@ object TrainEditor:
         contents += c1
       }
 
-  def apply(service: TrainEditorAdapter): Window =
-    TrainEditImpl(service)
+  def apply(inServicePort: TrainPorts.InBound): Window =
+    TrainEditImpl(TrainViewModelAdapter(inServicePort))
 
-  private class TrainEditImpl(val service: TrainEditorAdapter)
+  private class TrainEditImpl(val modelAdapter: TrainViewModelAdapter)
       extends Frame:
 
-    private val trainTech  = service.technologies
-    private val wagonTypes = service.wagonTypes
-    private val trains     = service.trains
+    private val trainTech  = modelAdapter.technologies
+    private val wagonTypes = modelAdapter.wagonTypes
+    private val trains     = modelAdapter.trains
 
     private val trainListView = new ListView(trains) {
       preferredSize = new Dimension(200, 100)
@@ -73,14 +73,15 @@ object TrainEditor:
         for
           selectedTrain <- trainListView.selection.items.headOption
           trainName     <- selectedTrain.name
-        yield service.deleteTrain(trainName)
+        yield modelAdapter.deleteTrain(trainName)
+        trainListView.listData = modelAdapter.trains
     }
 
     saveButton.reactions += {
       case ButtonClicked(_) =>
         println("save clicked")
-        service.addTrain(trainDataFromFields())
-        trainListView.listData = service.trains
+        modelAdapter.addTrain(trainDataFromFields())
+        trainListView.listData = modelAdapter.trains
     }
 
     new Frame {

@@ -1,4 +1,4 @@
-package infrastructures.ui.train
+package infrastructures.ui.train.model
 
 object TrainViewModel:
 

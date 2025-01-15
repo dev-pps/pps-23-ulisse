@@ -115,13 +115,17 @@ object TrainManager:
       */
     def wagonTypes: List[UseType]
 
-  /** Companion object of the trait `TrainModel`.
-    *
+  /** Companion object of the trait `TrainService`.
     * @see
     *   [[TrainService]] for more detailed behaviour definition.
     */
   object TrainService:
-    def apply(): TrainService = DefaultService()
+    /** @param initialState
+      *   Initial technologies saved.
+      * @return
+      *   TrainService
+      */
+    def apply(initialState: List[Technology]): TrainService = DefaultService()
 
   private class DefaultService extends TrainService:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))

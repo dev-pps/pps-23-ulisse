@@ -1,9 +1,9 @@
-package infrastructures.ui.train
+package infrastructures.ui.train.model
 
 import applications.train.TrainPorts
-import infrastructures.ui.train.TrainViewModel.*
+import TrainViewModel.*
 
-trait TrainEditorAdapter:
+trait TrainViewModelAdapter:
   def trains: List[TrainData]
   def technologies: List[TechType]
   def wagonTypes: List[Wagon]
@@ -11,12 +11,12 @@ trait TrainEditorAdapter:
   def deleteTrain(name: String): Unit
   def updateTrain(trainData: TrainData): Unit
 
-object TrainEditorAdapter:
-  def apply(trainService: TrainPorts.InBound): TrainEditorAdapter =
+object TrainViewModelAdapter:
+  def apply(trainService: TrainPorts.InBound): TrainViewModelAdapter =
     BaseAdapter(trainService)
 
 private final case class BaseAdapter(trainService: TrainPorts.InBound)
-    extends TrainEditorAdapter:
+    extends TrainViewModelAdapter:
   override def trains: List[TrainData] = trainService.trains.map(t =>
     TrainData(
       name = Some(t.name),
@@ -31,7 +31,6 @@ private final case class BaseAdapter(trainService: TrainPorts.InBound)
   override def technologies: List[TechType] =
     trainService.technologies.map(t => TechType(t.name, t.maxSpeed))
   override def addTrain(trainData: TrainData): Unit =
-    import entities.train.Trains.Train
     for
       name          <- trainData.name
       techName      <- trainData.technologyName
