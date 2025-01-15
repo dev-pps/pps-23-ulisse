@@ -1,15 +1,14 @@
 package applications.train
 
-import applications.train.TrainManager.{Errors, TrainService}
+import applications.train.TrainManagers.{Errors, TrainManager}
 import entities.train.Technology
 import entities.train.Trains.Train
 import entities.train.Wagons.{UseType, Wagon}
 
 object TrainPorts:
 
-  /** It represents all possible requests that can be done from external
-    * components to application for what concern about `Trains`, trains
-    * `Technology` and wagon `UseType`.
+  /** It represents all possible requests that can be done from external components to application for what concern
+    * about `Trains`, trains `Technology` and wagon `UseType`.
     *
     * A default implementation is [[BaseInBoundPort]]
     */
@@ -30,8 +29,7 @@ object TrainPorts:
       */
     def wagonTypes: List[UseType]
 
-    /** Add/save new train. If train does not exist it is saved as new one
-      * otherwise is returned a `Left` of [[Errors]]
+    /** Add/save new train. If train does not exist it is saved as new one otherwise is returned a `Left` of [[Errors]]
       *
       * @param name
       *   Train name
@@ -44,8 +42,7 @@ object TrainPorts:
       * @param wagonCount
       *   Amount of wagons that compose train
       * @return
-      *   `Left` type of [[TrainManager.Errors]] in case of some errors,
-      *   `Right(List[Train])` if edits are saved.
+      *   `Left` type of [[TrainManager.Errors]] in case of some errors, `Right(List[Train])` if edits are saved.
       */
     def addTrain(
         name: String,
@@ -59,8 +56,7 @@ object TrainPorts:
       * @param trainName
       *   Train name to delete
       * @return
-      *   `Some` type of [[Errors.DeleteTrainError]] in case of some deletion
-      *   errors.
+      *   `Some` type of [[Errors.DeleteTrainError]] in case of some deletion errors.
       */
     def removeTrain(trainName: String): Either[Errors, List[Train]]
 
@@ -70,8 +66,10 @@ object TrainPorts:
         wagonCount: Int
     ): Either[Errors, List[Train]]
 
-  case class BaseInBoundPort(service: TrainService) extends InBound:
-    export service.{addTrain => _, *}
+  /** @param manager
+    */
+  case class BaseInBoundPort(manager: TrainManager) extends InBound:
+    export manager.{addTrain => _, *}
 
     override def addTrain(
         name: String,
@@ -80,7 +78,7 @@ object TrainPorts:
         wagonCapacity: Int,
         wagonCount: Int
     ): Either[Errors, List[Train]] =
-      service.createTrain(
+      manager.createTrain(
         name,
         technologyName,
         wagonUseTypeName,

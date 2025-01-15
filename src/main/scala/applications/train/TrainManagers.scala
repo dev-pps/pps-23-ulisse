@@ -5,9 +5,10 @@ import entities.train.Technology
 import entities.train.Wagons.{UseType, Wagon}
 import scala.util.Either
 
-object TrainManager:
+object TrainManagers:
 
-  /** @param description
+  /** Train Manager errors that can be returned after a request.
+    * @param description
     *   Error description
     */
   enum Errors(val description: String):
@@ -20,27 +21,29 @@ object TrainManager:
         extends Errors(s"Technology not exist")
     case WagonTypeUnknown(name: String)
         extends Errors(s"Wagon type $name not exist")
-    case Unclassified(msg: String) extends Errors(s"Unclassified error: $msg")
 
-  trait TrainService:
+  trait TrainManager:
     /** Add train to train collection.
       *
       * @param train
       *   train to be added
       * @return
-      *   Returns [[Right]] of `List[Train]` if train is added else [[Left]] of
-      *   [[Errors.TrainAlreadyExists]]
+      *   Returns [[Right]] of `List[Train]` if train is added else [[Left]] of [[Errors.TrainAlreadyExists]]
       */
     def addTrain(train: Train): Either[Errors, List[Train]]
 
     /** @param name
+      *   train name
       * @param technologyName
+      *   train technology name
       * @param wagonTypeName
+      *   name of wagon type
       * @param wagonCapacity
+      *   wagon capacity
       * @param wagonCount
+      *   amount of wagons
       * @return
-      *   Returns [[Right]] of Train if train is added else [[Left]] of
-      *   [[Errors.TrainAlreadyExists]]
+      *   Returns [[Right]] of Train if train is added else [[Left]] of [[Errors.TrainAlreadyExists]]
       */
     def createTrain(
         name: String,
@@ -55,8 +58,7 @@ object TrainManager:
       * @param name
       *   train name to be removed
       * @return
-      *   Returns [[Right]] of list of Train if train is removed else [[Left]]
-      *   of [[Errors.TrainNotExists]]
+      *   Returns [[Right]] of list of Train if train is removed else [[Left]] of [[Errors.TrainNotExists]]
       */
     def removeTrain(name: String): Either[Errors, List[Train]]
 
@@ -71,8 +73,7 @@ object TrainManager:
       * @param wagonCount
       *   wagon amount
       * @return
-      *   Returns [[Right]] of Train if train is updated else [[Left]] of *
-      *   [[Errors.TrainNotExists]]
+      *   Returns [[Right]] of Train if train is updated else [[Left]] of * [[Errors.TrainNotExists]]
       */
     def updateTrain(name: String)(
         technology: Technology,
@@ -85,8 +86,7 @@ object TrainManager:
       * @param technology
       *   technology to be added
       * @return
-      *   [[Right]] of Technology if it is added else [[Left]] of
-      *   [[Errors.TrainAlreadyExists]]
+      *   [[Right]] of Technology if it is added else [[Left]] of [[Errors.TrainAlreadyExists]]
       */
     def addTechnology(technology: Technology): Either[Errors, List[Technology]]
 
@@ -95,8 +95,7 @@ object TrainManager:
       * @param name
       *   technology name to be removed
       * @return
-      *   Returns [[Right]] of List[Technology] if it is removed otherwise
-      *   [[Left]] of [[Errors.TrainNotExists]]
+      *   Returns [[Right]] of List[Technology] if it is removed otherwise [[Left]] of [[Errors.TrainNotExists]]
       */
     def removeTechnology(name: String): Either[Errors, List[Technology]]
 
@@ -115,31 +114,24 @@ object TrainManager:
       */
     def wagonTypes: List[UseType]
 
-  /** Companion object of the trait `TrainService`.
+  /** Companion object of the trait `TrainManager`.
+    *
     * @see
-    *   [[TrainService]] for more detailed behaviour definition.
+    *   [[TrainManager]] for more detailed behaviour definition.
     */
-  object TrainService:
+  object TrainManager:
     /** @param initialState
       *   Initial technologies saved.
       * @return
       *   TrainService
       */
-    def apply(initialState: List[Technology]): TrainService = DefaultService()
+    def apply(initialState: List[Technology]): TrainManager = DefaultManager()
 
-  private class DefaultService extends TrainService:
+  private class DefaultManager extends TrainManager:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _trains: List[Train] = List.empty
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _technologies: Map[String, Technology] = Map.empty
-
-    private def findTrain(name: String): Option[Train] =
-      _trains.find(_.name.contentEquals(name))
-
-    private def trainExists(name: String): Either[Errors, List[Train]] =
-      if _trains.exists(_.name.contentEquals(name)) then
-        Left(Errors.TrainAlreadyExists(name))
-      else Right(trains)
 
     override def addTrain(train: Train): Either[Errors, List[Train]] =
       createTrain(
@@ -158,81 +150,51 @@ object TrainManager:
         wagonCount: Int
     ): Either[Errors, List[Train]] =
       for
-        _ <- trainExists(name)
-        tk <- technologies.find(
-          _.name.contentEquals(technologyName)
-        ).toRight(Errors.TechnologyNotExists(technologyName))
-        w <- wagonTypes.find(_.name.contentEquals(wagonTypeName)).toRight(
-          Errors.WagonTypeUnknown(wagonTypeName)
-        )
+        _ <- trains.find(_.name.contentEquals(name)).map(t => Errors.TrainAlreadyExists(t.name)).toLeft(trains)
+        tk <-
+          technologies.find(_.name.contentEquals(technologyName)).toRight(Errors.TechnologyNotExists(technologyName))
+        w <- wagonTypes.find(_.name.contentEquals(wagonTypeName)).toRight(Errors.WagonTypeUnknown(wagonTypeName))
       yield
-        _trains =
-          Train(name, tk, Wagon(w, wagonCapacity), wagonCount) :: _trains
+        _trains = Train(name, tk, Wagon(w, wagonCapacity), wagonCount) :: _trains
         _trains
 
-    override def addTechnology(technology: Technology)
-        : Either[Errors, List[Technology]] =
-      import Errors.TechnologyAlreadyExists
-      _technologies.get(technology.name) match
-        case Some(t) =>
-          Left[Errors.TechnologyAlreadyExists, List[Technology]](
-            TechnologyAlreadyExists(t.name)
-          )
-        case None =>
-          _technologies = _technologies.updated(technology.name, technology)
-          Right[Errors, List[Technology]](technologies)
-
     override def removeTrain(name: String): Either[Errors, List[Train]] =
-      findTrain(name) match
-        case Some(_) =>
-          _trains = _trains.filterNot(_.name.contentEquals(name))
-          Right[Errors, List[Train]](trains)
-        case None =>
-          Left[Errors.TrainNotExists, List[Train]](Errors.TrainNotExists(name))
+      trains.find(_.name.contentEquals(name))
+        .map(_ =>
+          _trains = trains.filterNot(_.name.contentEquals(name))
+          trains
+        ).toRight(Errors.TrainNotExists(name))
 
-    override def removeTechnology(name: String)
-        : Either[Errors, List[Technology]] =
+    override def addTechnology(technology: Technology): Either[Errors, List[Technology]] =
+      import Errors.TechnologyAlreadyExists
+      _technologies.get(technology.name)
+        .map(_ => TechnologyAlreadyExists(technology.name))
+        .toLeft({
+          _technologies = _technologies.updated(technology.name, technology)
+          technologies
+        })
+
+    override def removeTechnology(name: String): Either[Errors, List[Technology]] =
       import Errors.TechnologyNotExists
-      _technologies.get(name) match
-        case Some(t) =>
-          _technologies = _technologies.removed(name)
-          Right[Errors, List[Technology]](technologies)
-        case None => Left[Errors, List[Technology]](TechnologyNotExists(name))
+      _technologies.get(name).map(t =>
+        _technologies = _technologies.removed(t.name)
+        technologies
+      ).toRight(TechnologyNotExists(name))
 
     override def updateTrain(name: String)(
         technology: Technology,
         wagon: Wagon,
         wagonCount: Int
     ): Either[Errors, List[Train]] =
-//      for
-//        train <- findTrain(name)
-//        res <- removeTrain(train.name)
-//        addRes <- addTrain(Train(
-//          name,
-//          technology,
-//          wagon,
-//          wagonCount
-//        ))
-//      yield addRes
-      findTrain(name) match
-        case Some(Train(n, _, _, _)) =>
-          val train = Train(
-            n,
-            technology,
-            wagon,
-            wagonCount
-          )
-          removeTrain(n) match
-            case Left(e) => Left[Errors.TrainNotExists, List[Train]](
-                Errors.TrainNotExists(s"$e during update call")
-              )
-            case Right(_) => addTrain(train)
-        case None =>
-          Left[Errors.TrainNotExists, List[Train]](Errors.TrainNotExists(name))
-        case _ =>
-          Left[Errors.Unclassified, List[Train]](
-            Errors.Unclassified("train not recognized in match case")
-          )
+      for
+        _ <- removeTrain(name)
+        ts <- addTrain(Train(
+          name,
+          technology,
+          wagon,
+          wagonCount
+        ))
+      yield ts
 
     override def trains: List[Train]            = _trains
     override def technologies: List[Technology] = _technologies.values.toList

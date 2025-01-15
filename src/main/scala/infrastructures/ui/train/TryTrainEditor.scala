@@ -1,13 +1,12 @@
 package infrastructures.ui.train
 
-import applications.train.{TrainManager, TrainPorts}
+import applications.train.{TrainManagers, TrainPorts}
 import entities.train.Technology
 
 object TryTrainEditor extends App:
-  val service = TrainManager.TrainService(List.empty)
+  val manager = TrainManagers.TrainManager(List.empty)
   List(Technology("Normal", 100), Technology("Highspeed", 460)).foreach(
-    service.addTechnology
+    manager.addTechnology
   )
-
-  val trainPort = TrainPorts.BaseInBoundPort(service)
+  val trainPort = TrainPorts.BaseInBoundPort(manager)
   TrainEditorView(trainPort)
