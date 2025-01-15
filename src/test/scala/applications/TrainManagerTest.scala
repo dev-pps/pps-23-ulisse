@@ -1,16 +1,16 @@
-package train.model
+package applications
 
+import applications.train.TrainManager
+import applications.train.TrainManager.Errors
+import applications.train.TrainManager.Errors.TechnologyAlreadyExists
+import entities.domain.train.Trains.Train
+import entities.domain.train.Wagons.UseType
+import entities.domain.train.{Technology, Trains, Wagons}
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
-import applications.train.TrainManager.Errors
-import applications.train.TrainManager.Errors.TechnologyAlreadyExists
-import applications.train.TrainManager
-import entities.domain.train.{Technology, Trains, Wagons}
-import entities.domain.train.Wagons.UseType
-import entities.domain.train.Trains.Train
 
 class TrainManagerTest extends AnyFeatureSpec with GivenWhenThen:
 
