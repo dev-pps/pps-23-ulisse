@@ -33,7 +33,7 @@ object TrainEditorView:
       selection.intervalMode = IntervalMode.Single
     }
 
-    private val trainsFleetPanel = new FlowPanel(new ScrollPane(trainListView))
+    private val trainsFleetPanel            = new FlowPanel(new ScrollPane(trainListView))
     private val nameField: TextField        = new TextField(10)
     private val trainTechCombo              = new ComboBox(trainTech)
     private val wagonTypeCombo              = new ComboBox(wagonTypes)

@@ -44,7 +44,7 @@ private final case class BaseAdapter(trainService: TrainPorts.InBound)
       wagonCapacity,
       wagonCount
     )
-  override def deleteTrain(name: String): Unit = trainService.removeTrain(name)
+  override def deleteTrain(name: String): Unit         = trainService.removeTrain(name)
   override def updateTrain(trainData: TrainData): Unit = None
   override def wagonTypes: List[Wagon] =
     trainService.wagonTypes.map(w => Wagon(w.name))
