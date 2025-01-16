@@ -38,6 +38,7 @@ object TrainEditor:
       import scala.swing.ListView.IntervalMode
       selection.intervalMode = IntervalMode.Single
     }
+
     private val trainTypes                = controller.technologyNames
     private val carriageTypes             = controller.wagonTypeNames
     private val trainsFleetPanel          = new FlowPanel(new ScrollPane(trainListView))

@@ -1,6 +1,6 @@
 package infrastructures.view
 
-import infrastructures.view.ports.ListenerOutPort
+import applications.ports.ListenerOutPort
 import scala.swing.BorderPanel.Position.*
 import scala.swing.event.*
 import scala.swing.*
