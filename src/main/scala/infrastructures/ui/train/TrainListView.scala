@@ -7,6 +7,7 @@ import scala.swing.{BoxPanel, Component, Dimension, Font, Label, ListView, Orien
 object TrainListView:
 
   private val selectedColor = Color.decode("#fff3d0")
+  private val nameFont      = new Font("Arial", java.awt.Font.BOLD, 18)
   private val labelFont     = new Font("Arial", java.awt.Font.BOLD, 14)
   private val valueFont     = new Font("Arial", java.awt.Font.PLAIN, 14)
 
@@ -26,13 +27,14 @@ object TrainListView:
         item: TrainViewModel.TrainData,
         index: Int
     ): Component = {
-      new TrainDataPanel(item) {
+      new TrainListItem(item, isSelected) {
         background = if isSelected then selectedColor else Color.WHITE
       }
     }
   }
 
-  private class TrainDataPanel(trainData: TrainViewModel.TrainData) extends BoxPanel(Orientation.Vertical) {
+  private class TrainListItem(trainData: TrainViewModel.TrainData, isSelected: Boolean)
+      extends BoxPanel(Orientation.Vertical) {
 
     private def createRow(labelText: String, value: Option[String]): BoxPanel = {
       new BoxPanel(Orientation.Horizontal) {
@@ -43,11 +45,11 @@ object TrainListView:
         contents += new Label(value.getOrElse("N/A")) {
           font = valueFont
         }
-        background = Color.white
+        background = if isSelected then selectedColor else Color.WHITE
       }
     }
     contents += new Label(trainData.name.getOrElse("N/A")) {
-      font = new Font("Arial", java.awt.Font.BOLD, 18)
+      font = nameFont
     }
     contents += createRow("Technology Name", trainData.technologyName)
     contents += createRow("Wagon Name Type", trainData.wagonNameType)

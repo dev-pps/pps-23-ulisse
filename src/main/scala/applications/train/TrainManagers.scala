@@ -73,7 +73,7 @@ object TrainManagers:
       * @param wagonCount
       *   wagon amount
       * @return
-      *   Returns [[Right]] of Train if train is updated else [[Left]] of * [[Errors.TrainNotExists]]
+      *   Returns [[Right]] of Train if train is updated else [[Left]] of [[Errors]]
       */
     def updateTrain(name: String)(
         technology: Technology,
