@@ -1,12 +1,9 @@
 package applications.train
 
-import applications.train.TrainManager.Errors.{
-  TrainAlreadyExists,
-  TrainNotExists
-}
-import entities.domain.train.Technology
-import entities.domain.train.Trains.Train
-import entities.domain.train.Wagons.{UseType, Wagon}
+import applications.train.TrainManager.Errors.{TrainAlreadyExists, TrainNotExists}
+import entities.train.Technology
+import entities.train.Trains.Train
+import entities.train.Wagons.{UseType, Wagon}
 
 import scala.util.Either
 
@@ -22,7 +19,7 @@ object TrainManager:
         extends Errors("Technology already exist")
     case TrainNotExists(msg: String)      extends Errors("Train not exist")
     case TechnologyNotExists(msg: String) extends Errors("Technology not exist")
-    case Unclassified(msg: String) extends Errors(s"Unclassified error: $msg")
+    case Unclassified(msg: String)        extends Errors(s"Unclassified error: $msg")
 
   trait TrainModel:
     /** Add train to train collection.
@@ -30,8 +27,7 @@ object TrainManager:
       * @param train
       *   train to be added
       * @return
-      *   Returns [[Right]] of Train if train is added else [[Left]] of
-      *   [[Errors.TrainAlreadyExists]]
+      *   Returns [[Right]] of Train if train is added else [[Left]] of [[Errors.TrainAlreadyExists]]
       */
     def add(train: Train): Either[Errors, Train]
 
@@ -40,8 +36,7 @@ object TrainManager:
       * @param name
       *   train name to be removed
       * @return
-      *   Returns [[Right]] of list of Train if train is removed else [[Left]]
-      *   of [[Errors.TrainNotExists]]
+      *   Returns [[Right]] of list of Train if train is removed else [[Left]] of [[Errors.TrainNotExists]]
       */
     def remove(name: String): Either[Errors, List[Train]]
 
@@ -56,8 +51,7 @@ object TrainManager:
       * @param wagonCount
       *   wagon amount
       * @return
-      *   Returns [[Right]] of Train if train is updated else [[Left]] of *
-      *   [[Errors.TrainNotExists]]
+      *   Returns [[Right]] of Train if train is updated else [[Left]] of * [[Errors.TrainNotExists]]
       */
     def update(name: String)(
         technology: Technology,
@@ -70,8 +64,7 @@ object TrainManager:
       * @param technology
       *   technology to be added
       * @return
-      *   [[Right]] of Technology if it is added else [[Left]] of
-      *   [[Errors.TrainAlreadyExists]]
+      *   [[Right]] of Technology if it is added else [[Left]] of [[Errors.TrainAlreadyExists]]
       */
     def addTechnology(technology: Technology): Either[Errors, Technology]
 
@@ -80,8 +73,7 @@ object TrainManager:
       * @param name
       *   technology name to be removed
       * @return
-      *   Returns [[Right]] of List[Technology] if it is removed otherwise
-      *   [[Left]] of [[Errors.TrainNotExists]]
+      *   Returns [[Right]] of List[Technology] if it is removed otherwise [[Left]] of [[Errors.TrainNotExists]]
       */
     def removeTechnology(name: String): Either[Errors, List[Technology]]
 
@@ -127,8 +119,7 @@ object TrainManager:
           _trains = train :: _trains
           Right[Errors, Train](train)
 
-    override def addTechnology(technology: Technology)
-        : Either[Errors, Technology] =
+    override def addTechnology(technology: Technology): Either[Errors, Technology] =
       import Errors.TechnologyAlreadyExists
       _technologies.get(technology.name) match
         case Some(t) =>
@@ -147,8 +138,7 @@ object TrainManager:
         case None =>
           Left[Errors.TrainNotExists, List[Train]](TrainNotExists(name))
 
-    override def removeTechnology(name: String)
-        : Either[Errors, List[Technology]] =
+    override def removeTechnology(name: String): Either[Errors, List[Technology]] =
       import Errors.TechnologyNotExists
       _technologies.get(name) match
         case Some(t) =>

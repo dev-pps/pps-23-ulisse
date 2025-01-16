@@ -1,4 +1,4 @@
-package infrastructures.ui
+package infrastructures.view
 
 import scala.swing.*
 import scala.swing.BorderPanel.Position.{Center, North, South}

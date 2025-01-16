@@ -1,4 +1,4 @@
-package entities.domain.train
+package entities.train
 
 /** The technology used by the train that define max speed bound of train
   */

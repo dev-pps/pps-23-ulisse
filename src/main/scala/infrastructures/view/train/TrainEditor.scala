@@ -1,4 +1,4 @@
-package infrastructures.ui.train
+package infrastructures.view.train
 
 import applications.train.TrainManager
 import applications.train.TrainsControllers.TrainEditorController
@@ -38,9 +38,9 @@ object TrainEditor:
       import scala.swing.ListView.IntervalMode
       selection.intervalMode = IntervalMode.Single
     }
-    private val trainTypes       = controller.technologyNames
-    private val carriageTypes    = controller.wagonTypeNames
-    private val trainsFleetPanel = new FlowPanel(new ScrollPane(trainListView))
+    private val trainTypes                = controller.technologyNames
+    private val carriageTypes             = controller.wagonTypeNames
+    private val trainsFleetPanel          = new FlowPanel(new ScrollPane(trainListView))
     private val nameField: TextField      = new TextField(10)
     private val carriagesField: TextField = new TextField(3)
     private val trainTypeCombo            = new ComboBox(trainTypes)

@@ -56,8 +56,7 @@ object StationMap:
     * @return
     *   Either a `StationMap` instance or an `Error` indicating the issue.
     */
-  def apply[L <: Location, T <: List[Station[L]]](stations: T)
-      : Either[Error, StationMap[L, T]] =
+  def apply[L <: Location, T <: List[Station[L]]](stations: T): Either[Error, StationMap[L, T]] =
     for
       a <- validateUniqueNames(stations)
       _ = print(a)
