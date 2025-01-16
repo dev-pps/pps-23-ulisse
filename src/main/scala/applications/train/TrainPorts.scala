@@ -60,6 +60,18 @@ object TrainPorts:
       */
     def removeTrain(trainName: String): Either[Errors, List[Train]]
 
+    /** Updates train with new information.
+      * @param name
+      *   train name to be updated
+      * @param technology
+      *   updated technology
+      * @param wagon
+      *   updated wagon
+      * @param wagonCount
+      *   updated wagon count
+      * @return
+      *   Returns [[Right]] of Train if train is updated else [[Left]] of [[Errors]]
+      */
     def updateTrain(name: String)(
         technology: Technology,
         wagon: Wagon,
@@ -67,6 +79,7 @@ object TrainPorts:
     ): Either[Errors, List[Train]]
 
   /** @param manager
+    *   TrainManager that handle input port requests
     */
   case class BaseInBoundPort(manager: TrainManager) extends InBound:
     export manager.{addTrain => _, *}

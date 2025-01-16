@@ -52,7 +52,6 @@ object TrainEditorView:
 
     saveButton.reactions += {
       case ButtonClicked(_) =>
-        println("save clicked")
         modelAdapter.addTrain(getFormFields)
         updateListAndClearFields()
     }
