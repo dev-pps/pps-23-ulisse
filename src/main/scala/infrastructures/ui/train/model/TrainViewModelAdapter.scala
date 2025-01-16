@@ -2,6 +2,8 @@ package infrastructures.ui.train.model
 
 import applications.train.TrainPorts
 import TrainViewModel.*
+import entities.train.Wagons.UseType
+import entities.train.{Technology, Wagons}
 
 trait TrainViewModelAdapter:
   def trains: List[TrainData]
@@ -28,23 +30,29 @@ private final case class BaseAdapter(trainService: TrainPorts.InBound)
     )
   )
 
-  override def technologies: List[TechType] =
-    trainService.technologies.map(t => TechType(t.name, t.maxSpeed))
   override def addTrain(trainData: TrainData): Unit =
     for
-      name          <- trainData.name
-      techName      <- trainData.technologyName
-      wagonCount    <- trainData.wagonCount
-      wagonType     <- trainData.wagonNameType
-      wagonCapacity <- trainData.wagonCapacity
-    yield trainService.addTrain(
-      name,
-      techName,
-      wagonType,
-      wagonCapacity,
-      wagonCount
-    )
-  override def deleteTrain(name: String): Unit         = trainService.removeTrain(name)
-  override def updateTrain(trainData: TrainData): Unit = None
+      n  <- trainData.name
+      tk <- trainData.technologyName
+      wc <- trainData.wagonCount
+      wt <- trainData.wagonNameType
+      wa <- trainData.wagonCapacity
+    yield trainService.addTrain(n, tk, wt, wa, wc)
+
+  override def deleteTrain(name: String): Unit = trainService.removeTrain(name)
+
+  override def updateTrain(trainData: TrainData): Unit =
+    for
+      n  <- trainData.name
+      tk <- trainData.technologyName
+      ts <- trainData.technologyMaxSpeed
+      wc <- trainData.wagonCount
+      wt <- trainData.wagonNameType
+      wa <- trainData.wagonCapacity
+    yield trainService.updateTrain(n)(Technology(tk, ts), Wagons.Wagon(UseType.valueOf(wt), wa), wc)
+
   override def wagonTypes: List[Wagon] =
     trainService.wagonTypes.map(w => Wagon(w.name))
+
+  override def technologies: List[TechType] =
+    trainService.technologies.map(t => TechType(t.name, t.maxSpeed))
