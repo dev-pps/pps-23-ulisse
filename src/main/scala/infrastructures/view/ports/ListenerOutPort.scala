@@ -1,4 +1,4 @@
-package infrastructures.ui.ports
+package infrastructures.view.ports
 
 import applications.RouteBank
 

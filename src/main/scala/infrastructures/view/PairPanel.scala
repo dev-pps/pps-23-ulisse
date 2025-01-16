@@ -1,4 +1,4 @@
-package infrastructures.ui
+package infrastructures.view
 
 import java.awt.Color
 import javax.swing.BorderFactory

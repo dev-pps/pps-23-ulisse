@@ -1,11 +1,10 @@
-package entities.domain.train
+package entities.train
 
 import Wagons.Wagon
 
 object Trains:
 
-  /** Train is characterized by [[Technology]], [[Wagons.Wagon]] types and total
-    * capacity and wagon amount.
+  /** Train is characterized by [[Technology]], [[Wagons.Wagon]] types and total capacity and wagon amount.
     */
   trait Train:
 

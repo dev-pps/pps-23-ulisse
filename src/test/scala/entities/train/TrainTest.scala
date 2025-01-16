@@ -5,9 +5,8 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.matchers.{must, should}
-import entities.domain.train.{Technology, Trains}
-import entities.domain.train.Trains.Train
-import entities.domain.train.Wagons.{UseType, Wagon}
+import Trains.Train
+import Wagons.{UseType, Wagon}
 
 class TrainTest extends AnyFlatSpec:
   val technology: Technology =

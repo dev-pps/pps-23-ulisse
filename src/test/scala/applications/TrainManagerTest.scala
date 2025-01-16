@@ -3,9 +3,9 @@ package applications
 import applications.train.TrainManager
 import applications.train.TrainManager.Errors
 import applications.train.TrainManager.Errors.TechnologyAlreadyExists
-import entities.domain.train.Trains.Train
-import entities.domain.train.Wagons.UseType
-import entities.domain.train.{Technology, Trains, Wagons}
+import entities.train.Trains.Train
+import entities.train.Wagons.UseType
+import entities.train.{Technology, Trains, Wagons}
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers
@@ -36,8 +36,8 @@ class TrainManagerTest extends AnyFeatureSpec with GivenWhenThen:
       Then("the train should be saved")
       res match
         case Right(Train(n, _, _, _)) => assert(n.contentEquals("FR-200"))
-        case Left(e)  => fail(s"During train creation an error occurred: $e")
-        case Right(r) => fail(s"Not expected return of add methods: $r")
+        case Left(e)                  => fail(s"During train creation an error occurred: $e")
+        case Right(r)                 => fail(s"Not expected return of add methods: $r")
 
     Scenario("Fill name fields with an already existing train name"):
       Given("that there is one train saved")
@@ -54,7 +54,7 @@ class TrainManagerTest extends AnyFeatureSpec with GivenWhenThen:
       Then("an error should be returned")
       res match
         case Left(e) => e.description should be("Train already exist")
-        case _ => fail(s"Add train with existing train name must not possible")
+        case _       => fail(s"Add train with existing train name must not possible")
       Then("train should not be added (train amount must be 1)")
       model.trains.size should be(1)
 

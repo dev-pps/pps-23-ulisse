@@ -1,7 +1,7 @@
 package applications.train
 
 import applications.train.TrainManager.TrainModel
-import infrastructures.ui.train.TrainEditor.ViewModel.TrainData
+import infrastructures.view.train.TrainEditor.ViewModel.TrainData
 
 object TrainsControllers:
 
@@ -26,13 +26,11 @@ object TrainsControllers:
       */
     def wagonTypeNames: List[String]
 
-    /** Save train edited information. If train does not exist it is saved as
-      * new one otherwise its info are updated
+    /** Save train edited information. If train does not exist it is saved as new one otherwise its info are updated
       * @param trainData
       *   Train information edits to be saved
       * @return
-      *   `Some` type of [[Errors.SaveEditsError]] in case of some errors,
-      *   `None` if edits are saved.
+      *   `Some` type of [[Errors.SaveEditsError]] in case of some errors, `None` if edits are saved.
       */
     def saveEdits(trainData: TrainData): Option[Errors.SaveEditsError]
 
@@ -40,8 +38,7 @@ object TrainsControllers:
       * @param trainName
       *   Train name to delete
       * @return
-      *   `Some` type of [[Errors.DeleteTrainError]] in case of some deletion
-      *   errors.
+      *   `Some` type of [[Errors.DeleteTrainError]] in case of some deletion errors.
       */
     def deleteTrain(trainName: String): Option[Errors.DeleteTrainError]
 
