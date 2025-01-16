@@ -1,6 +1,7 @@
 package applications.ports
 
 import applications.station.StationMap
+import applications.usecase.StationManager
 import entities.Location
 import entities.station.Station
 
@@ -8,6 +9,9 @@ import entities.station.Station
   * a `StationMap`.
   */
 object StationPort:
+
+  trait Outbound:
+    def show(): Unit
 
   /** Trait representing inbound operations for interacting with a `StationMap`.
     *

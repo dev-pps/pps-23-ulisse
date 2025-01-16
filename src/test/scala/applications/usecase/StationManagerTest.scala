@@ -1,19 +1,23 @@
 package applications.usecase
 
+import applications.ports.StationPort
 import entities.Location
 import entities.Location.Grid
 import entities.station.Station
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar.mock
 
 class StationManagerTest extends AnyWordSpec with Matchers:
 
+  private val mockUI = mock[StationPort.Outbound]
+
   "StationManager" should:
     "initialize with an empty station map" in:
-      StationManager[Grid]().stationMap.stations shouldBe empty
+      StationManager[Grid](mockUI).stationMap.stations shouldBe empty
 
     "add a valid station to the station map" in:
-      val stationManager = StationManager[Grid]()
+      val stationManager = StationManager[Grid](mockUI)
       Location.createGrid(1, 1).flatMap(
         Station("Station1", _, 1)
       ).toOption match
@@ -22,10 +26,9 @@ class StationManagerTest extends AnyWordSpec with Matchers:
               stationManager.stationMap.stations should contain only value
             case Left(_) => fail()
         case None => fail()
-      val model = StationManager[Grid]()
 
     "add invalid station to the station map" in:
-      val stationManager = StationManager[Grid]()
+      val stationManager = StationManager[Grid](mockUI)
       val location1 =
         Location.createGrid(1, 1).flatMap(Station("Station1", _, 1)).toOption
       val location2 =
@@ -41,7 +44,7 @@ class StationManagerTest extends AnyWordSpec with Matchers:
         case (_, _) => fail()
 
     "remove a present station from the station map" in:
-      val stationManager = StationManager[Grid]()
+      val stationManager = StationManager[Grid](mockUI)
       Location.createGrid(1, 1).flatMap(
         Station("Station1", _, 1)
       ).toOption match
@@ -55,7 +58,7 @@ class StationManagerTest extends AnyWordSpec with Matchers:
         case None => fail()
 
     "not remove an absent station from the station map" in:
-      val stationManager = StationManager[Grid]()
+      val stationManager = StationManager[Grid](mockUI)
       val station1 =
         Location.createGrid(1, 1).flatMap(Station("Station1", _, 1)).toOption
       val station2 =
