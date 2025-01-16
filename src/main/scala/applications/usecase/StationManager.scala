@@ -5,7 +5,7 @@ import applications.station.StationMap
 import entities.Location
 import entities.station.Station
 
-final case class StationManager[L <: Location]() extends StationPort.Inbound[L]:
+final case class StationManager[L <: Location](uiPort: StationPort.Outbound):
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private var _stationMap: StationMap[L] = StationMap[L]()
 
