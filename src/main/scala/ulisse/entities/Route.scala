@@ -13,8 +13,8 @@ trait Route:
   def has(id: Id): Boolean
 
 object Route:
-  def apply(typeRoute: TypeRoute, railsCount: Int, path: Path): Route =
-    RouteImpl((typeRoute, path), railsCount)
+  def apply(typeRoute: TypeRoute, path: Path, length: Double, railsCount: Int): Route =
+    RouteImpl((typeRoute, path), length, railsCount)
 
   opaque type Id = (TypeRoute, Path)
   type Station   = (String, Geo)
@@ -23,11 +23,9 @@ object Route:
   enum TypeRoute:
     case Normal, AV
 
-  private case class RouteImpl(id: Id, railsCount: Int) extends Route:
+  private case class RouteImpl(id: Id, length: Double, railsCount: Int) extends Route:
     override def typology: TypeRoute = id._1
     override def path: Path          = id._2
-
-    override def length: Double = path._1._2.distance(path._2._2)
 
     override def has(id: Id): Boolean =
       (this.id._1 canEqual id._1)
