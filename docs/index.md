@@ -5,14 +5,14 @@ layout: home
 hero:
   name: "PPS-23-Ulisse"
   text: "A train infrastructure simulator"
-  tagline: My great project tagline
+  tagline: PPS exam project
   actions:
     - theme: brand
-      text: My Page
-      link: /MyPage
+      text: Report
+      link: /0-intro
     - theme: alt
-      text: Requirements
-      link: /2-requirements
+      text: Scala docs
+      link: /
 
 features:
   - title: Feature A
