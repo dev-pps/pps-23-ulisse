@@ -85,7 +85,7 @@ object TrainEditor:
       open()
     }
 
-object GuiEntry extends App:
-  val model      = TrainManager.TrainModel()
-  val controller = TrainEditorController(model)
-  TrainEditor(controller)
+  @main def main(): Unit =
+    val model      = TrainManager.TrainModel()
+    val controller = TrainEditorController(model)
+    TrainEditor(controller)
