@@ -1,4 +1,4 @@
-package infrastructures.ui.train.model
+package ulisse.infrastructures.view.train.model
 
 object TrainViewModel:
 

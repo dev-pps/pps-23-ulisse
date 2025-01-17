@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view
 
-import scala.swing.{BorderPanel, BoxPanel, Component, FlowPanel, Orientation, Panel}
+import scala.swing.*
 
 trait WrapPanel[+P <: Panel]:
   def panel: P

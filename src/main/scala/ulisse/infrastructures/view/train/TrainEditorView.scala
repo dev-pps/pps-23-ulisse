@@ -1,12 +1,12 @@
-package infrastructures.ui.train
+package ulisse.infrastructures.view.train
 
-import scala.swing.*
-import scala.swing.event.*
-import scala.swing.{FlowPanel, ScrollPane}
-import scala.util.Try
-import model.{TrainViewModel, TrainViewModelAdapter}
+import ulisse.applications.train.TrainPorts
 import SwingUtils.onLeftOf
-import applications.train.TrainPorts
+import ulisse.infrastructures.view.train.model.{TrainViewModel, TrainViewModelAdapter}
+
+import scala.swing.event.*
+import scala.swing.*
+import scala.util.Try
 
 object TrainEditorView:
 

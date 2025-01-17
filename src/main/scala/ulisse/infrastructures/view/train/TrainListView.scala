@@ -1,8 +1,8 @@
-package infrastructures.ui.train
+package ulisse.infrastructures.view.train
 
-import infrastructures.ui.train.model.TrainViewModel
+import ulisse.infrastructures.view.train.model.TrainViewModel
 import java.awt.Color
-import scala.swing.{BoxPanel, Component, Dimension, Font, Label, ListView, Orientation, Swing}
+import scala.swing.*
 
 object TrainListView:
 

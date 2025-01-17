@@ -1,6 +1,6 @@
-package entities.train
+package ulisse.entities.train
 
-import Wagons.Wagon
+import ulisse.entities.train.Wagons.Wagon
 
 object Trains:
 

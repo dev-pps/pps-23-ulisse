@@ -1,9 +1,9 @@
-package applications.train
+package ulisse.applications.train
 
-import applications.train.TrainManagers.{Errors, TrainManager}
-import entities.train.Technology
-import entities.train.Trains.Train
-import entities.train.Wagons.{UseType, Wagon}
+import ulisse.applications.train.TrainManagers.{Errors, TrainManager}
+import ulisse.entities.train.Technology
+import ulisse.entities.train.Trains.Train
+import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 object TrainPorts:
 
