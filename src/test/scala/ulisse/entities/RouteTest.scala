@@ -31,5 +31,6 @@ class RouteTest extends AnyFlatSpec with Matchers:
     TypeRoute.values.filter(!_.canEqual(route.typology))
       .foreach(route must not be Route(_, path, pathLength, railsCount))
 
-//  "set route typology" should "change route typology" in:
-//    val
+  "set route typology" should "change route typology" in:
+    val changeRouteTypology = route.setTopology(TypeRoute.AV)
+    changeRouteTypology.typology must be(TypeRoute.AV)
