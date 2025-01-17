@@ -375,3 +375,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/sbt,scala,intellij,visualstudiocode,java,metals,macos,windows,linux,intellij+iml,intellij+all
+/docs/package-lock.json
+/docs/.vitepress/cache/
+/docs/.vitepress/dist/
+/docs/node_modules/
