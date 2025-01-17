@@ -2,20 +2,20 @@ package ulisse.applications
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.applications.RouteBank
+import ulisse.applications.useCases.RouteManager
 import ulisse.entities.Route.{Path, Station, TypeRoute}
 import ulisse.entities.{Coordinate, Route}
 
-class RouteBankTest extends AnyFlatSpec with Matchers:
+class RouteManagerTest extends AnyFlatSpec with Matchers:
   val railsCount             = 1
   val riminiStation: Station = ("Cesena", Coordinate.createGeo(20d, 20d))
   val cesenaStation: Station = ("Rimini", Coordinate.createGeo(10d, 10d))
   val path: Path             = (riminiStation, cesenaStation)
   val route: Route           = Route(TypeRoute.Normal, railsCount, path)
-  val routeBank              = RouteBank.fromList(List(route))
+  val routeBank              = RouteManager.fromList(List(route))
 
   "save new route" should "contains in routeBank" in:
-    val routeBank    = RouteBank.empty()
+    val routeBank    = RouteManager.empty()
     val newRouteBank = routeBank.save(route)
 
     routeBank.contains(route) must be(false)
