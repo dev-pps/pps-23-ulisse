@@ -1,8 +1,8 @@
-package applications.station
+package ulisse.applications.station
 
 import cats.implicits.catsSyntaxEq
-import entities.Location
-import entities.station.Station
+import ulisse.entities.Location
+import ulisse.entities.station.Station
 
 /** Defines a map of stations.
   *
@@ -18,14 +18,14 @@ import entities.station.Station
 trait StationMap[L <: Location]:
   type StationMapType <: Seq[Station[L]]
   val stations: StationMapType
+  def map[B](f: Station[L] => B): List[B]
 
   /** Adds a station to the map.
     *
     * @param station
     *   The station to add.
     * @return
-    *   Either a `StationMap` instance with the added station or an 'Error'
-    *   indicating the issue.
+    *   Either a `StationMap` instance with the added station or an 'Error' indicating the issue.
     */
   def addStation(station: Station[L]): Either[StationMap.Error, StationMap[L]]
 
@@ -34,11 +34,9 @@ trait StationMap[L <: Location]:
     * @param station
     *   The station to remove.
     * @return
-    *   Either a `StationMap` instance without the removed station or an 'Error'
-    *   indicating the issue.
+    *   Either a `StationMap` instance without the removed station or an 'Error' indicating the issue.
     */
-  def removeStation(station: Station[L])
-      : Either[StationMap.Error, StationMap[L]]
+  def removeStation(station: Station[L]): Either[StationMap.Error, StationMap[L]]
 
   /** Finds a station at the given location.
     *
@@ -106,3 +104,5 @@ object StationMap:
 
     def findStationAt(location: L): Option[Station[L]] =
       stations.find(_.location === location)
+
+    export stations.map

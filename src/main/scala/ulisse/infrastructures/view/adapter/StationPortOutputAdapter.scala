@@ -1,7 +1,7 @@
-package infrastructures.ui.adapter
+package ulisse.infrastructures.view.adapter
 
-import applications.ports.StationPort
-import infrastructures.ui.station.StationEditorView
+import ulisse.applications.ports.StationPort
+import ulisse.infrastructures.view.station.StationEditorView
 
 final case class StationPortOutputAdapter(stationEditorView: StationEditorView)
     extends StationPort.Outbound:

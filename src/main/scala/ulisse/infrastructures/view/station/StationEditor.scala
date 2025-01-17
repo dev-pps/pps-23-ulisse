@@ -1,12 +1,7 @@
-package infrastructures.ui.station
-//
-//import applications.station.StationEditorController
-//import entities.Location
-//import entities.station.*
-//
-//import java.awt.Color
-import applications.ports.StationPort
-import entities.Location
+package ulisse.infrastructures.view.station
+
+import ulisse.applications.ports.StationPort
+import ulisse.entities.Location
 
 import java.awt.Color
 import scala.swing.*
@@ -284,10 +279,12 @@ import scala.swing.*
 //  * @param controller
 //  *   The associated StationEditorController.
 //  */
-final case class StationEditorView(appPort: StationPort.Inbound[Location.Grid])
+val location = Location.createGrid(1, 1)
+final case class StationEditorView(appPort: StationPort.Inbound)
     extends BorderPanel:
   preferredSize = new Dimension(800, 600)
   background = Color.BLACK
+//  appPort.findStationAt()
 //
 //  private val updateContentTemplate: Panel => Unit =
 //    (stationEditorPanel: Panel) =>
