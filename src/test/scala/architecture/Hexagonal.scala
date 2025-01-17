@@ -2,6 +2,7 @@ package architecture
 
 import com.tngtech.archunit.core.importer.{ClassFileImporter, ImportOption}
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition
+import com.tngtech.archunit.library.Architectures
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 
@@ -63,7 +64,6 @@ class Hexagonal extends AnyFlatSpec with Matchers:
 
   "no classes of the infrastructures package" should "depend on the entities and userInteractions packages " +
     "and should depend on applications package" in:
-      // TODO: dire agli altri de infrastrutures dipende o no da userInteractios
       val rule = ArchRuleDefinition.noClasses()
         .that
         .resideInAnyPackage(INFRASTRUCTURES_PACKAGE)
@@ -82,3 +82,13 @@ class Hexagonal extends AnyFlatSpec with Matchers:
         .allowEmptyShould(true)
 
       rule.check(importOnlyClassesCreated)
+
+  "hexagonal architecture" should "be entities -> applications -> infrastructures/userInteractions" in:
+    val rule = Architectures.onionArchitecture()
+      .domainModels(ENTITIES_PACKAGE)
+      .applicationServices(APPLICATIONS_PACKAGE)
+      .adapter("infrastructures", INFRASTRUCTURES_PACKAGE)
+      .adapter("userInteractions", USER_INTERACTIONS_PACKAGE)
+      .allowEmptyShould(true)
+
+    rule.check(importOnlyClassesCreated)
