@@ -1,15 +1,16 @@
-package applications.train
+package ulisse.applications.train
 
-import applications.train.TrainManagers.Errors
-import applications.train.TrainManagers.Errors.*
-import entities.train.Trains.Train
-import entities.train.Wagons.UseType
-import entities.train.{Technology, Trains, Wagons}
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.must.Matchers.{be, not}
 import org.scalatest.matchers.should.Matchers.should
+import ulisse.applications.train.TrainManagers
+import ulisse.applications.train.TrainManagers.Errors
+import ulisse.applications.train.TrainManagers.Errors.*
+import ulisse.entities.train.Trains.Train
+import ulisse.entities.train.Wagons.UseType
+import ulisse.entities.train.{Technology, Trains, Wagons}
 
 import scala.Right
 import scala.language.postfixOps

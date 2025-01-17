@@ -1,7 +1,7 @@
-package infrastructures.ui.train
+package ulisse.infrastructures.view.train
 
-import scala.swing.{Component, FlowPanel, TextField}
 import scala.swing.event.ValueChanged
+import scala.swing.{Component, FlowPanel, TextField}
 
 object SwingUtils:
   extension (c: Component)

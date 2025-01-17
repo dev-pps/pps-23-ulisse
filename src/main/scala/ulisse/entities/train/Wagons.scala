@@ -1,4 +1,4 @@
-package entities.train
+package ulisse.entities.train
 
 object Wagons:
   private type Capacity = Int

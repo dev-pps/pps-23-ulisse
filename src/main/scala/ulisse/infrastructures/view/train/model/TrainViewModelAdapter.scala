@@ -1,9 +1,9 @@
-package infrastructures.ui.train.model
+package ulisse.infrastructures.view.train.model
 
-import applications.train.TrainPorts
+import ulisse.entities.train.Wagons.UseType
+import ulisse.applications.train.TrainPorts
+import ulisse.entities.train.{Technology, Wagons}
 import TrainViewModel.*
-import entities.train.Wagons.UseType
-import entities.train.{Technology, Wagons}
 
 trait TrainViewModelAdapter:
   def trains: List[TrainData]

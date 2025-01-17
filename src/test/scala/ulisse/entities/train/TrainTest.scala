@@ -1,12 +1,12 @@
-package entities.train
+package ulisse.entities.train
 
-import entities.train.Trains.Train
-import entities.train.Wagons.{UseType, Wagon}
 import org.scalatest.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.matchers.{must, should}
+import ulisse.entities.train.Trains.Train
+import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 class TrainTest extends AnyFlatSpec:
   val technology: Technology =
