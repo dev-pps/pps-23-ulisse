@@ -7,12 +7,14 @@ import ulisse.entities.Route.{Path, Station, TypeRoute}
 import ulisse.entities.{Coordinate, Route}
 
 class RouteManagerTest extends AnyFlatSpec with Matchers:
-  val railsCount             = 1
   val riminiStation: Station = ("Cesena", Coordinate.createGeo(20d, 20d))
   val cesenaStation: Station = ("Rimini", Coordinate.createGeo(10d, 10d))
   val path: Path             = (riminiStation, cesenaStation)
-  val route: Route           = Route(TypeRoute.Normal, railsCount, path)
-  val routeBank              = RouteManager.fromList(List(route))
+  val pathLength: Double     = 200.0d
+  val railsCount             = 1
+
+  val route: Route = Route(TypeRoute.Normal, path, pathLength, railsCount)
+  val routeBank    = RouteManager.fromList(List(route))
 
   "save new route" should "contains in routeBank" in:
     val routeBank    = RouteManager.empty()
@@ -28,7 +30,7 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
       case _              => fail("route is empty")
 
   "save route with same id" should "change route railsCount" in:
-    val sameRoute    = Route(TypeRoute.Normal, 3, path)
+    val sameRoute    = Route(TypeRoute.Normal, path, pathLength, 3)
     val newRouteBank = routeBank.save(sameRoute)
 
     val optRoute     = routeBank.route(route.id)
@@ -42,7 +44,7 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
       case None => fail("route is empty")
 
   "save two different route" should "have two element" in:
-    val differentRoute = Route(TypeRoute.AV, railsCount, path)
+    val differentRoute = Route(TypeRoute.AV, path, pathLength, railsCount)
     val newRouteBank   = routeBank.save(differentRoute)
 
     newRouteBank.contains(differentRoute) must be(true)
