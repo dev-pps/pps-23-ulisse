@@ -379,3 +379,6 @@ $RECYCLE.BIN/
 /docs/.vitepress/cache/
 /docs/.vitepress/dist/
 /docs/node_modules/
+node_modules/
+package-lock.json
+

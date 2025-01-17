@@ -28,6 +28,7 @@ export default defineConfig({
             },
             {text: 'Testing', link: '/5-testing'},
             {text: 'Retrospective', link: '/6-retrospective'},
+
         ],
 
         socialLinks: [
