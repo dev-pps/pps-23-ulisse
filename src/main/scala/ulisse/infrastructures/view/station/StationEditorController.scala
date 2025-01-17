@@ -1,4 +1,4 @@
-package infrastructures.ui.station
+package ulisse.infrastructures.view.station
 
 //package applications.station
 //

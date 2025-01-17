@@ -1,9 +1,9 @@
-package applications.usecase
+package ulisse.applications.useCases
 
-import applications.ports.StationPort
-import applications.station.StationMap
-import entities.Location
-import entities.station.Station
+import ulisse.applications.ports.StationPort
+import ulisse.applications.station.StationMap
+import ulisse.entities.Location
+import ulisse.entities.station.Station
 
 final case class StationManager[L <: Location](uiPort: StationPort.Outbound):
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
@@ -19,8 +19,7 @@ final case class StationManager[L <: Location](uiPort: StationPort.Outbound):
       println(stationMap)
       updatedMap
 
-  def removeStation(station: Station[L])
-      : Either[StationMap.Error, StationMap[L]] =
+  def removeStation(station: Station[L]): Either[StationMap.Error, StationMap[L]] =
     _stationMap.removeStation(station).map: updatedMap =>
       _stationMap = updatedMap; updatedMap
 

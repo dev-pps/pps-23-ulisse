@@ -1,4 +1,4 @@
-package infrastructures.ui
+package ulisse.infrastructures.view
 
 import scala.swing.*
 

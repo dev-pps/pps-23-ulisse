@@ -1,4 +1,4 @@
-package infrastructure.ui
+package ulisse.infrastructure.view
 
 //import applications.station.{Manger, StationEditorController}
 //import org.scalatest.wordspec.AnyWordSpec
