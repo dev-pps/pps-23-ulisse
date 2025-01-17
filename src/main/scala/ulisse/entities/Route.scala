@@ -3,6 +3,8 @@ package ulisse.entities
 import Coordinate.Geo
 import Route.{Id, Path, TypeRoute}
 
+import scala.compiletime.ops.string.Length
+
 trait Route:
   def id: Id
   def typology: TypeRoute
@@ -11,6 +13,7 @@ trait Route:
   def length: Double
 
   def setTopology(typeRoute: TypeRoute): Route
+  def setLength(length: Double): Route
 
   def has(id: Id): Boolean
 
@@ -39,6 +42,8 @@ object Route:
         case that: Route => has(that.id)
         case _           => false
 
-    override def hashCode(): Int = id.hashCode()
-
     override def setTopology(typeRoute: TypeRoute): Route = Route(typeRoute, id._2, length, railsCount)
+
+    override def setLength(length: Double): Route = Route(id._1, id._2, length, railsCount)
+
+    override def hashCode(): Int = id.hashCode()

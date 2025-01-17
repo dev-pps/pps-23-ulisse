@@ -34,3 +34,7 @@ class RouteTest extends AnyFlatSpec with Matchers:
   "set route typology" should "change route typology" in:
     val changeRouteTypology = route.setTopology(TypeRoute.AV)
     changeRouteTypology.typology must be(TypeRoute.AV)
+
+  "set route length" should "change route length" in:
+    val changeRouteLength = route.setLength(pathLength - 50.0d)
+    changeRouteLength.length must be(pathLength - 50.0d)
