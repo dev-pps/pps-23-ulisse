@@ -18,15 +18,18 @@ class RouteTest extends AnyFlatSpec with Matchers:
     route.length must be(pathLength)
     route.railsCount must be(railsCount)
 
-  "check same route" should "be same typology and path, but different railsCount" in:
-    val sameRoute: Route = Route(TypeRoute.Normal, path, pathLength, 1)
+  "check same route" should "be same typology and path and the others parameters different" in:
+    val sameRoute: Route = Route(TypeRoute.Normal, path, 100.0d, 1)
     route must be(sameRoute)
 
   "check different route" should "be different typology or path" in:
-    val bolognaStation: Station  = ("Bologna", Coordinate.createGeo(30d, 30d))
-    val differentTypology: Route = Route(TypeRoute.AV, path, pathLength, railsCount)
+    val bolognaStation: Station = ("Bologna", Coordinate.createGeo(30d, 30d))
     val differentPath: Route =
-      Route(TypeRoute.Normal, (riminiStation, bolognaStation), pathLength, railsCount)
+      Route(route.typology, (riminiStation, bolognaStation), pathLength, railsCount)
 
-    route must not be differentTypology
     route must not be differentPath
+    TypeRoute.values.filter(!_.canEqual(route.typology))
+      .foreach(route must not be Route(_, path, pathLength, railsCount))
+
+//  "set route typology" should "change route typology" in:
+//    val
