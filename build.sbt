@@ -8,7 +8,7 @@ hooks := {
 }
 
 scalafmtOnCompile := true
-coverageEnabled := true
+coverageEnabled   := true
 
 wartremoverWarnings ++= Warts.all
 wartremoverWarnings --= Seq(
@@ -20,19 +20,24 @@ wartremoverErrors ++= Warts.unsafe
 wartremoverErrors --= Seq(
 )
 
+Test / fork := true
+Test / javaOptions ++= Seq(
+  "-Xmx2G",
+)
+
 lazy val root = (project in file("."))
   .settings(
     name := "pps-23-ulisse",
     libraryDependencies ++= Seq(
-      "org.typelevel"          %% "cats-core"      % "2.12.0",
-      "org.scala-lang.modules" %% "scala-swing"    % "3.0.0",
-      "org.scala-lang.modules" %% "scala-swing"    % "3.0.0",
-      "org.scalatestplus"      %% "mockito-5-10"   % "3.2.18.0" % Test,
-      "org.scalatest"          %% "scalatest"      % "3.2.19" % Test,
-      "io.cucumber"            %% "cucumber-scala" % "8.25.1" % Test,
-      "com.tngtech.archunit"   %  "archunit"       % "1.3.0"  % Test,
-      "org.junit.jupiter"      %  "junit-jupiter-api" % "5.10.3" % Test
-
-),
-    Global / onLoad ~= (_ andThen ("hooks" :: _)),
+      "org.typelevel"          %% "cats-core"         % "2.12.0",
+      "org.scala-lang.modules" %% "scala-swing"       % "3.0.0",
+      "org.scala-lang.modules" %% "scala-swing"       % "3.0.0",
+      "org.slf4j"               % "slf4j-simple"      % "2.0.13",
+      "org.scalatestplus"      %% "mockito-5-10"      % "3.2.18.0" % Test,
+      "org.scalatest"          %% "scalatest"         % "3.2.19"   % Test,
+      "io.cucumber"            %% "cucumber-scala"    % "8.25.1"   % Test,
+      "com.tngtech.archunit"    % "archunit"          % "1.3.0"    % Test,
+      "org.junit.jupiter"       % "junit-jupiter-api" % "5.10.3"   % Test
+      ),
+    Global / onLoad ~= (_ andThen ("hooks" :: _))
   )
