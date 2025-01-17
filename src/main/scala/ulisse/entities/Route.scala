@@ -10,6 +10,8 @@ trait Route:
   def path: Path
   def length: Double
 
+  def setTopology(typeRoute: TypeRoute): Route
+
   def has(id: Id): Boolean
 
 object Route:
@@ -38,3 +40,5 @@ object Route:
         case _           => false
 
     override def hashCode(): Int = id.hashCode()
+
+    override def setTopology(typeRoute: TypeRoute): Route = Route(typeRoute, id._2, length, railsCount)
