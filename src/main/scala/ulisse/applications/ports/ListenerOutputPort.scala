@@ -2,16 +2,16 @@ package ulisse.applications.ports
 
 import ulisse.applications.useCases.RouteManager
 
-trait ListenerOutPort:
+trait ListenerOutputPort:
   def onSubmit(values: List[String]): Unit
 
-object ListenerOutPort:
+object ListenerOutputPort:
 
-  def apply(routeBank: RouteManager): ListenerOutPort =
-    ListenerOutPortImpl(routeBank)
+  def apply(routeBank: RouteManager): ListenerOutputPort =
+    ListenerOutputPortImpl(routeBank)
 
-  private case class ListenerOutPortImpl(routeBank: RouteManager)
-      extends ListenerOutPort:
+  private case class ListenerOutputPortImpl(routeBank: RouteManager)
+      extends ListenerOutputPort:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var bank: RouteManager = routeBank
 

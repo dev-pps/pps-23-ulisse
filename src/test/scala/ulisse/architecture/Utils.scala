@@ -10,6 +10,7 @@ object Packages:
   val USER_INTERACTIONS = "..userInteractions.."
 
   val USE_CASES = "..useCases.."
+  val PORTS     = "..ports"
 
 object ArchUnits:
   private val DO_NOT_INCLUDE_SCALA_COMPILED_FILE: Location => Boolean = !_.contains("$")
