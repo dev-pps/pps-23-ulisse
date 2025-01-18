@@ -11,12 +11,6 @@ import immutable.state.demo.immutableApplication.UI.{AppFrame, TestUI}
 
 import java.util.concurrent.LinkedBlockingQueue
 
-//def mv[SM, SV, AM, AV](m1: State[SM, AM], f: AM => State[SV, AV]): State[(SM, SV), AV] =
-//  State: (sm, sv) =>
-//    val (sm2, am) = m1.run(sm)
-//    val (sv2, av) = f(am).run(sv)
-//    ((sm2, sv2), av)
-
 def updateViewGivenAppState[AppState, AppAction](
     incomingAppState: State[AppState, AppAction],
     viewUpdate: AppAction => Unit
