@@ -27,3 +27,14 @@ class PackagesTest extends AnyFlatSpec:
       .orShould.haveSimpleNameEndingWith(inputPortEndingName)
 
     rule.check(IMPORT_ONLY_CLASSES_CREATED)
+
+  "classes of applications.adapters package" should "have Adapter as the ending in the name" in:
+    val adapterEndingName = "Adapter"
+    val rule = ArchRuleDefinition
+      .classes
+      .that
+      .resideInAPackage(Packages.INPUT_ADAPTER)
+      .should.haveSimpleNameEndingWith(adapterEndingName)
+      .allowEmptyShould(true)
+
+    rule.check(IMPORT_ONLY_CLASSES_CREATED)
