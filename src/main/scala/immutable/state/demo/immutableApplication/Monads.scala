@@ -1,6 +1,7 @@
-package immutable.state.demo
+package immutable.state.demo.immutableApplication
 
-import Streams.*, Stream.*
+import immutable.state.demo.immutableApplication.Streams.*
+import immutable.state.demo.immutableApplication.Streams.Stream.*
 object Monads:
 
   trait Monad[M[_]]:

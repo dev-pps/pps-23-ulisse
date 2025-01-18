@@ -1,10 +1,10 @@
-package immutable.state.demo
+package immutable.state.demo.immutableApplication
 
 //import applications.station.StationMap
 //import entities.Location
 //import entities.Location.Grid
 //import entities.station.Station
-import Monads.Monad
+import immutable.state.demo.immutableApplication.Monads.Monad
 //
 object States:
 //
