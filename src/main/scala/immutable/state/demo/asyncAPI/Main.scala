@@ -1,9 +1,9 @@
 package immutable.state.demo.asyncAPI
 
-import immutable.state.demo.immutableApplication.Monads.Monad
-import immutable.state.demo.immutableApplication.Monads.Monad.{map2, seqN}
-import immutable.state.demo.immutableApplication.Streams.Stream
-import immutable.state.demo.immutableApplication.Streams.Stream.{Cons, Empty}
+import immutable.state.demo.reference.Monads.Monad
+import immutable.state.demo.reference.Monads.Monad.{map2, seqN}
+import immutable.state.demo.reference.Streams.Stream
+import immutable.state.demo.reference.Streams.Stream.{Cons, Empty}
 import immutable.state.demo.asyncAPI.Application.Adapters.{RouteInputAdapter, StationInputAdapter}
 import immutable.state.demo.asyncAPI.Application.{AppState, RouteManager, StationManager}
 import immutable.state.demo.asyncAPI.UI.{AppFrame, TestUI}
