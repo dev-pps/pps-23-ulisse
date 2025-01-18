@@ -1,10 +1,9 @@
 package ulisse.architecture
 
-import com.tngtech.archunit.core.importer.{ClassFileImporter, ImportOption, Location}
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition
 import com.tngtech.archunit.library.Architectures
 import org.scalatest.flatspec.AnyFlatSpec
-import ArchUnits.IMPORT_ONLY_CLASSES_CREATED
+import ulisse.architecture.ArchUnits.IMPORT_ONLY_CLASSES_CREATED
 
 class HexagonalTest extends AnyFlatSpec:
 
