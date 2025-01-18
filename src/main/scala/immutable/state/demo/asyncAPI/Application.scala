@@ -22,9 +22,9 @@ object Application:
         stateEventQueue.offer((state: AppState) => {
           println("Adding station")
           val newStationManager = state.stationManager.addStation(arg)
-          state.copy(stationManager = newStationManager)
+          val newState          = state.copy(stationManager = newStationManager)
           promise.success(s"station $arg")
-          state
+          newState
         })
         promise.future
 
@@ -35,9 +35,9 @@ object Application:
         stateEventQueue.offer((state: AppState) => {
           println("Adding route")
           val newRouteManager = state.routeManager.addRoute(arg)
-          state.copy(routeManager = newRouteManager)
+          val newState        = state.copy(routeManager = newRouteManager)
           promise.success(arg)
-          state
+          newState
         })
         promise.future
 
