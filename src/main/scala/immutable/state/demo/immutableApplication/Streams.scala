@@ -1,4 +1,4 @@
-package immutable.state.demo
+package immutable.state.demo.immutableApplication
 
 object Streams:
 
