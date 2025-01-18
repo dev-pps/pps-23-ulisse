@@ -2,6 +2,7 @@ package ulisse.infrastructures.view.station
 
 import ulisse.applications.ports.StationPort
 import ulisse.entities.Location
+import ulisse.entities.Location.Grid
 
 import java.awt.Color
 import scala.swing.*
@@ -280,7 +281,7 @@ import scala.swing.*
 //  *   The associated StationEditorController.
 //  */
 val location = Location.createGrid(1, 1)
-final case class StationEditorView(appPort: StationPort.Inbound)
+final case class StationEditorView(appPort: StationPort.Inbound[Grid])
     extends BorderPanel:
   preferredSize = new Dimension(800, 600)
   background = Color.BLACK
