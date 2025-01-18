@@ -6,11 +6,24 @@ import ArchUnits.IMPORT_ONLY_CLASSES_CREATED
 
 class PackagesTest extends AnyFlatSpec:
 
-  "classes of use case package" should "have Manager as the ending in the name" in:
+  "classes of useCases package" should "have Manager as the ending in the name" in:
     val managerEndingName = "Manager"
-    val rule = ArchRuleDefinition.classes
+    val rule = ArchRuleDefinition
+      .classes
       .that
       .resideInAPackage(Packages.USE_CASES)
-      .should.haveSimpleNameContaining(managerEndingName)
+      .should.haveSimpleNameEndingWith(managerEndingName)
+
+    rule.check(IMPORT_ONLY_CLASSES_CREATED)
+
+  "classes of ports package" should "have Port as the ending in the name" in:
+    val outputPortEndingName = "OutputPort"
+    val inputPortEndingName  = "InputPort"
+    val rule = ArchRuleDefinition
+      .classes
+      .that
+      .resideInAPackage(Packages.PORTS)
+      .should.haveSimpleNameEndingWith(outputPortEndingName)
+      .orShould.haveSimpleNameEndingWith(inputPortEndingName)
 
     rule.check(IMPORT_ONLY_CLASSES_CREATED)
