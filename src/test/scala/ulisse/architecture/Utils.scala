@@ -9,6 +9,8 @@ object Packages:
   val INFRASTRUCTURES   = "..infrastructures.."
   val USER_INTERACTIONS = "..userInteractions.."
 
+  val USE_CASES = "..useCases.."
+
 object ArchUnits:
   private val DO_NOT_INCLUDE_SCALA_COMPILED_FILE: Location => Boolean = !_.contains("$")
 
