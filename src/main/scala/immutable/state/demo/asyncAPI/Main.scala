@@ -1,5 +1,9 @@
 package immutable.state.demo.asyncAPI
 
+import immutable.state.demo.Monads.Monad
+import immutable.state.demo.Monads.Monad.{map2, seqN}
+import immutable.state.demo.Streams.Stream
+import immutable.state.demo.Streams.Stream.{Cons, Empty}
 import immutable.state.demo.asyncAPI.Application.Adapters.{RouteInputAdapter, StationInputAdapter}
 import immutable.state.demo.asyncAPI.Application.{AppState, RouteManager, StationManager}
 import immutable.state.demo.asyncAPI.UI.{AppFrame, TestUI}
@@ -17,8 +21,8 @@ import java.util.concurrent.LinkedBlockingQueue
   app.open()
 
   val initialState = AppState(StationManager(List.empty), RouteManager(List.empty))
-
-  LazyList.continually(stateEventQueue.take()).foreach(event =>
-    println("Event")
-    event(initialState)
+  LazyList.continually(stateEventQueue.take()).scanLeft(initialState)((state, event) =>
+    event(state)
+  ).foreach((appState: AppState) =>
+    println(s"Stations: ${appState.stationManager.stations.length}, Routes: ${appState.routeManager.routes.length}")
   )
