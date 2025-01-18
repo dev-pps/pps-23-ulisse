@@ -2,36 +2,8 @@ package immutable.state.demo.immutableApplication
 
 import immutable.state.demo.immutableApplication.Monads.Monad
 
-//import applications.station.StationMap
-//import entities.Location
-//import entities.Location.Grid
-//import entities.station.Station
-
-//
 object States:
-  //
-  //  case class StationStateV1[L <: Location](stationMap: StationMap[L]):
-  //    def addStation(station: Station[L]): Either[StationMap.Error, StationMap[L]] =
-  //      stationMap.addStation(station)
-  //    def get(): StationMap[L] = stationMap
-  //
-  //  trait StationState[L <: Location]:
-  //    type StationStateType
-  //    def get(): State[StationStateType, StationMap[L]]
-  //    def addStation(station: Station[L])
-  //        : State[StationStateType, Either[StationMap.Error, StationMap[L]]]
-  //
-  //  object StationStateImpl extends StationState[Grid]:
-  //    type StationStateType = StationMap[Grid]
-  //    def addStation(station: Station[Grid])
-  //        : State[StationMap[Grid], Either[StationMap.Error, StationMap[Grid]]] =
-  //      State(s =>
-  //        s.addStation(station) match
-  //          case Left(value)  => (s, Left(value))
-  //          case Right(value) => (value, Right(value))
-  //      )
-  //    def get(): State[StationMap[Grid], StationMap[Grid]] = State(s => (s, s))
-  //
+
   //  // data structure for state (evolution)
   //  // a state is/has a function evolving S and producing a result A
   final case class State[S, A](run: S => (S, A))
