@@ -2,7 +2,7 @@ package immutable.state.demo.immutableApplication
 
 import immutable.state.demo.immutableApplication.Application.Adapters.{RouteInputAdapter, StationInputAdapter}
 import immutable.state.demo.immutableApplication.Application.AppState
-import immutable.state.demo.immutableApplication.States.State
+import immutable.state.demo.reference.States.State
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.swing.*
@@ -27,8 +27,6 @@ object UI:
           (stateAction => println(s"StationUI: $stateAction"))
         )
       )
-//      stationInputAdapter.stationPortMethod("station")
-      // TODO use returned state
     }) = BorderPanel.Position.West
 
   case class RouteUI(
@@ -36,8 +34,12 @@ object UI:
       stateEventQueue: LinkedBlockingQueue[() => State[AppState, ?]]
   ) extends BorderPanel:
     layout(Button("Add Route") {
-      routeInputAdapter.routePortMethod(1)
-      // TODO use returned state
+      stateEventQueue.offer(() =>
+        updateViewGivenAppState(
+          routeInputAdapter.routePortMethod(1),
+          (stateAction => println(s"RouteUI: $stateAction"))
+        )
+      )
     }) = BorderPanel.Position.East
 
   final case class AppFrame() extends MainFrame:

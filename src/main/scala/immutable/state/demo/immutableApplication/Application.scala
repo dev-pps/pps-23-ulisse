@@ -1,6 +1,6 @@
 package immutable.state.demo.immutableApplication
 
-import immutable.state.demo.immutableApplication.States.State
+import immutable.state.demo.reference.States.State
 import java.util.concurrent.LinkedBlockingQueue
 
 object Application:
