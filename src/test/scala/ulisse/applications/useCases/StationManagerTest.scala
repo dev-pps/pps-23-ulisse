@@ -5,8 +5,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.applications.ports.StationPorts
 import ulisse.applications.useCases.StationManager
-import ulisse.entities.Location
-import ulisse.entities.Location.Grid
+import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
 
 class StationManagerTest extends AnyWordSpec with Matchers:
@@ -15,11 +14,11 @@ class StationManagerTest extends AnyWordSpec with Matchers:
 
   "StationManager" should:
     "initialize with an empty station map" in:
-      StationManager[Grid](mockUI).stationMap.stations shouldBe empty
+      StationManager[Int, Grid](mockUI).stationMap.stations shouldBe empty
 
     "add a valid station to the station map" in:
-      val stationManager = StationManager[Grid](mockUI)
-      Location.createGrid(1, 1).flatMap(
+      val stationManager = StationManager[Int, Grid](mockUI)
+      Coordinate.createGrid(1, 1).flatMap(
         Station("Station1", _, 1)
       ).toOption match
         case Some(value) => stationManager.addStation(value) match
@@ -29,11 +28,11 @@ class StationManagerTest extends AnyWordSpec with Matchers:
         case None => fail()
 
     "add invalid station to the station map" in:
-      val stationManager = StationManager[Grid](mockUI)
+      val stationManager = StationManager[Int, Grid](mockUI)
       val location1 =
-        Location.createGrid(1, 1).flatMap(Station("Station1", _, 1)).toOption
+        Coordinate.createGrid(1, 1).flatMap(Station("Station1", _, 1)).toOption
       val location2 =
-        Location.createGrid(1, 1).flatMap(Station("Station2", _, 1)).toOption
+        Coordinate.createGrid(1, 1).flatMap(Station("Station2", _, 1)).toOption
       (location1, location2) match
         case (Some(s1), Some(s2)) =>
           stationManager.addStation(s1).flatMap(
@@ -45,8 +44,8 @@ class StationManagerTest extends AnyWordSpec with Matchers:
         case (_, _) => fail()
 
     "remove a present station from the station map" in:
-      val stationManager = StationManager[Grid](mockUI)
-      Location.createGrid(1, 1).flatMap(
+      val stationManager = StationManager[Int, Grid](mockUI)
+      Coordinate.createGrid(1, 1).flatMap(
         Station("Station1", _, 1)
       ).toOption match
         case Some(value) =>
@@ -59,11 +58,11 @@ class StationManagerTest extends AnyWordSpec with Matchers:
         case None => fail()
 
     "not remove an absent station from the station map" in:
-      val stationManager = StationManager[Grid](mockUI)
+      val stationManager = StationManager[Int, Grid](mockUI)
       val station1 =
-        Location.createGrid(1, 1).flatMap(Station("Station1", _, 1)).toOption
+        Coordinate.createGrid(1, 1).flatMap(Station("Station1", _, 1)).toOption
       val station2 =
-        Location.createGrid(2, 2).flatMap(Station("Station2", _, 1)).toOption
+        Coordinate.createGrid(2, 2).flatMap(Station("Station2", _, 1)).toOption
       (station1, station2) match
         case (Some(s1), Some(s2)) =>
           stationManager.addStation(s1).flatMap(

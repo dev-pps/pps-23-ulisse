@@ -1,7 +1,7 @@
 package ulisse.applications.station
 
 import cats.implicits.catsSyntaxEq
-import ulisse.entities.Location
+import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
 /** Defines a map of stations.
@@ -15,10 +15,10 @@ import ulisse.entities.station.Station
   * @tparam L
   *   The type of the location associated with the station.
   */
-trait StationMap[L <: Location]:
-  type StationMapType <: Seq[Station[L]]
+trait StationMap[N: Numeric, C <: Coordinate[N]]:
+  type StationMapType <: Seq[Station[N, C]]
   val stations: StationMapType
-  def map[B](f: Station[L] => B): List[B]
+  def map[B](f: Station[N, C] => B): List[B]
 
   /** Adds a station to the map.
     *
@@ -27,7 +27,7 @@ trait StationMap[L <: Location]:
     * @return
     *   Either a `StationMap` instance with the added station or an 'Error' indicating the issue.
     */
-  def addStation(station: Station[L]): Either[StationMap.Error, StationMap[L]]
+  def addStation(station: Station[N, C]): Either[StationMap.Error, StationMap[N, C]]
 
   /** Removes a station from the map.
     *
@@ -36,7 +36,7 @@ trait StationMap[L <: Location]:
     * @return
     *   Either a `StationMap` instance without the removed station or an 'Error' indicating the issue.
     */
-  def removeStation(station: Station[L]): Either[StationMap.Error, StationMap[L]]
+  def removeStation(station: Station[N, C]): Either[StationMap.Error, StationMap[N, C]]
 
   /** Finds a station at the given location.
     *
@@ -45,7 +45,7 @@ trait StationMap[L <: Location]:
     * @return
     *   An `Option` containing the station at the given location, if found.
     */
-  def findStationAt(location: L): Option[Station[L]]
+  def findStationAt(location: C): Option[Station[N, C]]
 
 /** Factory for [[StationMap]] instances. */
 object StationMap:
@@ -54,7 +54,7 @@ object StationMap:
   enum Error:
     case DuplicateStationName, DuplicateStationLocation, StationNotFound
 
-  private def validateUniqueNames[L <: Location, T <: Seq[Station[L]]](
+  private def validateUniqueNames[N: Numeric, C <: Coordinate[N], T <: Seq[Station[N, C]]](
       stations: T
   ): Either[Error, Unit] =
     Either.cond(
@@ -63,7 +63,7 @@ object StationMap:
       Error.DuplicateStationName
     )
 
-  private def validateUniqueLocations[L <: Location, T <: Seq[Station[L]]](
+  private def validateUniqueLocations[N: Numeric, C <: Coordinate[N], T <: Seq[Station[N, C]]](
       stations: T
   ): Either[Error, Unit] =
     Either.cond(
@@ -80,21 +80,21 @@ object StationMap:
     *   A `StationMap` instance.
     */
 
-  def apply[L <: Location](): StationMap[L] = StationMapImpl(List.empty)
+  def apply[N: Numeric, C <: Coordinate[N]](): StationMap[N, C] = StationMapImpl(List.empty)
 
-  private final case class StationMapImpl[L <: Location](
-      stations: List[Station[L]]
-  ) extends StationMap[L]:
-    type StationMapType = List[Station[L]]
+  private final case class StationMapImpl[N: Numeric, C <: Coordinate[N]](
+      stations: List[Station[N, C]]
+  ) extends StationMap[N, C]:
+    type StationMapType = List[Station[N, C]]
 
-    def addStation(station: Station[L]): Either[Error, StationMap[L]] =
+    def addStation(station: Station[N, C]): Either[Error, StationMap[N, C]] =
       val updatedStations = station :: stations
       for
-        _ <- validateUniqueNames[L, StationMapType](updatedStations)
-        _ <- validateUniqueLocations[L, StationMapType](updatedStations)
+        _ <- validateUniqueNames[N, C, StationMapType](updatedStations)
+        _ <- validateUniqueLocations[N, C, StationMapType](updatedStations)
       yield StationMapImpl(updatedStations)
 
-    def removeStation(station: Station[L]): Either[Error, StationMap[L]] =
+    def removeStation(station: Station[N, C]): Either[Error, StationMap[N, C]] =
       if stations.exists(_.location === station.location) then
         Right(
           StationMapImpl(stations.filterNot(_.location === station.location))
@@ -102,7 +102,7 @@ object StationMap:
       else
         Left(Error.StationNotFound)
 
-    def findStationAt(location: L): Option[Station[L]] =
+    def findStationAt(location: C): Option[Station[N, C]] =
       stations.find(_.location === location)
 
     export stations.map
