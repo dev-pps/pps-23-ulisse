@@ -15,11 +15,11 @@ trait RouteManager:
 
 object RouteManager:
   def apply(bank: Bank): RouteManager = RouteManagerImpl(bank)
-
+  def empty(): RouteManager           = RouteManager(Map.empty)
   def fromList(routes: List[Route]): RouteManager =
-    RouteManagerImpl(routes.map(route => (route.id, route)).toMap)
+    RouteManager(routes.map(route => (route.id, route)).toMap)
 
-  def empty(): RouteManager = RouteManagerImpl(Map.empty)
+  private def updateWith[A, B <: A](obj: A)(transform: A => B): A = transform(obj)
 
   enum ErrorSaving:
     case notExist
@@ -30,7 +30,7 @@ object RouteManager:
     override def size: Int = manager.size
 
     override def save(route: Route): Either[ErrorSaving, RouteManager] =
-      RouteManager(manager + (route.id -> route)).asRight
+      updateWith(this)(_.copy(manager + (route.id -> route))).asRight
 
     override def route(id: Id): Option[Route] = manager.get(id)
 
