@@ -23,7 +23,7 @@ final case class StationCard(
     openStationForm: Option[Station[Int, Grid]] => Unit
 ) extends GridPanel(3, 1):
   contents += new Label(s"Name: ${station.name}")
-  contents += new Label(s"Location: ${station.location}")
+  contents += new Label(s"Location: ${station.coordinate}")
   contents += new Label(s"numberOfTrack: ${station.numberOfTrack}")
   border = LineBorder(Color.BLACK, 2)
   listenTo(mouse.clicks)
@@ -141,8 +141,8 @@ final case class StationForm(
   private val numberOfTrack = new TextField(5)
   for s <- station do
     stationName.text = s.name
-    latitude.text = s.location.row.toString
-    longitude.text = s.location.column.toString
+    latitude.text = s.coordinate.row.toString
+    longitude.text = s.coordinate.column.toString
     numberOfTrack.text = s.numberOfTrack.toString
 
   /** Sets the location in the StationForm.

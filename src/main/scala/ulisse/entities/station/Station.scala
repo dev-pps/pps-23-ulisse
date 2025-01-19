@@ -8,16 +8,16 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
   *
   * A Station represents a location with tracks and associated metadata.
   *
-  * **Requirements**:
-  *   - The `name` must not be empty or blank.
-  *   - The `numberOfTrack` must be greater than 0.
-  *
-  * @tparam L
-  *   The type of the location associated with the station.
+  * @tparam N
+  *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
+  *   - An instance of `Numeric` must be available for the `N` type.
+  * @tparam C
+  *   A type that extends `Coordinate[N]`, which represents the station's location.
+  *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
   */
 trait Station[N: Numeric, C <: Coordinate[N]]:
   val name: String
-  val location: C
+  val coordinate: C
   val numberOfTrack: Int
 
 /** Factory for [[Station]] instances. */
@@ -25,16 +25,16 @@ object Station:
 
   def apply[N: Numeric, C <: Coordinate[N]](
       name: String,
-      location: C,
+      coordinate: C,
       numberOfTrack: Int
   ): Station[N, C] =
-    StationImpl(name, location, numberOfTrack)
+    StationImpl(name, coordinate, numberOfTrack)
 
   /** Creates a `Station` instance with validation.
     *
     * @param name
     *   The name of the station. Must not be empty or blank.
-    * @param location
+    * @param coordinate
     *   The location of the station.
     * @param numberOfTrack
     *   The number of tracks. Must be greater than 0.
@@ -43,17 +43,17 @@ object Station:
     */
   def createCheckedStation[N: Numeric, C <: Coordinate[N]](
       name: String,
-      location: C,
+      coordinate: C,
       numberOfTrack: Int
-  ): Either[AppError, CheckedStation[N, C]] =
+  ): Either[CheckedStation.Error, CheckedStation[N, C]] =
     for
       validName          <- validateNonBlankString(name, CheckedStation.Error.InvalidName)
       validNumberOfTrack <- validatePositive(numberOfTrack, CheckedStation.Error.InvalidNumberOfTrack)
-    yield CheckedStation(validName, location, validNumberOfTrack)
+    yield CheckedStation(validName, coordinate, validNumberOfTrack)
 
   private final case class StationImpl[N: Numeric, C <: Coordinate[N]](
       name: String,
-      location: C,
+      coordinate: C,
       numberOfTrack: Int
   ) extends Station[N, C]
 
@@ -63,19 +63,14 @@ object Station:
       case InvalidName, InvalidNumberOfTrack
 
   /** Defines a CheckedStation.
-   *
-   * A Station represents a location with tracks and associated metadata.
-   *
-   * **Requirements**:
-   *   - The `name` must not be empty or blank.
-   *   - The `numberOfTrack` must be greater than 0.
-   *
-   * @tparam L
-   * The type of the location associated with the station.
-   */
+    *
+    * **Requirements**:
+    *   - The `name` must not be empty or blank.
+    *   - The `numberOfTrack` must be greater than 0.
+    */
   case class CheckedStation[N: Numeric, C <: Coordinate[N]](
       name: String,
-      location: C,
+      coordinate: C,
       numberOfTrack: Int
   ) extends Station[N, C]
 
@@ -89,8 +84,6 @@ trait Selectable:
   *   the station instance of type `Station[L]` to be wrapped
   * @param selected
   *   a boolean flag indicating whether the station is selected
-  * @tparam L
-  *   The type of the location associated with the station.
   */
 final case class SelectableStation[N: Numeric, C <: Coordinate[N]](
     station: Station[N, C],
