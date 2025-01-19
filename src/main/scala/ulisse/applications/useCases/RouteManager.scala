@@ -4,7 +4,6 @@ import cats.syntax.either.*
 import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
 import ulisse.entities.Route.Id
-import ulisse.utils.CreationUtils
 
 import scala.collection.immutable.Map
 
@@ -29,7 +28,7 @@ object RouteManager:
     override def size: Int = manager.size
 
     override def save(route: Route): Either[ErrorSaving, RouteManager] =
-      CreationUtils.updateWith(this)(_.copy(manager + (route.id -> route))).asRight
+      this.copy(manager + (route.id -> route)).asRight
 
     override def route(id: Id): Option[Route] = manager.get(id)
 
