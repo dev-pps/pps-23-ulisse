@@ -2,8 +2,9 @@ package ulisse.infrastructures.view.station
 
 import cats.syntax.either.*
 import ulisse.applications.ports.StationPorts
-import ulisse.entities.Coordinates.*
+import ulisse.entities.Coordinates.{Coordinate, Grid}
 import ulisse.entities.station.Station
+import ulisse.entities.station.Station.CheckedStation
 
 /** Controller for StationEditorView.
   *
@@ -24,7 +25,7 @@ final case class StationEditorController(appPort: StationPorts.Input[Int, Grid])
       latitude: String,
       longitude: String,
       numberOfTrack: String
-  ): Either[Error, Station[Int, Grid]] =
+  ): Either[Error, CheckedStation[Int, Grid]] =
     for
       row    <- latitude.toIntOption.toRight(Error.InvalidRow)
       column <- longitude.toIntOption.toRight(Error.InvalidColumn)
@@ -35,7 +36,7 @@ final case class StationEditorController(appPort: StationPorts.Input[Int, Grid])
         case Right(value) => Right(value)
       numberOfTrack <-
         numberOfTrack.toIntOption.toRight(Error.InvalidNumberOfTrack)
-      station <- Station(name, location, numberOfTrack) match
+      station <- Station.createCheckedStation(name, location, numberOfTrack) match
         case Left(_)      => Left(Error.InvalidStation)
         case Right(value) => Right(value)
     yield station

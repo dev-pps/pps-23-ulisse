@@ -16,7 +16,7 @@ class StationMapTest extends AnyWordSpec with Matchers:
     "a new station is added" should:
       "contain the new station" in:
         Coordinate.createGrid(0, 0).flatMap(
-          Station("StationA", _, 1)
+          Station.createCheckedStation("StationA", _, 1)
         ).toOption match
           case Some(value) =>
             StationMap[Int, Grid]().addStation(value).map(_.stations) match
@@ -27,9 +27,9 @@ class StationMapTest extends AnyWordSpec with Matchers:
     "another station with same name is added" should:
       "not be added and returns error" in:
         val station1 =
-          Coordinate.createGrid(0, 0).flatMap(Station("StationA", _, 1)).toOption
+          Coordinate.createGrid(0, 0).flatMap(Station.createCheckedStation("StationA", _, 1)).toOption
         val station2 =
-          Coordinate.createGrid(1, 1).flatMap(Station("StationA", _, 1)).toOption
+          Coordinate.createGrid(1, 1).flatMap(Station.createCheckedStation("StationA", _, 1)).toOption
         (station1, station2) match
           case (Some(s1), Some(s2)) =>
             StationMap[Int, Grid]().addStation(s1).flatMap(
@@ -40,9 +40,9 @@ class StationMapTest extends AnyWordSpec with Matchers:
     "another station with same location is added" should:
       "not be added and returns error" in:
         val station1 =
-          Coordinate.createGrid(0, 0).flatMap(Station("StationA", _, 1)).toOption
+          Coordinate.createGrid(0, 0).flatMap(Station.createCheckedStation("StationA", _, 1)).toOption
         val station2 =
-          Coordinate.createGrid(0, 0).flatMap(Station("StationB", _, 1)).toOption
+          Coordinate.createGrid(0, 0).flatMap(Station.createCheckedStation("StationB", _, 1)).toOption
         (station1, station2) match
           case (Some(s1), Some(s2)) =>
             StationMap[Int, Grid]().addStation(s1).flatMap(
@@ -53,7 +53,7 @@ class StationMapTest extends AnyWordSpec with Matchers:
     "existing station is removed" should:
       "no longer be present" in:
         Coordinate.createGrid(0, 0).flatMap(
-          Station("StationA", _, 1)
+          Station.createCheckedStation("StationA", _, 1)
         ).toOption match
           case Some(value) =>
             StationMap[Int, Grid]().addStation(value).flatMap(
@@ -66,7 +66,7 @@ class StationMapTest extends AnyWordSpec with Matchers:
     "non-existing station is removed" should:
       "return error" in:
         Coordinate.createGrid(0, 0).flatMap(
-          Station("StationA", _, 1)
+          Station.createCheckedStation("StationA", _, 1)
         ).toOption match
           case Some(value) =>
             StationMap[Int, Grid]().removeStation(value) shouldBe Left(

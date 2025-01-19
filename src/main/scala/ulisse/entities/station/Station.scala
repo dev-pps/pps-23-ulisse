@@ -1,6 +1,8 @@
 package ulisse.entities.station
 
 import ulisse.entities.Coordinates.Coordinate
+import ulisse.utils.Errors.AppError
+import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
 
 /** Defines a Station.
   *
@@ -21,17 +23,12 @@ trait Station[N: Numeric, C <: Coordinate[N]]:
 /** Factory for [[Station]] instances. */
 object Station:
 
-  /** Represents errors that can occur during station creation. */
-  enum Error:
-    case InvalidName, InvalidNumberOfTrack
-
-  private def validateName(value: String, error: Error): Either[Error, String] =
-    Either.cond(!value.isBlank, value, error)
-  private def validateNumberOfTrack(
-      value: Int,
-      error: Error
-  ): Either[Error, Int] =
-    Either.cond(value > 0, value, error)
+  def apply[N: Numeric, C <: Coordinate[N]](
+      name: String,
+      location: C,
+      numberOfTrack: Int
+  ): Station[N, C] =
+    StationImpl(name, location, numberOfTrack)
 
   /** Creates a `Station` instance with validation.
     *
@@ -44,18 +41,28 @@ object Station:
     * @return
     *   Either a `Station` instance or an `Errors` indicating the issue.
     */
-  def apply[N: Numeric, C <: Coordinate[N]](
+  def createCheckedStation[N: Numeric, C <: Coordinate[N]](
       name: String,
       location: C,
       numberOfTrack: Int
-  ): Either[Error, Station[N, C]] =
+  ): Either[AppError, CheckedStation[N, C]] =
     for
-      validName <- validateName(name, Error.InvalidName)
-      validNumberOfTrack <-
-        validateNumberOfTrack(numberOfTrack, Error.InvalidNumberOfTrack)
-    yield StationImpl(validName, location, validNumberOfTrack)
+      validName          <- validateNonBlankString(name, CheckedStation.Error.InvalidName)
+      validNumberOfTrack <- validatePositive(numberOfTrack, CheckedStation.Error.InvalidNumberOfTrack)
+    yield CheckedStation(validName, location, validNumberOfTrack)
 
   private final case class StationImpl[N: Numeric, C <: Coordinate[N]](
+      name: String,
+      location: C,
+      numberOfTrack: Int
+  ) extends Station[N, C]
+
+  object CheckedStation:
+    /** Represents errors that can occur during station creation. */
+    enum Error extends AppError:
+      case InvalidName, InvalidNumberOfTrack
+
+  case class CheckedStation[N: Numeric, C <: Coordinate[N]](
       name: String,
       location: C,
       numberOfTrack: Int

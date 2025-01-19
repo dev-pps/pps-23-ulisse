@@ -19,7 +19,7 @@ class StationManagerTest extends AnyWordSpec with Matchers:
     "add a valid station to the station map" in:
       val stationManager = StationManager[Int, Grid](mockUI)
       Coordinate.createGrid(1, 1).flatMap(
-        Station("Station1", _, 1)
+        Station.createCheckedStation("Station1", _, 1)
       ).toOption match
         case Some(value) => stationManager.addStation(value) match
             case Right(_) =>
@@ -30,9 +30,9 @@ class StationManagerTest extends AnyWordSpec with Matchers:
     "add invalid station to the station map" in:
       val stationManager = StationManager[Int, Grid](mockUI)
       val location1 =
-        Coordinate.createGrid(1, 1).flatMap(Station("Station1", _, 1)).toOption
+        Coordinate.createGrid(1, 1).flatMap(Station.createCheckedStation("Station1", _, 1)).toOption
       val location2 =
-        Coordinate.createGrid(1, 1).flatMap(Station("Station2", _, 1)).toOption
+        Coordinate.createGrid(1, 1).flatMap(Station.createCheckedStation("Station2", _, 1)).toOption
       (location1, location2) match
         case (Some(s1), Some(s2)) =>
           stationManager.addStation(s1).flatMap(
@@ -46,7 +46,7 @@ class StationManagerTest extends AnyWordSpec with Matchers:
     "remove a present station from the station map" in:
       val stationManager = StationManager[Int, Grid](mockUI)
       Coordinate.createGrid(1, 1).flatMap(
-        Station("Station1", _, 1)
+        Station.createCheckedStation("Station1", _, 1)
       ).toOption match
         case Some(value) =>
           stationManager.addStation(value) match
@@ -60,9 +60,9 @@ class StationManagerTest extends AnyWordSpec with Matchers:
     "not remove an absent station from the station map" in:
       val stationManager = StationManager[Int, Grid](mockUI)
       val station1 =
-        Coordinate.createGrid(1, 1).flatMap(Station("Station1", _, 1)).toOption
+        Coordinate.createGrid(1, 1).flatMap(Station.createCheckedStation("Station1", _, 1)).toOption
       val station2 =
-        Coordinate.createGrid(2, 2).flatMap(Station("Station2", _, 1)).toOption
+        Coordinate.createGrid(2, 2).flatMap(Station.createCheckedStation("Station2", _, 1)).toOption
       (station1, station2) match
         case (Some(s1), Some(s2)) =>
           stationManager.addStation(s1).flatMap(
