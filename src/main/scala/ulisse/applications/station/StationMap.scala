@@ -80,18 +80,18 @@ object StationMap:
       val updatedStations = station :: stations
       for
         _ <- validateUniqueItems(updatedStations.map(_.name), Error.DuplicateStationName)
-        _ <- validateUniqueItems(updatedStations.map(_.location), Error.DuplicateStationLocation)
+        _ <- validateUniqueItems(updatedStations.map(_.coordinate), Error.DuplicateStationLocation)
       yield StationMapImpl(updatedStations)
 
     def removeStation(station: Station[N, C]): Either[Error, StationMap[N, C]] =
-      if stations.exists(_.location === station.location) then
+      if stations.exists(_.coordinate === station.coordinate) then
         Right(
-          StationMapImpl(stations.filterNot(_.location === station.location))
+          StationMapImpl(stations.filterNot(_.coordinate === station.coordinate))
         )
       else
         Left(Error.StationNotFound)
 
     def findStationAt(coordinate: C): Option[Station[N, C]] =
-      stations.find(_.location === coordinate)
+      stations.find(_.coordinate === coordinate)
 
     export stations.map

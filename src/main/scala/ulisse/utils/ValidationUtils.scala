@@ -4,27 +4,27 @@ import cats.implicits.catsSyntaxEq
 import ulisse.utils.Errors.AppError
 
 object ValidationUtils:
-  def validateRange[N: Numeric](
+  def validateRange[N: Numeric, E <: AppError](
       value: N,
       min: N,
       max: N,
-      error: AppError
-  )(using numeric: Numeric[N]): Either[AppError, N] =
+      error: E
+  )(using numeric: Numeric[N]): Either[E, N] =
     Either.cond(numeric.gteq(value, min) && numeric.lteq(value, max), value, error)
 
-  def validateNonNegative[N: Numeric](
+  def validateNonNegative[N: Numeric, E <: AppError](
       value: N,
-      error: AppError
-  )(using numeric: Numeric[N]): Either[AppError, N] =
+      error: E
+  )(using numeric: Numeric[N]): Either[E, N] =
     Either.cond(numeric.gteq(value, numeric.zero), value, error)
 
-  def validatePositive[N: Numeric](
+  def validatePositive[N: Numeric, E <: AppError](
       value: N,
-      error: AppError
-  )(using numeric: Numeric[N]): Either[AppError, N] =
+      error: E
+  )(using numeric: Numeric[N]): Either[E, N] =
     Either.cond(numeric.gt(value, numeric.zero), value, error)
 
-  def validateNonBlankString(value: String, error: AppError): Either[AppError, String] =
+  def validateNonBlankString[E <: AppError](value: String, error: E): Either[E, String] =
     Either.cond(!value.isBlank, value, error)
 
   def validateUniqueItems[E <: AppError](items: Seq[?], error: E): Either[E, Seq[?]] =
