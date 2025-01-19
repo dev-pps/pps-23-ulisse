@@ -30,6 +30,9 @@ object Coordinates:
 
   /** Factory for [Coordinate] instances. */
   object Coordinate:
+
+    def apply[T: Numeric](x: T, y: T): Coordinate[T] = CoordinateImpl(x, y)
+
     /** Creates a `Geo` instance with validation.
       *
       * @param latitude
@@ -60,6 +63,8 @@ object Coordinates:
         validRow <- validateNonNegative(row, Grid.Error.InvalidRow)
         validCol <- validateNonNegative(column, Grid.Error.InvalidColumn)
       yield Grid(validRow, validCol)
+
+    private final case class CoordinateImpl[T: Numeric](x: T, y: T) extends Coordinate[T](x, y)
 
   object Geo:
     /** Represents errors that can occur during [Geo] creation. */

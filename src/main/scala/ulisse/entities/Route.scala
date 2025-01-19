@@ -1,7 +1,7 @@
 package ulisse.entities
 
-import Coordinates.Geo
 import Route.{Id, Path, TypeRoute}
+import ulisse.entities.station.Station
 
 trait Route(val id: Id, val length: Double, val railsCount: Int):
   def typology: TypeRoute
