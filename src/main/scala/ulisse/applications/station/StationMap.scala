@@ -3,17 +3,24 @@ package ulisse.applications.station
 import cats.implicits.catsSyntaxEq
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
+import ulisse.utils.Errors.AppError
+import ulisse.utils.ValidationUtils.validateUniqueItems
 
 /** Defines a map of stations.
   *
-  * A StationMap represents a collection of stations.
+  * A `StationMap` represents a collection of stations, where each station is uniquely identified by its name and its
+  * location. This trait provides functionality to store, retrieve, and manipulate a collection of stations.
   *
   * **Requirements**:
   *   - The `name` of each station must be unique.
   *   - The `location` of each station must be unique.
   *
-  * @tparam L
-  *   The type of the location associated with the station.
+  * @tparam N
+  *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
+  *   - An instance of `Numeric` must be available for the `N` type.
+  * @tparam C
+  *   A type that extends `Coordinate[N]`, which represents the station's location.
+  *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
   */
 trait StationMap[N: Numeric, C <: Coordinate[N]]:
   type StationMapType <: Seq[Station[N, C]]
@@ -51,26 +58,8 @@ trait StationMap[N: Numeric, C <: Coordinate[N]]:
 object StationMap:
 
   /** Represents errors that can occur during station map creation. */
-  enum Error:
+  enum Error extends AppError:
     case DuplicateStationName, DuplicateStationLocation, StationNotFound
-
-  private def validateUniqueNames[N: Numeric, C <: Coordinate[N], T <: Seq[Station[N, C]]](
-      stations: T
-  ): Either[Error, Unit] =
-    Either.cond(
-      stations.map(_.name).distinct.size === stations.size,
-      (),
-      Error.DuplicateStationName
-    )
-
-  private def validateUniqueLocations[N: Numeric, C <: Coordinate[N], T <: Seq[Station[N, C]]](
-      stations: T
-  ): Either[Error, Unit] =
-    Either.cond(
-      stations.map(_.location).distinct.size === stations.size,
-      (),
-      Error.DuplicateStationLocation
-    )
 
   /** Creates an empty `StationMap` instance.
     *
@@ -90,8 +79,8 @@ object StationMap:
     def addStation(station: Station[N, C]): Either[Error, StationMap[N, C]] =
       val updatedStations = station :: stations
       for
-        _ <- validateUniqueNames[N, C, StationMapType](updatedStations)
-        _ <- validateUniqueLocations[N, C, StationMapType](updatedStations)
+        _ <- validateUniqueItems(updatedStations.map(_.name), Error.DuplicateStationName)
+        _ <- validateUniqueItems(updatedStations.map(_.location), Error.DuplicateStationLocation)
       yield StationMapImpl(updatedStations)
 
     def removeStation(station: Station[N, C]): Either[Error, StationMap[N, C]] =
@@ -102,7 +91,7 @@ object StationMap:
       else
         Left(Error.StationNotFound)
 
-    def findStationAt(location: C): Option[Station[N, C]] =
-      stations.find(_.location === location)
+    def findStationAt(coordinate: C): Option[Station[N, C]] =
+      stations.find(_.location === coordinate)
 
     export stations.map

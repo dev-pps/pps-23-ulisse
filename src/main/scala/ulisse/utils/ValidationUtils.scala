@@ -1,5 +1,6 @@
 package ulisse.utils
 
+import cats.implicits.catsSyntaxEq
 import ulisse.utils.Errors.AppError
 
 object ValidationUtils:
@@ -25,3 +26,6 @@ object ValidationUtils:
 
   def validateNonBlankString(value: String, error: AppError): Either[AppError, String] =
     Either.cond(!value.isBlank, value, error)
+
+  def validateUniqueItems[E <: AppError](items: Seq[?], error: E): Either[E, Seq[?]] =
+    Either.cond(items.distinct.size === items.size, items, error)
