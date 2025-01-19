@@ -16,7 +16,7 @@ trait RouteManager:
 object RouteManager:
   def apply(bank: Bank): RouteManager = RouteManagerImpl(bank)
   def empty(): RouteManager           = RouteManager(Map.empty)
-  def fromList(routes: List[Route]): RouteManager =
+  def createOf(routes: List[Route]): RouteManager =
     RouteManager(routes.map(route => (route.id, route)).toMap)
 
   private def updateWith[A, B <: A](obj: A)(transform: A => B): A = transform(obj)
