@@ -13,8 +13,8 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
   val pathLength: Double     = 200.0d
   val railsCount             = 1
 
-  val route: Route = Route(TypeRoute.Normal, path, pathLength, railsCount)
-  val routeManager = RouteManager.fromList(List(route))
+  val route: Route               = Route(TypeRoute.Normal, path, pathLength, railsCount)
+  val routeManager: RouteManager = RouteManager.fromList(List(route))
 
   "save new route" should "contains in routeBank" in:
     val routeBank    = RouteManager.empty()
