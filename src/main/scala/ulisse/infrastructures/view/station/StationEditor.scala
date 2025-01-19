@@ -281,7 +281,7 @@ import scala.swing.*
 //  *   The associated StationEditorController.
 //  */
 val location = Location.createGrid(1, 1)
-final case class StationEditorView(appPort: StationPort.Inbound[Grid])
+final case class StationEditorView(appPort: StationPort.Input[Grid])
     extends BorderPanel:
   preferredSize = new Dimension(800, 600)
   background = Color.BLACK

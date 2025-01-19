@@ -9,7 +9,7 @@ import ulisse.entities.station.Station
   */
 object StationPort:
 
-  trait Outbound:
+  trait Output:
     def show(): Unit
 
   /** Trait representing inbound operations for interacting with a `StationMap`.
@@ -17,7 +17,7 @@ object StationPort:
     * @tparam L
     *   The type of location used by the stations.
     */
-  trait Inbound[L <: Location]
+  trait Input[L <: Location]
 
 //    /** Retrieves the current station map.
 //      *
