@@ -3,14 +3,9 @@ package ulisse.entities
 import Coordinate.Geo
 import Route.{Id, Path, TypeRoute}
 
-import scala.compiletime.ops.string.Length
-
-trait Route:
-  def id: Id
+trait Route(val id: Id, val length: Double, val railsCount: Int):
   def typology: TypeRoute
-  def railsCount: Int
   def path: Path
-  def length: Double
 
   def setTopology(typeRoute: TypeRoute): Route
   def setLength(length: Double): Route
@@ -28,7 +23,8 @@ object Route:
   enum TypeRoute:
     case Normal, AV
 
-  private case class RouteImpl(id: Id, length: Double, railsCount: Int) extends Route:
+  private case class RouteImpl(override val id: Id, override val length: Double, override val railsCount: Int)
+      extends Route(id, length, railsCount):
     override def typology: TypeRoute = id._1
     override def path: Path          = id._2
 
