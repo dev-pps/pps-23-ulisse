@@ -1,6 +1,5 @@
 package ulisse.infrastructures.view
 
-import ulisse.applications.ports.ListenerOutputPorts
 import scala.swing.BorderPanel.Position.*
 import scala.swing.event.*
 import scala.swing.*
@@ -8,9 +7,7 @@ import scala.swing.*
 trait MapView
 
 object MapView:
-  def apply(listener: ListenerOutputPorts): MapView = MapViewImpl(listener)
-
-  private case class MapViewImpl(listener: ListenerOutputPorts) extends MainFrame,
+  private case class MapViewImpl() extends MainFrame,
         MapView:
     title = "Map"
     visible = true
@@ -58,9 +55,9 @@ object MapView:
         formPanel.setVisible(!formPanel.visible)
     }
 
-    formPanel.buttonForm().reactions += {
-      case event.ButtonClicked(_) => listener.onSubmit(formPanel.form())
-    }
+//    formPanel.buttonForm().reactions += {
+//      case event.ButtonClicked(_) => listener.onSubmit(formPanel.form())
+//    }
 
     contentPane.layout(createButton) = North
     glassPane.layout(formPanel.panel) = West
