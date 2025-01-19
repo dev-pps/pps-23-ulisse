@@ -5,17 +5,19 @@ import ulisse.applications.useCases.StationManager
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
-/** Defines the `StationPort` object containing inbound operations for managing a `StationMap`.
-  */
 object StationPorts:
+  /** Trait representing output operations that a `StationManager` uses.
+    */
+  trait Output
 
-  trait Output:
-    def show(): Unit
-
-  /** Trait representing inbound operations for interacting with a `StationMap`.
+  /** Trait representing input operations for interacting with a `StationManager`.
     *
-    * @tparam L
-    *   The type of location used by the stations.
+    * @tparam N
+    *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
+    *   - An instance of `Numeric` must be available for the `N` type.
+    * @tparam C
+    *   A type that extends `Coordinate[N]`, which represents the station's location.
+    *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
     */
   trait Input[N: Numeric, C <: Coordinate[N]]:
 

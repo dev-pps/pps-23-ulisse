@@ -13,7 +13,9 @@ class StationTest extends AnyWordSpec with Matchers:
 
     "not be created if the name is blank" in:
       List("", "  ").foreach(invalidName =>
-        Station.createCheckedStation(invalidName, Coordinate(0, 0), 1) shouldBe Station.CheckedStation.Error.InvalidName
+        Station.createCheckedStation(invalidName, Coordinate(0, 0), 1) shouldBe Left(
+          Station.CheckedStation.Error.InvalidName
+        )
       )
 
     "not be created if capacity is less than or equal to 0" in:
@@ -22,5 +24,5 @@ class StationTest extends AnyWordSpec with Matchers:
           "name",
           Coordinate(0, 0),
           invalidNumberOfTrack
-        ) shouldBe Station.CheckedStation.Error.InvalidNumberOfTrack
+        ) shouldBe Left(Station.CheckedStation.Error.InvalidNumberOfTrack)
       )
