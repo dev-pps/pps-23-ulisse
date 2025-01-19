@@ -12,12 +12,8 @@ final case class StationManager[L <: Location](uiPort: StationPort.Output):
   def stationMap: StationMap[L] = _stationMap
 
   def addStation(station: Station[L]): Either[StationMap.Error, StationMap[L]] =
-    println(_stationMap)
     _stationMap.addStation(station).map: updatedMap =>
-      println(updatedMap)
-      _stationMap = updatedMap;
-      println(stationMap)
-      updatedMap
+      _stationMap = updatedMap; updatedMap
 
   def removeStation(station: Station[L]): Either[StationMap.Error, StationMap[L]] =
     _stationMap.removeStation(station).map: updatedMap =>
