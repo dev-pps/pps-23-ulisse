@@ -1,8 +1,7 @@
 package ulisse.infrastructures.view.station
 
 import ulisse.applications.ports.StationPorts
-import ulisse.entities.Location
-import ulisse.entities.Location.Grid
+import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
 
 import java.awt.Color
@@ -20,8 +19,8 @@ import scala.swing.event.*
   *   A function that opens the station form to modify the station when the card is clicked.
   */
 final case class StationCard(
-    station: Station[Grid],
-    openStationForm: Option[Station[Grid]] => Unit
+    station: Station[Int, Grid],
+    openStationForm: Option[Station[Int, Grid]] => Unit
 ) extends GridPanel(3, 1):
   contents += new Label(s"Name: ${station.name}")
   contents += new Label(s"Location: ${station.location}")
@@ -67,17 +66,17 @@ final case class EmptyMapCard(
   */
 final case class StationMapView(
     controller: StationEditorController,
-    openStationForm: Option[Station[Grid]] => Unit,
+    openStationForm: Option[Station[Int, Grid]] => Unit,
     stationForm: Option[StationForm]
 ) extends GridPanel(5, 5):
   private val labels = for {
     x <- 0 until 5
     y <- 0 until 5
-    location <- Location.createGrid(x, y) match
+    coordinate <- Coordinate.createGrid(x, y) match
       case Left(value)  => None
       case Right(value) => Some(value)
-    station = controller.findStationAt(location)
-  } yield station.map(StationCard(_, openStationForm)).getOrElse(EmptyMapCard(location, stationForm))
+    station = controller.findStationAt(coordinate)
+  } yield station.map(StationCard(_, openStationForm)).getOrElse(EmptyMapCard(coordinate, stationForm))
   contents ++= labels
 
 /** A GridBagPanel displaying the station editor menu.
@@ -134,7 +133,7 @@ final case class StationEditorMenu(onCreateClick: () => Unit)
 final case class StationForm(
     controller: StationEditorController,
     onBackClick: () => Unit,
-    station: Option[Station[Grid]]
+    station: Option[Station[Int, Grid]]
 ) extends GridBagPanel:
   private val stationName   = new TextField(5)
   private val latitude      = new TextField(5)
@@ -277,7 +276,7 @@ final case class StationEditorContent(
   * @param controller
   *   The associated StationEditorController.
   */
-final case class StationEditorView(appPort: StationPorts.Input[Grid])
+final case class StationEditorView(appPort: StationPorts.Input[Int, Grid])
     extends BorderPanel:
 
   private val controller = StationEditorController(appPort)
@@ -295,7 +294,7 @@ final case class StationEditorView(appPort: StationPorts.Input[Grid])
         )
       )
 
-  private val openStationForm: Option[Station[Grid]] => Unit =
+  private val openStationForm: Option[Station[Int, Grid]] => Unit =
     station => {
       updateContentTemplate(StationForm(controller, openStationMenu, station))
     }

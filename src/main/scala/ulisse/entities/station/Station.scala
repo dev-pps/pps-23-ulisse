@@ -1,6 +1,6 @@
 package ulisse.entities.station
 
-import ulisse.entities.Location
+import ulisse.entities.Coordinates.Coordinate
 
 /** Defines a Station.
   *
@@ -13,9 +13,9 @@ import ulisse.entities.Location
   * @tparam L
   *   The type of the location associated with the station.
   */
-trait Station[L <: Location]:
+trait Station[N: Numeric, C <: Coordinate[N]]:
   val name: String
-  val location: L
+  val location: C
   val numberOfTrack: Int
 
 /** Factory for [[Station]] instances. */
@@ -44,22 +44,22 @@ object Station:
     * @return
     *   Either a `Station` instance or an `Errors` indicating the issue.
     */
-  def apply[L <: Location](
+  def apply[N: Numeric, C <: Coordinate[N]](
       name: String,
-      location: L,
+      location: C,
       numberOfTrack: Int
-  ): Either[Error, Station[L]] =
+  ): Either[Error, Station[N, C]] =
     for
       validName <- validateName(name, Error.InvalidName)
       validNumberOfTrack <-
         validateNumberOfTrack(numberOfTrack, Error.InvalidNumberOfTrack)
     yield StationImpl(validName, location, validNumberOfTrack)
 
-  private final case class StationImpl[L <: Location](
+  private final case class StationImpl[N: Numeric, C <: Coordinate[N]](
       name: String,
-      location: L,
+      location: C,
       numberOfTrack: Int
-  ) extends Station[L]
+  ) extends Station[N, C]
 
 /** Defines a Selectable Object. */
 trait Selectable:
@@ -74,8 +74,8 @@ trait Selectable:
   * @tparam L
   *   The type of the location associated with the station.
   */
-final case class SelectableStation[L <: Location](
-    station: Station[L],
+final case class SelectableStation[N: Numeric, C <: Coordinate[N]](
+    station: Station[N, C],
     selected: Boolean
-) extends Station[L] with Selectable:
+) extends Station[N, C] with Selectable:
   export station.*

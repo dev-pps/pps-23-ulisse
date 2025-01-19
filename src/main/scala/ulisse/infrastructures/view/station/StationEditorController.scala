@@ -2,8 +2,7 @@ package ulisse.infrastructures.view.station
 
 import cats.syntax.either.*
 import ulisse.applications.ports.StationPorts
-import ulisse.entities.Location
-import ulisse.entities.Location.Grid
+import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
 
 /** Controller for StationEditorView.
@@ -15,7 +14,7 @@ import ulisse.entities.station.Station
   * @param model
   *   the application model
   */
-final case class StationEditorController(appPort: StationPorts.Input[Grid]):
+final case class StationEditorController(appPort: StationPorts.Input[Int, Grid]):
 
   enum Error:
     case InvalidRow, InvalidColumn, InvalidNumberOfTrack, InvalidStation
@@ -25,14 +24,14 @@ final case class StationEditorController(appPort: StationPorts.Input[Grid]):
       latitude: String,
       longitude: String,
       numberOfTrack: String
-  ): Either[Error, Station[Grid]] =
+  ): Either[Error, Station[Int, Grid]] =
     for
       row    <- latitude.toIntOption.toRight(Error.InvalidRow)
       column <- longitude.toIntOption.toRight(Error.InvalidColumn)
-      location <- Location.createGrid(row, column) match
+      location <- Coordinate.createGrid(row, column) match
         case Left(value) => value match
-            case Location.Grid.Error.InvalidRow    => Left(Error.InvalidRow)
-            case Location.Grid.Error.InvalidColumn => Left(Error.InvalidColumn)
+            case Grid.Error.InvalidRow    => Left(Error.InvalidRow)
+            case Grid.Error.InvalidColumn => Left(Error.InvalidColumn)
         case Right(value) => Right(value)
       numberOfTrack <-
         numberOfTrack.toIntOption.toRight(Error.InvalidNumberOfTrack)
@@ -66,7 +65,7 @@ final case class StationEditorController(appPort: StationPorts.Input[Grid]):
       latitude: String,
       longitude: String,
       numberOfTrack: String,
-      oldStation: Option[Station[Grid]]
+      oldStation: Option[Station[Int, Grid]]
   ): Option[Error] =
     createStation(stationName, latitude, longitude, numberOfTrack) match {
       case Left(error) =>
