@@ -62,6 +62,17 @@ object Station:
     enum Error extends AppError:
       case InvalidName, InvalidNumberOfTrack
 
+  /** Defines a CheckedStation.
+   *
+   * A Station represents a location with tracks and associated metadata.
+   *
+   * **Requirements**:
+   *   - The `name` must not be empty or blank.
+   *   - The `numberOfTrack` must be greater than 0.
+   *
+   * @tparam L
+   * The type of the location associated with the station.
+   */
   case class CheckedStation[N: Numeric, C <: Coordinate[N]](
       name: String,
       location: C,
