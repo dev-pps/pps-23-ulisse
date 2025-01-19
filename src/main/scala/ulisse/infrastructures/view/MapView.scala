@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view
 
-import ulisse.applications.ports.ListenerOutputPort
+import ulisse.applications.ports.ListenerOutputPorts
 import scala.swing.BorderPanel.Position.*
 import scala.swing.event.*
 import scala.swing.*
@@ -8,9 +8,9 @@ import scala.swing.*
 trait MapView
 
 object MapView:
-  def apply(listener: ListenerOutputPort): MapView = MapViewImpl(listener)
+  def apply(listener: ListenerOutputPorts): MapView = MapViewImpl(listener)
 
-  private case class MapViewImpl(listener: ListenerOutputPort) extends MainFrame,
+  private case class MapViewImpl(listener: ListenerOutputPorts) extends MainFrame,
         MapView:
     title = "Map"
     visible = true

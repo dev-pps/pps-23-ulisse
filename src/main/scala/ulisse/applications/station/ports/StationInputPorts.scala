@@ -3,7 +3,7 @@ package ulisse.applications.station.ports
 import ulisse.entities.Location
 import ulisse.entities.station.Station
 
-object StationInputPort:
+object StationInputPorts:
   trait Inbound:
     def addStation[L <: Location](station: Station[L]): Unit
 
