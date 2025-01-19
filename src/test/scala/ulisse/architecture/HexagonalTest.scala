@@ -8,7 +8,7 @@ import ulisse.architecture.ArchUnits.IMPORT_ONLY_CLASSES_CREATED
 
 class HexagonalTest extends AnyFlatSpec:
 
-  private def packageDependenciesRule(rootPackage: String)(noDepend: String*)(depend: String*): ArchRule =
+  private def dependenciesRuleOfPackage(rootPackage: String)(noDepend: String*)(depend: String*): ArchRule =
     ArchRuleDefinition
       .noClasses
       .that
@@ -18,7 +18,7 @@ class HexagonalTest extends AnyFlatSpec:
       .allowEmptyShould(true)
 
   "no classes of the entities package" should "depends on the applications, infrastructures and userInteractions packages" in:
-    val rule = packageDependenciesRule(Packages.ENTITIES)(
+    val rule = dependenciesRuleOfPackage(Packages.ENTITIES)(
       Packages.APPLICATIONS,
       Packages.INFRASTRUCTURES,
       Packages.USER_INTERACTIONS
@@ -28,7 +28,7 @@ class HexagonalTest extends AnyFlatSpec:
 
   "no classes of the applications package" should "depend on the infrastructures and userInteractions packages " +
     "and should depend on entities package" in:
-      val rule = packageDependenciesRule(Packages.APPLICATIONS)(Packages.INFRASTRUCTURES, Packages.USER_INTERACTIONS)(
+      val rule = dependenciesRuleOfPackage(Packages.APPLICATIONS)(Packages.INFRASTRUCTURES, Packages.USER_INTERACTIONS)(
         Packages.ENTITIES
       )
 
@@ -36,16 +36,18 @@ class HexagonalTest extends AnyFlatSpec:
 
   "no classes of the infrastructures package" should "depend on the entities and userInteractions packages " +
     "and should depend on applications package" in:
-      val rule = packageDependenciesRule(Packages.INFRASTRUCTURES)(Packages.ENTITIES, Packages.USER_INTERACTIONS)(
-        Packages.APPLICATIONS
+      val rule = dependenciesRuleOfPackage(Packages.INFRASTRUCTURES)(Packages.USER_INTERACTIONS)(
+        Packages.APPLICATIONS,
+        Packages.ENTITIES
       )
 
       rule.check(IMPORT_ONLY_CLASSES_CREATED)
 
   "no classes of the userInteractions package" should "depend on the entities and infrastructures packages " +
     "and should depend on application package" in:
-      val rule = packageDependenciesRule(Packages.USER_INTERACTIONS)(Packages.ENTITIES, Packages.INFRASTRUCTURES)(
-        Packages.APPLICATIONS
+      val rule = dependenciesRuleOfPackage(Packages.USER_INTERACTIONS)(Packages.INFRASTRUCTURES)(
+        Packages.APPLICATIONS,
+        Packages.ENTITIES
       )
 
       rule.check(IMPORT_ONLY_CLASSES_CREATED)
