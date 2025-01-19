@@ -1,6 +1,6 @@
 package ulisse.entities
 
-import Coordinate.Geo
+import Coordinates.Geo
 import Route.{Id, Path, TypeRoute}
 
 trait Route(val id: Id, val length: Double, val railsCount: Int):

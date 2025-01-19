@@ -1,4 +1,4 @@
-package ulisse.infrastructure.view
+//package ulisse.infrastructure.view.station
 
 //import applications.station.{Manger, StationEditorController}
 //import org.scalatest.wordspec.AnyWordSpec
