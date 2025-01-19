@@ -1,7 +1,7 @@
 package ulisse.entities.station
 
 import ulisse.entities.Coordinates.Coordinate
-import ulisse.utils.Errors.AppError
+import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
 
 /** Defines a Station.
@@ -59,7 +59,7 @@ object Station:
 
   object CheckedStation:
     /** Represents errors that can occur during station creation. */
-    enum Error extends AppError:
+    enum Error extends BaseError:
       case InvalidName, InvalidNumberOfTrack
 
   /** Defines a CheckedStation.

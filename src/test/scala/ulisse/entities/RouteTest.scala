@@ -2,11 +2,12 @@ package ulisse.entities
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
+import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.Route.{Path, Station, TypeRoute}
 
 class RouteTest extends AnyFlatSpec with Matchers:
-  val riminiStation: Station = ("Cesena", Coordinate(20d, 20d))
-  val cesenaStation: Station = ("Rimini", Coordinate(10d, 10d))
+  val riminiStation: Station = ("Rimini", Coordinate(20d, 20d))
+  val cesenaStation: Station = ("Cesena", Coordinate(10d, 10d))
   val path: Path             = (riminiStation, cesenaStation)
   val pathLength: Double     = 200.0d
   val railsCount: Int        = 1

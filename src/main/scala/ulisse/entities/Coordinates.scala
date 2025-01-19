@@ -1,7 +1,7 @@
 package ulisse.entities
 
 import scala.math.{pow, sqrt}
-import ulisse.utils.Errors.AppError
+import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonNegative, validateRange}
 
 import scala.annotation.targetName
@@ -68,7 +68,7 @@ object Coordinates:
 
   object Geo:
     /** Represents errors that can occur during [Geo] creation. */
-    enum Error extends AppError:
+    enum Error extends BaseError:
       case InvalidLatitude, InvalidLongitude
 
   /** A 2D geographic coordinate point. */
@@ -77,9 +77,9 @@ object Coordinates:
 
   object Grid:
     /** Represents errors that can occur during [Grid] creation. */
-    enum Error extends AppError:
+    enum Error extends BaseError:
       case InvalidRow, InvalidColumn
 
   /** A 2D grid coordinate point. */
   final case class Grid private[Coordinates] (row: Int, column: Int)
-      extends Coordinate(row, column)
+      extends Coordinate[Int](row, column)
