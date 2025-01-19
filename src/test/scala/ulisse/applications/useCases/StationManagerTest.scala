@@ -11,7 +11,7 @@ import ulisse.entities.station.Station
 
 class StationManagerTest extends AnyWordSpec with Matchers:
 
-  private val mockUI = mock[StationPort.Outbound]
+  private val mockUI = mock[StationPort.Output]
 
   "StationManager" should:
     "initialize with an empty station map" in:

@@ -5,7 +5,7 @@ import ulisse.applications.station.StationMap
 import ulisse.entities.Location
 import ulisse.entities.station.Station
 
-final case class StationManager[L <: Location](uiPort: StationPort.Outbound):
+final case class StationManager[L <: Location](uiPort: StationPort.Output):
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private var _stationMap: StationMap[L] = StationMap[L]()
 

@@ -4,5 +4,5 @@ import ulisse.applications.ports.StationPort
 import ulisse.infrastructures.view.station.StationEditorView
 
 final case class StationPortOutputAdapter(stationEditorView: StationEditorView)
-    extends StationPort.Outbound:
+    extends StationPort.Output:
   override def show(): Unit = stationEditorView.visible = true
