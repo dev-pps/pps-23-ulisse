@@ -9,16 +9,16 @@ object Trains:
   trait Train:
 
     /** Train name */
-    val name: String
+    def name: String
 
     /** Technology used by train */
-    val techType: Technology
+    def techType: Technology
 
     /** wagon which train is composed by */
-    val wagon: Wagons.Wagon
+    def wagon: Wagons.Wagon
 
     /** Amount of wagons */
-    val wagonCount: Int
+    def wagonCount: Int
 
     /** @return
       *   max speed reachable by train
@@ -61,11 +61,11 @@ object Trains:
     def unapply(train: Train): Option[(String, Technology, Wagon, Int)] =
       Some(train.name, train.techType, train.wagon, train.wagonCount)
 
-  private class TrainImpl(
-      val name: String,
-      val techType: Technology,
-      val wagon: Wagon,
-      val wagonCount: Int
-  ) extends Train:
-    def maxSpeed: Int = techType.maxSpeed
-    def capacity: Int = wagon.capacity * wagonCount
+    private case class TrainImpl(
+        name: String,
+        techType: Technology,
+        wagon: Wagon,
+        wagonCount: Int
+    ) extends Train:
+      def maxSpeed: Int = techType.maxSpeed
+      def capacity: Int = wagon.capacity * wagonCount

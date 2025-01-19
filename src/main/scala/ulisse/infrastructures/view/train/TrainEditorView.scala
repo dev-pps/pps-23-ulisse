@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.train
 
-import ulisse.applications.train.TrainPorts
 import SwingUtils.onLeftOf
+import ulisse.applications.ports.TrainPorts
 import ulisse.infrastructures.view.train.model.{TrainViewModel, TrainViewModelAdapter}
 
 import scala.swing.event.*
@@ -10,7 +10,7 @@ import scala.util.Try
 
 object TrainEditorView:
 
-  def apply(inServicePort: TrainPorts.InBound): Window =
+  def apply(inServicePort: TrainPorts.Input): Window =
     TrainEditImpl(TrainViewModelAdapter(inServicePort))
 
   private class TrainEditImpl(val modelAdapter: TrainViewModelAdapter)
