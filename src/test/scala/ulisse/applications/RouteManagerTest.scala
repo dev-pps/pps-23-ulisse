@@ -16,15 +16,17 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
   val route: Route               = Route(TypeRoute.Normal, path, pathLength, railsCount)
   val routeManager: RouteManager = RouteManager.fromList(List(route))
 
-  "save new route" should "contains in routeBank" in:
-    val routeBank    = RouteManager.empty()
-    val newRouteBank = routeBank.save(route)
+//  "create empty routeManager"
 
-    newRouteBank match
+  "save new route" should "contains in routeBank" in:
+    val routeManager    = RouteManager.empty()
+    val newRouteManager = routeManager.save(route)
+
+    newRouteManager match
       case Left(error) => fail(error.productPrefix)
-      case Right(newRouteBank) =>
-        routeBank.contains(route) must be(false)
-        newRouteBank.contains(route) must be(true)
+      case Right(newRouteManager) =>
+        routeManager.contains(route) must be(false)
+        newRouteManager.contains(route) must be(true)
 
   "read route" should "from id" in:
     val optRoute = routeManager.route(route.id)
@@ -34,24 +36,24 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
 
   "save route with same id" should "change route railsCount" in:
     val differentRailsCountRoute = Route(TypeRoute.Normal, path, pathLength, 3)
-    val newRouteBank             = routeManager.save(differentRailsCountRoute)
+    val newRouteManager          = routeManager.save(differentRailsCountRoute)
     val optOldRoute              = routeManager.route(route.id)
 
-    newRouteBank match
+    newRouteManager match
       case Left(error) => fail(error.productPrefix)
-      case Right(newRouteBank) => newRouteBank.route(differentRailsCountRoute.id) match
+      case Right(newRouteManager) => newRouteManager.route(differentRailsCountRoute.id) match
           case Some(route) =>
             route.railsCount must be(differentRailsCountRoute.railsCount)
             optOldRoute.map(oldRout => route.railsCount must not be oldRout.railsCount)
           case None => fail("Route not found")
 
   "save two different route" should "have two element" in:
-    val differentRoute = Route(TypeRoute.AV, path, pathLength, railsCount)
-    val newRouteBank   = routeManager.save(differentRoute)
+    val differentRoute  = Route(TypeRoute.AV, path, pathLength, railsCount)
+    val newRouteManager = routeManager.save(differentRoute)
 
-    newRouteBank match
+    newRouteManager match
       case Left(error) => fail(error.productPrefix)
-      case Right(newRouteBank) =>
+      case Right(newRouteManager) =>
         val lengthRouteBank = routeManager.size + 1
-        newRouteBank.contains(differentRoute) must be(true)
-        newRouteBank.size must be(lengthRouteBank)
+        newRouteManager.contains(differentRoute) must be(true)
+        newRouteManager.size must be(lengthRouteBank)
