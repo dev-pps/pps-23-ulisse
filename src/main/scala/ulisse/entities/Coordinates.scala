@@ -42,7 +42,7 @@ object Coordinates:
       * @return
       *   Either a `Geo` instance or an `Error` indicating the issue.
       */
-    def createGeo(latitude: Double, longitude: Double): Either[AppError, Geo] =
+    def createGeo(latitude: Double, longitude: Double): Either[Geo.Error, Geo] =
       for
         validLat <- validateRange(latitude, -90.0, 90.0, Geo.Error.InvalidLatitude)
         validLon <-
@@ -58,7 +58,7 @@ object Coordinates:
       * @return
       *   Either a `Grid` instance or an `Error` indicating the issue.
       */
-    def createGrid(row: Int, column: Int): Either[AppError, Grid] =
+    def createGrid(row: Int, column: Int): Either[Grid.Error, Grid] =
       for
         validRow <- validateNonNegative(row, Grid.Error.InvalidRow)
         validCol <- validateNonNegative(column, Grid.Error.InvalidColumn)
