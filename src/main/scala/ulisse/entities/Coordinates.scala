@@ -4,6 +4,8 @@ import scala.math.{pow, sqrt}
 import ulisse.utils.Errors.AppError
 import ulisse.utils.ValidationUtils.{validateNonNegative, validateRange}
 
+import scala.annotation.targetName
+
 object Coordinates:
 
   /** A generic trait representing a 2D coordinate point in space.
@@ -19,6 +21,9 @@ object Coordinates:
     *   The y-coordinate value.
     */
   trait Coordinate[T: Numeric](private val x: T, private val y: T):
+    @targetName("equals")
+    def ===(that: Coordinate[T])(using numeric: Numeric[T]): Boolean =
+      numeric.equiv(x, that.x) && numeric.equiv(y, that.y)
     def distance(coordinate: Coordinate[T])(using numeric: Numeric[T]): Double =
       sqrt(pow(numeric.toDouble(coordinate.x) - numeric.toDouble(x), 2)
         + pow(numeric.toDouble(coordinate.y) - numeric.toDouble(y), 2))
