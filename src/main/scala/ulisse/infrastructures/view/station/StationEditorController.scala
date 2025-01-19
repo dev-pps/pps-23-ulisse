@@ -1,7 +1,5 @@
 package ulisse.infrastructures.view.station
 
-package applications.station
-
 import cats.syntax.either.*
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Location
