@@ -4,7 +4,6 @@ import ulisse.applications.ports.StationPorts
 import ulisse.entities.Location
 import ulisse.entities.Location.Grid
 import ulisse.entities.station.Station
-import ulisse.infrastructures.view.station.applications.station.StationEditorController
 
 import java.awt.Color
 import scala.swing.*
