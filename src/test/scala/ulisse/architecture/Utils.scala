@@ -1,6 +1,6 @@
 package ulisse.architecture
 
-import com.tngtech.archunit.core.importer.{ClassFileImporter, Location}
+import com.tngtech.archunit.core.importer.{ClassFileImporter, ImportOption, Location}
 
 object Packages:
   private val applications    = "applications"
@@ -20,7 +20,11 @@ object Packages:
 
 object ArchUnits:
   private val DO_NOT_INCLUDE_SCALA_COMPILED_FILE: Location => Boolean = !_.contains("$")
+  private val DO_NOT_INCLUDE_TEST_CLASSES: Location => Boolean        = !_.contains("test-classes")
+  private val PRINT_IMPORTS: Location => Boolean = location =>
+    println(location); true
 
   val IMPORT_ONLY_CLASSES_CREATED = new ClassFileImporter()
     .withImportOption(DO_NOT_INCLUDE_SCALA_COMPILED_FILE(_))
+    .withImportOption(DO_NOT_INCLUDE_TEST_CLASSES(_))
     .importPackages(Packages.PROJECT)

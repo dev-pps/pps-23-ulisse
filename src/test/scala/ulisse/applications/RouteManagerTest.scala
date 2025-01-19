@@ -12,23 +12,23 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
   val path: Path             = (riminiStation, cesenaStation)
   val pathLength: Double     = 200.0d
   val railsCount             = 1
+  val route: Route           = Route(TypeRoute.Normal, path, pathLength, railsCount)
 
-  val route: Route               = Route(TypeRoute.Normal, path, pathLength, railsCount)
-  val routeManager: RouteManager = RouteManager.fromList(List(route))
+  val emptyRouteManager: RouteManager = RouteManager.empty()
+  val routeManager: RouteManager      = RouteManager.fromList(List(route))
 
   "create empty routeManager" should "have size 0" in:
-    val routeBank = RouteManager.empty()
-    routeBank.size must be(0)
+    val zeroSize = 0
+    emptyRouteManager.size must be(zeroSize)
 
-  "save new route" should "contains in routeBank" in:
-    val routeManager    = RouteManager.empty()
-    val newRouteManager = routeManager.save(route)
+  "save new route" should "be contains in routeManager" in:
+    val newRouteManager = emptyRouteManager.save(route)
 
     newRouteManager match
       case Left(error) => fail(error.productPrefix)
-      case Right(newRouteManager) =>
-        routeManager.contains(route) must be(false)
-        newRouteManager.contains(route) must be(true)
+      case Right(manager) =>
+        manager.size must be(1)
+        manager.contains(route) must be(true)
 
   "read route" should "from id" in:
     val optRoute = routeManager.route(route.id)
