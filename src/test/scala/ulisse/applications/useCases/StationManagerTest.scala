@@ -3,7 +3,7 @@ package ulisse.applications.useCases
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.applications.ports.StationPort
+import ulisse.applications.ports.StationPorts
 import ulisse.applications.useCases.StationManager
 import ulisse.entities.Location
 import ulisse.entities.Location.Grid
@@ -11,7 +11,7 @@ import ulisse.entities.station.Station
 
 class StationManagerTest extends AnyWordSpec with Matchers:
 
-  private val mockUI = mock[StationPort.Output]
+  private val mockUI = mock[StationPorts.Output]
 
   "StationManager" should:
     "initialize with an empty station map" in:

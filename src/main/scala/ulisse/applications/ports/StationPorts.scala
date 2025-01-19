@@ -7,7 +7,7 @@ import ulisse.entities.station.Station
 
 /** Defines the `StationPort` object containing inbound operations for managing a `StationMap`.
   */
-object StationPort:
+object StationPorts:
 
   trait Output:
     def show(): Unit

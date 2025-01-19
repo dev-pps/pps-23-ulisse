@@ -1,11 +1,11 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.ports.StationPort
+import ulisse.applications.ports.StationPorts
 import ulisse.applications.station.StationMap
 import ulisse.entities.Location
 import ulisse.entities.station.Station
 
-final case class StationManager[L <: Location](uiPort: StationPort.Output):
+final case class StationManager[L <: Location](uiPort: StationPorts.Output):
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private var _stationMap: StationMap[L] = StationMap[L]()
 
