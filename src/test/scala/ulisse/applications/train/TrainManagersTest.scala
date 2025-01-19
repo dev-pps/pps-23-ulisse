@@ -5,9 +5,9 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.must.Matchers.{be, not}
 import org.scalatest.matchers.should.Matchers.should
-import ulisse.applications.train.TrainManagers
-import ulisse.applications.train.TrainManagers.Errors
-import ulisse.applications.train.TrainManagers.Errors.*
+import ulisse.applications.useCases.TrainManagers.Errors
+import ulisse.applications.useCases.TrainManagers.Errors.*
+import ulisse.applications.useCases.TrainManagers
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.Wagons.UseType
 import ulisse.entities.train.{Technology, Trains, Wagons}
@@ -71,7 +71,9 @@ class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
       When("I ask the train-manager to add train")
       val res = manager.addTrain(train)
       Then("the train should be saved, no errors are returned and i got updated list of trains")
-//      res should be(Right(List(Train("", _, _, _)))
+      res match
+        case Left(e)  => e should not be (Errors.TrainAlreadyExists(train.name))
+        case Right(l) => l.size should be(1)
 
     Scenario("Save new train with a name of another (already saved) train"):
       Given("that there is one train saved and also its related technology")

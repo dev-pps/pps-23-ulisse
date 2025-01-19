@@ -1,4 +1,4 @@
-package ulisse.applications.train
+package ulisse.applications.useCases
 
 import ulisse.entities.train.Technology
 import ulisse.entities.train.Trains.Train

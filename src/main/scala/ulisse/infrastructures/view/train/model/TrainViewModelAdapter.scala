@@ -1,9 +1,9 @@
 package ulisse.infrastructures.view.train.model
 
 import ulisse.entities.train.Wagons.UseType
-import ulisse.applications.train.TrainPorts
 import ulisse.entities.train.{Technology, Wagons}
 import TrainViewModel.*
+import ulisse.applications.ports.TrainPorts
 
 trait TrainViewModelAdapter:
   def trains: List[TrainData]
@@ -14,10 +14,10 @@ trait TrainViewModelAdapter:
   def updateTrain(trainData: TrainData): Unit
 
 object TrainViewModelAdapter:
-  def apply(trainService: TrainPorts.InBound): TrainViewModelAdapter =
+  def apply(trainService: TrainPorts.Input): TrainViewModelAdapter =
     BaseAdapter(trainService)
 
-  private final case class BaseAdapter(trainService: TrainPorts.InBound)
+  private final case class BaseAdapter(trainService: TrainPorts.Input)
       extends TrainViewModelAdapter:
     override def trains: List[TrainData] = trainService.trains.map(t =>
       TrainData(

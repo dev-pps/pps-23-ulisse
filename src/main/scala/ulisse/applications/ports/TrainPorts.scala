@@ -1,6 +1,6 @@
-package ulisse.applications.train
+package ulisse.applications.ports
 
-import ulisse.applications.train.TrainManagers.{Errors, TrainManager}
+import ulisse.applications.useCases.TrainManagers.{Errors, TrainManager}
 import ulisse.entities.train.Technology
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.Wagons.{UseType, Wagon}
@@ -9,10 +9,8 @@ object TrainPorts:
 
   /** It represents all possible requests that can be done from external components to application for what concern
     * about `Trains`, trains `Technology` and wagon `UseType`.
-    *
-    * A default implementation is [[BaseInBoundPort]]
     */
-  trait InBound:
+  trait Input:
     /** Returns the list of `Train`
       * @return
       *   List of `Train`
@@ -78,23 +76,26 @@ object TrainPorts:
         wagonCount: Int
     ): Either[Errors, List[Train]]
 
-  /** @param manager
-    *   TrainManager that handle input port requests
-    */
-  case class BaseInBoundPort(manager: TrainManager) extends InBound:
-    export manager.{addTrain => _, *}
+  object Input:
+    def apply(manager: TrainManager): Input = BaseInBoundPort(manager)
 
-    override def addTrain(
-        name: String,
-        technologyName: String,
-        wagonUseTypeName: String,
-        wagonCapacity: Int,
-        wagonCount: Int
-    ): Either[Errors, List[Train]] =
-      manager.createTrain(
-        name,
-        technologyName,
-        wagonUseTypeName,
-        wagonCapacity,
-        wagonCount
-      )
+    /** @param manager
+      *   TrainManager that handle input port requests
+      */
+    private case class BaseInBoundPort(manager: TrainManager) extends Input:
+      export manager.{addTrain => _, *}
+
+      override def addTrain(
+          name: String,
+          technologyName: String,
+          wagonUseTypeName: String,
+          wagonCapacity: Int,
+          wagonCount: Int
+      ): Either[Errors, List[Train]] =
+        manager.createTrain(
+          name,
+          technologyName,
+          wagonUseTypeName,
+          wagonCapacity,
+          wagonCount
+        )
