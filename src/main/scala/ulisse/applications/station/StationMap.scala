@@ -3,7 +3,7 @@ package ulisse.applications.station
 import cats.implicits.catsSyntaxEq
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
-import ulisse.utils.Errors.AppError
+import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.validateUniqueItems
 
 /** Defines a map of stations.
@@ -58,7 +58,7 @@ trait StationMap[N: Numeric, C <: Coordinate[N]]:
 object StationMap:
 
   /** Represents errors that can occur during station map creation. */
-  enum Error extends AppError:
+  enum Error extends BaseError:
     case DuplicateStationName, DuplicateStationLocation, StationNotFound
 
   /** Creates an empty `StationMap` instance.

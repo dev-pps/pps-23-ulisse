@@ -276,10 +276,8 @@ final case class StationEditorContent(
   * @param controller
   *   The associated StationEditorController.
   */
-final case class StationEditorView(appPort: StationPorts.Input[Int, Grid])
+final case class StationEditorView(controller: StationEditorController)
     extends BorderPanel:
-
-  private val controller = StationEditorController(appPort)
 
   private val updateContentTemplate: Panel => Unit =
     (stationEditorPanel: Panel) =>
