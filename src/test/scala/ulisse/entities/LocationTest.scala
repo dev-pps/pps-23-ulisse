@@ -3,6 +3,7 @@ package ulisse.entities
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Location
+import ulisse.entities.Location.{Geo, Grid}
 
 class LocationTest extends AnyWordSpec with Matchers:
 
@@ -15,18 +16,18 @@ class LocationTest extends AnyWordSpec with Matchers:
 
       "not be created if latitude is greater than 90 or less than -90" in:
         Location.createGeo(-91.0, 0.0) shouldBe Left(
-          Location.Error.InvalidLatitude
+          Geo.Error.InvalidLatitude
         )
         Location.createGeo(91.0, 0.0) shouldBe Left(
-          Location.Error.InvalidLatitude
+          Geo.Error.InvalidLatitude
         )
 
       "not be created if longitude is greater than 180 or less than -180" in:
         Location.createGeo(0.0, -181.0) shouldBe Left(
-          Location.Error.InvalidLongitude
+          Geo.Error.InvalidLongitude
         )
         Location.createGeo(0.0, 181.0) shouldBe Left(
-          Location.Error.InvalidLongitude
+          Geo.Error.InvalidLongitude
         )
 
     "is a Grid" should:
@@ -36,7 +37,7 @@ class LocationTest extends AnyWordSpec with Matchers:
         ) shouldBe Right((0, 0))
 
       "not be created if row is negative" in:
-        Location.createGrid(-1, 0) shouldBe Left(Location.Error.InvalidRow)
+        Location.createGrid(-1, 0) shouldBe Left(Grid.Error.InvalidRow)
 
       "not be created if column is negative" in:
-        Location.createGrid(0, -1) shouldBe Left(Location.Error.InvalidColumn)
+        Location.createGrid(0, -1) shouldBe Left(Grid.Error.InvalidColumn)

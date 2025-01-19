@@ -3,7 +3,7 @@ package ulisse.infrastructures.view.station
 package applications.station
 
 import cats.syntax.either.*
-import ulisse.applications.ports.StationPort
+import ulisse.applications.ports.StationPorts
 import ulisse.entities.Location
 import ulisse.entities.Location.Grid
 import ulisse.entities.station.Station
@@ -17,7 +17,7 @@ import ulisse.entities.station.Station
   * @param model
   *   the application model
   */
-final case class StationEditorController(appPort: StationPort.Input[Grid]):
+final case class StationEditorController(appPort: StationPorts.Input[Grid]):
 
   enum Error:
     case InvalidRow, InvalidColumn, InvalidNumberOfTrack, InvalidStation
@@ -33,8 +33,8 @@ final case class StationEditorController(appPort: StationPort.Input[Grid]):
       column <- longitude.toIntOption.toRight(Error.InvalidColumn)
       location <- Location.createGrid(row, column) match
         case Left(value) => value match
-            case Location.Error.InvalidRow    => Left(Error.InvalidRow)
-            case Location.Error.InvalidColumn => Left(Error.InvalidColumn)
+            case Location.Grid.Error.InvalidRow    => Left(Error.InvalidRow)
+            case Location.Grid.Error.InvalidColumn => Left(Error.InvalidColumn)
         case Right(value) => Right(value)
       numberOfTrack <-
         numberOfTrack.toIntOption.toRight(Error.InvalidNumberOfTrack)

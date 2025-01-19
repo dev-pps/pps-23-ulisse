@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.station
 
-import ulisse.applications.ports.StationPort
+import ulisse.applications.ports.StationPorts
 import ulisse.entities.Location
 import ulisse.entities.Location.Grid
 import ulisse.entities.station.Station
@@ -278,7 +278,7 @@ final case class StationEditorContent(
   * @param controller
   *   The associated StationEditorController.
   */
-final case class StationEditorView(appPort: StationPort.Input[Grid])
+final case class StationEditorView(appPort: StationPorts.Input[Grid])
     extends BorderPanel:
 
   private val controller = StationEditorController(appPort)
