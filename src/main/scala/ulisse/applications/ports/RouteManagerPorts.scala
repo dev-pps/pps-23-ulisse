@@ -5,7 +5,7 @@ import ulisse.entities.Route
 
 object RouteManagerPorts:
 
-  trait Input:
-    def save(route: Route): RouteManager
+  trait Input(routeManager: RouteManager):
+    def save(route: Route): Unit
 
   trait Output
