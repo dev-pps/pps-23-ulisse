@@ -2,6 +2,7 @@ package ulisse.architecture
 
 import com.tngtech.archunit.lang.ArchRule
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition
+import com.tngtech.archunit.lang.syntax.elements.GivenClassesConjunction
 import org.scalatest.flatspec.AnyFlatSpec
 import ulisse.architecture.ArchUnits.IMPORT_ONLY_CLASSES_CREATED
 
@@ -15,6 +16,16 @@ class PackagesTest extends AnyFlatSpec:
       .should.haveSimpleNameEndingWith(endingName)
       .allowEmptyShould(true)
 
+  private val doubleEndingNameRulePossible: (String, String, String) => ArchRule =
+    (rootPackage, firstEnding, orSecondEnding) =>
+      ArchRuleDefinition
+        .classes
+        .that
+        .resideInAPackage(rootPackage)
+        .should.haveSimpleNameEndingWith(firstEnding)
+        .orShould.haveSimpleNameEndingWith(orSecondEnding)
+        .allowEmptyShould(true)
+
   private val tripleEndingNameRulePossible: (String, String, String, String) => ArchRule =
     (rootPackage, firstEnding, orSecondEnding, orThirdEnding) =>
       ArchRuleDefinition
@@ -27,8 +38,9 @@ class PackagesTest extends AnyFlatSpec:
         .allowEmptyShould(true)
 
   "classes of useCases package" should "have Manager as the ending in the name" in:
-    val managerEndingName = "Manager"
-    val rule              = simpleEndingNameRule(Packages.USE_CASES, managerEndingName)
+    val managerEndingName  = "Manager"
+    val managersEndingName = "Managers"
+    val rule               = doubleEndingNameRulePossible(Packages.USE_CASES, managersEndingName, managerEndingName)
 
     rule.check(IMPORT_ONLY_CLASSES_CREATED)
 
