@@ -11,16 +11,16 @@ class StationTest extends AnyWordSpec with Matchers:
     "be created if the name is not blank and numberOfTracks is greater than 0" in:
       (for
         location <- Coordinate.createGrid(0, 0)
-        station  <- Station("name", location, 100)
+        station  <- Station.createCheckedStation("name", location, 100)
       yield (station.name, station.numberOfTrack)) shouldBe Right("name", 100)
 
     "not be created if the name is blank" in:
       List("", "  ").foreach(invalidName =>
         (for
           location <- Coordinate.createGrid(0, 0)
-          station  <- Station(invalidName, location, 100)
+          station  <- Station.createCheckedStation(invalidName, location, 100)
         yield (station.name, station.numberOfTrack)) shouldBe Left(
-          Station.Error.InvalidName
+          Station.CheckedStation.Error.InvalidName
         )
       )
 
@@ -28,8 +28,8 @@ class StationTest extends AnyWordSpec with Matchers:
       List(0, -1).foreach(invalidNumberOfTrack =>
         (for
           location <- Coordinate.createGrid(0, 0)
-          station  <- Station("name", location, invalidNumberOfTrack)
+          station  <- Station.createCheckedStation("name", location, invalidNumberOfTrack)
         yield (station.name, station.numberOfTrack)) shouldBe Left(
-          Station.Error.InvalidNumberOfTrack
+          Station.CheckedStation.Error.InvalidNumberOfTrack
         )
       )
