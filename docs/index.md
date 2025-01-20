@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: Report
-      link: /0-intro
+      link: report/0-intro
     - theme: alt
       text: Scala docs
       link: /
