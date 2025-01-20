@@ -25,7 +25,7 @@ object Coordinate:
     * @param longitude
     *   The longitude of the location. Must be between -180 and 180.
     * @return
-    *   Either a `Geo` instance or an `Error` indicating the issue.
+    *   Either a `Geo` instance or an `Errors` indicating the issue.
     */
   def createGeoWithValidation(
       latitude: Double,

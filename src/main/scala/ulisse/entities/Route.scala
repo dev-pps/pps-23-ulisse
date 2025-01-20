@@ -17,7 +17,7 @@ object Route:
     RouteImpl((typeRoute, path), length, railsCount)
 
   opaque type Id = (TypeRoute, Path)
-  type Station   = (String, Geo)
+  type Station   = (String, ?)
   type Path      = (Station, Station)
 
   enum TypeRoute:
