@@ -10,7 +10,7 @@ object TrainManagers:
 
   /** Train Manager errors that can be returned after a request.
     * @param description
-    *   Error description
+    *   Errors description
     */
   enum Errors(val description: String):
     case TrainAlreadyExists(msg: String)
