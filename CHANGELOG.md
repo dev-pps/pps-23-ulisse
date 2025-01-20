@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.1.0...v1.1.1) (2025-01-20)
+
+### Bug Fixes
+
+* fixed base page urls ([f2f173c](https://github.com/dev-pps/pps-23-ulisse/commit/f2f173cb63c0341d3d3aa3e3a7e3c6e8179da3e5))
+
 ## [1.1.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.0.0...v1.1.0) (2025-01-20)
 
 ### Features
