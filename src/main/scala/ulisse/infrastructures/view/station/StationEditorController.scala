@@ -34,9 +34,9 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N]](appPort
       stationGenerator: (String, C, Int) => Either[BaseError, CheckedStation[N, C]]
   )(using numeric: Numeric[N]): Either[BaseError, CheckedStation[N, C]] =
     for
-      row           <- numeric.parseString(latitude).toRight(Error.InvalidRowFormat)
-      column        <- numeric.parseString(latitude).toRight(Error.InvalidColumnFormat)
-      coordinate    <- coordinateGenerator(row, column)
+      latitude      <- numeric.parseString(latitude).toRight(Error.InvalidRowFormat)
+      longitude     <- numeric.parseString(longitude).toRight(Error.InvalidColumnFormat)
+      coordinate    <- coordinateGenerator(latitude, longitude)
       numberOfTrack <- numberOfTrack.toIntOption.toRight(Error.InvalidNumberOfTrackFormat)
       station       <- stationGenerator(name, coordinate, numberOfTrack)
     yield station
@@ -74,7 +74,7 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N]](appPort
       for old <- oldStation do removeStation(old)
       appPort.addStation(_)
     } match
-      case Right(stationMap) => println(stationMap); Right(stationMap)
+      case Right(stationMap) => Right(stationMap)
       case Left(error)       => Left(error)
 
   export appPort.{findStationAt, removeStation}
