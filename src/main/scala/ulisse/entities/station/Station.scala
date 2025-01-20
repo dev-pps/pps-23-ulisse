@@ -42,7 +42,7 @@ object Station:
     * @param numberOfTrack
     *   The number of tracks. Must be greater than 0.
     * @return
-    *   Either a `Station` instance or an `Error` indicating the issue.
+    *   Either a `Station` instance or an `Errors` indicating the issue.
     */
   def apply[L <: Location](
       name: String,

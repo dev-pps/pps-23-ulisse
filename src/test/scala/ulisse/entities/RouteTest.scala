@@ -5,8 +5,8 @@ import org.scalatest.matchers.must.Matchers
 import ulisse.entities.Route.{Path, Station, TypeRoute}
 
 class RouteTest extends AnyFlatSpec with Matchers:
-  val riminiStation: Station = ("Cesena", Coordinate.createGeo(20d, 20d))
-  val cesenaStation: Station = ("Rimini", Coordinate.createGeo(10d, 10d))
+  val riminiStation: Station = ("Cesena", Coordinate(20d, 20d))
+  val cesenaStation: Station = ("Rimini", Coordinate(10d, 10d))
   val path: Path             = (riminiStation, cesenaStation)
   val pathLength: Double     = 200.0d
   val railsCount: Int        = 1
@@ -23,7 +23,7 @@ class RouteTest extends AnyFlatSpec with Matchers:
     route must be(sameRoute)
 
   "check different route" should "be different typology or path" in:
-    val bolognaStation: Station = ("Bologna", Coordinate.createGeo(30d, 30d))
+    val bolognaStation: Station = ("Bologna", Coordinate(30d, 30d))
     val differentPath: Route =
       Route(route.typology, (riminiStation, bolognaStation), pathLength, railsCount)
 
