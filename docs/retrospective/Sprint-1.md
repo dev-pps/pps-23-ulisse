@@ -1,5 +1,6 @@
 # Sprint Planning 1
-[Link to backlog]()
+[Link to backlog](./backlogs/1-backlog)
+
 ## Sprint Goal
 Setup project and provide to stakeholder a demo for Station, Route and Train creation.
 
