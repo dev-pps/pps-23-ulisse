@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.station
 
 import ulisse.applications.ports.StationPorts
 import ulisse.applications.station.StationMap
-import ulisse.entities.Coordinates.{Coordinate, Grid}
+import ulisse.entities.Coordinates.{Coordinate, Geo, Grid}
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.utils.Errors.BaseError
@@ -20,7 +20,7 @@ import ulisse.utils.Errors.BaseError
   *   A type that extends `Coordinate[N]`, which represents the station's location.
   *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
   */
-final case class StationEditorController(appPort: StationPorts.Input[Int, Grid]):
+final case class StationEditorController[N: Numeric, C <: Coordinate[N]](appPort: StationPorts.Input[N, C]):
 
   enum Error extends BaseError:
     case InvalidRowFormat, InvalidColumnFormat, InvalidNumberOfTrackFormat
@@ -29,14 +29,16 @@ final case class StationEditorController(appPort: StationPorts.Input[Int, Grid])
       name: String,
       latitude: String,
       longitude: String,
-      numberOfTrack: String
-  ): Either[BaseError, CheckedStation[Int, Grid]] =
+      numberOfTrack: String,
+      coordinateGenerator: (N, N) => Either[BaseError, C],
+      stationGenerator: (String, C, Int) => Either[BaseError, CheckedStation[N, C]]
+  )(using numeric: Numeric[N]): Either[BaseError, CheckedStation[N, C]] =
     for
-      row           <- latitude.toIntOption.toRight(Error.InvalidRowFormat)
-      column        <- longitude.toIntOption.toRight(Error.InvalidColumnFormat)
-      coordinate    <- Coordinate.createGrid(row, column)
+      row           <- numeric.parseString(latitude).toRight(Error.InvalidRowFormat)
+      column        <- numeric.parseString(latitude).toRight(Error.InvalidColumnFormat)
+      coordinate    <- coordinateGenerator(row, column)
       numberOfTrack <- numberOfTrack.toIntOption.toRight(Error.InvalidNumberOfTrackFormat)
-      station       <- Station.createCheckedStation(name, coordinate, numberOfTrack)
+      station       <- stationGenerator(name, coordinate, numberOfTrack)
     yield station
 
   /** Handles the click event when the "OK" button is pressed.
@@ -64,9 +66,11 @@ final case class StationEditorController(appPort: StationPorts.Input[Int, Grid])
       latitude: String,
       longitude: String,
       numberOfTrack: String,
-      oldStation: Option[Station[Int, Grid]]
-  ): Either[BaseError, StationMap[Int, Grid]] =
-    createStation(stationName, latitude, longitude, numberOfTrack).flatMap {
+      oldStation: Option[Station[N, C]]
+  )(using coordinateGenerator: (N, N) => Either[BaseError, C])(using
+      stationGenerator: (String, C, Int) => Either[BaseError, CheckedStation[N, C]]
+  ): Either[BaseError, StationMap[N, C]] =
+    createStation(stationName, latitude, longitude, numberOfTrack, coordinateGenerator, stationGenerator).flatMap {
       for old <- oldStation do removeStation(old)
       appPort.addStation(_)
     } match
@@ -74,3 +78,9 @@ final case class StationEditorController(appPort: StationPorts.Input[Int, Grid])
       case Left(error)       => Left(error)
 
   export appPort.{findStationAt, removeStation}
+
+given ((Int, Int) => Either[BaseError, Grid])            = Coordinate.createGrid
+given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
+given ((Double, Double) => Either[BaseError, Geo])       = Coordinate.createGeo
+given [N: Numeric, C <: Coordinate[N]]: ((String, C, Int) => Either[BaseError, CheckedStation[N, C]]) =
+  Station.createCheckedStation

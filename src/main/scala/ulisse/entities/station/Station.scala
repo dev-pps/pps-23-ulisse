@@ -15,7 +15,7 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
   *   A type that extends `Coordinate[N]`, which represents the station's location.
   *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
   */
-trait Station[N: Numeric, C <: Coordinate[N]]:
+trait Station[N: Numeric, +C <: Coordinate[N]]:
   val name: String
   val coordinate: C
   val numberOfTrack: Int
@@ -51,7 +51,7 @@ object Station:
       validNumberOfTrack <- validatePositive(numberOfTrack, CheckedStation.Error.InvalidNumberOfTrack)
     yield CheckedStation(validName, coordinate, validNumberOfTrack)
 
-  private final case class StationImpl[N: Numeric, C <: Coordinate[N]](
+  private final case class StationImpl[N: Numeric, +C <: Coordinate[N]](
       name: String,
       coordinate: C,
       numberOfTrack: Int

@@ -9,6 +9,8 @@ import scala.swing.*
 import scala.swing.Swing.LineBorder
 import scala.swing.event.*
 
+import StationEditorController.*
+
 /** A Card displaying station information.
   *
   * @constructor
@@ -65,7 +67,7 @@ final case class EmptyMapCard(
   *   The form where location details are added when an EmptyMapCard is clicked.
   */
 final case class StationMapView(
-    controller: StationEditorController,
+    controller: StationEditorController[Int, Grid],
     openStationForm: Option[Station[Int, Grid]] => Unit,
     stationForm: Option[StationForm]
 ) extends GridPanel(5, 5):
@@ -131,7 +133,7 @@ final case class StationEditorMenu(onCreateClick: () => Unit)
   *   The station to be edited.
   */
 final case class StationForm(
-    controller: StationEditorController,
+    controller: StationEditorController[Int, Grid],
     onBackClick: () => Unit,
     station: Option[Station[Int, Grid]]
 ) extends GridBagPanel:
@@ -276,7 +278,7 @@ final case class StationEditorContent(
   * @param controller
   *   The associated StationEditorController.
   */
-final case class StationEditorView(controller: StationEditorController)
+final case class StationEditorView(controller: StationEditorController[Int, Grid])
     extends BorderPanel:
 
   private val updateContentTemplate: Panel => Unit =
