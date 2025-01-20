@@ -1,3 +1,10 @@
+## [1.1.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.0.0...v1.1.0) (2025-01-20)
+
+### Features
+
+* create errors utils ([d9b045b](https://github.com/dev-pps/pps-23-ulisse/commit/d9b045bacf0120ba77e84e60c71d7110ef405e21))
+* remove userInteraction package ([64ecbf8](https://github.com/dev-pps/pps-23-ulisse/commit/64ecbf8fea9c96bcee685dc2e9c7a5beaaf0391f))
+
 ## 1.0.0 (2025-01-19)
 
 ### Features
