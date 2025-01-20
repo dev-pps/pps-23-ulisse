@@ -1,6 +1,5 @@
 package ulisse.applications.station
 
-import cats.implicits.catsSyntaxEq
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.BaseError
@@ -24,6 +23,7 @@ import ulisse.utils.ValidationUtils.validateUniqueItems
   */
 trait StationMap[N: Numeric, C <: Coordinate[N]]:
   type StationMapType <: Seq[Station[N, C]]
+  type R
   val stations: StationMapType
   def map[B](f: Station[N, C] => B): List[B]
 
@@ -34,7 +34,7 @@ trait StationMap[N: Numeric, C <: Coordinate[N]]:
     * @return
     *   Either a `StationMap` instance with the added station or an 'Error' indicating the issue.
     */
-  def addStation(station: Station[N, C]): Either[StationMap.Error, StationMap[N, C]]
+  def addStation(station: Station[N, C]): R
 
   /** Removes a station from the map.
     *
@@ -43,7 +43,7 @@ trait StationMap[N: Numeric, C <: Coordinate[N]]:
     * @return
     *   Either a `StationMap` instance without the removed station or an 'Error' indicating the issue.
     */
-  def removeStation(station: Station[N, C]): Either[StationMap.Error, StationMap[N, C]]
+  def removeStation(station: Station[N, C]): R
 
   /** Finds a station at the given location.
     *
@@ -69,24 +69,42 @@ object StationMap:
     *   A `StationMap` instance.
     */
 
-  def apply[N: Numeric, C <: Coordinate[N]](): StationMap[N, C] = StationMapImpl(List.empty)
-
-  private final case class StationMapImpl[N: Numeric, C <: Coordinate[N]](
+  def apply[N: Numeric, C <: Coordinate[N]](): BaseStationMap[N, C]                      = BaseStationMap(List.empty)
+  def createCheckedStationMap[N: Numeric, C <: Coordinate[N]](): CheckedStationMap[N, C] = CheckedStationMap(List.empty)
+  final case class BaseStationMap[N: Numeric, C <: Coordinate[N]] private[StationMap] (
       stations: List[Station[N, C]]
   ) extends StationMap[N, C]:
     type StationMapType = List[Station[N, C]]
+    type R              = BaseStationMap[N, C]
 
-    def addStation(station: Station[N, C]): Either[Error, StationMap[N, C]] =
+    def addStation(station: Station[N, C]): R =
+      BaseStationMap(station :: stations)
+
+    def removeStation(station: Station[N, C]): R =
+      BaseStationMap(stations.filterNot(_.coordinate === station.coordinate))
+
+    def findStationAt(coordinate: C): Option[Station[N, C]] =
+      stations.find(_.coordinate === coordinate)
+
+    export stations.map
+
+  final case class CheckedStationMap[N: Numeric, C <: Coordinate[N]] private[StationMap] (
+      stations: List[Station[N, C]]
+  ) extends StationMap[N, C]:
+    type StationMapType = List[Station[N, C]]
+    type R              = Either[Error, CheckedStationMap[N, C]]
+
+    def addStation(station: Station[N, C]): R =
       val updatedStations = station :: stations
       for
         _ <- validateUniqueItems(updatedStations.map(_.name), Error.DuplicateStationName)
         _ <- validateUniqueItems(updatedStations.map(_.coordinate), Error.DuplicateStationLocation)
-      yield StationMapImpl(updatedStations)
+      yield CheckedStationMap(updatedStations)
 
-    def removeStation(station: Station[N, C]): Either[Error, StationMap[N, C]] =
+    def removeStation(station: Station[N, C]): R =
       if stations.exists(_.coordinate === station.coordinate) then
         Right(
-          StationMapImpl(stations.filterNot(_.coordinate === station.coordinate))
+          CheckedStationMap(stations.filterNot(_.coordinate === station.coordinate))
         )
       else
         Left(Error.StationNotFound)

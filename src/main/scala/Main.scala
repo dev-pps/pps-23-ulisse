@@ -21,3 +21,12 @@ final case class Setting():
   val settings = Setting()
   app.contents = settings.stationEditorView
   app.open()
+
+trait Map {
+  def findElement(key: String): Int
+}
+
+// Trait for CheckedMap (returns Either[String, Int])
+trait CheckedMap {
+  def findElement(key: String): Either[String, Int]
+}

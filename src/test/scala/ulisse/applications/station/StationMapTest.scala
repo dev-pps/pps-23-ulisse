@@ -17,7 +17,7 @@ class StationMapTest extends AnyWordSpec with Matchers:
 
     "a new station is added" should:
       "contain the new station" in:
-        StationMap().addStation(station).map(_.stations) match
+        StationMap.createCheckedStationMap().addStation(station).map(_.stations) match
           case Right(stations) =>
             stations should contain only station
           case Left(_) => fail()
@@ -25,20 +25,20 @@ class StationMapTest extends AnyWordSpec with Matchers:
     "another station with same name is added" should:
       "not be added and returns error" in:
         val otherStation = Station("StationA", Coordinate(1, 1), 1)
-        StationMap().addStation(station).flatMap(
+        StationMap.createCheckedStationMap().addStation(station).flatMap(
           _.addStation(otherStation)
         ) shouldBe Left(StationMap.Error.DuplicateStationName)
 
     "another station with same location is added" should:
       "not be added and returns error" in:
         val otherStation = Station("StationB", Coordinate(0, 0), 1)
-        StationMap().addStation(station).flatMap(
+        StationMap.createCheckedStationMap().addStation(station).flatMap(
           _.addStation(otherStation)
         ) shouldBe Left(StationMap.Error.DuplicateStationLocation)
 
     "existing station is removed" should:
       "no longer be present" in:
-        StationMap().addStation(station).flatMap(
+        StationMap.createCheckedStationMap().addStation(station).flatMap(
           _.removeStation(station)
         ).map(_.stations) match
           case Right(stations) => stations should not contain station
@@ -46,6 +46,6 @@ class StationMapTest extends AnyWordSpec with Matchers:
 
     "non-existing station is removed" should:
       "return error" in:
-        StationMap().removeStation(station) shouldBe Left(
+        StationMap.createCheckedStationMap().removeStation(station) shouldBe Left(
           StationMap.Error.StationNotFound
         )
