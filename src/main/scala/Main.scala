@@ -2,6 +2,7 @@ import ulisse.applications.adapters.StationPortInputAdapter
 import ulisse.applications.useCases.StationManager
 import ulisse.entities.Coordinates.{Coordinate, Grid}
 import ulisse.entities.station.Station
+import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
 import ulisse.infrastructures.view.adapter.StationPortOutputAdapter
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
@@ -10,8 +11,8 @@ import ulisse.utils.Errors.BaseError
 final case class Setting():
   type N = Int
   type C = Grid
-  type S = Station[N, C]
-  lazy val outputAdapter: StationPortOutputAdapter                   = StationPortOutputAdapter(stationEditorView)
+  type S = CheckedStation[N, C]
+  lazy val outputAdapter: StationPortOutputAdapter[N, C, S]          = StationPortOutputAdapter(stationEditorController)
   lazy val stationManager: StationManager[N, C, S]                   = StationManager(outputAdapter)
   lazy val inputAdapter: StationPortInputAdapter[N, C, S]            = StationPortInputAdapter(stationManager)
   lazy val stationEditorController: StationEditorController[N, C, S] = StationEditorController(inputAdapter)
