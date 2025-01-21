@@ -11,4 +11,7 @@ object RouteAdapter:
     def apply(manager: RouteManager): RoutePorts.UIPort = IUAdapter(manager)
 
     private case class IUAdapter(manager: RouteManager) extends RoutePorts.UIPort():
-      override def save(route: Route): Either[String, Route] = "Error".asLeft
+      override def size: Int = manager.size
+
+      override def save(route: Route): Either[RouteManager.ErrorSaving, RoutePorts.UIPort] =
+        manager.save(route).map(UIAdapter(_))
