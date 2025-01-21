@@ -4,11 +4,12 @@ import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.Route
 import ulisse.entities.Route.TypeRoute
 
+import scala.swing.*
 import scala.swing.BorderPanel.Position.{Center, South}
 import scala.swing.Font.Style
-import scala.swing.*
 
 trait FormPanel[+MP <: Panel] extends WrapPanel[MP]:
+  def keyValuesPanel: Seq[KeyValuesPanel[Panel]]
   def saveButton(): Button
   def deleteButton(): Button
   def exitButton(): Button
@@ -17,6 +18,15 @@ trait FormPanel[+MP <: Panel] extends WrapPanel[MP]:
 object FormPanel:
   def apply[MP <: BorderPanel, P <: Panel](panel: MP, pairs: KeyValuesPanel[P]*)(using opaque: Boolean): FormPanel[MP] =
     FormPanelImpl(panel, pairs: _*)
+
+  def route(using opaque: Boolean): FormPanel[BorderPanel] =
+    val typeRoute = KeyValuesPanel(FlowPanel())(Label("Route Type"), ComboBox(Seq("Normal", "AV")))
+    val departureStation =
+      KeyValuesPanel(FlowPanel())(Label("Departure Station"), TextField(5), TextField(3), TextField(3))
+    val arrivalStation = KeyValuesPanel(FlowPanel())(Label("Arrival Station"), TextField(5), TextField(3), TextField(3))
+    val railsCount     = KeyValuesPanel(FlowPanel())(Label("Rails Count"), TextField(10))
+    val length         = KeyValuesPanel(FlowPanel())(Label("Length"), TextField(10))
+    FormPanel(BorderPanel(), typeRoute, departureStation, arrivalStation, length, railsCount)
 
   private case class FormPanelImpl[+MP <: BorderPanel, +P <: Panel](mainPanel: MP, keyValuesPanel: KeyValuesPanel[P]*)(
       using opaque: Boolean
