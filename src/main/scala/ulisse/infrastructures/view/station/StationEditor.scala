@@ -8,8 +8,12 @@ import java.awt.Color
 import scala.swing.*
 import scala.swing.Swing.LineBorder
 import scala.swing.event.*
-
 import StationEditorController.given
+import ulisse.entities.station.Station.CheckedStation
+
+type N = Int
+type C = Grid
+type S = CheckedStation[N, C]
 
 /** A Card displaying station information.
   *
@@ -21,8 +25,8 @@ import StationEditorController.given
   *   A function that opens the station form to modify the station when the card is clicked.
   */
 final case class StationCard(
-    station: Station[Int, Grid],
-    openStationForm: Option[Station[Int, Grid]] => Unit
+    station: S,
+    openStationForm: Option[S] => Unit
 ) extends GridPanel(3, 1):
   contents += new Label(s"Name: ${station.name}")
   contents += new Label(s"Location: ${station.coordinate}")
@@ -44,7 +48,7 @@ final case class StationCard(
   *   The form where the location will be set upon card click.
   */
 final case class EmptyMapCard(
-    mapLocation: Grid,
+    mapLocation: C,
     stationForm: Option[StationForm]
 ) extends Label:
   text = "Empty"
@@ -67,8 +71,8 @@ final case class EmptyMapCard(
   *   The form where location details are added when an EmptyMapCard is clicked.
   */
 final case class StationMapView(
-    controller: StationEditorController[Int, Grid, Station[Int, Grid]],
-    openStationForm: Option[Station[Int, Grid]] => Unit,
+    controller: StationEditorController[N, C, S],
+    openStationForm: Option[S] => Unit,
     stationForm: Option[StationForm]
 ) extends GridPanel(5, 5):
   private val labels = for {
@@ -133,9 +137,9 @@ final case class StationEditorMenu(onCreateClick: () => Unit)
   *   The station to be edited.
   */
 final case class StationForm(
-    controller: StationEditorController[Int, Grid, Station[Int, Grid]],
+    controller: StationEditorController[N, C, S],
     onBackClick: () => Unit,
-    station: Option[Station[Int, Grid]]
+    station: Option[S]
 ) extends GridBagPanel:
   private val stationName   = new TextField(5)
   private val latitude      = new TextField(5)
@@ -154,7 +158,7 @@ final case class StationForm(
     * @param location
     *   The location to set.
     */
-  def setLocation(location: Grid): Unit =
+  def setLocation(location: C): Unit =
     latitude.text = location.row.toString
     longitude.text = location.column.toString
 
@@ -278,7 +282,7 @@ final case class StationEditorContent(
   * @param controller
   *   The associated StationEditorController.
   */
-final case class StationEditorView(controller: StationEditorController[Int, Grid, Station[Int, Grid]])
+final case class StationEditorView(controller: StationEditorController[N, C, S])
     extends BorderPanel:
 
   private val updateContentTemplate: Panel => Unit =
@@ -294,8 +298,9 @@ final case class StationEditorView(controller: StationEditorController[Int, Grid
         )
       )
 
-  private val openStationForm: Option[Station[Int, Grid]] => Unit =
+  private val openStationForm: Option[S] => Unit =
     station => {
+      updateContentTemplate(StationForm(controller, openStationMenu, station))
       updateContentTemplate(StationForm(controller, openStationMenu, station))
     }
 

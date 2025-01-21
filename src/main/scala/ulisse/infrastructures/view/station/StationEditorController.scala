@@ -36,7 +36,7 @@ object StationEditorController:
   */
 final case class StationEditorController[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
     appPort: StationPorts.Input[N, C, S]
-) extends StationPorts.Output:
+):
 
   private def createStation(
       name: String,
