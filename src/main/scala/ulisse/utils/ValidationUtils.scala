@@ -101,5 +101,5 @@ object ValidationUtils:
     * @return
     *   Returns `Right(items)` if the items are unique, otherwise `Left(error)`.
     */
-  def validateUniqueItems[E <: BaseError](items: Seq[?], error: E): Either[E, Seq[?]] =
+  def validateUniqueItems[A, E <: BaseError](items: Seq[A], error: E): Either[E, Seq[A]] =
     Either.cond(items.distinct.size === items.size, items, error)
