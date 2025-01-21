@@ -1,5 +1,6 @@
 import {defineConfig} from 'vitepress'
 let reportPath = '/report'
+let processPath = '/process'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
     base: '/pps-23-ulisse',
@@ -9,7 +10,6 @@ export default defineConfig({
         // https://vitepress.dev/reference/default-theme-config
         nav: [
             {text: 'Home', link: '/'},
-            {text: 'Examples', link: '/markdown-examples'}
         ],
 
         sidebar: [
@@ -27,8 +27,11 @@ export default defineConfig({
                 ]
             },
             {text: 'Testing', link: `${reportPath}/5-testing`},
-            {text: 'Retrospective', link: `${reportPath}/6-retrospective`},
-
+            {text: 'Development process artifacts',
+                items: [
+                    {text: 'Testing', link: `${processPath}/sprint-1`},
+                ]
+            },
         ],
 
         socialLinks: [
