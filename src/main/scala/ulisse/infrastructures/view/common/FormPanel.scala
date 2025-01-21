@@ -1,26 +1,26 @@
 package ulisse.infrastructures.view.common
 
-import scala.swing.*
+import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.Route
+import ulisse.entities.Route.TypeRoute
+
 import scala.swing.BorderPanel.Position.{Center, South}
 import scala.swing.Font.Style
+import scala.swing.*
 
-trait FormPanel[+MP <: Panel, +A <: Component, +B <: Component] extends WrapPanel[MP]:
+trait FormPanel[+MP <: Panel] extends WrapPanel[MP]:
   def saveButton(): Button
   def deleteButton(): Button
   def exitButton(): Button
-  def form(): List[String]
+  def create(): Option[Route]
 
 object FormPanel:
+  def apply[MP <: BorderPanel, P <: Panel](panel: MP, pairs: KeyValuesPanel[P]*)(using opaque: Boolean): FormPanel[MP] =
+    FormPanelImpl(panel, pairs: _*)
 
-  def apply[MP <: BorderPanel, P <: Panel, A <: Component, B <: Component](
-      panel: MP,
-      pairs: PairPanel[P, A, B]*
-  )(using opaque: Boolean): FormPanel[MP, A, B] = FormPanelImpl(panel, pairs: _*)
-
-  private case class FormPanelImpl[+MP <: BorderPanel, +P <: Panel, +A <: Component, +B <: Component](
-      mainPanel: MP,
-      pairPanels: PairPanel[P, A, B]*
-  )(using opaque: Boolean) extends FormPanel[MP, A, B]:
+  private case class FormPanelImpl[+MP <: BorderPanel, +P <: Panel](mainPanel: MP, keyValuesPanel: KeyValuesPanel[P]*)(
+      using opaque: Boolean
+  ) extends FormPanel[MP]:
     private val title  = Label("Route")
     private val save   = new Button("save")
     private val delete = new Button("delete")
@@ -35,10 +35,10 @@ object FormPanel:
 
     title.font = Font("Arial", Style.Bold, 24)
 
-    centralBox.contents += Swing.VGlue
+    centralBox.contents += Swing.Glue
     centralBox.contents += title
-    centralBox.contents ++= pairPanels.map(_.panel())
-    centralBox.contents += Swing.VGlue
+    centralBox.contents ++= keyValuesPanel.map(_.panel())
+    centralBox.contents += Swing.Glue
 
     mainPanel.layout(centralBox) = Center
     mainPanel.layout(southBox) = South
@@ -50,4 +50,16 @@ object FormPanel:
     override def deleteButton(): Button = delete
     override def exitButton(): Button   = exit
 
-    override def form(): List[String] = pairPanels.map(_.value.toString).toList
+    override def create(): Option[Route] =
+      for {
+        typeRoute        <- keyValuesPanel(0).values[ComboBox[String]].headOption
+        departureStation <- keyValuesPanel(1).values[TextField].headOption
+        arrivalStation   <- keyValuesPanel(2).values[TextField].headOption
+        length           <- keyValuesPanel(3).values[TextField].headOption
+        railsCount       <- keyValuesPanel(4).values[TextField].headOption
+      } yield Route(
+        TypeRoute.valueOf(typeRoute.selection.item),
+        (("Rimini", Coordinate(10.0d, 10.0d)), ("Cesena", Coordinate(20.0d, 20.0d))),
+        30.0d,
+        2
+      )
