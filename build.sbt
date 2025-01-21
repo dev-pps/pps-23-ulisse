@@ -7,6 +7,8 @@ hooks := {
   println(s"changeHooksPath command exited with code: ${command.!}")
 }
 
+scalacOptions += "-deprecation"
+
 scalafmtOnCompile := true
 coverageEnabled   := true
 
