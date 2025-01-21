@@ -28,8 +28,9 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
   "StationEditorController" when:
     "onOkClick is invoked" should:
       "add a new station when inputs are valid and oldStation is None" in:
-        val inputPort  = StationPortInputAdapter[Int, Coordinate[Int]](StationManager(outputPort))
-        val controller = StationEditorController[Int, Coordinate[Int]](inputPort)
+        val inputPort =
+          StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](StationManager(outputPort))
+        val controller = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
         val station    = Station(stationName, Coordinate(x, y), numberOfTrack)
 
         controller.onOkClick(
@@ -43,8 +44,9 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
         controller.findStationAt(Coordinate(x, y)) shouldBe Some(station)
 
       "replace the station when inputs are valid and oldStation is Some(station)" in:
-        val inputPort  = StationPortInputAdapter[Int, Coordinate[Int]](StationManager(outputPort))
-        val controller = StationEditorController[Int, Coordinate[Int]](inputPort)
+        val inputPort =
+          StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](StationManager(outputPort))
+        val controller = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
         val oldStation = Station(stationName, Coordinate(x, y), numberOfTrack)
         val newStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
 
@@ -70,8 +72,9 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
         controller.findStationAt(Coordinate(x + 1, y + 1)) shouldBe Some(newStation)
 
       "returns error when input are not valid" in:
-        val inputPort  = StationPortInputAdapter[Int, Coordinate[Int]](StationManager(outputPort))
-        val controller = StationEditorController[Int, Coordinate[Int]](inputPort)
+        val inputPort =
+          StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](StationManager(outputPort))
+        val controller = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
 
         controller.onOkClick(
           stationName,

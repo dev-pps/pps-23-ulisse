@@ -34,7 +34,9 @@ object StationEditorController:
   *   A type that extends `Coordinate[N]`, which represents the station's location.
   *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
   */
-final case class StationEditorController[N: Numeric, C <: Coordinate[N]](appPort: StationPorts.Input[N, C]):
+final case class StationEditorController[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
+    appPort: StationPorts.Input[N, C, S]
+):
 
   def createStation(
       name: String,
@@ -42,8 +44,8 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N]](appPort
       longitude: String,
       numberOfTrack: String,
       coordinateGenerator: (N, N) => Either[BaseError, C],
-      stationGenerator: (String, C, Int) => Either[BaseError, CheckedStation[N, C]]
-  )(using numeric: Numeric[N]): Either[BaseError, CheckedStation[N, C]] =
+      stationGenerator: (String, C, Int) => Either[BaseError, S]
+  )(using numeric: Numeric[N]): Either[BaseError, S] =
     for
       latitude      <- numeric.parseString(latitude).toRight(StationEditorController.Error.InvalidRowFormat)
       longitude     <- numeric.parseString(longitude).toRight(StationEditorController.Error.InvalidColumnFormat)
@@ -77,10 +79,10 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N]](appPort
       latitude: String,
       longitude: String,
       numberOfTrack: String,
-      oldStation: Option[Station[N, C]]
+      oldStation: Option[S]
   )(using coordinateGenerator: (N, N) => Either[BaseError, C])(using
-      stationGenerator: (String, C, Int) => Either[BaseError, CheckedStation[N, C]]
-  ): Either[BaseError, StationMap[N, C]] =
+      stationGenerator: (String, C, Int) => Either[BaseError, S]
+  ): Either[BaseError, StationMap[N, C, S]] =
     createStation(stationName, latitude, longitude, numberOfTrack, coordinateGenerator, stationGenerator).flatMap { s =>
       for old <- oldStation do removeStation(old)
       val st = appPort.addStation(s)
