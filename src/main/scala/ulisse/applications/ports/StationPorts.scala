@@ -21,14 +21,15 @@ object StationPorts:
     */
   trait Input[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
 
-    type StationMap = CheckedStationMap[N, C, S]
+    private type SM = CheckedStationMap[N, C, S]
+    private type E  = CheckedStationMap.Error
 
     /** Retrieves the current station map.
       *
       * @return
       *   The `StationMap` containing the stations.
       */
-    def stationMap: CheckedStationMap[N, C, S]
+    def stationMap: SM
 
     /** Adds a station to the station map.
       *
@@ -37,7 +38,7 @@ object StationPorts:
       * @return
       *   Either the updated `StationMap` or an `Error` indicating the issue.
       */
-    def addStation(station: S): Either[CheckedStationMap.Error, StationMap]
+    def addStation(station: S): Either[E, SM]
 
     /** Removes a station from the station map.
       *
@@ -46,7 +47,7 @@ object StationPorts:
       * @return
       *   Either the updated `StationMap` or an `Error` indicating the issue.
       */
-    def removeStation(station: S): Either[CheckedStationMap.Error, StationMap]
+    def removeStation(station: S): Either[E, SM]
 
     /** Finds a station at a specified location.
       *

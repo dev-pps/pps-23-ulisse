@@ -1,7 +1,6 @@
 package ulisse.applications.adapters
 
 import ulisse.applications.ports.StationPorts
-import ulisse.applications.station.StationMap
 import ulisse.applications.useCases.StationManager
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station

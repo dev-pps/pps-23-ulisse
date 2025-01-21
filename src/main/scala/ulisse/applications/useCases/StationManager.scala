@@ -7,17 +7,20 @@ import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
 final case class StationManager[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](uiPort: StationPorts.Output):
+
+  type SM = CheckedStationMap[N, C, S]
+  type E  = CheckedStationMap.Error
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  private var _stationMap: CheckedStationMap[N, C, S] = StationMap.createCheckedStationMap()
+  private var _stationMap: SM = StationMap.createCheckedStationMap()
 
-  def stationMap: CheckedStationMap[N, C, S] = _stationMap
+  def stationMap: SM = _stationMap
 
-  def addStation(station: S): Either[CheckedStationMap.Error, CheckedStationMap[N, C, S]] =
+  def addStation(station: S): Either[E, SM] =
     _stationMap.addStation(station).map(updatedMap =>
       _stationMap = updatedMap; updatedMap
     )
 
-  def removeStation(station: S): Either[CheckedStationMap.Error, CheckedStationMap[N, C, S]] =
+  def removeStation(station: S): Either[E, SM] =
     _stationMap.removeStation(station).map: updatedMap =>
       _stationMap = updatedMap; updatedMap
 
