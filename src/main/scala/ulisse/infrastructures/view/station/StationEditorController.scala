@@ -8,6 +8,10 @@ import ulisse.entities.station.Station.CheckedStation
 import ulisse.utils.Errors.BaseError
 
 object StationEditorController:
+
+  enum Error extends BaseError:
+    case InvalidRowFormat, InvalidColumnFormat, InvalidNumberOfTrackFormat
+
   given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
 
   given ((Int, Int) => Either[BaseError, Grid]) = Coordinate.createGrid
@@ -32,9 +36,6 @@ object StationEditorController:
   */
 final case class StationEditorController[N: Numeric, C <: Coordinate[N]](appPort: StationPorts.Input[N, C]):
 
-  enum Error extends BaseError:
-    case InvalidRowFormat, InvalidColumnFormat, InvalidNumberOfTrackFormat
-
   def createStation(
       name: String,
       latitude: String,
@@ -44,10 +45,10 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N]](appPort
       stationGenerator: (String, C, Int) => Either[BaseError, CheckedStation[N, C]]
   )(using numeric: Numeric[N]): Either[BaseError, CheckedStation[N, C]] =
     for
-      latitude      <- numeric.parseString(latitude).toRight(Error.InvalidRowFormat)
-      longitude     <- numeric.parseString(longitude).toRight(Error.InvalidColumnFormat)
+      latitude      <- numeric.parseString(latitude).toRight(StationEditorController.Error.InvalidRowFormat)
+      longitude     <- numeric.parseString(longitude).toRight(StationEditorController.Error.InvalidColumnFormat)
       coordinate    <- coordinateGenerator(latitude, longitude)
-      numberOfTrack <- numberOfTrack.toIntOption.toRight(Error.InvalidNumberOfTrackFormat)
+      numberOfTrack <- numberOfTrack.toIntOption.toRight(StationEditorController.Error.InvalidNumberOfTrackFormat)
       station       <- stationGenerator(name, coordinate, numberOfTrack)
     yield station
 
