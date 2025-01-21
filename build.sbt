@@ -13,7 +13,8 @@ coverageEnabled   := true
 wartremoverWarnings ++= Warts.all
 wartremoverWarnings --= Seq(
   Wart.ImplicitParameter,
-  Wart.Nothing
+  Wart.Nothing,
+  Wart.Equals
 )
 
 wartremoverErrors ++= Warts.unsafe

@@ -13,7 +13,7 @@ class StationMapTest extends AnyWordSpec with Matchers:
   "A StationMap" when:
     "created" should:
       "be empty" in:
-        StationMap[Int, Coordinate[Int]]().stations shouldBe empty
+        StationMap.createCheckedStationMap[Int, Coordinate[Int]]().stations shouldBe empty
 
     "a new station is added" should:
       "contain the new station" in:
