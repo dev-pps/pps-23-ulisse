@@ -24,7 +24,6 @@ object WrapPanel:
 
   private case class WrapPanelImpl[+P <: Panel](mainPanel: P)(items: Component*)(using opaque: Boolean)
       extends WrapPanel[P]:
-    items.map(_.peer).foreach(mainPanel.peer.add)
     mainPanel.opaque = opaque
 
     override def panel(): P                         = mainPanel

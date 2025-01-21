@@ -15,6 +15,8 @@ object PairPanel:
       using opaque: Boolean
   ) extends PairPanel[P, A, B]:
     private val wrapPanel: WrapPanel[P] = WrapPanel(mainPanel)(first, second)
+    mainPanel.peer.add(first.peer)
+    mainPanel.peer.add(second.peer)
     mainPanel.maximumSize = new Dimension(400, 40)
 
     export wrapPanel.*
