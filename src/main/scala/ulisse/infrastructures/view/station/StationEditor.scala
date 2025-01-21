@@ -9,7 +9,7 @@ import scala.swing.*
 import scala.swing.Swing.LineBorder
 import scala.swing.event.*
 
-import StationEditorController.*
+import StationEditorController.given
 
 /** A Card displaying station information.
   *
@@ -26,7 +26,7 @@ final case class StationCard(
 ) extends GridPanel(3, 1):
   contents += new Label(s"Name: ${station.name}")
   contents += new Label(s"Location: ${station.coordinate}")
-  contents += new Label(s"numberOfTrack: ${station.numberOfTrack}")
+  contents += new Label(s"numberOfTrack: ${station.numberOfTracks}")
   border = LineBorder(Color.BLACK, 2)
   listenTo(mouse.clicks)
   reactions += {
@@ -145,7 +145,7 @@ final case class StationForm(
     stationName.text = s.name
     latitude.text = s.coordinate.row.toString
     longitude.text = s.coordinate.column.toString
-    numberOfTrack.text = s.numberOfTrack.toString
+    numberOfTrack.text = s.numberOfTracks.toString
 
   /** Sets the location in the StationForm.
     *

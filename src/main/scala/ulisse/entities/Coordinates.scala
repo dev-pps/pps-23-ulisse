@@ -1,5 +1,7 @@
 package ulisse.entities
 
+import cats.Eq
+
 import scala.math.{pow, sqrt}
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonNegative, validateRange}
@@ -24,13 +26,16 @@ object Coordinates:
     @targetName("equals")
     def ===(that: Coordinate[T])(using numeric: Numeric[T]): Boolean =
       numeric.equiv(x, that.x) && numeric.equiv(y, that.y)
+    override def equals(obj: Any): Boolean =
+      obj match
+        case that: Coordinate[?] => this.x == that.x && this.y == that.y
+        case _                   => false
     def distance(coordinate: Coordinate[T])(using numeric: Numeric[T]): Double =
       sqrt(pow(numeric.toDouble(coordinate.x) - numeric.toDouble(x), 2)
         + pow(numeric.toDouble(coordinate.y) - numeric.toDouble(y), 2))
 
   /** Factory for [Coordinate] instances. */
   object Coordinate:
-
     def apply[T: Numeric](x: T, y: T): Coordinate[T] = CoordinateImpl(x, y)
 
     /** Creates a `Geo` instance with validation.

@@ -1,60 +1,43 @@
-//package ulisse.infrastructure.view.station
-//
-////import applications.station.{Manger, StationEditorController}
-//import org.mockito.Mockito.when
-//import org.scalatest.wordspec.AnyWordSpec
-//import org.scalatest.matchers.should.Matchers
-//import ulisse.applications.adapters.StationPortInputAdapter
-//import ulisse.applications.ports.StationPorts
-//import ulisse.applications.station.StationMap
-//import ulisse.applications.useCases.StationManager
-//import ulisse.entities.Coordinates.{Coordinate, Grid}
-//import ulisse.entities.station.Station
-//import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
-////import entities.Location
-////import entities.station.Station
-//import org.scalatestplus.mockito.MockitoSugar.mock
-////
-//class StationEditorControllerTest extends AnyWordSpec with Matchers:
-//
-//  private val view = mock[StationPorts.Output]
-//  private val inputPort = StationPortInputAdapter[Int, Grid](StationManager(view))
-//  "StationEditorController" when:
-//    "onOkClick is invoked" should:
-//      "add a new station when inputs are valid and oldStation is None" in:
-//        val controller = StationEditorController(inputPort)
-//
-//        val stationName   = "New Station"
-//        val latitude      = "1"
-//        val longitude     = "1"
-//        val numberOfTrack = "1"
-//
-//        Coordinate.createGrid(1, 1).toOption match
-//          case Some(coordinate: Grid) =>
-//            val station = Station[Int, Grid](stationName, coordinate, 1)
-//            val station2 = Station[Int, Grid](stationName, coordinate, 1)
-//            station shouldBe station2
-//            StationMap().addStation(station) match
-//              case Right(stationMap) =>
-////                when(inputPort.addStation(station)).thenReturn(Right(station))
-////                when(inputPort.stationMap).thenReturn(stationMap)
-////                when(inputPort.findStationAt(coordinate)).thenReturn(Some(station))
-//                print(controller.onOkClick(
-//                  stationName,
-//                  latitude,
-//                  longitude,
-//                  numberOfTrack,
-//                  None
-//                ))
-//                controller.findStationAt(coordinate) shouldEqual Some(station)
-//                fail()
-//              case _ => fail()
-//          case _ => fail()
-//        val station = Station(stationName, Coordinate(1, 1), 1)
-//
-//
-//
-////
+package ulisse.infrastructure.view.station
+
+import org.mockito.Mockito.when
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+import ulisse.applications.adapters.StationPortInputAdapter
+import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.station.Station
+import ulisse.applications.ports.StationPorts
+import ulisse.applications.useCases.StationManager
+import ulisse.infrastructures.view.station.StationEditorController
+import ulisse.infrastructures.view.station.StationEditorController.given
+import org.scalatestplus.mockito.MockitoSugar.mock
+import ulisse.applications.station.StationMap
+import ulisse.utils.Errors.BaseError
+
+class StationEditorControllerTest extends AnyWordSpec with Matchers:
+
+  private val outputPort    = mock[StationPorts.Output]
+  private val stationName   = "New Station"
+  private val x             = 1
+  private val y             = 1
+  private val numberOfTrack = "1"
+  "StationEditorController" when:
+    "onOkClick is invoked" should:
+      "add a new station when inputs are valid and oldStation is None" in:
+        val inputPort  = StationPortInputAdapter[Int, Coordinate[Int]](StationManager(outputPort))
+        val controller = StationEditorController[Int, Coordinate[Int]](inputPort)
+        val station    = Station(stationName, Coordinate(x, y), 1)
+
+        controller.onOkClick(
+          stationName,
+          x.toString,
+          y.toString,
+          numberOfTrack,
+          None
+        ) shouldBe Right(StationMap(station))
+
+        controller.findStationAt(Coordinate(x, y)) shouldBe Some(station)
+
 ////      "replace the station when inputs are valid and oldStation is Some(station)" in:
 ////        val model      = Manger()
 ////        val controller = StationEditorController(view, model)

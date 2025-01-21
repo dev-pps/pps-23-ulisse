@@ -1,5 +1,6 @@
 package ulisse.entities.station
 
+import cats.implicits.catsSyntaxEq
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
@@ -15,13 +16,20 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
   *   A type that extends `Coordinate[N]`, which represents the station's location.
   *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
   */
-trait Station[N: Numeric, +C <: Coordinate[N]]:
+trait Station[N: Numeric, C <: Coordinate[N]]:
   val name: String
   val coordinate: C
-  val numberOfTrack: Int
+  val numberOfTracks: Int
+  override def equals(other: Any): Boolean = other match
+    case s: Station[_, _] =>
+      name === s.name &&
+      coordinate == s.coordinate &&
+      numberOfTracks === s.numberOfTracks
+    case _ => false
 
 /** Factory for [[Station]] instances. */
 object Station:
+  given CanEqual[Station[_, _], Station[_, _]] = CanEqual.canEqualAny
 
   def apply[N: Numeric, C <: Coordinate[N]](
       name: String,
@@ -51,10 +59,10 @@ object Station:
       validNumberOfTrack <- validatePositive(numberOfTrack, CheckedStation.Error.InvalidNumberOfTrack)
     yield CheckedStation(validName, coordinate, validNumberOfTrack)
 
-  private final case class StationImpl[N: Numeric, +C <: Coordinate[N]](
+  private final case class StationImpl[N: Numeric, C <: Coordinate[N]](
       name: String,
       coordinate: C,
-      numberOfTrack: Int
+      numberOfTracks: Int
   ) extends Station[N, C]
 
   object CheckedStation:
@@ -71,7 +79,7 @@ object Station:
   case class CheckedStation[N: Numeric, C <: Coordinate[N]](
       name: String,
       coordinate: C,
-      numberOfTrack: Int
+      numberOfTracks: Int
   ) extends Station[N, C]
 
 /** Defines a Selectable Object. */

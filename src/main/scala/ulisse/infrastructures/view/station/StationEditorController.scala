@@ -7,6 +7,16 @@ import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.utils.Errors.BaseError
 
+object StationEditorController:
+  given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
+
+  given ((Int, Int) => Either[BaseError, Grid]) = Coordinate.createGrid
+
+  given ((Double, Double) => Either[BaseError, Geo]) = Coordinate.createGeo
+
+  given [N: Numeric, C <: Coordinate[N]]: ((String, C, Int) => Either[BaseError, CheckedStation[N, C]]) =
+    Station.createCheckedStation
+
 /** Controller for StationEditorView.
   *
   * @constructor
@@ -25,7 +35,7 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N]](appPort
   enum Error extends BaseError:
     case InvalidRowFormat, InvalidColumnFormat, InvalidNumberOfTrackFormat
 
-  private[this] def createStation(
+  def createStation(
       name: String,
       latitude: String,
       longitude: String,
@@ -70,17 +80,13 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N]](appPort
   )(using coordinateGenerator: (N, N) => Either[BaseError, C])(using
       stationGenerator: (String, C, Int) => Either[BaseError, CheckedStation[N, C]]
   ): Either[BaseError, StationMap[N, C]] =
-    createStation(stationName, latitude, longitude, numberOfTrack, coordinateGenerator, stationGenerator).flatMap {
+    createStation(stationName, latitude, longitude, numberOfTrack, coordinateGenerator, stationGenerator).flatMap { s =>
       for old <- oldStation do removeStation(old)
-      appPort.addStation(_)
+      val st = appPort.addStation(s)
+      println(st)
+      st
     } match
       case Right(stationMap) => Right(stationMap)
       case Left(error)       => Left(error)
 
   export appPort.{findStationAt, removeStation}
-
-given ((Int, Int) => Either[BaseError, Grid])            = Coordinate.createGrid
-given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
-given ((Double, Double) => Either[BaseError, Geo])       = Coordinate.createGeo
-given [N: Numeric, C <: Coordinate[N]]: ((String, C, Int) => Either[BaseError, CheckedStation[N, C]]) =
-  Station.createCheckedStation

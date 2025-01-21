@@ -26,6 +26,9 @@ trait StationMap[N: Numeric, C <: Coordinate[N]]:
   type R
   val stations: StationMapType
   def map[B](f: Station[N, C] => B): List[B]
+  override def equals(other: Any): Boolean = other match
+    case that: StationMap[_, _] => that.stations == stations
+    case _                      => false
 
   /** Adds a station to the map.
     *
@@ -69,9 +72,10 @@ object StationMap:
     *   A `StationMap` instance.
     */
 
-  def apply[N: Numeric, C <: Coordinate[N]](): BaseStationMap[N, C]                      = BaseStationMap(List.empty)
+  def apply[N: Numeric, C <: Coordinate[N]](stations: Station[N, C]*): StationMap[N, C] =
+    BaseStationMap(stations.toList)
   def createCheckedStationMap[N: Numeric, C <: Coordinate[N]](): CheckedStationMap[N, C] = CheckedStationMap(List.empty)
-  final case class BaseStationMap[N: Numeric, C <: Coordinate[N]] private[StationMap] (
+  private final case class BaseStationMap[N: Numeric, C <: Coordinate[N]] private[StationMap] (
       stations: List[Station[N, C]]
   ) extends StationMap[N, C]:
     type StationMapType = List[Station[N, C]]
