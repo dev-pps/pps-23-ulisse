@@ -6,6 +6,7 @@ import ulisse.applications.useCases.StationManager
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
-final case class StationPortInputAdapter[N: Numeric, C <: Coordinate[N]](stationManager: StationManager[N, C])
-    extends StationPorts.Input[N, C]:
+final case class StationPortInputAdapter[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
+    stationManager: StationManager[N, C, S]
+) extends StationPorts.Input[N, C, S]:
   export stationManager.{addStation, findStationAt, removeStation, stationMap}

@@ -67,7 +67,7 @@ final case class EmptyMapCard(
   *   The form where location details are added when an EmptyMapCard is clicked.
   */
 final case class StationMapView(
-    controller: StationEditorController[Int, Grid],
+    controller: StationEditorController[Int, Grid, Station[Int, Grid]],
     openStationForm: Option[Station[Int, Grid]] => Unit,
     stationForm: Option[StationForm]
 ) extends GridPanel(5, 5):
@@ -133,7 +133,7 @@ final case class StationEditorMenu(onCreateClick: () => Unit)
   *   The station to be edited.
   */
 final case class StationForm(
-    controller: StationEditorController[Int, Grid],
+    controller: StationEditorController[Int, Grid, Station[Int, Grid]],
     onBackClick: () => Unit,
     station: Option[Station[Int, Grid]]
 ) extends GridBagPanel:
@@ -278,7 +278,7 @@ final case class StationEditorContent(
   * @param controller
   *   The associated StationEditorController.
   */
-final case class StationEditorView(controller: StationEditorController[Int, Grid])
+final case class StationEditorView(controller: StationEditorController[Int, Grid, Station[Int, Grid]])
     extends BorderPanel:
 
   private val updateContentTemplate: Panel => Unit =
