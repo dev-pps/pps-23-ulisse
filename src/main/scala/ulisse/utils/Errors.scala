@@ -1,7 +1,6 @@
 package ulisse.utils
 
-import ulisse.utils.Errors.{ErrorExist, ErrorMessage, ErrorNotFound}
-
+/** Defines the basic error message types for the application. */
 object Errors:
 
   trait BaseError
