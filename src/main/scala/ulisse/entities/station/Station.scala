@@ -7,7 +7,8 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
 
 /** Defines a Station.
   *
-  * A Station represents a location with tracks and associated metadata.
+  * A `Station` represents a location where trains can stop. Each station has a name, a location, and a number of
+  * tracks.
   *
   * @tparam N
   *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
@@ -29,8 +30,23 @@ trait Station[N: Numeric, C <: Coordinate[N]]:
 
 /** Factory for [[Station]] instances. */
 object Station:
-  given CanEqual[Station[_, _], Station[_, _]] = CanEqual.canEqualAny
-
+  /** Creates a `Station` instance.
+    *
+    * @tparam N
+    *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
+    *   - An instance of `Numeric` must be available for the `N` type.
+    * @tparam C
+    *   A type that extends `Coordinate[N]`, which represents the station's location.
+    *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
+    * @param name
+    *   The name of the station.
+    * @param coordinate
+    *   The location of the station.
+    * @param numberOfTrack
+    *   The number of tracks.
+    * @return
+    *   A `Station` instance.
+    */
   def apply[N: Numeric, C <: Coordinate[N]](
       name: String,
       coordinate: C,
@@ -40,6 +56,12 @@ object Station:
 
   /** Creates a `Station` instance with validation.
     *
+    * @tparam N
+    *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
+    *   - An instance of `Numeric` must be available for the `N` type.
+    * @tparam C
+    *   A type that extends `Coordinate[N]`, which represents the station's location.
+    *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
     * @param name
     *   The name of the station. Must not be empty or blank.
     * @param coordinate
@@ -70,31 +92,52 @@ object Station:
     enum Error extends BaseError:
       case InvalidName, InvalidNumberOfTrack
 
-  /** Defines a CheckedStation.
+  /** Defines a `CheckedStation`.
     *
-    * **Requirements**:
-    *   - The `name` must not be empty or blank.
-    *   - The `numberOfTrack` must be greater than 0.
+    * A `CheckedStation` represents a validated station.
+    *
+    * @tparam N
+    *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
+    *   - An instance of `Numeric` must be available for the `N` type.
+    * @tparam C
+    *   A type that extends `Coordinate[N]`, which represents the station's location.
+    *   - The `C` type must ensure uniqueness and comparability of coordinates.
+    * @param name
+    *   The name of the station. Must be non-blank.
+    * @param coordinate
+    *   The location of the station, represented as a coordinate of type `C`.
+    * @param numberOfTracks
+    *   The number of tracks at the station. Must be a positive integer.
+    *
+    * **Note**: Instances of `CheckedStation` can only be created through the `Station.createCheckedStation` method to
+    * ensure validation.
     */
-  case class CheckedStation[N: Numeric, C <: Coordinate[N]](
+  case class CheckedStation[N: Numeric, C <: Coordinate[N]] private[Station] (
       name: String,
       coordinate: C,
       numberOfTracks: Int
   ) extends Station[N, C]
 
+  /** Represents a selectable station.
+    *
+    * A `SelectableStation` wraps a `Station` instance and provides a boolean flag to indicate whether the station is
+    * selected.
+    *
+    * @tparam N
+    *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
+    * @tparam C
+    *   A type that extends `Coordinate[N]`, representing the station's location.
+    * @param station
+    *   The station instance of type `Station[N, C]` to be wrapped.
+    * @param selected
+    *   A boolean flag indicating whether the station is selected. `true` if selected, `false` otherwise.
+    */
+  final case class SelectableStation[N: Numeric, C <: Coordinate[N]](
+      station: Station[N, C],
+      selected: Boolean
+  ) extends Station[N, C] with Selectable:
+    export station.*
+
 /** Defines a Selectable Object. */
 trait Selectable:
   val selected: Boolean
-
-/** Represents a selectable station.
-  *
-  * @param station
-  *   the station instance of type `Station[L]` to be wrapped
-  * @param selected
-  *   a boolean flag indicating whether the station is selected
-  */
-final case class SelectableStation[N: Numeric, C <: Coordinate[N]](
-    station: Station[N, C],
-    selected: Boolean
-) extends Station[N, C] with Selectable:
-  export station.*

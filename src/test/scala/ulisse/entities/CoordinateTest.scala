@@ -4,7 +4,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinates.*
 
-class LocationTest extends AnyWordSpec with Matchers:
+class CoordinateTest extends AnyWordSpec with Matchers:
 
   "A Location" when:
     "is a Geo" should:
