@@ -12,7 +12,6 @@ import ulisse.infrastructures.view.station.StationEditorController
 import ulisse.infrastructures.view.station.StationEditorController.given
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.applications.station.StationMap
-import ulisse.entities.station.Station.CheckedStation
 import ulisse.utils.Errors.BaseError
 
 class StationEditorControllerTest extends AnyWordSpec with Matchers:
