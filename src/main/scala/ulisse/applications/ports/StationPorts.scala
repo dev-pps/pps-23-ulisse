@@ -1,7 +1,7 @@
 package ulisse.applications.ports
 
 import ulisse.applications.station.StationMap
-import ulisse.applications.useCases.StationManager
+import ulisse.applications.station.StationMap.CheckedStationMap
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
@@ -35,7 +35,7 @@ object StationPorts:
       * @return
       *   Either the updated `StationMap` or an `Error` indicating the issue.
       */
-    def addStation(station: Station[N, C]): Either[StationMap.Error, StationMap[N, C]]
+    def addStation(station: Station[N, C]): Either[CheckedStationMap.Error, StationMap[N, C]]
 
     /** Removes a station from the station map.
       *
@@ -44,7 +44,7 @@ object StationPorts:
       * @return
       *   Either the updated `StationMap` or an `Error` indicating the issue.
       */
-    def removeStation(station: Station[N, C]): Either[StationMap.Error, StationMap[N, C]]
+    def removeStation(station: Station[N, C]): Either[CheckedStationMap.Error, StationMap[N, C]]
 
     /** Finds a station at a specified location.
       *

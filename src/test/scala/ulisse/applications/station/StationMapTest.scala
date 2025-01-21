@@ -3,6 +3,7 @@ package ulisse.applications.station
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.applications.station.StationMap
+import ulisse.applications.station.StationMap.CheckedStationMap
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
 
@@ -27,14 +28,14 @@ class StationMapTest extends AnyWordSpec with Matchers:
         val otherStation = Station("StationA", Coordinate(1, 1), 1)
         StationMap.createCheckedStationMap().addStation(station).flatMap(
           _.addStation(otherStation)
-        ) shouldBe Left(StationMap.Error.DuplicateStationName)
+        ) shouldBe Left(CheckedStationMap.Error.DuplicateStationName)
 
     "another station with same location is added" should:
       "not be added and returns error" in:
         val otherStation = Station("StationB", Coordinate(0, 0), 1)
         StationMap.createCheckedStationMap().addStation(station).flatMap(
           _.addStation(otherStation)
-        ) shouldBe Left(StationMap.Error.DuplicateStationLocation)
+        ) shouldBe Left(CheckedStationMap.Error.DuplicateStationLocation)
 
     "existing station is removed" should:
       "no longer be present" in:
@@ -47,5 +48,5 @@ class StationMapTest extends AnyWordSpec with Matchers:
     "non-existing station is removed" should:
       "return error" in:
         StationMap.createCheckedStationMap().removeStation(station) shouldBe Left(
-          StationMap.Error.StationNotFound
+          CheckedStationMap.Error.StationNotFound
         )
