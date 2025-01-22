@@ -1,12 +1,12 @@
-package immutable.state.demo.asyncAPI
+package immutable.state.demo.asyncAPI.simpleDemo
 
+import immutable.state.demo.asyncAPI.simpleDemo.Application.Adapters.{RouteInputAdapter, StationInputAdapter}
+import immutable.state.demo.asyncAPI.simpleDemo.Application.{AppState, RouteManager, StationManager}
+import immutable.state.demo.asyncAPI.simpleDemo.UI.{AppFrame, TestUI}
 import immutable.state.demo.reference.Monads.Monad
 import immutable.state.demo.reference.Monads.Monad.{map2, seqN}
 import immutable.state.demo.reference.Streams.Stream
 import immutable.state.demo.reference.Streams.Stream.{Cons, Empty}
-import immutable.state.demo.asyncAPI.Application.Adapters.{RouteInputAdapter, StationInputAdapter}
-import immutable.state.demo.asyncAPI.Application.{AppState, RouteManager, StationManager}
-import immutable.state.demo.asyncAPI.UI.{AppFrame, TestUI}
 
 import java.util.concurrent.LinkedBlockingQueue
 

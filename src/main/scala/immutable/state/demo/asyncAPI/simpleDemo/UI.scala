@@ -1,9 +1,9 @@
-package immutable.state.demo.asyncAPI
+package immutable.state.demo.asyncAPI.simpleDemo
 
-import immutable.state.demo.asyncAPI.Application.Adapters.{RouteInputAdapter, StationInputAdapter}
+import Application.Adapters.{RouteInputAdapter, StationInputAdapter}
 
 import scala.concurrent.ExecutionContext
-import scala.swing.{BorderPanel, Button, Dimension, MainFrame, Swing}
+import scala.swing.*
 
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
   Swing.onEDT(runnable.run())

@@ -1,4 +1,4 @@
-package immutable.state.demo.asyncAPI
+package immutable.state.demo.asyncAPI.simpleDemo
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
