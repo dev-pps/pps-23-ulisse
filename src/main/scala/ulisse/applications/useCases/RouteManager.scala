@@ -21,6 +21,7 @@ object RouteManager:
 
   enum ErrorSaving:
     case notExist
+    case creation
 
   opaque type Bank = Map[Id, Route]
 

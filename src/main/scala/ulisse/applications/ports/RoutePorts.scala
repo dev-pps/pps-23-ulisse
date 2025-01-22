@@ -7,4 +7,4 @@ object RoutePorts:
 
   trait UIPort():
     def size: Int
-    def save(route: Route): Either[RouteManager.ErrorSaving, UIPort]
+    def save(route: Option[Route]): Either[RouteManager.ErrorSaving, UIPort]
