@@ -25,7 +25,7 @@ wartremoverErrors --= Seq(
 
 Test / fork := true
 Test / javaOptions ++= Seq(
-  "-Xmx2G",
+  "-Xmx2G"
 )
 
 lazy val root = (project in file("."))
@@ -33,7 +33,7 @@ lazy val root = (project in file("."))
     name := "pps-23-ulisse",
     libraryDependencies ++= Seq(
       "org.typelevel"          %% "cats-core"         % "2.12.0",
-      "org.scala-lang.modules" %% "scala-swing"       % "3.0.0",
+      "org.typelevel"          %% "cats-effect"       % "3.5.4",
       "org.scala-lang.modules" %% "scala-swing"       % "3.0.0",
       "org.slf4j"               % "slf4j-simple"      % "2.0.13",
       "org.scalatestplus"      %% "mockito-5-10"      % "3.2.18.0" % Test,
