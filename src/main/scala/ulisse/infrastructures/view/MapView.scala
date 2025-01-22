@@ -7,6 +7,7 @@ import ulisse.applications.ports.RoutePorts.UIPort
 import ulisse.applications.useCases.RouteManager
 import ulisse.entities.Route
 import ulisse.infrastructures.view.common.FormPanel
+import ulisse.infrastructures.view.form.RouteForm
 
 import scala.swing.*
 import scala.swing.BorderPanel.Position.*
@@ -43,11 +44,11 @@ object MapView:
     private val countLabel = "Count Route: "
     private val errorStr   = "Error: "
 
-    val stateStationGUI: Ref[IO, Points]  = Ref.of[IO, Points](Points(List.empty)).unsafeRunSync()
-    val mapPark: MapPanel                 = MapPanel(Points(List.empty))
-    val info: Label                       = Label(s"$countLabel ${uiPort.size}")
-    val error: Label                      = Label(errorStr)
-    val formPanel: FormPanel[BorderPanel] = FormPanel.route
+    val stateStationGUI: Ref[IO, Points] = Ref.of[IO, Points](Points(List.empty)).unsafeRunSync()
+    val mapPark: MapPanel                = MapPanel(Points(List.empty))
+    val info: Label                      = Label(s"$countLabel ${uiPort.size}")
+    val error: Label                     = Label(errorStr)
+    val formPanel: RouteForm             = RouteForm()
 
     // Main content pane with BorderLayout
     val contentPane  = new BorderPanel
