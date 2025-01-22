@@ -3,6 +3,7 @@ package ulisse.infrastructures.view
 import cats.effect.IO
 import cats.effect.kernel.Ref
 import cats.effect.unsafe.implicits.global
+import cats.syntax.either.*
 import ulisse.applications.ports.RoutePorts.UIPort
 import ulisse.applications.useCases.RouteManager
 import ulisse.entities.Route
@@ -52,53 +53,35 @@ object MapView:
     // Main content pane with BorderLayout
     val contentPane  = new BorderPanel
     val glassPane    = new BorderPanel
-    val createButton = new Button("Create")
+    val createButton = new Button("Form Route")
     val northPanel   = new FlowPanel(createButton, info, error)
 
     info.text = countLabel + uiPort.size.toString
-    error.text = errorStr + "None"
+    error.text = errorStr + "ddd"
 
-    glassPane.visible = formPanel.visible
     glassPane.opaque = false
+    glassPane.visible = false
+    formPanel.setVisible(false)
 
-    // Panel to appear on glassPane with form fields
-//    private val formPanel: formPanel.setVisible(false)
+    private val stateRef: Ref[IO, Either[RouteManager.ErrorSaving, UIPort]] =
+      Ref.of[IO, Either[RouteManager.ErrorSaving, UIPort]](uiPort.asRight).unsafeRunSync()
 
     sealed trait Action[T]:
       def create: T
-
     case object RouteCreate extends Action[Option[Route]]:
       override def create: Option[Route] = formPanel.create()
 
-//    case object DepartureStation extends Action[Route.Station]:
-//      private val departureStation = formPanel.keyValuesPanel(1)
-//      private val values           = departureStation.values[TextField]
-//      private val name             = values(1).text
-//      val coordinate               = Coordinate(values(2).text.toDouble, values(3).text.toDouble)
-//      override def create: Station = (name, coordinate)
-//
-//    case object ArrivalStation extends Action[Station]:
-//      private val arrivalStation   = formPanel.keyValuesPanel(2)
-//      private val values           = arrivalStation.values[TextField]
-//      private val name             = values(1).text
-//      val coordinate               = Coordinate(values(2).text.toDouble, values(3).text.toDouble)
-//      override def create: Station = (name, coordinate)
-//
-//    case object Length extends Action[Double]:
-//      private val length          = formPanel.keyValuesPanel(3)
-//      private val value           = length.values[TextField]
-//      override def create: Double = value(1).text.toDouble
-//
-//    case object CountRails extends Action[Int]:
-//      private val railsCount   = formPanel.keyValuesPanel(4)
-//      private val value        = railsCount.values[TextField]
-//      override def create: Int = value(1).text.toInt
-
     // Funzione di aggiornamento dello stato
-    def updateState(state: UIPort, route: Route): Either[RouteManager.ErrorSaving, UIPort] =
-      state.save(route)
+    private def updateState(
+        state: Either[RouteManager.ErrorSaving, UIPort],
+        route: Option[Route]
+    ): Either[RouteManager.ErrorSaving, UIPort] =
+      state.flatMap(uiPort => uiPort.save(route))
 
-    val stateRef: Ref[IO, UIPort] = Ref.of[IO, UIPort](uiPort).unsafeRunSync()
+    private def updatePark(points: Points, x: String, y: String): Points =
+      points.copy(list = points.list :+ (x, y))
+
+    private def runOnEDT(io: IO[Unit]): Unit = Swing.onEDT(io.unsafeRunAndForget())
 
     // Create button action
     listenTo(createButton)
@@ -111,48 +94,40 @@ object MapView:
     // formPanel button action
     formPanel.saveButton().reactions += {
       case event.ButtonClicked(_) =>
-        for {
-          route <- formPanel.create()
-        } yield {
-          formPanel.setVisible(false)
-          glassPane.visible = false
-
-          uiPort.save(route) match
+        val update = stateRef
+          .updateAndGet(state => updateState(state, formPanel.create()))
+          .flatMap {
             case Left(errorSaving) =>
-              println("ERROR")
-              error.text = errorStr + errorSaving.toString
-            case Right(port) =>
-              println(s"CREATED ${port.size}")
-              info.text = countLabel + port.size.toString
-              repaint()
-              validate()
-              this.copy(uiPort = port)
-        }
+              println(errorSaving)
+              IO(error.text = s"$errorStr + ${errorSaving.toString}")
+            case Right(port) => IO(info.text = s"$countLabel ${port.size}")
+          }
+        runOnEDT(update)
     }
 
     formPanel.exitButton().reactions += {
-      case event.ButtonClicked(_) => formPanel.setVisible(false)
+      case event.ButtonClicked(_) =>
+        formPanel.setVisible(false)
+        glassPane.visible = false
     }
 
-    def updatePark(points: Points, x: String, y: String): Points =
-      points.copy(list = points.list :+ (x, y))
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
+    private var field = 0
 
-    def runOnEDT(io: IO[Unit]): Unit = Swing.onEDT(io.unsafeRunAndForget())
-
-    
     mapPark.listenTo(mapPark.mouse.clicks)
     mapPark.reactions += {
       case event.MousePressed(_, point, _, _, _) =>
-        if glassPane.visible then
-
+        if formPanel.visible then
           val update = stateStationGUI
             .updateAndGet(state => updatePark(mapPark.points, point.x.toString, point.y.toString))
             .flatMap(updateState =>
-//              mapPark.stateRef.updateAndGet(updateState)
-              formPanel.setArrivalStation("station", point.getX, point.getY)
+              field match
+                case 0 => formPanel.setDepartureStation("station", point.getX, point.getY)
+                case 1 => formPanel.setArrivalStation("station", point.getX, point.getY)
+              field = (field + 1) % 2
               mapPark.points = updateState
               mapPark.repaint()
-              IO(println(s"STATE_GUI: ${updateState.list}"))
+              IO(())
             )
           runOnEDT(update)
 
