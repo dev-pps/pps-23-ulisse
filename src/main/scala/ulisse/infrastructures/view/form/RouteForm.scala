@@ -13,6 +13,9 @@ trait RouteForm extends FormPanel[BorderPanel]:
   def arrivalStation: Seq[TextField]
   def railsCount: Option[TextField]
   def length: Option[TextField]
+
+  def setDepartureStation(name: String, x: Double, y: Double): Unit
+  def setArrivalStation(name: String, x: Double, y: Double): Unit
   def create(): Option[Route]
 
 object RouteForm:
@@ -48,6 +51,12 @@ object RouteForm:
     override def railsCount: Option[TextField] = form.keyValuesPanel(3).values[TextField].headOption
 
     override def length: Option[TextField] = form.keyValuesPanel(4).values[TextField].headOption
+
+    override def setDepartureStation(name: String, x: Double, y: Double): Unit =
+      List(name, x.toString, y.toString).zip(departureStation).foreach((v, f) => f.text = v)
+
+    override def setArrivalStation(name: String, x: Double, y: Double): Unit =
+      List(name, x.toString, y.toString).zip(arrivalStation).foreach((v, f) => f.text = v)
 
     override def create(): Option[Route] =
       for {

@@ -6,7 +6,6 @@ import cats.effect.unsafe.implicits.global
 import ulisse.applications.ports.RoutePorts.UIPort
 import ulisse.applications.useCases.RouteManager
 import ulisse.entities.Route
-import ulisse.infrastructures.view.common.FormPanel
 import ulisse.infrastructures.view.form.RouteForm
 
 import scala.swing.*
@@ -140,12 +139,7 @@ object MapView:
 
     def runOnEDT(io: IO[Unit]): Unit = Swing.onEDT(io.unsafeRunAndForget())
 
-    //    val departureStation = formPanel.keyValuesPanel(1)
-//    val arrivalStation   = formPanel.keyValuesPanel(2)
-
-//    @SuppressWarnings(Array("org.wartremover.warts.Var"))
-//    private var field = departureStation
-
+    
     mapPark.listenTo(mapPark.mouse.clicks)
     mapPark.reactions += {
       case event.MousePressed(_, point, _, _, _) =>
@@ -155,42 +149,13 @@ object MapView:
             .updateAndGet(state => updatePark(mapPark.points, point.x.toString, point.y.toString))
             .flatMap(updateState =>
 //              mapPark.stateRef.updateAndGet(updateState)
-              formPanel
+              formPanel.setArrivalStation("station", point.getX, point.getY)
               mapPark.points = updateState
               mapPark.repaint()
               IO(println(s"STATE_GUI: ${updateState.list}"))
             )
           runOnEDT(update)
 
-//          val departure = field.values[TextField]
-//          val name      = departure(0)
-//          val x         = departure(1)
-//          val y         = departure(2)
-//
-//          name.text = "Station"
-//          x.text = point.x.toString
-//          y.text = point.y.toString
-//
-//          mapPark.list match
-//            case list if list.size < 2 =>
-//              copy(
-//                formPanel = formPanel,
-//                mapPark = MapPark(list :+ (point.x.toString, point.y.toString))
-//              )
-//            case list if list.size % 2 == 0 =>
-//              copy(
-//                formPanel = formPanel,
-//                mapPark = MapPark(list.updated(1, (point.x.toString, point.y.toString)))
-//              )
-//            case list if list.size % 2 == 1 =>
-//              copy(
-//                formPanel = formPanel,
-//                mapPark = MapPark(list.updated(1, (point.x.toString, point.y.toString)))
-//              )
-//
-//          println(s"Mouse clicked at $point size: ${mapPark.list.size}")
-//          mapPark.repaint()
-//          field = if field equals departureStation then arrivalStation else departureStation
     }
 
     contentPane.layout(northPanel) = North
