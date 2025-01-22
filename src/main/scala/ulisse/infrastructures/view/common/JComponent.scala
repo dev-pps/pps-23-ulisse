@@ -6,7 +6,9 @@ object JComponent:
 
   object JLabel:
     def apply(text: String): JBLabel = JBLabel(Label(text), text)
-    case class JBLabel(label: Label, text: String)
+    case class JBLabel(label: Label, text: String):
+      println("JLabel")
+      label.text = text
 
   object JTextField:
     def apply(text: String): JBTextField = JBTextField(TextField(text), text)
