@@ -13,7 +13,7 @@ object KeyValuesPanel:
   private case class KeyValuesPanelImpl[+P <: Panel](mainPanel: P)(key: Component, values: Component*)(using
       opaque: Boolean
   ) extends KeyValuesPanel[P]:
-    private val wrapPanel: WrapPanel[P] = WrapPanel(mainPanel)(values: _*)
+    private val wrapPanel: WrapPanel[P] = WrapPanel(mainPanel)(Seq(key).appendedAll(values): _*)
 
     mainPanel.peer.add(key.peer)
     values.foreach(component => mainPanel.peer.add(component.peer))
