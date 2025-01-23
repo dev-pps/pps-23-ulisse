@@ -5,15 +5,11 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.must.Matchers.{be, not}
 import org.scalatest.matchers.should.Matchers.should
-import TrainManagers.Errors
-import TrainManagers.Errors.*
 import TrainManagers.TrainManager
+import ulisse.applications.useCases.train.TrainManagers.TrainErrors.TrainAlreadyExists
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.Wagons.UseType
 import ulisse.entities.train.{Technology, Trains, Wagons}
-
-import scala.Right
-import scala.language.postfixOps
 
 class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
 
@@ -83,16 +79,8 @@ class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
       )
 
       Then("no errors should be returned")
-      res should not be Left(Errors)
+      res should not be Left(TrainManagers.TrainErrors)
 
       Then("train should be updated correctly")
-      res match
-        case Right(TrainManager(List(Train(n, tk, w, c)))) =>
-          n should be(initialTrain.name)
-          tk.name should be(newTechnology.name)
-          tk.maxSpeed should be(newTechnology.maxSpeed)
-          w.use should be(UseType.Other)
-          w.capacity should be(50)
-          c should be(7)
-        case Left(e)  => fail(s"Fail: ${e.description}")
-        case Right(l) => fail(s"Right excepted: $l")
+      val expectedTrain = Train(initialTrain.name, newTechnology, Wagons.Wagon(UseType.Other, 50), 7)
+      res should be(Right(TrainManager(List(expectedTrain))))
