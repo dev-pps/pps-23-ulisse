@@ -6,8 +6,7 @@ import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
 import ulisse.entities.train.Technology
 import TechnologyManagers.TechnologyManager
-import TechnologyManagers.TechErrors.TechnologyAlreadyExists
-import TechnologyManagers.TechErrors.InvalidSpeed
+import TechnologyManagers.TechErrors.{InvalidSpeed, TechnologyAlreadyExists}
 
 class TechnologyManagerTest extends AnyFeatureSpec with GivenWhenThen:
   val emptyManager: TechnologyManager = TechnologyManager(List.empty)
