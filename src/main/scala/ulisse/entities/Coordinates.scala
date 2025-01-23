@@ -106,6 +106,8 @@ object Coordinates:
       */
     def apply[T: Numeric](x: T, y: T): Coordinate[T] = CoordinateImpl(x, y)
 
+    def geo(latitude: Double, longitude: Double): Geo = Geo(latitude, longitude)
+
     /** Creates a `Geo` instance with validation.
       *
       * @param latitude

@@ -6,6 +6,7 @@ import cats.effect.unsafe.implicits.global
 import cats.syntax.either.*
 import ulisse.applications.ports.RoutePorts.UIPort
 import ulisse.applications.useCases.RouteManager
+import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
 import ulisse.infrastructures.view.form.RouteForm
 
@@ -20,19 +21,22 @@ object MapView:
 
   def apply(uiPort: UIPort): MapView = MapViewImpl(uiPort)
 
-  private case class Points(list: List[(String, String)])
+  private case class Points(list: List[((Int, Int), (Int, Int))])
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class MapPanel(var points: Points) extends Panel:
-//    val stateRef: Ref[IO, Points] = Ref.of[IO, Points](Points(List.empty)).unsafeRunSync()
-
-    def add(x: String, y: String): Points =
-      points.copy(list = points.list :+ (x, y))
 
     override def paintComponent(g: Graphics2D): Unit = {
       super.paintComponent(g)
-      g.setColor(java.awt.Color.BLACK)
-      points.list.foreach((x, y) => g.drawOval(x.toInt, y.toInt, 10, 10))
+
+      points.list.foreach((p1, p2) =>
+        g.setColor(java.awt.Color.GREEN)
+        g.fillOval(p1._1, p1._2, 5, 5)
+        g.setColor(java.awt.Color.BLACK)
+        g.drawLine(p1._1, p1._2, p2._1, p2._2)
+        g.setColor(java.awt.Color.GREEN)
+        g.fillOval(p2._1, p2._2, 5, 5)
+      )
     }
 
   private case class MapViewImpl(uiPort: UIPort) extends MainFrame,
@@ -63,8 +67,8 @@ object MapView:
     glassPane.visible = false
     formPanel.setVisible(false)
 
-    private val stateRef: Ref[IO, Either[RouteManager.ErrorSaving, UIPort]] =
-      Ref.of[IO, Either[RouteManager.ErrorSaving, UIPort]](uiPort.asRight).unsafeRunSync()
+    private val stateRef: Ref[IO, Either[ErrorSaving, UIPort]] =
+      Ref.of[IO, Either[ErrorSaving, UIPort]](uiPort.asRight).unsafeRunSync()
 
     sealed trait Action[T]:
       def create: T
@@ -72,14 +76,11 @@ object MapView:
       override def create: Option[Route] = formPanel.create()
 
     // Funzione di aggiornamento dello stato
-    private def updateState(
-        state: Either[RouteManager.ErrorSaving, UIPort],
-        route: Option[Route]
-    ): Either[RouteManager.ErrorSaving, UIPort] =
+    private def updateState(state: Either[ErrorSaving, UIPort], route: Option[Route]): Either[ErrorSaving, UIPort] =
       state.flatMap(uiPort => uiPort.save(route))
 
-    private def updatePark(points: Points, x: String, y: String): Points =
-      points.copy(list = points.list :+ (x, y))
+//    private def updatePark(points: Points, x: String, y: String): Points =
+//      points.copy(list = points.list :+ (x, y))
 
     private def runOnEDT(io: IO[Unit]): Unit = Swing.onEDT(io.unsafeRunAndForget())
 
@@ -100,9 +101,24 @@ object MapView:
             case Left(errorSaving) =>
               println(errorSaving)
               IO(error.text = s"$errorStr + ${errorSaving.toString}")
-            case Right(port) => IO(info.text = s"$countLabel ${port.size}")
+            case Right(port) =>
+              val newPoints = port
+                .routes
+                .map(router => router.path)
+                .map(path =>
+                  (
+                    (path._1._2.latitude.toInt, path._1._2.longitude.toInt),
+                    (path._2._2.latitude.toInt, path._2._2.longitude.toInt)
+                  )
+                )
+
+              mapPark.points = Points(newPoints)
+              mapPark.repaint()
+
+              IO(info.text = s"$countLabel ${port.routes.size}")
           }
-        runOnEDT(update)
+        Swing.onEDT(update.unsafeRunAndForget())
+//        println(s"save ${stateRef.get.}")
     }
 
     formPanel.exitButton().reactions += {
@@ -118,18 +134,23 @@ object MapView:
     mapPark.reactions += {
       case event.MousePressed(_, point, _, _, _) =>
         if formPanel.visible then
-          val update = stateStationGUI
-            .updateAndGet(state => updatePark(mapPark.points, point.x.toString, point.y.toString))
-            .flatMap(updateState =>
-              field match
-                case 0 => formPanel.setDepartureStation("station", point.getX, point.getY)
-                case 1 => formPanel.setArrivalStation("station", point.getX, point.getY)
-              field = (field + 1) % 2
-              mapPark.points = updateState
-              mapPark.repaint()
-              IO(())
-            )
-          runOnEDT(update)
+          field match
+            case 0 => formPanel.setDepartureStation("station", point.getX, point.getY)
+            case 1 => formPanel.setArrivalStation("station", point.getX, point.getY)
+          field = (field + 1) % 2
+
+//          val update = stateStationGUI
+//            .updateAndGet(state => updatePark(mapPark.points, point.x.toString, point.y.toString))
+//            .flatMap(updateState =>
+//              field match
+//                case 0 => formPanel.setDepartureStation("station", point.getX, point.getY)
+//                case 1 => formPanel.setArrivalStation("station", point.getX, point.getY)
+//              field = (field + 1) % 2
+//              mapPark.points = updateState
+//              mapPark.repaint()
+//              IO(())
+//            )
+//          runOnEDT(update)
 
     }
 
