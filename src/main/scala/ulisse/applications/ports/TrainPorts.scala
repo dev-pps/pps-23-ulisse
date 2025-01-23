@@ -1,6 +1,6 @@
 package ulisse.applications.ports
 
-import ulisse.applications.useCases.TrainManagers.{Errors, TrainManager}
+import ulisse.applications.useCases.train.TrainManagers.{Errors, TrainManager}
 import ulisse.entities.train.Technology
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.Wagons.{UseType, Wagon}
@@ -76,26 +76,25 @@ object TrainPorts:
         wagonCount: Int
     ): Either[Errors, List[Train]]
 
-  object Input:
-    def apply(manager: TrainManager): Input = BaseInBoundPort(manager)
-
-    /** @param manager
-      *   TrainManager that handle input port requests
-      */
-    private case class BaseInBoundPort(manager: TrainManager) extends Input:
-      export manager.{addTrain => _, *}
-
-      override def addTrain(
-          name: String,
-          technologyName: String,
-          wagonUseTypeName: String,
-          wagonCapacity: Int,
-          wagonCount: Int
-      ): Either[Errors, List[Train]] =
-        manager.createTrain(
-          name,
-          technologyName,
-          wagonUseTypeName,
-          wagonCapacity,
-          wagonCount
-        )
+//  object Input:
+//    def apply(manager: TrainManager): Input = BaseInBoundPort(manager)
+//    /** @param manager
+//      *   TrainManager that handle input port requests
+//      */
+//    private case class BaseInBoundPort(manager: TrainManager) extends Input:
+//      export manager.{addTrain => _, *}
+//
+//      override def addTrain(
+//          name: String,
+//          technologyName: String,
+//          wagonUseTypeName: String,
+//          wagonCapacity: Int,
+//          wagonCount: Int
+//      ): Either[Errors, List[Train]] = Right(List.empty)
+//        manager.createTrain(
+//          name,
+//          technologyName,
+//          wagonUseTypeName,
+//          wagonCapacity,
+//          wagonCount
+//        )
