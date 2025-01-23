@@ -1,13 +1,13 @@
-package ulisse.applications.train
+package ulisse.applications.useCases.train
 
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
 import ulisse.entities.train.Technology
-import ulisse.applications.useCases.train.TechnologyManagers.TechnologyManager
-import ulisse.applications.useCases.train.TechnologyManagers.TechErrors.TechnologyAlreadyExists
-import ulisse.applications.useCases.train.TechnologyManagers.TechErrors.InvalidSpeed
+import TechnologyManagers.TechnologyManager
+import TechnologyManagers.TechErrors.TechnologyAlreadyExists
+import TechnologyManagers.TechErrors.InvalidSpeed
 
 class TechnologyManagerTest extends AnyFeatureSpec with GivenWhenThen:
   val emptyManager: TechnologyManager = TechnologyManager(List.empty)
