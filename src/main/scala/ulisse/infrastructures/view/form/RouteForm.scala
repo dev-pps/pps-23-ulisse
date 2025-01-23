@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.form
 
-import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.Coordinates.{Coordinate, Geo}
 import ulisse.entities.Route
 import ulisse.entities.Route.TypeRoute
 import ulisse.infrastructures.view.common.{FormPanel, KeyValuesPanel}
@@ -66,8 +66,11 @@ object RouteForm:
       } yield Route(
         TypeRoute.valueOf(typeRoute.selection.item),
         (
-          (departureStation(0).text, Coordinate(departureStation(1).text.toDouble, departureStation(2).text.toDouble)),
-          (arrivalStation(0).text, Coordinate(arrivalStation(1).text.toDouble, arrivalStation(2).text.toDouble))
+          (
+            departureStation(0).text,
+            Coordinate.geo(departureStation(1).text.toDouble, departureStation(2).text.toDouble)
+          ),
+          (arrivalStation(0).text, Coordinate.geo(arrivalStation(1).text.toDouble, arrivalStation(2).text.toDouble))
         ),
         30.0d,
         2

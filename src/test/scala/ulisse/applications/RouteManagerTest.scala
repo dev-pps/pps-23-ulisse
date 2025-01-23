@@ -8,8 +8,8 @@ import ulisse.entities.Route.{Path, Station, TypeRoute}
 import ulisse.entities.Route
 
 class RouteManagerTest extends AnyFlatSpec with Matchers:
-  val riminiStation: Station = ("Rimini", Coordinate(20d, 20d))
-  val cesenaStation: Station = ("Cesena", Coordinate(10d, 10d))
+  val riminiStation: Station = ("Rimini", Coordinate.geo(20d, 20d))
+  val cesenaStation: Station = ("Cesena", Coordinate.geo(10d, 10d))
   val path: Path             = (riminiStation, cesenaStation)
   val pathLength: Double     = 200.0d
   val railsCount             = 1
@@ -22,7 +22,7 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
     val zeroSize = 0
     emptyRouteManager.size must be(zeroSize)
 
-  "save new route" should "be contains in routeManager" in:
+  "save new routes" should "be contains in routeManager" in:
     val newRouteManager = emptyRouteManager.save(route)
 
     newRouteManager match
@@ -31,13 +31,13 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
         manager.size must be(1)
         manager.contains(route) must be(true)
 
-  "read route" should "from id" in:
+  "read routes" should "from id" in:
     val optRoute = singleElementRouteManager.route(route.id)
     optRoute match
       case Some(newRoute) => newRoute must be(route)
       case _              => fail("Route not found")
 
-  "save route with same id" should "change route railsCount" in:
+  "save routes with same id" should "change routes railsCount" in:
     val differentRailsCountRoute = Route(TypeRoute.Normal, path, pathLength, 3)
     val newRouteManager          = singleElementRouteManager.save(differentRailsCountRoute)
     val optOldRoute              = singleElementRouteManager.route(route.id)
@@ -52,7 +52,7 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
           oldRoute.railsCount must not be newRoute.railsCount
         }
 
-  "save two different route" should "have two element" in:
+  "save two different routes" should "have two element" in:
     val differentRoute  = Route(TypeRoute.AV, path, pathLength, railsCount)
     val newRouteManager = singleElementRouteManager.save(differentRoute)
 

@@ -12,7 +12,8 @@ object RouteAdapter:
     def apply(manager: RouteManager): RoutePorts.UIPort = IUAdapter(manager)
 
     private case class IUAdapter(manager: RouteManager) extends RoutePorts.UIPort():
-      override def size: Int = manager.size
+      export manager.*
 
       override def save(optRoute: Option[Route]): Either[RouteManager.ErrorSaving, RoutePorts.UIPort] =
-        optRoute.map(route => manager.save(route).map(UIAdapter(_))).getOrElse(Left(ErrorSaving.creation))
+        optRoute.map(route => manager.save(route).map(newManager => UIAdapter(newManager)))
+          .getOrElse(Left(ErrorSaving.creation))
