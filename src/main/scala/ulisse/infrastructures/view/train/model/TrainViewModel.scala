@@ -12,4 +12,4 @@ object TrainViewModel:
   )
 
   case class TechType(name: String, maxSpeed: Int)
-  case class Wagon(useName: String)
+  case class WagonName(useName: String)
