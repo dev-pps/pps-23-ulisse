@@ -2,36 +2,44 @@ package ulisse.infrastructures.view.train
 
 import SwingUtils.onLeftOf
 import ulisse.applications.ports.TrainPorts
+import ulisse.infrastructures.view.train.model.TrainViewModel.{TechType, TrainData, WagonName}
 import ulisse.infrastructures.view.train.model.{TrainViewModel, TrainViewModelAdapter}
 
 import scala.swing.event.*
 import scala.swing.*
+import scala.swing.Dialog.Message
 import scala.util.Try
+
+trait TrainEditorView:
+  def updateTrainList(trains: List[TrainData]): Unit
+  def updateTechnology(techs: List[TechType]): Unit
+  def updateWagons(wagons: List[WagonName]): Unit
+  def showError(errorMessage: String): Unit
 
 object TrainEditorView:
 
   def apply(inServicePort: TrainPorts.Input): Window =
-    TrainEditImpl(TrainViewModelAdapter(inServicePort))
+    TrainEditImpl(inServicePort)
 
-  private class TrainEditImpl(val modelAdapter: TrainViewModelAdapter)
-      extends Frame:
+  private class TrainEditImpl(val port: TrainPorts.Input)
+      extends Frame, TrainEditorView:
+    private val modelAdapter = TrainViewModelAdapter(port, this)
+    modelAdapter.requestTechnologies()
+    modelAdapter.requestWagonTypes()
+    modelAdapter.requestTrains()
 
-    private val trainTech  = modelAdapter.technologies
-    private val wagonTypes = modelAdapter.wagonTypes
-    private val trains     = modelAdapter.trains
+    private val trainListView = TrainListView(List.empty)
 
-    private val trainListView = TrainListView(trains)
-
-    private val trainsFleetPanel            = new FlowPanel(new ScrollPane(trainListView))
-    private val nameField: TextField        = new TextField(10)
-    private val trainTechCombo              = new ComboBox(trainTech)
-    private val wagonTypeCombo              = new ComboBox(wagonTypes)
-    private val wagonCountAmount: TextField = SwingUtils.NumberField(2)
-    private val wagonCapacity: TextField    = SwingUtils.NumberField(4)
-    private val saveButton: Button          = new Button("Save")
-    private val updateButton: Button        = new Button("Update")
-    private val deleteButton: Button        = new Button("Delete")
-    private val clearButton: Button         = new Button("Clear")
+    private val trainsFleetPanel                    = new FlowPanel(new ScrollPane(trainListView))
+    private val nameField: TextField                = new TextField(10)
+    private val trainTechCombo: ComboBox[TechType]  = new ComboBox(List.empty)
+    private val wagonTypeCombo: ComboBox[WagonName] = new ComboBox(List.empty)
+    private val wagonCountAmount: TextField         = SwingUtils.NumberField(2)
+    private val wagonCapacity: TextField            = SwingUtils.NumberField(4)
+    private val saveButton: Button                  = new Button("Save")
+    private val updateButton: Button                = new Button("Update")
+    private val deleteButton: Button                = new Button("Delete")
+    private val clearButton: Button                 = new Button("Clear")
 
     updateButton.enabled = false
     deleteButton.enabled = false
@@ -47,19 +55,19 @@ object TrainEditorView:
           trainName     <- selectedTrain.name
         yield modelAdapter.deleteTrain(trainName)
         updateButton.enabled = true
-        updateListAndClearFields()
+        clearFields()
     }
 
     saveButton.reactions += {
       case ButtonClicked(_) =>
         modelAdapter.addTrain(getFormFields)
-        updateListAndClearFields()
+        clearFields()
     }
 
     updateButton.reactions += {
       case ButtonClicked(_) =>
         modelAdapter.updateTrain(getFormFields)
-        updateListAndClearFields()
+        clearFields()
     }
 
     import scala.swing.{BoxPanel, Orientation}
@@ -72,7 +80,7 @@ object TrainEditorView:
       contents += deleteButton.onLeftOf(clearButton).onLeftOf(updateButton).onLeftOf(saveButton)
     }
 
-    new Frame {
+    private val mainFrame = new Frame {
       title = "Train Fleet Editor"
       contents = new BorderPanel {
         layout(trainsFleetPanel) = BorderPanel.Position.Center
@@ -103,32 +111,50 @@ object TrainEditorView:
       for
         n  <- t.name
         tk <- t.technologyName
+        ts <- t.technologyMaxSpeed
         wt <- t.wagonNameType
         c  <- t.wagonCapacity
         wc <- t.wagonCount
       yield
         nameField.text = n
-        trainTechCombo.selection.index = trainTech.map(_.name).indexOf(tk)
-        wagonTypeCombo.selection.index = wagonTypes.map(_.useName).indexOf(wt)
+        trainTechCombo.selection.item = TechType(tk, ts)
+        wagonTypeCombo.selection.item = WagonName(wt)
         wagonCapacity.text = c.toString
         wagonCountAmount.text = wc.toString
         updateButton.enabled = true
         deleteButton.enabled = true
 
     private def getFormFields: TrainViewModel.TrainData =
-      val selectedTech =
-        trainTech.lift(trainTechCombo.selection.index)
-      val selectedWagonType = wagonTypes.lift(wagonTypeCombo.selection.index)
       TrainViewModel.TrainData(
         Option(nameField.text).filter(_.nonEmpty),
-        technologyName = selectedTech.map(_.name).filter(_.nonEmpty),
-        wagonNameType = selectedWagonType.map(_.useName).filter(_.nonEmpty),
+        technologyName = Some(getSelectedTechnology.name),
+        wagonNameType = Some(getSelectedWagonType.useName),
         wagonCount = Try(wagonCountAmount.text.toInt).toOption,
         wagonCapacity = Try(wagonCapacity.text.toInt).toOption,
-        technologyMaxSpeed = selectedTech.map(_.maxSpeed)
+        technologyMaxSpeed = Some(getSelectedTechnology.maxSpeed)
       )
 
-    private def updateListAndClearFields(): Unit = {
-      trainListView.listData = modelAdapter.trains
-      clearFields()
-    }
+    private def getSelectedTechnology: TechType = trainTechCombo.selection.item
+
+    private def getSelectedWagonType: WagonName = wagonTypeCombo.selection.item
+
+    override def updateTrainList(trains: List[TrainData]): Unit =
+      Swing.onEDT(trainListView.listData = trains)
+
+    override def updateTechnology(techs: List[TechType]): Unit =
+      println("Update technology combobox")
+      Swing.onEDT(trainTechCombo.peer.setModel(ComboBox.newConstantModel(techs)))
+
+    override def updateWagons(wagons: List[WagonName]): Unit =
+      println("Update wagon combobox")
+      Swing.onEDT(wagonTypeCombo.peer.setModel(ComboBox.newConstantModel(wagons)))
+
+    override def showError(errorMessage: String): Unit =
+      Swing.onEDT(
+        Dialog.showMessage(
+          mainFrame,
+          errorMessage,
+          "Error !",
+          Message.Error
+        )
+      )
