@@ -4,7 +4,8 @@ import ulisse.entities.train.Technology
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist, ErrorValidation}
 
 object TechnologyManagers:
-
+  /** Train TechnologyManager errors that can be returned after a request.
+    */
   sealed trait TechErrors extends BaseError
   object TechErrors:
     final case class InvalidSpeed(speed: Int) extends ErrorValidation(s"technology speed value $speed") with TechErrors
@@ -12,12 +13,36 @@ object TechnologyManagers:
     final case class TechnologyNotExists(name: String)     extends ErrorNotExist(s"technology $name") with TechErrors
 
   trait TechnologyManager:
+    /** Add new technology if is valid and there no duplicate
+      * @param technology
+      *   Technology to add
+      * @return
+      *   Returns [[Right]] of updated `TechnologyManager` if technology is added else [[Left]] of
+      *   [[TechnologyAlreadyExists]] error
+      */
     def add(technology: Technology): Either[TechErrors, TechnologyManager]
+
+    /** Remove technology if exist
+      *
+      * @param name
+      *   Name of technology
+      * @return
+      *   Returns [[Right]] of updated `TechnologyManager` if technology is removed else [[Left]] of
+      *   [[TechnologyNotExists]] error
+      */
     def remove(name: String): Either[TechErrors, TechnologyManager]
+
+    /** @return
+      *   List of saved technologies
+      */
     def technologiesList: List[Technology]
 
   object TechnologyManager:
-
+    /** @param technologies
+      *   Technologies saved
+      * @return
+      *   `TechnologyManager`
+      */
     def apply(technologies: List[Technology]): TechnologyManager =
       TechnologyManagerImpl(technologies.map(t => (t.name, t)).toMap)
 
