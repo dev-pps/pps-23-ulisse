@@ -122,14 +122,12 @@ object TrainManagers:
           wagonCount: Int
       ): Either[TrainErrors, TrainManager] =
         for
-          _ <- trains.find(_.name.contentEquals(name)).map(t => TrainErrors.TrainAlreadyExists(t.name)).toLeft(trains)
-          //        tk <-
-          //          technologies.find(_.name.contentEquals(technologyName)).toRight(Errors.TechnologyNotExists(technologyName))
+          _ <- findTrain(name).map(t => TrainErrors.TrainAlreadyExists(t.name)).toLeft(trains)
           w <- wagonTypes.find(_.name.contentEquals(wagonTypeName)).toRight(TrainErrors.WagonTypeUnknown(wagonTypeName))
         yield TrainManager(Train(name, technology, Wagon(w, wagonCapacity), wagonCount) :: trains)
 
       override def removeTrain(name: String): Either[TrainErrors, TrainManager] =
-        trains.find(_.name.contentEquals(name))
+        findTrain(name)
           .map(_ =>
             TrainManager(trains.filterNot(_.name.contentEquals(name)))
           ).toRight(TrainErrors.TrainNotExists(name))
@@ -150,3 +148,5 @@ object TrainManagers:
         yield ts
 
       override def wagonTypes: List[UseType] = UseType.values.toList
+
+      private def findTrain(name: String): Option[Train] = trains.find(_.name.contentEquals(name))
