@@ -6,7 +6,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.must.Matchers.{be, not}
 import org.scalatest.matchers.should.Matchers.should
 import TrainManagers.TrainManager
-import ulisse.applications.useCases.train.TrainManagers.TrainErrors.TrainAlreadyExists
+import ulisse.applications.useCases.train.TrainManagers.TrainErrors.{NegativeValue, TrainAlreadyExists}
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.Wagons.UseType
 import ulisse.entities.train.{Technology, Trains, Wagons}
@@ -84,3 +84,33 @@ class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
       Then("train should be updated correctly")
       val expectedTrain = Train(initialTrain.name, newTechnology, Wagons.Wagon(UseType.Other, 50), 7)
       res should be(Right(TrainManager(List(expectedTrain))))
+
+    Scenario("Try add train with negative wagon capacity"):
+      Given("an empty train manager with no train saved")
+      val manager = TrainManager(List.empty)
+      When("I save a train with negative wagon capacity")
+      val invalidWagon = Wagons.Wagon(UseType.Passenger, -30)
+      val invalidTrain = Trains.Train(
+        "FR-200",
+        Technology("MonoRoute", 50),
+        invalidWagon,
+        4
+      )
+      Then("an error should be returned")
+      val res = manager.addTrain(invalidTrain)
+      res should be(Left(NegativeValue("wagon capacity", -30)))
+
+    Scenario("Try add train with negative train length"):
+      Given("an empty train manager with no train saved")
+      val manager = TrainManager(List.empty)
+      When("I save a train with negative train length")
+      val invalidTrainLength = -12
+      val invalidTrain = Trains.Train(
+        "FR-200",
+        Technology("MonoRoute", 50),
+        Wagons.Wagon(UseType.Passenger, 30),
+        invalidTrainLength
+      )
+      Then("an error should be returned")
+      val res = manager.addTrain(invalidTrain)
+      res should be(Left(NegativeValue("train length", invalidTrainLength)))

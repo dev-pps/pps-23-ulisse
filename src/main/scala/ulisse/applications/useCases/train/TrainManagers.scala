@@ -3,7 +3,8 @@ package ulisse.applications.useCases.train
 import ulisse.entities.train.Technology
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.Wagons.{UseType, Wagon}
-import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist}
+import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist, ErrorValidation}
+
 import scala.util.Either
 
 object TrainManagers:
@@ -15,6 +16,8 @@ object TrainManagers:
     final case class TrainAlreadyExists(name: String) extends ErrorMessage(s"[DUPLICATE] train $name") with TrainErrors
     final case class TrainNotExists(name: String)     extends ErrorNotExist(s"train $name") with TrainErrors
     final case class WagonTypeUnknown(name: String)   extends ErrorNotExist(s"wagon type $name") with TrainErrors
+    final case class NegativeValue(name: String, value: Int) extends ErrorValidation(s"negative $name value: $value")
+        with TrainErrors
 
   trait TrainManager:
     /** Add train to train collection.
@@ -35,8 +38,8 @@ object TrainManagers:
       *   name of wagon type
       * @param wagonCapacity
       *   wagon capacity
-      * @param wagonCount
-      *   amount of wagons
+      * @param length
+      *   length of train (amount of wagons)
       * @return
       *   Returns [[Right]] of updated `TrainManager` if train is added else [[Left]] of
       *   [[TrainErrors.TrainAlreadyExists]]
@@ -46,7 +49,7 @@ object TrainManagers:
         technology: Technology,
         wagonTypeName: String,
         wagonCapacity: Int,
-        wagonCount: Int
+        length: Int
     ): Either[TrainErrors, TrainManager]
 
     /** Remove train from train collection.
@@ -67,15 +70,15 @@ object TrainManagers:
       *   Train technology
       * @param wagon
       *   wagon type
-      * @param wagonCount
-      *   wagon amount
+      * @param length
+      *   train length (wagon amount)
       * @return
       *   Returns [[Right]] of updated `TrainManager` if train is updated else [[Left]] of [[TrainErrors]]
       */
     def updateTrain(name: String)(
         technology: Technology,
         wagon: Wagon,
-        wagonCount: Int
+        length: Int
     ): Either[TrainErrors, TrainManager]
 
     /** @return
@@ -111,7 +114,7 @@ object TrainManagers:
           train.techType,
           train.wagon.use.name,
           train.wagon.capacity,
-          train.wagonCount
+          train.length
         )
 
       override def createTrain(
@@ -119,12 +122,18 @@ object TrainManagers:
           technology: Technology,
           wagonTypeName: String,
           wagonCapacity: Int,
-          wagonCount: Int
+          length: Int
       ): Either[TrainErrors, TrainManager] =
         for
           _ <- findTrain(name).map(t => TrainErrors.TrainAlreadyExists(t.name)).toLeft(trains)
           w <- wagonTypes.find(_.name.contentEquals(wagonTypeName)).toRight(TrainErrors.WagonTypeUnknown(wagonTypeName))
-        yield TrainManager(Train(name, technology, Wagon(w, wagonCapacity), wagonCount) :: trains)
+          wc <- wagonCapacity.validatePositiveValue("wagon capacity")
+          c  <- length.validatePositiveValue("train length")
+        yield TrainManager(Train(name, technology, Wagon(w, wc), c) :: trains)
+
+      extension (value: Int)
+        private def validatePositiveValue(name: String): Either[TrainErrors.NegativeValue, Int] =
+          if value > 0 then Right(value) else Left(TrainErrors.NegativeValue(name, value))
 
       override def removeTrain(name: String): Either[TrainErrors, TrainManager] =
         findTrain(name)
@@ -135,7 +144,7 @@ object TrainManagers:
       override def updateTrain(name: String)(
           technology: Technology,
           wagon: Wagon,
-          wagonCount: Int
+          length: Int
       ): Either[TrainErrors, TrainManager] =
         for
           r <- removeTrain(name)
@@ -143,7 +152,7 @@ object TrainManagers:
             name,
             technology,
             wagon,
-            wagonCount
+            length
           ))
         yield ts
 
