@@ -39,7 +39,7 @@ object TrainViewModelAdapter:
             technologyMaxSpeed = Some(t.techType.maxSpeed),
             wagonNameType = Some(t.wagon.use.name),
             wagonCapacity = Some(t.wagon.capacity),
-            wagonCount = Some(t.wagonCount)
+            wagonCount = Some(t.length)
           )
         )
 
