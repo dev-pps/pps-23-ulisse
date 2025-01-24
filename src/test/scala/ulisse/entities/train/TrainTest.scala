@@ -12,7 +12,7 @@ class TrainTest extends AnyFlatSpec:
   val technology: Technology =
     Technology(name = "HighSpeed", maxSpeed = 300)
   val wagonCapacity = 50
-  val wagonCount    = 5
+  val length        = 5
   val wagonInfo: Wagon =
     Wagon(UseType.Passenger, wagonCapacity)
   val train: Train =
@@ -20,14 +20,14 @@ class TrainTest extends AnyFlatSpec:
       name = "3905",
       techType = technology,
       wagon = wagonInfo,
-      wagonCount = wagonCount
+      length = length
     )
 
   "A Train" should "provide overall capacity and length depending wagon specs" in:
     train.name should be("3905")
     train.wagon.use should be(UseType.Passenger)
     train.wagon.capacity should be(wagonCapacity)
-    train.capacity should be(wagonCapacity * wagonCount)
+    train.capacity should be(wagonCapacity * length)
 
   it should "have speed bounded by technology max speed" in:
     train.techType.name should be("HighSpeed")

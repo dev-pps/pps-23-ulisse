@@ -18,7 +18,7 @@ object Trains:
     def wagon: Wagons.Wagon
 
     /** Amount of wagons */
-    def wagonCount: Int
+    def length: Int
 
     /** @return
       *   max speed reachable by train
@@ -40,8 +40,8 @@ object Trains:
       *   [[Technology]] technology used by train
       * @param wagon
       *   [[Wagons.Wagon]] wagon that compose train
-      * @param wagonCount
-      *   Amount of wagon
+      * @param length
+      *   train length (mount of wagon)
       * @return
       *   A new Train instance
       */
@@ -49,9 +49,9 @@ object Trains:
         name: String,
         techType: Technology,
         wagon: Wagon,
-        wagonCount: Int
+        length: Int
     ): Train =
-      TrainImpl(name, techType, wagon, wagonCount)
+      TrainImpl(name, techType, wagon, length)
 
     /** @param train
       *   Train instance
@@ -59,13 +59,13 @@ object Trains:
       *   An `Option` containing all characteristic of train.
       */
     def unapply(train: Train): Option[(String, Technology, Wagon, Int)] =
-      Some(train.name, train.techType, train.wagon, train.wagonCount)
+      Some(train.name, train.techType, train.wagon, train.length)
 
     private case class TrainImpl(
         name: String,
         techType: Technology,
         wagon: Wagon,
-        wagonCount: Int
+        length: Int
     ) extends Train:
       def maxSpeed: Int = techType.maxSpeed
-      def capacity: Int = wagon.capacity * wagonCount
+      def capacity: Int = wagon.capacity * length
