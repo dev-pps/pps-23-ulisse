@@ -1,4 +1,4 @@
-# Sprint Planning 1
+# Sprint Planning 1 (13/01 - 17/01)
 [Link to backlog](./backlogs/1-backlog)
 
 ## Sprint Goal
