@@ -10,7 +10,7 @@ import TechnologyManagers.TechErrors.{InvalidSpeed, TechnologyAlreadyExists}
 
 class TechnologyManagerTest extends AnyFeatureSpec with GivenWhenThen:
   val emptyManager: TechnologyManager = TechnologyManager(List.empty)
-  val technology: Technology          = Technology("Standard", 130)
+  val technology: Technology          = Technology("Standard", 130, 1.0, 0.5)
 
   Feature("Managing train technologies (add, remove)"):
     Scenario("Add new train technology"):
@@ -23,7 +23,7 @@ class TechnologyManagerTest extends AnyFeatureSpec with GivenWhenThen:
 
     Scenario("Try to add technology with already existing one (same name)"):
       Given("some technologies are saved")
-      val technology = Technology("Standard", 130)
+      val technology = Technology("Standard", 130, 1.0, 0.5)
       When("I add technology twice (with same name)")
       val res =
         for
@@ -48,7 +48,7 @@ class TechnologyManagerTest extends AnyFeatureSpec with GivenWhenThen:
       Given("that no technologies are saved")
       When("I add new technology with negative max speed")
       val negativeSpeed     = -100
-      val invalidTechnology = Technology("TechNotValid", negativeSpeed)
+      val invalidTechnology = Technology("TechNotValid", negativeSpeed, 1.0, 0.5)
       val res               = emptyManager.add(invalidTechnology)
       Then("it should be returned an InvalidValue error")
       res should be(Left(InvalidSpeed(negativeSpeed)))

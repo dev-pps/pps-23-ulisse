@@ -13,6 +13,16 @@ trait Technology:
     */
   def maxSpeed: Int
 
+  /** @return
+    *   train acceleration
+    */
+  def acceleration: Double
+
+  /** @return
+    *   train deceleration
+    */
+  def deceleration: Double
+
 /** Factory for [[train.model.Trains.TechnologyType]] instances.
   */
 object Technology:
@@ -25,8 +35,8 @@ object Technology:
     * @return
     *   [[Technology]] instance.
     */
-  def apply(name: String, maxSpeed: Int): Technology =
-    TechnologyImpl(name: String, maxSpeed: Int)
+  def apply(name: String, maxSpeed: Int, acceleration: Double, deceleration: Double): Technology =
+    TechnologyImpl(name, maxSpeed, acceleration, deceleration)
 
-  private case class TechnologyImpl(name: String, maxSpeed: Int)
+  private case class TechnologyImpl(name: String, maxSpeed: Int, acceleration: Double, deceleration: Double)
       extends Technology
