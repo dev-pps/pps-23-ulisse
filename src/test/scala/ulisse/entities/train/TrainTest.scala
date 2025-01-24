@@ -10,7 +10,7 @@ import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 class TrainTest extends AnyFlatSpec:
   val technology: Technology =
-    Technology(name = "HighSpeed", maxSpeed = 300)
+    Technology(name = "HighSpeed", maxSpeed = 300, acceleration = 1.0, deceleration = 0.5)
   val wagonCapacity = 50
   val length        = 5
   val wagonInfo: Wagon =
