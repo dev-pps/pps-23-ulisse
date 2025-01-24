@@ -37,6 +37,8 @@ object TrainViewModelAdapter:
             name = Some(t.name),
             technologyName = Some(t.techType.name),
             technologyMaxSpeed = Some(t.techType.maxSpeed),
+            technologyAcc = Some(t.techType.acceleration),
+            technologyDec = Some(t.techType.deceleration),
             wagonNameType = Some(t.wagon.use.name),
             wagonCapacity = Some(t.wagon.capacity),
             wagonCount = Some(t.length)
@@ -44,7 +46,8 @@ object TrainViewModelAdapter:
         )
 
     extension (t: List[Technology])
-      private def toTechType: List[TechType] = t.map(tk => TechType(tk.name, tk.maxSpeed))
+      private def toTechType: List[TechType] =
+        t.map(tk => TechType(tk.name, tk.maxSpeed, tk.acceleration, tk.deceleration))
 
     extension (w: List[UseType])
       private def toWagonNames: List[WagonName] = w.map(w => WagonName(w.name))
@@ -82,10 +85,12 @@ object TrainViewModelAdapter:
         n  <- trainData.name
         tk <- trainData.technologyName
         ts <- trainData.technologyMaxSpeed
+        ac <- trainData.technologyAcc
+        de <- trainData.technologyDec
         wc <- trainData.wagonCount
         wt <- trainData.wagonNameType
         wa <- trainData.wagonCapacity
-      yield trainService.updateTrain(n)(Technology(tk, ts), Wagons.Wagon(UseType.valueOf(wt), wa), wc)
+      yield trainService.updateTrain(n)(Technology(tk, ts, ac, de), Wagons.Wagon(UseType.valueOf(wt), wa), wc)
 
     override def requestWagonTypes(): Unit =
       trainService.wagonTypes.onComplete {
