@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.train
 
 import SwingUtils.onLeftOf
 import ulisse.applications.ports.TrainPorts
-import ulisse.infrastructures.view.train.model.TrainViewModel.{TechType, TrainData, WagonName}
+import ulisse.infrastructures.view.train.model.TrainViewModel.{emptyTrainData, TechType, TrainData, WagonName}
 import ulisse.infrastructures.view.train.model.{TrainViewModel, TrainViewModelAdapter}
 
 import scala.swing.event.*
@@ -100,10 +100,7 @@ object TrainEditorView:
     }
 
     private def clearFields(): Unit =
-      import TrainViewModel.TrainData
-      val emptyString = Some("")
-      val unsetValue  = Some(0)
-      loadFormFields(TrainData(emptyString, emptyString, emptyString, unsetValue, unsetValue, unsetValue))
+      loadFormFields(emptyTrainData)
       updateButton.enabled = false
       deleteButton.enabled = false
 
@@ -112,12 +109,14 @@ object TrainEditorView:
         n  <- t.name
         tk <- t.technologyName
         ts <- t.technologyMaxSpeed
+        ac <- t.technologyAcc
+        de <- t.technologyDec
         wt <- t.wagonNameType
         c  <- t.wagonCapacity
         wc <- t.wagonCount
       yield
         nameField.text = n
-        trainTechCombo.selection.item = TechType(tk, ts)
+        trainTechCombo.selection.item = TechType(tk, ts, ac, de)
         wagonTypeCombo.selection.item = WagonName(wt)
         wagonCapacity.text = c.toString
         wagonCountAmount.text = wc.toString
@@ -128,6 +127,8 @@ object TrainEditorView:
       TrainViewModel.TrainData(
         Option(nameField.text).filter(_.nonEmpty),
         technologyName = Some(getSelectedTechnology.name),
+        technologyAcc = Some(getSelectedTechnology.acc),
+        technologyDec = Some(getSelectedTechnology.dec),
         wagonNameType = Some(getSelectedWagonType.useName),
         wagonCount = Try(wagonCountAmount.text.toInt).toOption,
         wagonCapacity = Try(wagonCapacity.text.toInt).toOption,
