@@ -8,7 +8,8 @@ import ulisse.applications.ports.TrainPorts
 import ulisse.infrastructures.view.train.TrainEditorView
 import ulisse.utils.Errors.BaseError
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import java.util.concurrent.Executors
+import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 trait TrainViewModelAdapter:
@@ -25,6 +26,9 @@ object TrainViewModelAdapter:
 
   private final case class BaseAdapter(trainService: TrainPorts.Input, view: TrainEditorView)
       extends TrainViewModelAdapter:
+    implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutorService(
+      Executors.newFixedThreadPool(1)
+    )
 
     extension (l: List[Train])
       private def toTrainDatas: List[TrainData] =
