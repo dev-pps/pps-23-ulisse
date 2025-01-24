@@ -10,9 +10,13 @@ import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
 import ulisse.infrastructures.view.form.RouteForm
 
+import scala.concurrent.ExecutionContext
 import scala.swing.*
 import scala.swing.BorderPanel.Position.*
 import scala.swing.event.*
+
+given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
+  Swing.onEDT(runnable.run())
 
 trait MapView
 
@@ -39,8 +43,7 @@ object MapView:
       )
     }
 
-  private case class MapViewImpl(uiPort: UIPort) extends MainFrame,
-        MapView:
+  private case class MapViewImpl(uiPort: UIPort) extends MainFrame, MapView:
     title = "Map"
     visible = true
     preferredSize = new Dimension(800, 800)
@@ -50,7 +53,7 @@ object MapView:
 
     val stateStationGUI: Ref[IO, Points] = Ref.of[IO, Points](Points(List.empty)).unsafeRunSync()
     val mapPark: MapPanel                = MapPanel(Points(List.empty))
-    val info: Label                      = Label(s"$countLabel ${uiPort.size}")
+    val info: Label                      = Label(s"$countLabel")
     val error: Label                     = Label(errorStr)
     val formPanel: RouteForm             = RouteForm()
 
@@ -60,7 +63,7 @@ object MapView:
     val createButton = new Button("Form Route")
     val northPanel   = new FlowPanel(createButton, info, error)
 
-    info.text = countLabel + uiPort.size.toString
+    info.text = s"$countLabel 0"
     error.text = errorStr + "ddd"
 
     glassPane.opaque = false
@@ -75,15 +78,6 @@ object MapView:
     case object RouteCreate extends Action[Option[Route]]:
       override def create: Option[Route] = formPanel.create()
 
-    // Funzione di aggiornamento dello stato
-    private def updateState(state: Either[ErrorSaving, UIPort], route: Option[Route]): Either[ErrorSaving, UIPort] =
-      state.flatMap(uiPort => uiPort.save(route))
-
-//    private def updatePark(points: Points, x: String, y: String): Points =
-//      points.copy(list = points.list :+ (x, y))
-
-    private def runOnEDT(io: IO[Unit]): Unit = Swing.onEDT(io.unsafeRunAndForget())
-
     // Create button action
     listenTo(createButton)
     reactions += {
@@ -95,30 +89,26 @@ object MapView:
     // formPanel button action
     formPanel.saveButton().reactions += {
       case event.ButtonClicked(_) =>
-        val update = stateRef
-          .updateAndGet(state => updateState(state, formPanel.create()))
-          .flatMap {
-            case Left(errorSaving) =>
-              println(errorSaving)
-              IO(error.text = s"$errorStr + ${errorSaving.toString}")
-            case Right(port) =>
-              val newPoints = port
-                .routes
-                .map(router => router.path)
-                .map(path =>
-                  (
-                    (path._1._2.latitude.toInt, path._1._2.longitude.toInt),
-                    (path._2._2.latitude.toInt, path._2._2.longitude.toInt)
-                  )
+        uiPort.save(formPanel.create()).onComplete(future =>
+          for {
+            either <- future
+          } yield {
+            either match
+              case Left(errorSaving) => error.text = s"$errorStr + $errorSaving"
+              case Right(routes) =>
+                mapPark.points = Points(
+                  routes.map(router => router.path)
+                    .map(path =>
+                      (
+                        (path._1._2.latitude.toInt, path._1._2.longitude.toInt),
+                        (path._2._2.latitude.toInt, path._2._2.longitude.toInt)
+                      )
+                    )
                 )
-
-              mapPark.points = Points(newPoints)
-              mapPark.repaint()
-
-              IO(info.text = s"$countLabel ${port.routes.size}")
+                mapPark.repaint()
+                info.text = s"$countLabel ${routes.size}"
           }
-        Swing.onEDT(update.unsafeRunAndForget())
-//        println(s"save ${stateRef.get.}")
+        )
     }
 
     formPanel.exitButton().reactions += {
