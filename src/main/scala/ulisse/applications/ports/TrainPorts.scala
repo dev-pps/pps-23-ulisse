@@ -1,12 +1,11 @@
 package ulisse.applications.ports
 
 import ulisse.applications.adapters.TrainServiceManagerAdapter
-import ulisse.applications.useCases.train.TechnologyManagers.TechnologyManager
-import ulisse.applications.useCases.train.TrainManagers.TrainManager
-import ulisse.entities.train.Technology
-import ulisse.entities.train.Trains.Train
+import ulisse.applications.useCases.TechnologyManagers.TechnologyManager
+import ulisse.applications.useCases.TrainManagers.TrainManager
+import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
-import ulisse.utils.Errors.BaseError
+import ulisse.utils.Errors.{BaseError, ErrorMessage}
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Future
@@ -26,7 +25,7 @@ object TrainPorts:
     /** @return
       *   List of saved train `Technology`.
       */
-    def technologies: Future[List[Technology]]
+    def technologies: Future[List[TrainTechnology]]
 
     /** @return
       *   List of `Wagons.UseType`
@@ -62,30 +61,33 @@ object TrainPorts:
       * @param trainName
       *   Train name to delete
       * @return
-      *   `Some` type of [[BaseError.DeleteTrainError]] in case of some deletion errors.
+      *   `Some` type of [[DeleteTrainError]] in case of some deletion errors.
       */
     def removeTrain(trainName: String): Future[Either[BaseError, List[Train]]]
 
-    /** Updates train with new information.
+    /** Updates train with new information except name.
       *
       * @param name
       *   train name to be updated
-      * @param technology
-      *   updated technology
-      * @param wagon
-      *   updated wagon
+      * @param technologyName
+      *   Train technology name
+      * @param wagonUseTypeName
+      *   Wagon type of use name
+      * @param wagonCapacity
+      *   Single wagon transport capacity
       * @param wagonCount
-      *   updated wagon count
+      *   Amount of wagons that compose train
       * @return
-      *   Returns [[Right]] of Train if train is updated else [[Left]] of [[BaseError]]
+      *   Returns [[Right]] of List[Train] if train is updated else [[Left]] of [[ErrorMessage]]
       */
     def updateTrain(name: String)(
-        technology: Technology,
-        wagon: Wagon,
+        technologyName: String,
+        wagonUseTypeName: String,
+        wagonCapacity: Int,
         wagonCount: Int
     ): Future[Either[BaseError, List[Train]]]
 
   object Input:
-    type AppState = (TrainManager, TechnologyManager)
+    type AppState = (TrainManager, TechnologyManager[TrainTechnology])
     def apply(stateEventQueue: LinkedBlockingQueue[AppState => AppState]): Input =
       TrainServiceManagerAdapter(stateEventQueue)

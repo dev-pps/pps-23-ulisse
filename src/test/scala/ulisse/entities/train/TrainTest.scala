@@ -5,12 +5,12 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.matchers.{must, should}
-import ulisse.entities.train.Trains.Train
+import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 class TrainTest extends AnyFlatSpec:
-  val technology: Technology =
-    Technology(name = "HighSpeed", maxSpeed = 300, acceleration = 1.0, deceleration = 0.5)
+  val technology: Trains.TrainTechnology =
+    TrainTechnology(name = "HighSpeed", maxSpeed = 300, acceleration = 1.0, deceleration = 0.5)
   val wagonCapacity = 50
   val length        = 5
   val wagonInfo: Wagon =
