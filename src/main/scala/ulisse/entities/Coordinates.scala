@@ -7,7 +7,6 @@ import ulisse.utils.ValidationUtils.{validateNonNegative, validateRange}
 import scala.annotation.targetName
 
 object Coordinates:
-
   /** A generic trait representing a 2D coordinate point in space.
     *
     * @tparam T
@@ -142,3 +141,7 @@ object Coordinates:
     */
   final case class Grid private[Coordinates] (row: Int, column: Int)
       extends Coordinate[Int](row, column)
+
+  given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
+  given ((Int, Int) => Either[BaseError, Grid])            = Coordinate.createGrid
+  given ((Double, Double) => Either[BaseError, Geo])       = Coordinate.createGeo

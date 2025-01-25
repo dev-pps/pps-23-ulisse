@@ -12,15 +12,6 @@ object StationEditorController:
   enum Error extends BaseError:
     case InvalidRowFormat, InvalidColumnFormat, InvalidNumberOfTrackFormat
 
-  given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
-
-  given ((Int, Int) => Either[BaseError, Grid]) = Coordinate.createGrid
-
-  given ((Double, Double) => Either[BaseError, Geo]) = Coordinate.createGeo
-
-  given [N: Numeric, C <: Coordinate[N]]: ((String, C, Int) => Either[BaseError, CheckedStation[N, C]]) =
-    Station.createCheckedStation
-
 /** Controller for StationEditorView.
   *
   * @constructor
