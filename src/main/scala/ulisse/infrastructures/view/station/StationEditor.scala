@@ -8,7 +8,6 @@ import java.awt.Color
 import scala.swing.*
 import scala.swing.Swing.LineBorder
 import scala.swing.event.*
-import StationEditorController.given
 import ulisse.entities.station.Station.CheckedStation
 
 type N = Int

@@ -8,18 +8,19 @@ import ulisse.infrastructures.view.adapter.StationPortOutputAdapter
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 import ulisse.utils.Errors.BaseError
 
-final case class Setting():
+final case class StationSettings():
   type N = Int
   type C = Grid
   type S = CheckedStation[N, C]
+  val eventStream = new EventStream[BaseError]
   lazy val outputAdapter: StationPortOutputAdapter[N, C, S]     = StationPortOutputAdapter(stationEditorController)
   lazy val stationManager: StationManager[N, C, S]              = StationManager(outputAdapter)
   lazy val inputAdapter: StationPortInputAdapter[N, C, S]       = StationPortInputAdapter(stationManager)
   val stationEditorController: StationEditorController[N, C, S] = StationEditorController(inputAdapter)
   val stationEditorView: StationEditorView                      = StationEditorView(stationEditorController)
 
-@main def main(): Unit =
+@main def stationEditor(): Unit =
   val app      = AppFrame()
-  val settings = Setting()
+  val settings = StationSettings()
   app.contents = settings.stationEditorView
   app.open()

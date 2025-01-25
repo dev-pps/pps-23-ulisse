@@ -118,6 +118,9 @@ object Station:
       numberOfTracks: Int
   ) extends Station[N, C]
 
+  given [N: Numeric, C <: Coordinate[N]]: ((String, C, Int) => Either[BaseError, CheckedStation[N, C]]) =
+    Station.createCheckedStation
+
   /** Represents a selectable station.
     *
     * A `SelectableStation` wraps a `Station` instance and provides a boolean flag to indicate whether the station is
