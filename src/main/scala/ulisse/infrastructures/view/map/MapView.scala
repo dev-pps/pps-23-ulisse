@@ -1,4 +1,4 @@
-package ulisse.infrastructures.view
+package ulisse.infrastructures.view.map
 
 import cats.effect.IO
 import cats.effect.kernel.Ref
@@ -8,6 +8,7 @@ import ulisse.applications.ports.RoutePorts.UIPort
 import ulisse.applications.useCases.RouteManager
 import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
+import ulisse.infrastructures.view.MapPanel
 import ulisse.infrastructures.view.form.RouteForm
 
 import scala.concurrent.ExecutionContext
@@ -25,24 +26,6 @@ object MapView:
 
   def apply(uiPort: UIPort): MapView = MapViewImpl(uiPort)
 
-  private case class Points(list: List[((Int, Int), (Int, Int))])
-
-  @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  private case class MapPanel(var points: Points) extends Panel:
-
-    override def paintComponent(g: Graphics2D): Unit = {
-      super.paintComponent(g)
-
-      points.list.foreach((p1, p2) =>
-        g.setColor(java.awt.Color.GREEN)
-        g.fillOval(p1._1, p1._2, 5, 5)
-        g.setColor(java.awt.Color.BLACK)
-        g.drawLine(p1._1, p1._2, p2._1, p2._2)
-        g.setColor(java.awt.Color.GREEN)
-        g.fillOval(p2._1, p2._2, 5, 5)
-      )
-    }
-
   private case class MapViewImpl(uiPort: UIPort) extends MainFrame, MapView:
     title = "Map"
     visible = true
@@ -51,11 +34,10 @@ object MapView:
     private val countLabel = "Count Route: "
     private val errorStr   = "Error: "
 
-    val stateStationGUI: Ref[IO, Points] = Ref.of[IO, Points](Points(List.empty)).unsafeRunSync()
-    val mapPark: MapPanel                = MapPanel(Points(List.empty))
-    val info: Label                      = Label(s"$countLabel")
-    val error: Label                     = Label(errorStr)
-    val formPanel: RouteForm             = RouteForm()
+    val mapPark: MapPanel    = MapPanel.empty()
+    val info: Label          = Label(s"$countLabel")
+    val error: Label         = Label(errorStr)
+    val formPanel: RouteForm = RouteForm()
 
     // Main content pane with BorderLayout
     val contentPane  = new BorderPanel
@@ -96,15 +78,7 @@ object MapView:
             either match
               case Left(errorSaving) => error.text = s"$errorStr + $errorSaving"
               case Right(routes) =>
-                mapPark.points = Points(
-                  routes.map(router => router.path)
-                    .map(path =>
-                      (
-                        (path._1._2.latitude.toInt, path._1._2.longitude.toInt),
-                        (path._2._2.latitude.toInt, path._2._2.longitude.toInt)
-                      )
-                    )
-                )
+                mapPark.setPoints(routes.map(router => router.path))
                 mapPark.repaint()
                 info.text = s"$countLabel ${routes.size}"
           }
@@ -128,20 +102,6 @@ object MapView:
             case 0 => formPanel.setDepartureStation("station", point.getX, point.getY)
             case 1 => formPanel.setArrivalStation("station", point.getX, point.getY)
           field = (field + 1) % 2
-
-//          val update = stateStationGUI
-//            .updateAndGet(state => updatePark(mapPark.points, point.x.toString, point.y.toString))
-//            .flatMap(updateState =>
-//              field match
-//                case 0 => formPanel.setDepartureStation("station", point.getX, point.getY)
-//                case 1 => formPanel.setArrivalStation("station", point.getX, point.getY)
-//              field = (field + 1) % 2
-//              mapPark.points = updateState
-//              mapPark.repaint()
-//              IO(())
-//            )
-//          runOnEDT(update)
-
     }
 
     contentPane.layout(northPanel) = North
