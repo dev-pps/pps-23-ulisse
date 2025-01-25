@@ -19,7 +19,7 @@ object StationPorts:
     *   A type that extends `Coordinate[N]`, which represents the station's location.
     *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
     */
-  trait Input[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
+  trait Input[N: Numeric, C <: Coordinate[N], S <: Station[N, C]] extends InputPort:
 
     private type SM = CheckedStationMap[N, C, S]
     private type E  = CheckedStationMap.Error
