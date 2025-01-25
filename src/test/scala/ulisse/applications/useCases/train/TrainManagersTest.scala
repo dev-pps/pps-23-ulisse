@@ -5,11 +5,12 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.must.Matchers.{be, not}
 import org.scalatest.matchers.should.Matchers.should
-import TrainManagers.TrainManager
-import ulisse.applications.useCases.train.TrainManagers.TrainErrors.{NegativeValue, TrainAlreadyExists}
-import ulisse.entities.train.Trains.Train
+import ulisse.applications.useCases.TrainManagers
+import ulisse.applications.useCases.TrainManagers.TrainManager
+import ulisse.applications.useCases.TrainManagers.TrainErrors.{NegativeValue, TrainAlreadyExists}
+import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.UseType
-import ulisse.entities.train.{Technology, Trains, Wagons}
+import ulisse.entities.train.{Trains, Wagons}
 
 class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
 
@@ -21,7 +22,7 @@ class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
   Feature("Managing saved trains (add, remove, update)"):
     val train = Trains.Train(
       "FR-200",
-      Technology("HighSpeed", 300, 1.8, 0.8),
+      TrainTechnology("HighSpeed", 300, 1.8, 0.8),
       Wagons.Wagon(UseType.Passenger, 300),
       4
     )
@@ -37,7 +38,7 @@ class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
     Scenario("Save new train with a name of another (already saved) train"):
       Given("that there is one train saved and technology is assumed valid")
       val manager    = TrainManager(List(train))
-      val technology = Technology("MonoRoute", 50, 0.5, 0.5)
+      val technology = TrainTechnology("MonoRoute", 50, 0.5, 0.5)
 
       When("a train is added")
       val conflictName = train.name
@@ -61,8 +62,8 @@ class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
 
     Scenario("Update train information"):
       Given("that is train we wants update is saved")
-      val initialTechnology = Technology("HighSpeed", 300, 1.0, 0.5)
-      val newTechnology     = Technology("Normal", 130, 1.0, 0.5)
+      val initialTechnology = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
+      val newTechnology     = TrainTechnology("Normal", 130, 1.0, 0.5)
       val initialTrain = Trains.Train(
         "FR-200",
         initialTechnology,
@@ -74,7 +75,8 @@ class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
       When("update train with new technology and wagon info")
       val res = manager.updateTrain(initialTrain.name)(
         newTechnology,
-        Wagons.Wagon(UseType.Other, 50),
+        UseType.Other.name,
+        50,
         7
       )
 
@@ -92,7 +94,7 @@ class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
       val invalidWagon = Wagons.Wagon(UseType.Passenger, -30)
       val invalidTrain = Trains.Train(
         "FR-200",
-        Technology("MonoRoute", 50, 0.5, 0.5),
+        TrainTechnology("MonoRoute", 50, 0.5, 0.5),
         invalidWagon,
         4
       )
@@ -107,7 +109,7 @@ class TrainManagersTest extends AnyFeatureSpec with GivenWhenThen:
       val invalidTrainLength = -12
       val invalidTrain = Trains.Train(
         "FR-200",
-        Technology("MonoRoute", 50, 1.0, 0.5),
+        TrainTechnology("MonoRoute", 50, 1.0, 0.5),
         Wagons.Wagon(UseType.Passenger, 30),
         invalidTrainLength
       )

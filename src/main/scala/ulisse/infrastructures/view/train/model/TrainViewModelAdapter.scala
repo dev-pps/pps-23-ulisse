@@ -1,8 +1,8 @@
 package ulisse.infrastructures.view.train.model
 
 import ulisse.entities.train.Wagons.UseType
-import ulisse.entities.train.Trains.Train
-import ulisse.entities.train.{Technology, Wagons}
+import ulisse.entities.train.Trains.{Train, TrainTechnology}
+import ulisse.entities.train.Wagons
 import TrainViewModel.*
 import ulisse.applications.ports.TrainPorts
 import ulisse.infrastructures.view.train.TrainEditorView
@@ -45,7 +45,7 @@ object TrainViewModelAdapter:
           )
         )
 
-    extension (t: List[Technology])
+    extension (t: List[TrainTechnology])
       private def toTechType: List[TechType] =
         t.map(tk => TechType(tk.name, tk.maxSpeed, tk.acceleration, tk.deceleration))
 
@@ -77,20 +77,18 @@ object TrainViewModelAdapter:
 
     private def showNewTrainList(r: Either[BaseError, List[Train]]): Unit =
       r match
-        case Left(err) => view.showError("Errore")
+        case Left(err) => view.showError("Error")
         case Right(t)  => view.updateTrainList(t.toTrainDatas)
 
     override def updateTrain(trainData: TrainData): Unit =
       for
         n  <- trainData.name
-        tk <- trainData.technologyName
+        tn <- trainData.technologyName
         ts <- trainData.technologyMaxSpeed
-        ac <- trainData.technologyAcc
-        de <- trainData.technologyDec
-        wc <- trainData.wagonCount
-        wt <- trainData.wagonNameType
-        wa <- trainData.wagonCapacity
-      yield trainService.updateTrain(n)(Technology(tk, ts, ac, de), Wagons.Wagon(UseType.valueOf(wt), wa), wc)
+        wq <- trainData.wagonCount
+        wn <- trainData.wagonNameType
+        wc <- trainData.wagonCapacity
+      yield trainService.updateTrain(n)(tn, wn, wc, wq)
 
     override def requestWagonTypes(): Unit =
       trainService.wagonTypes.onComplete {

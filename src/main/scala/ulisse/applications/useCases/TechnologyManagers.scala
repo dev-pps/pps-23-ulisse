@@ -1,6 +1,6 @@
-package ulisse.applications.useCases.train
+package ulisse.applications.useCases
 
-import ulisse.entities.train.Technology
+import ulisse.entities.Technology
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist, ErrorValidation}
 
 object TechnologyManagers:
@@ -12,7 +12,7 @@ object TechnologyManagers:
     final case class TechnologyAlreadyExists(name: String) extends ErrorMessage(s"technology $name") with TechErrors
     final case class TechnologyNotExists(name: String)     extends ErrorNotExist(s"technology $name") with TechErrors
 
-  trait TechnologyManager:
+  trait TechnologyManager[T <: Technology]:
     /** Add new technology if is valid and there no duplicate
       * @param technology
       *   Technology to add
@@ -20,7 +20,7 @@ object TechnologyManagers:
       *   Returns [[Right]] of updated `TechnologyManager` if technology is added else [[Left]] of
       *   [[TechnologyAlreadyExists]] error
       */
-    def add(technology: Technology): Either[TechErrors, TechnologyManager]
+    def add(technology: T): Either[TechErrors, TechnologyManager[T]]
 
     /** Remove technology if exist
       *
@@ -30,12 +30,12 @@ object TechnologyManagers:
       *   Returns [[Right]] of updated `TechnologyManager` if technology is removed else [[Left]] of
       *   [[TechnologyNotExists]] error
       */
-    def remove(name: String): Either[TechErrors, TechnologyManager]
+    def remove(name: String): Either[TechErrors, TechnologyManager[T]]
 
     /** @return
       *   List of saved technologies
       */
-    def technologiesList: List[Technology]
+    def technologiesList: List[T]
 
   object TechnologyManager:
     /** @param technologies
@@ -43,28 +43,27 @@ object TechnologyManagers:
       * @return
       *   `TechnologyManager`
       */
-    def apply(technologies: List[Technology]): TechnologyManager =
+    def apply[T <: Technology](technologies: List[T]): TechnologyManager[T] =
       TechnologyManagerImpl(technologies.map(t => (t.name, t)).toMap)
 
-    private case class TechnologyManagerImpl(technologies: Map[String, Technology]) extends TechnologyManager:
-      def add(technology: Technology): Either[TechErrors, TechnologyManager] =
+    private case class TechnologyManagerImpl[T <: Technology](technologies: Map[String, T])
+        extends TechnologyManager[T]:
+      def add(technology: T): Either[TechErrors, TechnologyManager[T]] =
         for
           t <- technology.validate
           ts <- technologies.get(t.name)
             .map(_ => TechErrors.TechnologyAlreadyExists(t.name)).toLeft(
               technologies.updated(technology.name, technology)
             )
-        yield TechnologyManager(ts.values.toList)
+        yield TechnologyManager[T](ts.values.toList)
 
-      def technologiesList: List[Technology] = technologies.values.toList
+      def technologiesList: List[T] = technologies.values.toList
 
-      def remove(name: String): Either[TechErrors, TechnologyManager] =
+      def remove(name: String): Either[TechErrors, TechnologyManager[T]] =
         technologies.get(name).map(t =>
           TechnologyManager(technologies.removed(t.name).values.toList)
         ).toRight(TechErrors.TechnologyNotExists(name))
 
       extension (t: Technology)
         private def validate: Either[TechErrors, Technology] =
-          t.maxSpeed > 0 match
-            case true => Right(t)
-            case _    => Left(TechErrors.InvalidSpeed(t.maxSpeed))
+          if t.maxSpeed > 0 then Right(t) else Left(TechErrors.InvalidSpeed(t.maxSpeed))

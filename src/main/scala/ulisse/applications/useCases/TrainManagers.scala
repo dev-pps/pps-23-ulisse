@@ -1,7 +1,6 @@
-package ulisse.applications.useCases.train
+package ulisse.applications.useCases
 
-import ulisse.entities.train.Technology
-import ulisse.entities.train.Trains.Train
+import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist, ErrorValidation}
 
@@ -46,7 +45,7 @@ object TrainManagers:
       */
     def createTrain(
         name: String,
-        technology: Technology,
+        technology: TrainTechnology,
         wagonTypeName: String,
         wagonCapacity: Int,
         length: Int
@@ -68,16 +67,19 @@ object TrainManagers:
       *   Train name
       * @param technology
       *   Train technology
-      * @param wagon
-      *   wagon type
+      * @param wagonUseName
+      *   wagon use name
+      * @param wagonCapacity
+      *   wagon capacity
       * @param length
       *   train length (wagon amount)
       * @return
       *   Returns [[Right]] of updated `TrainManager` if train is updated else [[Left]] of [[TrainErrors]]
       */
     def updateTrain(name: String)(
-        technology: Technology,
-        wagon: Wagon,
+        technology: TrainTechnology,
+        wagonUseName: String,
+        wagonCapacity: Int,
         length: Int
     ): Either[TrainErrors, TrainManager]
 
@@ -119,7 +121,7 @@ object TrainManagers:
 
       override def createTrain(
           name: String,
-          technology: Technology,
+          technology: TrainTechnology,
           wagonTypeName: String,
           wagonCapacity: Int,
           length: Int
@@ -142,18 +144,20 @@ object TrainManagers:
           ).toRight(TrainErrors.TrainNotExists(name))
 
       override def updateTrain(name: String)(
-          technology: Technology,
-          wagon: Wagon,
+          technology: TrainTechnology,
+          wagonUseName: String,
+          wagonCapacity: Int,
           length: Int
       ): Either[TrainErrors, TrainManager] =
         for
           r <- removeTrain(name)
-          ts <- r.addTrain(Train(
+          ts <- r.createTrain(
             name,
             technology,
-            wagon,
+            wagonUseName,
+            wagonCapacity,
             length
-          ))
+          )
         yield ts
 
       override def wagonTypes: List[UseType] = UseType.values.toList
