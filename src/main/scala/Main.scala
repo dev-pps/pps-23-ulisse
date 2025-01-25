@@ -1,3 +1,4 @@
+import ulisse.applications.AppState
 import ulisse.applications.adapters.StationPortInputAdapter
 import ulisse.applications.useCases.StationManager
 import ulisse.entities.Coordinates.{Coordinate, Grid}
@@ -8,11 +9,13 @@ import ulisse.infrastructures.view.adapter.StationPortOutputAdapter
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 import ulisse.utils.Errors.BaseError
 
+import java.util.concurrent.LinkedBlockingQueue
+
 final case class StationSettings():
   type N = Int
   type C = Grid
   type S = CheckedStation[N, C]
-  val eventStream = new EventStream[BaseError]
+  val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   lazy val outputAdapter: StationPortOutputAdapter[N, C, S]     = StationPortOutputAdapter(stationEditorController)
   lazy val stationManager: StationManager[N, C, S]              = StationManager(outputAdapter)
   lazy val inputAdapter: StationPortInputAdapter[N, C, S]       = StationPortInputAdapter(stationManager)
