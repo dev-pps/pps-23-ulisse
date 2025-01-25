@@ -2,22 +2,16 @@
 [Link to backlog](./backlogs/2-backlog)
 
 ## Sprint Goal
-What we want at the end of sprint? 
+Combine station management with route management
+
 ## Deadline
 The sprint deadline is 24/01/2025.
 
 ## Sprint Review
-This usually starts with a review of completed Product Backlog items:
-- a discussion of opportunities
-- constraints and risks
-- a discussion of what might be the best things to do next (potentially resulting in Product Backlog changes).
-
-Only completed product functionality can be demonstrated
+The stakeholder is not completely satisfied because only part of the main objective was achieved. 
 
 ## Sprint Retrospective
-“The Sprint Retrospective, which follows the Review, involves inspect and adapt regarding the process and environment. It’s an opportunity for the Team to discuss what’s working and what’s not working, and agree on changes to try.”
-
-“A meeting facilitated by the ScrumMaster at which the complete Team discusses the just-concluded Sprint and determines what could be changed that might make the next Sprint more enjoyable or productive.”
-
-
-### Changes to try
+Overall the internal management was better than in the latest sprint due to a better tracking of working time and
+better group cohesion.
+this week most of the time was spent studying topics related to FP (e.g. immutability and immutable state)
+rather than working on product features

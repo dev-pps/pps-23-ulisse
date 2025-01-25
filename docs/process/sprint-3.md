@@ -2,7 +2,7 @@
 [Link to backlog](./backlogs/3-backlog)
 
 ## Sprint Goal
-
+Develop landing page idea capable of navigating through all previous editors
 ## Deadline
 The sprint deadline is 31/01/2025.
 
