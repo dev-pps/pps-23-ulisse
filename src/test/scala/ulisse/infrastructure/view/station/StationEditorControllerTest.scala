@@ -11,13 +11,19 @@ import ulisse.applications.useCases.StationManager
 import ulisse.infrastructures.view.station.StationEditorController
 import ulisse.infrastructures.view.station.StationEditorController.given
 import org.scalatestplus.mockito.MockitoSugar.mock
+import ulisse.applications.AppState
 import ulisse.applications.station.StationMap
 import ulisse.utils.Errors.BaseError
+
+import java.util.concurrent.LinkedBlockingQueue
 
 class StationEditorControllerTest extends AnyWordSpec with Matchers:
 
   private type N = Int
   private type C = Coordinate[N]
+  private type S = Station[N, C]
+
+  given eventStream: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   private val outputPort    = mock[StationPorts.Output]
   private val stationName   = "New Station"
   private val x             = 1

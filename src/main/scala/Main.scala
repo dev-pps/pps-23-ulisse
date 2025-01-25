@@ -10,12 +10,15 @@ import ulisse.infrastructures.view.station.{StationEditorController, StationEdit
 import ulisse.utils.Errors.BaseError
 
 import java.util.concurrent.LinkedBlockingQueue
+import StationTypes.*
 
-final case class StationSettings():
+object StationTypes:
   type N = Int
   type C = Grid
   type S = CheckedStation[N, C]
-  val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+
+final case class StationSettings():
+  given eventStream: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   lazy val outputAdapter: StationPortOutputAdapter[N, C, S]     = StationPortOutputAdapter(stationEditorController)
   lazy val stationManager: StationManager[N, C, S]              = StationManager(outputAdapter)
   lazy val inputAdapter: StationPortInputAdapter[N, C, S]       = StationPortInputAdapter(stationManager)
@@ -27,3 +30,10 @@ final case class StationSettings():
   val settings = StationSettings()
   app.contents = settings.stationEditorView
   app.open()
+
+  val initialState = AppState[N, C, S](settings.stationManager)
+  LazyList.continually(settings.eventStream.take()).scanLeft(initialState)((state, event) =>
+    event(state)
+  ).foreach((appState: AppState[N, C, S]) =>
+    println(s"Stations: ${appState.stationManager.stationMap.stations.length}")
+  )
