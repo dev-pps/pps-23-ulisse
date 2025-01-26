@@ -7,6 +7,8 @@ import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.utils.Errors.BaseError
 
+import scala.concurrent.Future
+
 object StationEditorController:
 
   enum Error extends BaseError:
@@ -73,14 +75,11 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N], S <: St
       oldStation: Option[S]
   )(using coordinateGenerator: (N, N) => Either[BaseError, C])(using
       stationGenerator: (String, C, Int) => Either[BaseError, S]
-  ): Either[BaseError, StationMap[N, C, S]] =
-    createStation(stationName, latitude, longitude, numberOfTrack, coordinateGenerator, stationGenerator).flatMap { s =>
-      for old <- oldStation do removeStation(old)
-      val st = appPort.addStation(s)
-      println(st)
-      st
-    } match
-      case Right(stationMap) => Right(stationMap)
-      case Left(error)       => Left(error)
+  ): Future[Either[BaseError, StationMap[N, C, S]]] =
+    createStation(stationName, latitude, longitude, numberOfTrack, coordinateGenerator, stationGenerator) match
+      case Left(value) => Future.successful(Left(value))
+      case Right(value) =>
+        for old <- oldStation do removeStation(old)
+        appPort.addStation(value)
 
   export appPort.{findStationAt, removeStation}

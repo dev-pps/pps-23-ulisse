@@ -10,6 +10,12 @@ import scala.swing.Swing.LineBorder
 import scala.swing.event.*
 import ulisse.entities.station.Station.CheckedStation
 
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
+
+given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
+  Swing.onEDT(runnable.run())
+
 type N = Int
 type C = Grid
 type S = CheckedStation[N, C]
@@ -75,14 +81,21 @@ final case class StationMapView(
     stationForm: Option[StationForm]
 ) extends GridPanel(5, 5):
   private val labels = for {
-    x <- 0 until 5
-    y <- 0 until 5
-    coordinate <- Coordinate.createGrid(x, y) match
-      case Left(value)  => None
-      case Right(value) => Some(value)
-    station = controller.findStationAt(coordinate)
-  } yield station.map(StationCard(_, openStationForm)).getOrElse(EmptyMapCard(coordinate, stationForm))
-  contents ++= labels
+    x          <- 0 until 5
+    y          <- 0 until 5
+    coordinate <- Coordinate.createGrid(x, y).toOption
+  } yield {
+    controller.findStationAt(coordinate).onComplete {
+      case Success(Some(station)) =>
+        contents += StationCard(station, openStationForm)
+      case _ =>
+        contents += EmptyMapCard(coordinate, stationForm)
+        revalidate()
+        repaint()
+    }
+  }
+
+//  Future.sequence(labels).foreach(contents ++= _)
 
 /** A GridBagPanel displaying the station editor menu.
   *

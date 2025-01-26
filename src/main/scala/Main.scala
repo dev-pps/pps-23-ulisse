@@ -21,7 +21,7 @@ final case class StationSettings():
   given eventStream: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   lazy val outputAdapter: StationPortOutputAdapter[N, C, S]     = StationPortOutputAdapter(stationEditorController)
   lazy val stationManager: StationManager[N, C, S]              = StationManager(outputAdapter)
-  lazy val inputAdapter: StationPortInputAdapter[N, C, S]       = StationPortInputAdapter(stationManager)
+  lazy val inputAdapter: StationPortInputAdapter[N, C, S]       = StationPortInputAdapter()
   val stationEditorController: StationEditorController[N, C, S] = StationEditorController(inputAdapter)
   val stationEditorView: StationEditorView                      = StationEditorView(stationEditorController)
 
