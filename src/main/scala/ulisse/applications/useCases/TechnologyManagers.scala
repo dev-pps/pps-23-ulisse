@@ -55,8 +55,7 @@ object TechnologyManagers:
         extends TechnologyManager[T]:
       def add(technology: T): Either[TechErrors, TechnologyManager[T]] =
         for
-          v <- technology.validate
-          t <- getBy(v.name)
+          t <- technology.validate
           ts <- technologies.get(t.name)
             .map(_ => TechErrors.TechnologyAlreadyExists(t.name)).toLeft(
               technologies.updated(technology.name, technology)
