@@ -20,7 +20,6 @@ final case class TrainServiceManagerAdapter(stateEventQueue: LinkedBlockingQueue
   def removeTrain(name: String): Future[Either[BaseError, List[Train]]] =
     val promise = Promise[Either[BaseError, List[Train]]]
     stateEventQueue.offer((state: AppState) => {
-      println("remove train")
       val managerResult = state._1.removeTrain(name)
       unpackResult(managerResult)(promise, state)
     })
@@ -35,7 +34,6 @@ final case class TrainServiceManagerAdapter(stateEventQueue: LinkedBlockingQueue
   ): Future[Either[BaseError, List[Train]]] =
     val promise = Promise[Either[BaseError, List[Train]]]
     stateEventQueue.offer((state: AppState) => {
-      println("add train")
       val (trainManager, techManager) = state
       val tech                        = techManager.technologiesList.find(_.name.contentEquals(technologyName))
       val managerResult = tech match
@@ -53,7 +51,6 @@ final case class TrainServiceManagerAdapter(stateEventQueue: LinkedBlockingQueue
   ): Future[Either[BaseError, List[Train]]] =
     val promise = Promise[Either[BaseError, List[Train]]]
     stateEventQueue.offer((state: AppState) => {
-      println("update train")
       val (trainManager, techManager) = state
       val res =
         for

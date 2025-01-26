@@ -37,6 +37,11 @@ object TechnologyManagers:
       */
     def technologiesList: List[T]
 
+    /** @param name
+      *   name of technology
+      */
+    def getBy(name: String): Either[TechErrors, T]
+
   object TechnologyManager:
     /** @param technologies
       *   Technologies saved
@@ -50,7 +55,8 @@ object TechnologyManagers:
         extends TechnologyManager[T]:
       def add(technology: T): Either[TechErrors, TechnologyManager[T]] =
         for
-          t <- technology.validate
+          v <- technology.validate
+          t <- getBy(v.name)
           ts <- technologies.get(t.name)
             .map(_ => TechErrors.TechnologyAlreadyExists(t.name)).toLeft(
               technologies.updated(technology.name, technology)
@@ -60,9 +66,14 @@ object TechnologyManagers:
       def technologiesList: List[T] = technologies.values.toList
 
       def remove(name: String): Either[TechErrors, TechnologyManager[T]] =
-        technologies.get(name).map(t =>
-          TechnologyManager(technologies.removed(t.name).values.toList)
-        ).toRight(TechErrors.TechnologyNotExists(name))
+        for
+          t <- getBy(name)
+        yield TechnologyManager(technologies.removed(t.name).values.toList)
+
+      def getBy(name: String): Either[TechErrors, T] =
+        technologiesList.find(_.name.contentEquals(name)).toRight(TechErrors.TechnologyNotExists(
+          name
+        ))
 
       extension (t: Technology)
         private def validate: Either[TechErrors, Technology] =
