@@ -5,6 +5,8 @@ import ulisse.applications.station.StationMap.CheckedStationMap
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
+import scala.concurrent.Future
+
 object StationPorts:
   /** Trait representing output operations that a `StationManager` uses.
     */
@@ -29,7 +31,7 @@ object StationPorts:
       * @return
       *   The `StationMap` containing the stations.
       */
-    def stationMap: SM
+    def stationMap: Future[SM]
 
     /** Adds a station to the station map.
       *
@@ -38,7 +40,7 @@ object StationPorts:
       * @return
       *   Either the updated `StationMap` or an `Error` indicating the issue.
       */
-    def addStation(station: S): Either[E, SM]
+    def addStation(station: S): Future[Either[E, SM]]
 
     /** Removes a station from the station map.
       *
@@ -47,7 +49,7 @@ object StationPorts:
       * @return
       *   Either the updated `StationMap` or an `Error` indicating the issue.
       */
-    def removeStation(station: S): Either[E, SM]
+    def removeStation(station: S): Future[Either[E, SM]]
 
     /** Finds a station at a specified location.
       *
@@ -56,4 +58,4 @@ object StationPorts:
       * @return
       *   An `Option` containing the station at the specified location, if it exists.
       */
-    def findStationAt(coordinate: C): Option[S]
+    def findStationAt(coordinate: C): Future[Option[S]]
