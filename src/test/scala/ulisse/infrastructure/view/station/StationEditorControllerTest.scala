@@ -1,49 +1,64 @@
-//package ulisse.infrastructure.view.station
-//
-//import org.scalatest.wordspec.AnyWordSpec
-//import org.scalatest.matchers.should.Matchers
-//import ulisse.applications.adapters.StationPortInputAdapter
-//import ulisse.entities.Coordinates.Coordinate
-//import ulisse.entities.station.Station
-//import ulisse.applications.ports.StationPorts
-//import ulisse.applications.useCases.StationManager
-//import ulisse.infrastructures.view.station.StationEditorController
-//import org.scalatestplus.mockito.MockitoSugar.mock
-//import ulisse.applications.AppState
-//import ulisse.applications.station.StationMap
-//import ulisse.utils.Errors.BaseError
-//
-//import java.util.concurrent.LinkedBlockingQueue
-//
-//class StationEditorControllerTest extends AnyWordSpec with Matchers:
-//
-//  private type N = Int
-//  private type C = Coordinate[N]
-//  private type S = Station[N, C]
-//
-//  given eventStream: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
-//  private val outputPort    = mock[StationPorts.Output]
-//  private val stationName   = "New Station"
-//  private val x             = 1
-//  private val y             = 1
-//  private val numberOfTrack = 1
-//  private val station       = Station(stationName, Coordinate(x, y), numberOfTrack)
-//
-//  "StationEditorController" when:
-//    "onOkClick is invoked" should:
-//      "add a new station when inputs are valid and oldStation is None" in:
-//        val inputPort =
-//          StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](StationManager(outputPort))
-//        val controller = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
-//        val station    = Station(stationName, Coordinate(x, y), numberOfTrack)
-//
-//        controller.onOkClick(
-//          stationName,
-//          x.toString,
-//          y.toString,
-//          numberOfTrack.toString,
-//          None
-//        ) shouldBe Right(StationMap(station))
+package ulisse.infrastructure.view.station
+
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+import ulisse.applications.adapters.StationPortInputAdapter
+import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.station.Station
+import ulisse.applications.ports.StationPorts
+import ulisse.applications.useCases.StationManager
+import ulisse.infrastructures.view.station.StationEditorController
+import org.scalatestplus.mockito.MockitoSugar.mock
+import ulisse.applications.AppState
+import ulisse.applications.station.StationMap
+import ulisse.utils.Errors.BaseError
+
+import java.util.concurrent.LinkedBlockingQueue
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
+
+class StationEditorControllerTest extends AnyWordSpec with Matchers:
+
+  private type N = Int
+  private type C = Coordinate[N]
+  private type S = Station[N, C]
+
+  given ExecutionContext = ExecutionContext.global
+  given eventStream: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+  private val outputPort     = mock[StationPorts.Output]
+  private val stationName    = "New Station"
+  private val x              = 1
+  private val y              = 1
+  private val numberOfTrack  = 1
+  private val station        = Station(stationName, Coordinate(x, y), numberOfTrack)
+  private val stationManager = StationManager[N, C, S](outputPort)
+  private val initialState   = AppState[N, C, S](stationManager)
+
+  "StationEditorController" when:
+    "onOkClick is invoked" should:
+      "add a new station when inputs are valid and oldStation is None" in:
+        val inputPort  = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]]()
+        val controller = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
+        val station    = Station(stationName, Coordinate(x, y), numberOfTrack)
+
+        Future {
+          LazyList.continually(eventStream.take()).scanLeft(initialState)((state, event) =>
+            event(state)
+          ).foreach((appState: AppState[N, C, S]) =>
+            println(s"Stations: ${appState.stationManager.stationMap.stations.length}")
+          )
+        }
+        Await.result(
+          controller.onOkClick(
+            stationName,
+            x.toString,
+            y.toString,
+            numberOfTrack.toString,
+            None
+          ),
+          Duration.Inf
+        ) shouldBe Right(StationMap(station))
+
 //
 //        controller.findStationAt(Coordinate(x, y)) shouldBe Some(station)
 //
