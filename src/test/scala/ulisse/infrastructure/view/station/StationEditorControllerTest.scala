@@ -13,7 +13,7 @@ import ulisse.applications.AppState
 import ulisse.applications.station.StationMap
 import ulisse.utils.Errors.BaseError
 
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.{Executors, LinkedBlockingQueue}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
@@ -23,7 +23,7 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
   private type C = Coordinate[N]
   private type S = Station[N, C]
 
-  given ExecutionContext = ExecutionContext.global
+  given ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
   given eventStream: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   private val outputPort     = mock[StationPorts.Output]
   private val stationName    = "New Station"
