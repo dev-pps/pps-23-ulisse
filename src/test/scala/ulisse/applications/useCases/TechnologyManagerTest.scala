@@ -4,7 +4,8 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
-import TechnologyManagers.TechErrors.{InvalidSpeed, TechnologyAlreadyExists}
+
+import TechnologyManagers.TechErrors.{InvalidSpeed, TechnologyAlreadyExists, TechnologyNotExists}
 import TechnologyManagers.TechnologyManager
 import ulisse.entities.Technology
 
@@ -55,10 +56,17 @@ class TechnologyManagerTest extends AnyFeatureSpec with GivenWhenThen:
 
     Scenario("Get technology providing name"):
       Given("There is technology that i need saved")
+      val manager = TechnologyManager[Technology](List(technology))
       When("I ask manager to get it")
+      val tech = manager.getBy(technology.name)
       Then("technology should be returned")
+      tech should be(Right(technology))
 
-    Scenario("Try get technology that not exists")
-    Given("There is technology that i need saved")
-    When("I ask manager to get it")
-    Then("it should be returned and error")
+    Scenario("Try get technology that not exists"):
+      Given("Manager does not contain technology I need")
+      When("I ask manager to get it")
+      val tech = emptyManager.getBy(technology.name)
+      Then("it should be returned and error")
+      tech should be(Left(TechnologyNotExists(
+        technology.name
+      )))
