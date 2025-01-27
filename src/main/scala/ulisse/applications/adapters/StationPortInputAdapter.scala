@@ -22,8 +22,10 @@ final case class StationPortInputAdapter[N: Numeric, C <: Coordinate[N], S <: St
     p.future
   override def addStation(station: S): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
+
     eventQueue.add((state: AppState[N, C, S]) => {
       val updatedMap = state.stationMap.addStation(station)
+      println("addStationResult: ")
       p.success(updatedMap)
       updatedMap match
         case Left(value)  => state
