@@ -34,7 +34,7 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
   private val inputPort =
     StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream, outputPort)
   private val controller    = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
-  private def updateState() = () => runAll(initialState, eventStream)
+  private def updateState() = runAll(initialState, eventStream)
 
   "StationEditorController" when:
     "onOkClick is invoked" should:
