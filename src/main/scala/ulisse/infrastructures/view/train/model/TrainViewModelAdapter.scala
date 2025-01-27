@@ -25,7 +25,7 @@ object TrainViewModelAdapter:
 
   private final case class BaseAdapter(trainService: TrainPorts.Input, view: TrainEditorView)
       extends TrainViewModelAdapter:
-    implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutorService(
+    given executionContext: ExecutionContext = ExecutionContext.fromExecutorService(
       Executors.newFixedThreadPool(1)
     )
 
