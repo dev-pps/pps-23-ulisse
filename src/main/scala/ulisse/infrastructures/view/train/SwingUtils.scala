@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.train
 
 import scala.swing.event.ValueChanged
-import scala.swing.{Component, FlowPanel, TextField}
+import scala.swing.{Component, FlowPanel, Swing, TextField}
 
 object SwingUtils:
   extension (c: Component)
@@ -16,7 +16,9 @@ object SwingUtils:
     listenTo(this)
     reactions += {
       case ValueChanged(_) =>
-        if (!text.matches("^[0-9]*$")) {
-          text = text.filter(_.isDigit)
+        Swing.onEDT {
+          if (!text.matches("^[0-9]*$")) {
+            text = text.filter(_.isDigit)
+          }
         }
     }

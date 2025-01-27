@@ -48,9 +48,10 @@ object StationTypes:
   // Train Fleet init
   val trainPort: TrainPorts.Input = TrainServiceManagerAdapter(stateEventQueue)
   val trainView                   = TrainEditorView(trainPort)
-  trainView.open()
+  // trainView.open()
 
   // Init Managers state
+  // Managers can be initialized loading entities from file/external repo
   val trainManager     = TrainManager(List.empty)
   val technologies     = List(TrainTechnology("AV", 300, 2.0, 1.0), TrainTechnology("Normal", 160, 1.0, 0.5))
   val trainTechManager = TechnologyManager[TrainTechnology](technologies)
