@@ -1,21 +1,21 @@
 package ulisse.infrastructure.view.station
 
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-import ulisse.applications.adapters.StationPortInputAdapter
-import ulisse.entities.Coordinates.Coordinate
-import ulisse.entities.station.Station
-import ulisse.applications.ports.StationPorts
-import ulisse.infrastructures.view.station.StationEditorController
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
 import ulisse.applications.AppState
+import ulisse.applications.adapters.StationPortInputAdapter
+import ulisse.applications.ports.StationPorts
 import ulisse.applications.station.StationMap
+import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.station.Station
+import ulisse.infrastructures.view.station.StationEditorController
 import ulisse.utils.Errors.BaseError
 
 import java.util.concurrent.LinkedBlockingQueue
-import scala.concurrent.duration.Duration
 import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 class StationEditorControllerTest extends AnyWordSpec with Matchers:
 

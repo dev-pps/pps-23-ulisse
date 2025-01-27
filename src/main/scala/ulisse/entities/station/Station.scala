@@ -54,6 +54,9 @@ object Station:
   ): Station[N, C] =
     StationImpl(name, coordinate, numberOfTrack)
 
+  given [N: Numeric, C <: Coordinate[N]]: ((String, C, Int) => Either[BaseError, CheckedStation[N, C]]) =
+    Station.createCheckedStation
+
   /** Creates a `Station` instance with validation.
     *
     * @tparam N
@@ -81,17 +84,6 @@ object Station:
       validNumberOfTrack <- validatePositive(numberOfTrack, CheckedStation.Error.InvalidNumberOfTrack)
     yield CheckedStation(validName, coordinate, validNumberOfTrack)
 
-  private final case class StationImpl[N: Numeric, C <: Coordinate[N]](
-      name: String,
-      coordinate: C,
-      numberOfTracks: Int
-  ) extends Station[N, C]
-
-  object CheckedStation:
-    /** Represents errors that can occur during station creation. */
-    enum Error extends BaseError:
-      case InvalidName, InvalidNumberOfTrack
-
   /** Defines a `CheckedStation`.
     *
     * A `CheckedStation` represents a validated station.
@@ -118,9 +110,6 @@ object Station:
       numberOfTracks: Int
   ) extends Station[N, C]
 
-  given [N: Numeric, C <: Coordinate[N]]: ((String, C, Int) => Either[BaseError, CheckedStation[N, C]]) =
-    Station.createCheckedStation
-
   /** Represents a selectable station.
     *
     * A `SelectableStation` wraps a `Station` instance and provides a boolean flag to indicate whether the station is
@@ -140,6 +129,17 @@ object Station:
       selected: Boolean
   ) extends Station[N, C] with Selectable:
     export station.*
+
+  private final case class StationImpl[N: Numeric, C <: Coordinate[N]](
+      name: String,
+      coordinate: C,
+      numberOfTracks: Int
+  ) extends Station[N, C]
+
+  object CheckedStation:
+    /** Represents errors that can occur during station creation. */
+    enum Error extends BaseError:
+      case InvalidName, InvalidNumberOfTrack
 
 /** Defines a Selectable Object. */
 trait Selectable:

@@ -31,22 +31,6 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N], S <: St
     appPort: StationPorts.Input[N, C, S]
 ):
 
-  private def createStation(
-      name: String,
-      latitude: String,
-      longitude: String,
-      numberOfTrack: String,
-      coordinateGenerator: (N, N) => Either[BaseError, C],
-      stationGenerator: (String, C, Int) => Either[BaseError, S]
-  )(using numeric: Numeric[N]): Either[BaseError, S] =
-    for
-      latitude      <- numeric.parseString(latitude).toRight(StationEditorController.Error.InvalidRowFormat)
-      longitude     <- numeric.parseString(longitude).toRight(StationEditorController.Error.InvalidColumnFormat)
-      coordinate    <- coordinateGenerator(latitude, longitude)
-      numberOfTrack <- numberOfTrack.toIntOption.toRight(StationEditorController.Error.InvalidNumberOfTrackFormat)
-      station       <- stationGenerator(name, coordinate, numberOfTrack)
-    yield station
-
   /** Handles the click event when the "OK" button is pressed.
     *
     * This method is responsible for creating a new station with the provided information. If an `oldStation` is
@@ -81,5 +65,21 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N], S <: St
       case Right(value) =>
         for old <- oldStation do removeStation(old)
         appPort.addStation(value)
+
+  private def createStation(
+      name: String,
+      latitude: String,
+      longitude: String,
+      numberOfTrack: String,
+      coordinateGenerator: (N, N) => Either[BaseError, C],
+      stationGenerator: (String, C, Int) => Either[BaseError, S]
+  )(using numeric: Numeric[N]): Either[BaseError, S] =
+    for
+      latitude      <- numeric.parseString(latitude).toRight(StationEditorController.Error.InvalidRowFormat)
+      longitude     <- numeric.parseString(longitude).toRight(StationEditorController.Error.InvalidColumnFormat)
+      coordinate    <- coordinateGenerator(latitude, longitude)
+      numberOfTrack <- numberOfTrack.toIntOption.toRight(StationEditorController.Error.InvalidNumberOfTrackFormat)
+      station       <- stationGenerator(name, coordinate, numberOfTrack)
+    yield station
 
   export appPort.{findStationAt, removeStation}

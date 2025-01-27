@@ -5,7 +5,6 @@ import ulisse.applications.ports.StationPorts
 import ulisse.applications.station.StationMap.CheckedStationMap
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
-import ulisse.utils.Errors.BaseError
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
@@ -16,30 +15,25 @@ final case class StationPortInputAdapter[N: Numeric, C <: Coordinate[N], S <: St
 ) extends StationPorts.Input[N, C, S]:
   type SM = CheckedStationMap[N, C, S]
   type E  = CheckedStationMap.Error
+
   override def stationMap: Future[SM] =
     val p = Promise[SM]()
     eventQueue.add((state: AppState[N, C, S]) => { p.success(state.stationMap); state })
     p.future
+
   override def addStation(station: S): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-
     eventQueue.add((state: AppState[N, C, S]) => {
       val updatedMap = state.stationMap.addStation(station)
-      println("addStationResult: ")
-      p.success(updatedMap)
-      updatedMap match
-        case Left(value)  => state
-        case Right(value) => state.copy(stationMap = value)
+      updateState(p, state, updatedMap)
     })
     p.future
+
   override def removeStation(station: S): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[N, C, S]) => {
       val updatedMap = state.stationMap.removeStation(station)
-      p.success(updatedMap)
-      updatedMap match
-        case Left(value)  => state
-        case Right(value) => state.copy(stationMap = value)
+      updateState(p, state, updatedMap)
     })
     p.future
   override def findStationAt(coordinate: C): Future[Option[S]] =
@@ -50,3 +44,10 @@ final case class StationPortInputAdapter[N: Numeric, C <: Coordinate[N], S <: St
       state
     })
     p.future
+
+  private def updateState(p: Promise[Either[E, SM]], state: AppState[N, C, S], updatedMap: state.stationMap.R) = {
+    p.success(updatedMap)
+    updatedMap match
+      case Left(value)  => state
+      case Right(value) => state.copy(stationMap = value)
+  }

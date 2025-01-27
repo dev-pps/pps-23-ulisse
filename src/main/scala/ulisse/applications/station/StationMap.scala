@@ -100,28 +100,6 @@ object StationMap:
   def createCheckedStationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](): CheckedStationMap[N, C, S] =
     CheckedStationMap(List.empty)
 
-  private final case class BaseStationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
-      stations: List[S]
-  ) extends StationMap[N, C, S]:
-    type StationMapType = List[S]
-    type R              = BaseStationMap[N, C, S]
-
-    def addStation(station: S): R =
-      BaseStationMap(station :: stations)
-
-    def removeStation(station: S): R =
-      BaseStationMap(stations.filterNot(_.coordinate === station.coordinate))
-
-    def findStationAt(coordinate: C): Option[S] =
-      stations.find(_.coordinate === coordinate)
-
-    export stations.map
-
-  object CheckedStationMap:
-    /** Represents errors that can occur during [[CheckedStationMap]] creation. */
-    enum Error extends BaseError:
-      case DuplicateStationName, DuplicateStationLocation, StationNotFound
-
   /** A case class that implements the `StationMap` trait with validation for unique station names and locations.
     *
     * @tparam N
@@ -155,3 +133,25 @@ object StationMap:
       stations.find(_.coordinate === coordinate)
 
     export stations.map
+
+  private final case class BaseStationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
+      stations: List[S]
+  ) extends StationMap[N, C, S]:
+    type StationMapType = List[S]
+    type R              = BaseStationMap[N, C, S]
+
+    def addStation(station: S): R =
+      BaseStationMap(station :: stations)
+
+    def removeStation(station: S): R =
+      BaseStationMap(stations.filterNot(_.coordinate === station.coordinate))
+
+    def findStationAt(coordinate: C): Option[S] =
+      stations.find(_.coordinate === coordinate)
+
+    export stations.map
+
+  object CheckedStationMap:
+    /** Represents errors that can occur during [[CheckedStationMap]] creation. */
+    enum Error extends BaseError:
+      case DuplicateStationName, DuplicateStationLocation, StationNotFound

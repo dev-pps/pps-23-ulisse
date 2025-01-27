@@ -8,8 +8,8 @@ import ulisse.applications.AppState
 import ulisse.applications.ports.StationPorts
 import ulisse.applications.station.StationMap
 import ulisse.applications.station.StationMap.CheckedStationMap
-import ulisse.entities.station.Station
 import ulisse.entities.Coordinates.*
+import ulisse.entities.station.Station
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Await
@@ -18,13 +18,11 @@ import scala.util.Right
 
 class StationPortInputAdapterTest extends AnyWordSpec with Matchers:
 
-  private val outputPort = mock[StationPorts.Output]
-  private val station    = Station("StationA", Coordinate(0, 0), 1)
-
   private type N = Int
   private type C = Coordinate[N]
   private type S = Station[N, C]
-
+  private val outputPort   = mock[StationPorts.Output]
+  private val station      = Station("StationA", Coordinate(0, 0), 1)
   private val initialState = AppState[N, C, S](StationMap.createCheckedStationMap())
   private val eventStream  = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   private val inputPort =

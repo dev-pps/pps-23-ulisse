@@ -1,12 +1,18 @@
 package ulisse.entities
 
-import scala.math.{pow, sqrt}
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonNegative, validateRange}
 
 import scala.annotation.targetName
+import scala.math.{pow, sqrt}
 
 object Coordinates:
+  given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
+
+  given ((Int, Int) => Either[BaseError, Grid]) = Coordinate.createGrid
+
+  given ((Double, Double) => Either[BaseError, Geo]) = Coordinate.createGeo
+
   /** A generic trait representing a 2D coordinate point in space.
     *
     * @tparam T
@@ -55,6 +61,35 @@ object Coordinates:
         pow(numeric.toDouble(coordinate.x) - numeric.toDouble(x), 2) +
           pow(numeric.toDouble(coordinate.y) - numeric.toDouble(y), 2)
       )
+
+  /** A 2D geographic coordinate point.
+    *
+    * Represents a location defined by latitude and longitude values.
+    *
+    * @param latitude
+    *   The latitude value, which must be between -90 and 90.
+    * @param longitude
+    *   The longitude value, which must be between -180 and 180.
+    *
+    * **Note**: Instances of `Geo` can only be created through the `Coordinates.createGeo` method to ensure validation.
+    */
+  final case class Geo private[Coordinates] (latitude: Double, longitude: Double)
+      extends Coordinate[Double](latitude, longitude)
+
+  /** A 2D grid coordinate point.
+    *
+    * Represents a grid location defined by row and column values.
+    *
+    * @param row
+    *   The row value, which must be non-negative.
+    * @param column
+    *   The column value, which must be non-negative.
+    *
+    * **Note**: Instances of `Grid` can only be created through the `Coordinates.createGrid` method to ensure
+    * validation.
+    */
+  final case class Grid private[Coordinates] (row: Int, column: Int)
+      extends Coordinate[Int](row, column)
 
   /** Factory for [[Coordinate]] instances. */
   object Coordinate:
@@ -108,40 +143,7 @@ object Coordinates:
     enum Error extends BaseError:
       case InvalidLatitude, InvalidLongitude
 
-  /** A 2D geographic coordinate point.
-    *
-    * Represents a location defined by latitude and longitude values.
-    *
-    * @param latitude
-    *   The latitude value, which must be between -90 and 90.
-    * @param longitude
-    *   The longitude value, which must be between -180 and 180.
-    *
-    * **Note**: Instances of `Geo` can only be created through the `Coordinates.createGeo` method to ensure validation.
-    */
-  final case class Geo private[Coordinates] (latitude: Double, longitude: Double)
-      extends Coordinate[Double](latitude, longitude)
-
   object Grid:
     /** Represents errors that can occur during [[Grid]] creation. */
     enum Error extends BaseError:
       case InvalidRow, InvalidColumn
-
-  /** A 2D grid coordinate point.
-    *
-    * Represents a grid location defined by row and column values.
-    *
-    * @param row
-    *   The row value, which must be non-negative.
-    * @param column
-    *   The column value, which must be non-negative.
-    *
-    * **Note**: Instances of `Grid` can only be created through the `Coordinates.createGrid` method to ensure
-    * validation.
-    */
-  final case class Grid private[Coordinates] (row: Int, column: Int)
-      extends Coordinate[Int](row, column)
-
-  given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
-  given ((Int, Int) => Either[BaseError, Grid])            = Coordinate.createGrid
-  given ((Double, Double) => Either[BaseError, Geo])       = Coordinate.createGeo
