@@ -3,7 +3,6 @@ package ulisse.applications.adapters
 import ulisse.applications.AppState
 import ulisse.applications.ports.StationPorts
 import ulisse.applications.station.StationMap.CheckedStationMap
-import ulisse.applications.useCases.StationManager
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.BaseError
@@ -18,28 +17,32 @@ final case class StationPortInputAdapter[N: Numeric, C <: Coordinate[N], S <: St
   type E  = CheckedStationMap.Error
   override def stationMap: Future[SM] =
     val p = Promise[SM]()
-    eventQueue.add((state: AppState[N, C, S]) => { p.success(state.stationManager.stationMap); state })
+    eventQueue.add((state: AppState[N, C, S]) => { p.success(state.stationMap); state })
     p.future
   override def addStation(station: S): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[N, C, S]) => {
-      val updatedMap = state.stationManager.addStation(station)
+      val updatedMap = state.stationMap.addStation(station)
       p.success(updatedMap)
-      state
+      updatedMap match
+        case Left(value)  => state
+        case Right(value) => state.copy(stationMap = value)
     })
     p.future
   override def removeStation(station: S): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[N, C, S]) => {
-      val updatedMap = state.stationManager.removeStation(station)
+      val updatedMap = state.stationMap.removeStation(station)
       p.success(updatedMap)
-      state
+      updatedMap match
+        case Left(value)  => state
+        case Right(value) => state.copy(stationMap = value)
     })
     p.future
   override def findStationAt(coordinate: C): Future[Option[S]] =
     val p = Promise[Option[S]]()
     eventQueue.add((state: AppState[N, C, S]) => {
-      val station = state.stationManager.findStationAt(coordinate)
+      val station = state.stationMap.findStationAt(coordinate)
       p.success(station)
       state
     })

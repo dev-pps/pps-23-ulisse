@@ -31,16 +31,16 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
   private val y             = 1
   private val numberOfTrack = 1
   private val station       = Station(stationName, Coordinate(x, y), numberOfTrack)
+  val stationManager        = StationManager[N, C, S](outputPort)
 
   "StationEditorController" when:
     "onOkClick is invoked" should:
       "add a new station when inputs are valid and oldStation is None" in:
-        val stationManager = StationManager[N, C, S](outputPort)
-        val initialState   = AppState[N, C, S](stationManager)
-        val eventStream    = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
-        val inputPort      = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream)
-        val controller     = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
-        val station        = Station(stationName, Coordinate(x, y), numberOfTrack)
+        val initialState = AppState[N, C, S](stationManager.stationMap)
+        val eventStream  = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+        val inputPort    = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream)
+        val controller   = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
+        val station      = Station(stationName, Coordinate(x, y), numberOfTrack)
 
         val addStationResult =
           controller.onOkClick(
@@ -58,11 +58,11 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
         Await.result(findStationResult, Duration.Inf) shouldBe Some(station)
 
       "replace the station when inputs are valid and oldStation is Some(station)" in:
-        val stationManager = StationManager[N, C, S](outputPort)
-        val initialState   = AppState[N, C, S](stationManager)
-        val eventStream    = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
-        val inputPort      = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream)
-        val controller     = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
+//        val stationManager = StationManager[N, C, S](outputPort)
+        val initialState = AppState[N, C, S](stationManager.stationMap)
+        val eventStream  = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+        val inputPort    = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream)
+        val controller   = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
 
         val oldStation = Station(stationName, Coordinate(5, 5), numberOfTrack)
         val newStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
@@ -98,11 +98,11 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
         Await.result(findOldStationAfterAddNewStationResult, Duration.Inf) shouldBe None
 
       "returns error when input are not valid" in:
-        val stationManager = StationManager[N, C, S](outputPort)
-        val initialState   = AppState[N, C, S](stationManager)
-        val eventStream    = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
-        val inputPort      = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream)
-        val controller     = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
+//        val stationManager = StationManager[N, C, S](outputPort)
+        val initialState = AppState[N, C, S](stationManager.stationMap)
+        val eventStream  = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+        val inputPort    = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream)
+        val controller   = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
 
         val addStationWithWrongRowResult =
           controller.onOkClick(

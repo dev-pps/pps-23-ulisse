@@ -31,9 +31,9 @@ final case class StationSettings():
   app.contents = settings.stationEditorView
   app.open()
 
-  val initialState = AppState[N, C, S](settings.stationManager)
+  val initialState = AppState[N, C, S](settings.stationManager.stationMap)
   LazyList.continually(settings.eventStream.take()).scanLeft(initialState)((state, event) =>
     event(state)
   ).foreach((appState: AppState[N, C, S]) =>
-    println(s"Stations: ${appState.stationManager.stationMap.stations.length}")
+    println(s"Stations: ${appState.stationMap.stations.length}")
   )
