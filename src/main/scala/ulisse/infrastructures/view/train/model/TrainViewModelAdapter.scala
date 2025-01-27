@@ -7,9 +7,8 @@ import TrainViewModel.*
 import ulisse.applications.ports.TrainPorts
 import ulisse.infrastructures.view.train.TrainEditorView
 import ulisse.utils.Errors.BaseError
-
 import java.util.concurrent.Executors
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 trait TrainViewModelAdapter:
@@ -30,74 +29,58 @@ object TrainViewModelAdapter:
       Executors.newFixedThreadPool(1)
     )
 
-    extension (l: List[Train])
-      private def toTrainDatas: List[TrainData] =
-        l.map(t =>
-          TrainData(
-            name = Some(t.name),
-            technologyName = Some(t.techType.name),
-            technologyMaxSpeed = Some(t.techType.maxSpeed),
-            technologyAcc = Some(t.techType.acceleration),
-            technologyDec = Some(t.techType.deceleration),
-            wagonNameType = Some(t.wagon.use.name),
-            wagonCapacity = Some(t.wagon.capacity),
-            wagonCount = Some(t.length)
-          )
-        )
-
-    extension (t: List[TrainTechnology])
-      private def toTechType: List[TechType] =
-        t.map(tk => TechType(tk.name, tk.maxSpeed, tk.acceleration, tk.deceleration))
-
-    extension (w: List[UseType])
-      private def toWagonNames: List[WagonName] = w.map(w => WagonName(w.name))
-
     override def requestTrains(): Unit =
-      trainService.trains.onComplete {
-        case Failure(e) => view.showError(e.getMessage)
-        case Success(l) => view.updateTrainList(l.toTrainDatas)
-      }
+      trainService.trains.handleOnComplete(l =>
+        view.updateTrainList(l.toTrainDatas)
+      )
 
     override def addTrain(trainData: TrainData): Unit =
-      for
-        n  <- trainData.name
-        tk <- trainData.technologyName
-        wc <- trainData.wagonCount
-        wt <- trainData.wagonNameType
-        wa <- trainData.wagonCapacity
-      yield trainService.addTrain(n, tk, wt, wa, wc).onComplete {
-        case Failure(e) => view.showError(e.getMessage)
-        case Success(r) => showNewTrainList(r)
+      trainData.extractThenPerform: (name, tkName, wType, wCap, tLen) =>
+        trainService.addTrain(name, tkName, wType, wCap, tLen)
+
+    override def deleteTrain(name: String): Unit =
+      trainService.removeTrain(name).handleOnComplete(t => showNewTrainList(t))
+
+    override def updateTrain(trainData: TrainData): Unit =
+      trainData.extractThenPerform { (name, tkName, wType, wCap, tLen) =>
+        trainService.updateTrain(name)(tkName, wType, wCap, tLen)
       }
 
-    override def deleteTrain(name: String): Unit = trainService.removeTrain(name).onComplete {
-      case Failure(e) => view.showError(e.getMessage)
-      case Success(r) => showNewTrainList(r)
-    }
+    override def requestWagonTypes(): Unit =
+      trainService.wagonTypes.handleOnComplete(w => view.updateWagons(w.toWagonNames))
+
+    override def requestTechnologies(): Unit =
+      trainService.technologies.handleOnComplete(t => view.updateTechnology(t.toTechType))
+
+    extension (trainData: TrainData)
+      private def extractThenPerform(action: (
+          String,
+          String,
+          String,
+          Int,
+          Int
+      ) => Future[Either[BaseError, List[Train]]]): Unit =
+        val data =
+          for
+            n  <- trainData.name
+            tn <- trainData.technologyName
+            ts <- trainData.technologyMaxSpeed
+            wq <- trainData.wagonCount
+            wn <- trainData.wagonNameType
+            wc <- trainData.wagonCapacity
+          yield (n, tn, wn, wc, wq)
+        data match
+          case Some(d) => action(d._1, d._2, d._3, d._4, d._5).handleOnComplete(t => showNewTrainList(t))
+          case None    => view.showError("Some field are empty!")
+
+    extension [T](toComplete: Future[T])
+      private def handleOnComplete(onSuccess: T => Unit): Unit =
+        toComplete.onComplete {
+          case Failure(e) => view.showError(e.getMessage)
+          case Success(r) => onSuccess(r)
+        }
 
     private def showNewTrainList(r: Either[BaseError, List[Train]]): Unit =
       r match
-        case Left(err) => view.showError("Error")
+        case Left(err) => view.showError(s"Error: $err")
         case Right(t)  => view.updateTrainList(t.toTrainDatas)
-
-    override def updateTrain(trainData: TrainData): Unit =
-      for
-        n  <- trainData.name
-        tn <- trainData.technologyName
-        ts <- trainData.technologyMaxSpeed
-        wq <- trainData.wagonCount
-        wn <- trainData.wagonNameType
-        wc <- trainData.wagonCapacity
-      yield trainService.updateTrain(n)(tn, wn, wc, wq)
-
-    override def requestWagonTypes(): Unit =
-      trainService.wagonTypes.onComplete {
-        case Failure(e) => view.showError(e.getMessage)
-        case Success(w) => view.updateWagons(w.toWagonNames)
-      }
-
-    override def requestTechnologies(): Unit =
-      trainService.technologies.onComplete {
-        case Failure(e) => view.showError(e.getMessage)
-        case Success(t) => view.updateTechnology(t.toTechType)
-      }
