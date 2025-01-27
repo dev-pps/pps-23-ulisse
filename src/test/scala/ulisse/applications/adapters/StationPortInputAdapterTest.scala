@@ -1,3 +1,5 @@
+package ulisse.applications.adapters
+
 //package ulisse.applications.useCases
 //
 //import org.scalatest.matchers.should.Matchers
