@@ -11,7 +11,8 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 final case class StationPortInputAdapter[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
-    eventQueue: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]
+    eventQueue: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]],
+    outputPort: StationPorts.Output
 ) extends StationPorts.Input[N, C, S]:
   type SM = CheckedStationMap[N, C, S]
   type E  = CheckedStationMap.Error
