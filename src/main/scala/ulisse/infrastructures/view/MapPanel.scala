@@ -3,10 +3,9 @@ package ulisse.infrastructures.view
 import ulisse.entities.Coordinates
 import ulisse.entities.Route.Station
 
-import java.awt.{Image, RenderingHints}
-import java.awt.image.ImageObserver
+import java.awt.RenderingHints
 import javax.imageio.ImageIO
-import scala.swing.{Graphics2D, Panel}
+import scala.swing.{Graphics2D, Image, Panel}
 
 trait MapPanel extends Panel:
   def setPoints(points: List[(Station, Station)]): Unit
@@ -17,11 +16,11 @@ object MapPanel:
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class MapPanelImpl(var points: List[((Int, Int), (Int, Int))]) extends Panel with MapPanel:
-    val url = ClassLoader.getSystemResource("station.png")
-//    val url = getClass.getResource("/station.png")
-//    val inputStream = getClass.getResourceAsStream("/station.png")
-    val image = ImageIO.read(url)
-//    inputStream.close()
+    private val stationUrl   = ClassLoader.getSystemResource("station.png")
+    private val stationImage = ImageIO.read(stationUrl)
+
+    private val routeUrl   = getClass.getResource("/route.png")
+    private val routeImage = ImageIO.read(routeUrl)
 
     override def setPoints(points: List[((String, Coordinates.Geo), (String, Coordinates.Geo))]): Unit =
       this.points = points.map((p1, p2) =>
@@ -32,22 +31,20 @@ object MapPanel:
       super.paintComponent(g)
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
-//      final URL imgURL = ClassLoader.getSystemResource(path);
-//      return new ImageIcon(imgURL).getImage();
-
-//      inputStream.close()
-
-//      val icon = new ImageIcon(image)
-//      val imgURL = ClassLoader.getSystemResource("station.png")
-//      println(imgURL)
-//      val image = new ImageIcon(imgURL).getImage
-//      println(image)
+      drawTiledImage(g, routeImage, (30, 30), (400, 400), (500, 500))
 
       points.foreach((p1, p2) =>
         g.setColor(java.awt.Color.BLACK)
         g.drawLine(p1._1, p1._2, p2._1, p2._2)
 
-        val d  = g.drawImage(image, p1._1 - 15, p1._2 - 15, 30, 30, this.peer)
-        val d1 = g.drawImage(image, p2._1 - 15, p2._2 - 15, 30, 30, this.peer)
+        val d  = g.drawImage(stationImage, p1._1 - 15, p1._2 - 15, 30, 30, peer)
+        val d1 = g.drawImage(stationImage, p2._1 - 15, p2._2 - 15, 30, 30, peer)
       )
     }
+
+    private def drawTiledImage(g: Graphics2D, img: Image, dimension: (Int, Int), start: (Int, Int), end: (Int, Int)) =
+      val x   = start._1 until end._1 by dimension._1
+      val y   = start._2 until end._2 by dimension._2
+      val pos = x zip y
+
+      pos.foreach((x, y) => g.drawImage(img, x, y, dimension._1, dimension._2, peer))
