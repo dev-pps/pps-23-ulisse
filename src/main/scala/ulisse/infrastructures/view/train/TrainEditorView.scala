@@ -133,8 +133,8 @@ object TrainEditorView:
         technologyAcc = Some(getSelectedTechnology.acc),
         technologyDec = Some(getSelectedTechnology.dec),
         wagonNameType = Some(getSelectedWagonType.useName),
-        wagonCount = Try(wagonCountAmount.text.toInt).toOption,
-        wagonCapacity = Try(wagonCapacity.text.toInt).toOption,
+        wagonCount = wagonCountAmount.text.toIntOption,
+        wagonCapacity = wagonCapacity.text.toIntOption,
         technologyMaxSpeed = Some(getSelectedTechnology.maxSpeed)
       )
 
