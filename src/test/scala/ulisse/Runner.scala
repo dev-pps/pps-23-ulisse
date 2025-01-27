@@ -1,10 +1,11 @@
 package ulisse
 
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import ulisse.Runner.runAll
+
 import java.util.concurrent.LinkedBlockingQueue
 import scala.jdk.CollectionConverters.*
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.should.Matchers
-import ulisse.Runner.runAll
 
 object Runner:
 
@@ -24,10 +25,7 @@ object Runner:
   def runAll[S](initialState: S, queue: LinkedBlockingQueue[S => S]): List[S] =
     val elements = java.util.ArrayList[S => S]()
     queue.drainTo(elements)
-    elements.asScala.toList.scanLeft(initialState)((state, event) =>
-      println(s"state: $state")
-      event(state)
-    )
+    elements.asScala.toList.scanLeft(initialState)((state, event) => event(state))
 
 class RunnerTest extends AnyWordSpec with Matchers:
 

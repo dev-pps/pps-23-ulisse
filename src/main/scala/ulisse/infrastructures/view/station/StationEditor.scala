@@ -3,14 +3,13 @@ package ulisse.infrastructures.view.station
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
+import ulisse.entities.station.Station.CheckedStation
 
 import java.awt.Color
+import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.*
 import scala.swing.Swing.LineBorder
 import scala.swing.event.*
-import ulisse.entities.station.Station.CheckedStation
-
-import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
@@ -162,6 +161,7 @@ final case class StationForm(
     latitude.text = s.coordinate.row.toString
     longitude.text = s.coordinate.column.toString
     numberOfTrack.text = s.numberOfTracks.toString
+  private val c = new Constraints
 
   /** Sets the location in the StationForm.
     *
@@ -173,8 +173,6 @@ final case class StationForm(
   def setLocation(location: C): Unit =
     latitude.text = location.row.toString
     longitude.text = location.column.toString
-
-  private val c = new Constraints
   c.anchor = GridBagPanel.Anchor.Center
   c.gridx = 0
   c.weightx = 1
@@ -323,6 +321,11 @@ final case class StationEditorView(controller: StationEditorController[N, C, S])
 
   openStationMenu()
 
+  private def updateContent(content: StationEditorContent): Unit =
+    layout(makeContent(content)) = BorderPanel.Position.Center
+    revalidate()
+    repaint()
+
   private def makeContent(content: StationEditorContent): GridBagPanel =
     new GridBagPanel:
       private val c = new Constraints
@@ -335,8 +338,3 @@ final case class StationEditorView(controller: StationEditorController[N, C, S])
       c.gridx = 1
       c.weightx = 0.3
       layout(content.stationEditorPanel) = c
-
-  private def updateContent(content: StationEditorContent): Unit =
-    layout(makeContent(content)) = BorderPanel.Position.Center
-    revalidate()
-    repaint()
