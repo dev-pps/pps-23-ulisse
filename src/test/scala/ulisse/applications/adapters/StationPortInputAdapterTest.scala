@@ -7,6 +7,7 @@ import ulisse.Runner.runAll
 import ulisse.applications.AppState
 import ulisse.applications.ports.StationPorts
 import ulisse.applications.station.StationMap
+import ulisse.applications.station.StationMap.CheckedStationMap
 import ulisse.entities.station.Station
 import ulisse.entities.Coordinates.*
 
@@ -34,29 +35,35 @@ class StationPortInputAdapterTest extends AnyWordSpec with Matchers:
     "add a valid station to the station map" in:
       val addStationResult = inputPort.addStation(station)
       val stationMapResult = inputPort.stationMap
-      updateState()
 
+      updateState()
       Await.result(addStationResult, Duration.Inf) shouldBe Right(StationMap(station))
       Await.result(stationMapResult, Duration.Inf) shouldBe StationMap(station)
 
-//
-//    "add invalid station to the station map" in:
-//      val stationManager = StationManager[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](mockUI)
-//      stationManager.addStation(station)
-//      stationManager.addStation(station) match
-//        case Right(_) => fail()
-//        case Left(_)  => stationManager.stationMap.stations should contain only station
-//
-//    "remove a present station from the station map" in:
-//      val stationManager = StationManager[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](mockUI)
-//      stationManager.addStation(station)
-//      stationManager.removeStation(station)
-//      stationManager.stationMap.stations shouldBe empty
-//
-//    "not remove an absent station from the station map" in:
-//      val stationManager = StationManager[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](mockUI)
-//      val otherStation   = Station("StationB", Coordinate(1, 1), 1)
-//      stationManager.addStation(station)
-//      stationManager.removeStation(otherStation) match
-//        case Right(_) => fail()
-//        case Left(_)  => stationManager.stationMap.stations should contain only station
+    "add invalid station to the station map" in:
+      val addStationResult     = inputPort.addStation(station)
+      val addSameStationResult = inputPort.addStation(station)
+      val stationMapResult     = inputPort.stationMap
+
+      updateState()
+      Await.result(addStationResult, Duration.Inf) shouldBe Right(StationMap(station))
+      Await.result(addSameStationResult, Duration.Inf) shouldBe Left(CheckedStationMap.Error.DuplicateStationName)
+      Await.result(stationMapResult, Duration.Inf) shouldBe StationMap(station)
+
+    "remove a present station from the station map" in:
+      val addStationResult    = inputPort.addStation(station)
+      val removeStationResult = inputPort.removeStation(station)
+      val stationMapResult    = inputPort.stationMap
+
+      updateState()
+      Await.result(addStationResult, Duration.Inf) shouldBe Right(StationMap(station))
+      Await.result(removeStationResult, Duration.Inf) shouldBe Right(StationMap[N, C, S]())
+      Await.result(stationMapResult, Duration.Inf) shouldBe StationMap[N, C, S]()
+
+    "not remove an absent station from the station map" in:
+      val removeStationResult = inputPort.removeStation(station)
+      val stationMapResult    = inputPort.stationMap
+      updateState()
+
+      Await.result(removeStationResult, Duration.Inf) shouldBe Left(CheckedStationMap.Error.StationNotFound)
+      Await.result(stationMapResult, Duration.Inf) shouldBe StationMap[N, C, S]()
