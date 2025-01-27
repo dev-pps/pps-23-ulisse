@@ -24,7 +24,10 @@ object Runner:
   def runAll[S](initialState: S, queue: LinkedBlockingQueue[S => S]): List[S] =
     val elements = java.util.ArrayList[S => S]()
     queue.drainTo(elements)
-    elements.asScala.toList.scanLeft(initialState)((state, event) => event(state))
+    elements.asScala.toList.scanLeft(initialState)((state, event) =>
+      println(s"state: $state")
+      event(state)
+    )
 
 class RunnerTest extends AnyWordSpec with Matchers:
 

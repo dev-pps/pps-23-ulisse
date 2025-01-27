@@ -9,6 +9,7 @@ import ulisse.applications.ports.StationPorts
 import ulisse.applications.useCases.StationManager
 import ulisse.infrastructures.view.station.StationEditorController
 import org.scalatestplus.mockito.MockitoSugar.mock
+import ulisse.Runner.runAll
 import ulisse.applications.AppState
 import ulisse.applications.station.StationMap
 import ulisse.utils.Errors.BaseError
@@ -16,6 +17,7 @@ import ulisse.utils.Errors.BaseError
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.Success
 
 class StationEditorControllerTest extends AnyWordSpec with Matchers:
 
@@ -23,106 +25,119 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
   private type C = Coordinate[N]
   private type S = Station[N, C]
 
-  given ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
-  given eventStream: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
-  private val outputPort     = mock[StationPorts.Output]
-  private val stationName    = "New Station"
-  private val x              = 1
-  private val y              = 1
-  private val numberOfTrack  = 1
-  private val station        = Station(stationName, Coordinate(x, y), numberOfTrack)
-  private val stationManager = StationManager[N, C, S](outputPort)
-  private val initialState   = AppState[N, C, S](stationManager)
-  private def runAll(): Unit =
-    Future {
-      LazyList.continually(eventStream.take()).scanLeft(initialState)((state, event) =>
-        event(state)
-      ).foreach((appState: AppState[N, C, S]) =>
-        println(s"Stations: ${appState.stationManager.stationMap.stations.length}")
-      )
-    }
+  private val outputPort    = mock[StationPorts.Output]
+  private val stationName   = "New Station"
+  private val x             = 1
+  private val y             = 1
+  private val numberOfTrack = 1
+  private val station       = Station(stationName, Coordinate(x, y), numberOfTrack)
 
   "StationEditorController" when:
     "onOkClick is invoked" should:
       "add a new station when inputs are valid and oldStation is None" in:
-        val inputPort  = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]]()
-        val controller = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
-        val station    = Station(stationName, Coordinate(x, y), numberOfTrack)
+        val stationManager = StationManager[N, C, S](outputPort)
+        val initialState   = AppState[N, C, S](stationManager)
+        val eventStream    = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+        val inputPort      = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream)
+        val controller     = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
+        val station        = Station(stationName, Coordinate(x, y), numberOfTrack)
 
-        Future {
-          LazyList.continually(eventStream.take()).scanLeft(initialState)((state, event) =>
-            event(state)
-          ).foreach((appState: AppState[N, C, S]) =>
-            println(s"Stations: ${appState.stationManager.stationMap.stations.length}")
-          )
-        }
-        Await.result(
+        val addStationResult =
           controller.onOkClick(
             stationName,
             x.toString,
             y.toString,
             numberOfTrack.toString,
             None
-          ),
-          Duration.Inf
-        ) shouldBe Right(StationMap(station))
+          )
 
-//
-//        controller.findStationAt(Coordinate(x, y)) shouldBe Some(station)
-//
-//      "replace the station when inputs are valid and oldStation is Some(station)" in:
-//        val inputPort =
-//          StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](StationManager(outputPort))
-//        val controller = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
-//        val oldStation = Station(stationName, Coordinate(x, y), numberOfTrack)
-//        val newStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
-//
-//        controller.onOkClick(
-//          stationName,
-//          x.toString,
-//          y.toString,
-//          numberOfTrack.toString,
-//          None
-//        ) shouldBe Right(StationMap(oldStation))
-//
-//        controller.findStationAt(Coordinate(x, y)) shouldBe Some(station)
-//
-//        controller.onOkClick(
-//          stationName,
-//          (x + 1).toString,
-//          (y + 1).toString,
-//          (numberOfTrack + 1).toString,
-//          Some(oldStation)
-//        ) shouldBe Right(StationMap(newStation))
-//
-//        controller.findStationAt(Coordinate(x, y)) shouldBe None
-//        controller.findStationAt(Coordinate(x + 1, y + 1)) shouldBe Some(newStation)
-//
-//      "returns error when input are not valid" in:
-//        val inputPort =
-//          StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](StationManager(outputPort))
-//        val controller = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
-//
-//        controller.onOkClick(
-//          stationName,
-//          "a",
-//          y.toString,
-//          numberOfTrack.toString,
-//          None
-//        ) shouldBe Left(StationEditorController.Error.InvalidRowFormat)
-//
-//        controller.onOkClick(
-//          stationName,
-//          x.toString,
-//          "a",
-//          numberOfTrack.toString,
-//          None
-//        ) shouldBe Left(StationEditorController.Error.InvalidColumnFormat)
-//
-//        controller.onOkClick(
-//          stationName,
-//          x.toString,
-//          y.toString,
-//          "a",
-//          None
-//        ) shouldBe Left(StationEditorController.Error.InvalidNumberOfTrackFormat)
+        val findStationResult = controller.findStationAt(Coordinate(x, y))
+
+        runAll(initialState, eventStream)
+        Await.result(addStationResult, Duration.Inf) shouldBe Right(StationMap(station))
+        Await.result(findStationResult, Duration.Inf) shouldBe Some(station)
+
+      "replace the station when inputs are valid and oldStation is Some(station)" in:
+        val stationManager = StationManager[N, C, S](outputPort)
+        val initialState   = AppState[N, C, S](stationManager)
+        val eventStream    = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+        val inputPort      = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream)
+        val controller     = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
+
+        val oldStation = Station(stationName, Coordinate(5, 5), numberOfTrack)
+        val newStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
+
+        val addOldStationResult =
+          controller.onOkClick(
+            stationName,
+            5.toString,
+            5.toString,
+            numberOfTrack.toString,
+            None
+          )
+
+        val findOldStationResult = controller.findStationAt(Coordinate(5, 5))
+
+        val addNewStationResult =
+          controller.onOkClick(
+            stationName,
+            (x + 1).toString,
+            (y + 1).toString,
+            (numberOfTrack + 1).toString,
+            Some(oldStation)
+          )
+
+        val findNewStationResult                   = controller.findStationAt(Coordinate(x + 1, y + 1))
+        val findOldStationAfterAddNewStationResult = controller.findStationAt(Coordinate(x, y))
+
+        runAll(initialState, eventStream)
+        Await.result(addOldStationResult, Duration.Inf) shouldBe Right(StationMap(oldStation))
+        Await.result(findOldStationResult, Duration.Inf) shouldBe Some(oldStation)
+        Await.result(addNewStationResult, Duration.Inf) shouldBe Right(StationMap(newStation))
+        Await.result(findNewStationResult, Duration.Inf) shouldBe Some(newStation)
+        Await.result(findOldStationAfterAddNewStationResult, Duration.Inf) shouldBe None
+
+      "returns error when input are not valid" in:
+        val stationManager = StationManager[N, C, S](outputPort)
+        val initialState   = AppState[N, C, S](stationManager)
+        val eventStream    = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+        val inputPort      = StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream)
+        val controller     = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
+
+        val addStationWithWrongRowResult =
+          controller.onOkClick(
+            stationName,
+            "a",
+            y.toString,
+            numberOfTrack.toString,
+            None
+          )
+
+        val addStationWithWrongColumnResult =
+          controller.onOkClick(
+            stationName,
+            x.toString,
+            "a",
+            numberOfTrack.toString,
+            None
+          )
+
+        val addStationWithWrongNumberOfTrackResult =
+          controller.onOkClick(
+            stationName,
+            x.toString,
+            y.toString,
+            "a",
+            None
+          )
+
+        runAll(initialState, eventStream)
+        Await.result(addStationWithWrongRowResult, Duration.Inf) shouldBe Left(
+          StationEditorController.Error.InvalidRowFormat
+        )
+        Await.result(addStationWithWrongColumnResult, Duration.Inf) shouldBe Left(
+          StationEditorController.Error.InvalidColumnFormat
+        )
+        Await.result(addStationWithWrongNumberOfTrackResult, Duration.Inf) shouldBe Left(
+          StationEditorController.Error.InvalidNumberOfTrackFormat
+        )
