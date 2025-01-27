@@ -1,13 +1,14 @@
 package ulisse.infrastructures.view
 
 import ulisse.entities.Coordinates
+import ulisse.entities.Coordinates.{Coordinate, UIPoint}
 import ulisse.entities.Route.Station
 
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import javax.imageio.ImageIO
 import scala.math.BigDecimal.double2bigDecimal
-import scala.math.{abs, atan2, sqrt}
+import scala.math.{abs, sqrt}
 import scala.swing.{Graphics2D, Image, Panel}
 
 trait MapPanel extends Panel:
@@ -40,8 +41,9 @@ object MapPanel:
         val half        = stationSize / 2
         val scale       = 0.05
 
-        val ss: (Double, Double)    = (p1._1.toDouble + (stationSize * scale), p1._2.toDouble + (stationSize * scale))
-        val es: (Double, Double)    = (p2._1.toDouble + (half * scale), p2._2.toDouble + (half * scale))
+        val ss: UIPoint =
+          Coordinate.uiPoint(p1._1.toDouble + (stationSize * scale), p1._2.toDouble + (stationSize * scale))
+        val es: UIPoint = Coordinate.uiPoint(p2._1.toDouble + (half * scale), p2._2.toDouble + (half * scale))
         val start: (Double, Double) = (p1._1 - half, p1._2 - half)
         val end: (Double, Double)   = (p2._1 - half, p2._2 - half)
 
@@ -50,28 +52,22 @@ object MapPanel:
         g.drawImage(stationImage, end._1.toInt, end._2.toInt, 30, 30, peer)
       )
 
-    private def drawTiledImage(
-        g: Graphics2D,
-        img: Image,
-        scale: Double,
-        start: (Double, Double),
-        end: (Double, Double)
-    ): Unit =
+    private def drawTiledImage(g: Graphics2D, img: Image, scale: Double, start: UIPoint, end: UIPoint): Unit =
       val scaleDim = (img.getWidth(peer) * scale, img.getHeight(peer) * scale)
-      val rotate   = calculateAngle(start._1, start._2, end._1, end._2)
+      val rotate   = start.angle(end)
       val diagonal = sqrt(scaleDim._1 * scaleDim._1 + scaleDim._2 * scaleDim._2)
 
       val positions: Seq[(Double, Double)] =
-        val dx       = end._1 - start._1
-        val dy       = end._2 - start._2
-        val distance = sqrt(dx * dx + dy * dy)
+        val dx       = end.x - start.x
+        val dy       = end.y - start.y
+        val distance = start.distance(end)
 
-        val correctedStep = diagonal - abs(diagonal - scaleDim._1) // Correzione per evitare sovrapposizioni
-        val stepX         = (dx / distance) * correctedStep        // Fattore di scala applicato alla larghezza
-        val stepY         = (dy / distance) * correctedStep        // Fattore di scala applicato alla larghezza
+        val correctedStep = diagonal - abs(diagonal - scaleDim._1)
+        val stepX         = (dx / distance) * correctedStep
+        val stepY         = (dy / distance) * correctedStep
 
-        val x = start._1 until end._1 by stepX
-        val y = start._2 until end._2 by stepY
+        val x = start.x until end.x by stepX
+        val y = start.y until end.y by stepY
         (x zip y).map((x, y) => (x.toDouble, y.toDouble))
 
       positions.foreach((x, y) =>
@@ -82,8 +78,3 @@ object MapPanel:
         transform.translate(-scaleDim._1 / 2, -scaleDim._2 / 2)
         g.drawImage(img, transform, peer)
       )
-
-    def calculateAngle(x1: Double, y1: Double, x2: Double, y2: Double): Double =
-      val dx = x2 - x1
-      val dy = y2 - y1
-      atan2(dy, dx)

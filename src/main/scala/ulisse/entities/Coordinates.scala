@@ -4,7 +4,7 @@ import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonNegative, validateRange}
 
 import scala.annotation.targetName
-import scala.math.{pow, sqrt}
+import scala.math.{atan2, pow, sqrt}
 
 object Coordinates:
   given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
@@ -62,6 +62,9 @@ object Coordinates:
           pow(numeric.toDouble(coordinate.y) - numeric.toDouble(y), 2)
       )
 
+    def angle(coordinate: Coordinate[T])(using numeric: Numeric[T]): Double =
+      atan2(numeric.toDouble(coordinate.y) - numeric.toDouble(y), numeric.toDouble(coordinate.x) - numeric.toDouble(x))
+
   /** A 2D geographic coordinate point.
     *
     * Represents a location defined by latitude and longitude values.
@@ -76,6 +79,7 @@ object Coordinates:
   final case class Geo private[Coordinates] (latitude: Double, longitude: Double)
       extends Coordinate[Double](latitude, longitude)
 
+  /** Factory for [Coordinate] instances. */
   /** A 2D grid coordinate point.
     *
     * Represents a grid location defined by row and column values.
@@ -107,6 +111,8 @@ object Coordinates:
     def apply[T: Numeric](x: T, y: T): Coordinate[T] = CoordinateImpl(x, y)
 
     def geo(latitude: Double, longitude: Double): Geo = Geo(latitude, longitude)
+
+    def uiPoint(x: Double, y: Double): UIPoint = UIPoint(x, y)
 
     /** Creates a `Geo` instance with validation.
       *
@@ -149,3 +155,6 @@ object Coordinates:
     /** Represents errors that can occur during [[Grid]] creation. */
     enum Error extends BaseError:
       case InvalidRow, InvalidColumn
+  object UI
+
+  final case class UIPoint private[Coordinates] (x: Double, y: Double) extends Coordinate(x, y)
