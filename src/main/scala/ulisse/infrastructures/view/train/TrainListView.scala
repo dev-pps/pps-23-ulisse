@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.train
 
 import ulisse.infrastructures.view.train.model.TrainViewModel
+
 import java.awt.Color
 import scala.swing.*
 
@@ -13,11 +14,15 @@ object TrainListView:
 
   def apply(trains: List[TrainViewModel.TrainData]): ListView[TrainViewModel.TrainData] =
     new ListView(trains) {
-      preferredSize = new Dimension(400, 100)
       import scala.swing.ListView.IntervalMode
       selection.intervalMode = IntervalMode.Single
       renderer = new ItemRenderer[TrainViewModel.TrainData]
     }
+
+  extension [T](listView: ListView[T])
+    def updateDataModel(data: List[T]): Unit =
+      listView.listData = data
+      listView.revalidate()
 
   private class ItemRenderer[T] extends ListView.Renderer[TrainViewModel.TrainData] {
     override def componentFor(
