@@ -26,8 +26,8 @@ class PackagesTest extends AnyFlatSpec:
         .orShould.haveSimpleNameEndingWith(orSecondEnding)
         .allowEmptyShould(true)
 
-  private val quadrupleEndingNameRulePossible: (String, String, String, String, String) => ArchRule =
-    (rootPackage, firstEnding, orSecondEnding, orThirdEnding, orFourthEnding) =>
+  private val tripleEndingNameRulePossible: (String, String, String, String) => ArchRule =
+    (rootPackage, firstEnding, orSecondEnding, orThirdEnding) =>
       ArchRuleDefinition
         .classes
         .that
@@ -35,7 +35,6 @@ class PackagesTest extends AnyFlatSpec:
         .should.haveSimpleNameEndingWith(firstEnding)
         .orShould.haveSimpleNameEndingWith(orSecondEnding)
         .orShould.haveSimpleNameEndingWith(orThirdEnding)
-        .orShould().haveSimpleNameEndingWith(orFourthEnding)
         .allowEmptyShould(true)
 
   "classes of useCases package" should "have Manager as the ending in the name" in:
@@ -47,16 +46,9 @@ class PackagesTest extends AnyFlatSpec:
 
   "classes of ports package" should "have Port as the ending in the name" in:
     val portEndingName       = "Ports"
-    val inputPortTrait       = "InputPort"
     val inputPortEndingName  = "Input"
     val outputPortEndingName = "Output"
-    val rule = quadrupleEndingNameRulePossible(
-      Packages.PORTS,
-      portEndingName,
-      inputPortTrait,
-      inputPortEndingName,
-      outputPortEndingName
-    )
+    val rule = tripleEndingNameRulePossible(Packages.PORTS, portEndingName, inputPortEndingName, outputPortEndingName)
 
     rule.check(IMPORT_ONLY_CLASSES_CREATED)
 
