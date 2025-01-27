@@ -33,6 +33,14 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
   private val station        = Station(stationName, Coordinate(x, y), numberOfTrack)
   private val stationManager = StationManager[N, C, S](outputPort)
   private val initialState   = AppState[N, C, S](stationManager)
+  private def runAll(): Unit =
+    Future {
+      LazyList.continually(eventStream.take()).scanLeft(initialState)((state, event) =>
+        event(state)
+      ).foreach((appState: AppState[N, C, S]) =>
+        println(s"Stations: ${appState.stationManager.stationMap.stations.length}")
+      )
+    }
 
   "StationEditorController" when:
     "onOkClick is invoked" should:
