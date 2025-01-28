@@ -1,14 +1,11 @@
 package ulisse.infrastructures.view.map
 
-import cats.effect.IO
-import cats.effect.kernel.Ref
-import cats.effect.unsafe.implicits.global
 import cats.syntax.either.*
 import ulisse.applications.ports.RoutePorts.UIPort
 import ulisse.applications.useCases.RouteManager
 import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
-import ulisse.infrastructures.view.MapPanel
+import ulisse.infrastructures.view.components.JComponents.JButton.JButton
 import ulisse.infrastructures.view.form.RouteForm
 
 import scala.concurrent.ExecutionContext
@@ -42,30 +39,29 @@ object MapView:
     // Main content pane with BorderLayout
     val contentPane  = new BorderPanel
     val glassPane    = new BorderPanel
-    val createButton = new Button("Form Route")
-    val northPanel   = new FlowPanel(createButton, info, error)
+    val createButton = JButton("Form Route")
+    val northPanel   = new FlowPanel(createButton.button, info, error)
 
     info.text = s"$countLabel 0"
     error.text = errorStr + "ddd"
 
     glassPane.opaque = false
     glassPane.visible = false
-    formPanel.setVisible(false)
+    formPanel.setVisible(true)
 
-    private val stateRef: Ref[IO, Either[ErrorSaving, UIPort]] =
-      Ref.of[IO, Either[ErrorSaving, UIPort]](uiPort.asRight).unsafeRunSync()
-
-    sealed trait Action[T]:
-      def create: T
-    case object RouteCreate extends Action[Option[Route]]:
-      override def create: Option[Route] = formPanel.create()
+    private val dialog = new Dialog(this) {
+      title = "Dialogo Mobile"
+      //          modal = true // Blocca interazione col MainFrame finché non chiuso
+      contents = formPanel.panel()
+//      preferredSize = new Dimension(300, 200)
+      centerOnScreen()
+    }
 
     // Create button action
-    listenTo(createButton)
+    listenTo(createButton.button)
     reactions += {
       case event.ButtonClicked(_) =>
-        glassPane.visible = true
-        formPanel.setVisible(true)
+        dialog.open()
     }
 
     // formPanel button action
@@ -87,8 +83,7 @@ object MapView:
 
     formPanel.exitButton().reactions += {
       case event.ButtonClicked(_) =>
-        formPanel.setVisible(false)
-        glassPane.visible = false
+        dialog.close()
     }
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
@@ -106,7 +101,6 @@ object MapView:
 
     contentPane.layout(northPanel) = North
     contentPane.layout(mapPark) = Center
-    glassPane.layout(formPanel.panel()) = West
 
     contents = contentPane
     peer.setGlassPane(glassPane.peer)

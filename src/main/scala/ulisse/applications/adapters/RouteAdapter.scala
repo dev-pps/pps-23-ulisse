@@ -4,7 +4,7 @@ import cats.syntax.either.*
 import ulisse.applications.ports.RoutePorts
 import ulisse.applications.useCases.RouteManager
 import ulisse.applications.useCases.RouteManager.ErrorSaving
-import ulisse.entities.{Coordinates, Route}
+import ulisse.entities.Route
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
