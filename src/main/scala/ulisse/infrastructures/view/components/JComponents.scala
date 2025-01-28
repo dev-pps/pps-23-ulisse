@@ -23,7 +23,7 @@ object JComponents:
 
     private case class JButtonImpl(text: String, styleService: StyleService) extends JButton:
       override def setColorPalette(colorPalette: ColorPalette): JButton =
-        copy(styleService = JStyle.change(styleService, colorPalette))
+        copy(styleService = styleService.change(colorPalette))
 
       val button: Button = new Button(text):
         @SuppressWarnings(Array("org.wartremover.warts.Var"))
