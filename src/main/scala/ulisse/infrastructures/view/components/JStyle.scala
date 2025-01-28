@@ -1,14 +1,23 @@
 package ulisse.infrastructures.view.components
 
+import scala.annotation.targetName
 import scala.swing.Color
+
+// type
+extension (a: Class[?])
+  @targetName("equals")
+  def ===(b: Class[?]): Boolean = a.getName contentEquals b.getName
 
 trait JStyle
 
 object JStyle:
-  def empty(): StyleService               = StyleService()
-  def apply(style: JStyle*): StyleService = StyleService(style: _*)
-  def change[T <: JStyle](styleService: StyleService, style: T): StyleService =
-    StyleService(styleService.all.filterNot(_.isInstanceOf[T]).appended(style): _*)
+  def empty(): StyleService                = StyleService()
+  def apply(styles: JStyle*): StyleService = StyleService(styles: _*)
+
+  extension (service: StyleService)
+    def change[T <: JStyle](styles: T*): StyleService =
+      val newStyle = service.all.filterNot(style => styles.exists(_.getClass === style.getClass)) ++ styles
+      StyleService(newStyle: _*)
 
   case class StyleService(style: JStyle*):
     val colorPalette: Option[ColorPalette] = style.collectFirst { case c: ColorPalette => c }
