@@ -1,6 +1,8 @@
 package applicationComponent
 
 import applicationComponent.ApplicationComponents.{Controller, DriverRequirement}
+import applicationComponent.ApplicationComponents3.Dependency.Application.userFactory
+import applicationComponent.ControllerModule.ControllerImpl
 
 object ApplicationComponents:
   trait ViewRequirement[C]:
@@ -83,169 +85,119 @@ object ApplicationComponents:
 
   BidirectionalComponent(StationEditorController.apply, InputAdapter2.apply, Manager2.apply, OutputAdapter2.apply)
 //
-//object ApplicationComponents2:
-//  // Base traits
-//  trait Input
-//  trait Output
-//  trait Manager
-//  trait Controller
-//
-//  // Basic requirements
-//  trait InputPortRequirement[M]:
-//    def manager: M
-//
-//  trait OutputPortRequirement[D]:
-//    def driven: D
-//
-//  trait DriverRequirement[IP]:
-//    def inputPort: IP
-//
-//  trait ManagerRequirement[OP]:
-//    def outputPort: OP
-//
-//  // View base trait
-//  trait View[D]:
-//    def driver: D
-//
-//  // Ports collections
-//  trait InputPorts[IP <: Input]
-//  trait OutputPorts[OP <: Output]
-//
-//  case class SingleInputPort[IP <: Input](port: IP)             extends InputPorts[IP]
-//  case class SingleOutputPort[OP <: Output](port: OP)           extends OutputPorts[OP]
-//  case class EmptyInputPorts[IP <: Input]()                     extends InputPorts[IP]
-//  case class EmptyOutputPorts[OP <: Output]()                   extends OutputPorts[OP]
-//  case class MultipleInputPorts[IP <: Input](ports: List[IP])   extends InputPorts[IP]
-//  case class MultipleOutputPorts[OP <: Output](ports: List[OP]) extends OutputPorts[OP]
-//
-//  // Component traits
-//  trait DriverComponent[IP <: Input, V <: View[_]]:
-//    def inputPorts: InputPorts[IP]
-//    def view: Option[V]
-//
-//  trait DrivenComponent[OP <: Output]:
-//    def outputPorts: OutputPorts[OP]
-//
-//  trait O1 extends Output
-//  trait O2 extends Output
-//
-//  trait BidirectionalComponent[IP <: Input, OP <: Output, V <: View[_]]
-//      extends DriverComponent[IP, V] with O1 with O2
-//
-//  // Specific implementations
-//  case class InputAdapter2(manager: Manager2)                extends Input
-//  case class OutputAdapter2(driven: StationEditorController) extends Output
-//  case class Manager2(outputPort: OutputAdapter2)            extends Manager
-//
-//  trait ComponentParams
-//  trait ViewComponentParams extends ComponentParams:
-//    def name: String
-//    def viewBuilder: Option[StationEditorController => StationEditorView]
-//
-//  case class StationEditorParams(
-//      viewBuilder: Option[StationEditorController => StationEditorView] = None
-//  ) extends ViewComponentParams
-//
-//  case class StationEditorView(driver: StationEditorController) extends View[StationEditorController]
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//  case class StationEditorController(
-//                                      inputPorts: InputPorts[InputAdapter2],
-//                                      outputPorts: OutputPorts[OutputAdapter2],
-//                                      params: StationEditorParams
-//                                    ) extends Controller, BidirectionalComponent[InputAdapter2, OutputAdapter2, StationEditorView, StationEditorParams]:
-//    lazy val view: Option[StationEditorView] = params.viewBuilder.map(_(this))
-//
-//  // Builder configuration
-//  sealed trait ComponentBuilderConfig[C, IP <: Input, M <: Manager, OP <: Output, V <: View[C], P <: ComponentParams]:
-//    def build(requirements: InputPortRequirement[M] & ManagerRequirement[OP] & OutputPortRequirement[C]): C
-//
-//  case class BidirectionalConfig[C, IP <: Input, M <: Manager, OP <: Output, V <: View[C], P <: ViewComponentParams](
-//                                      builder: (InputPorts[IP], OutputPorts[OP], P) => C) extends ComponentBuilderConfig[C, IP, M, OP, V, P]:
-//    def build(req: InputPortRequirement[M] & ManagerRequirement[OP] & OutputPortRequirement[C]): C =
-//      builder(req.inputPorts, req.outputPorts, req.asInstanceOf[ComponentBuilder[C, IP, M, OP, V, P]].params)
-//
-//  // Component builder
-//  case class ComponentBuilder[C, IP <: Input, M <: Manager, OP <: Output, V <: View[C], P <: ComponentParams](
-//                                                                                                               componentBuilder: ComponentBuilderConfig[C, IP, M, OP, V, P],
-//                                                                                                               inputPortsBuilder: Option[(InputPortRequirement[M]) => InputPorts[IP]],
-//                                                                                                               managerBuilder: Option[(ManagerRequirement[OP]) => M],
-//                                                                                                               outputPortBuilder: Option[(OutputPortRequirement[C]) => OutputPorts[OP]],
-//                                                                                                               params: P
-//                                                                                                             ) extends InputPortRequirement[M],
-//    ManagerRequirement[OP],
-//    OutputPortRequirement[C]:
-//
-//    lazy val component: C = componentBuilder.build(this)
-//    lazy val inputPorts: InputPorts[IP] = inputPortsBuilder.map(_(this)).getOrElse(EmptyInputPorts())
-//    lazy val manager: M = managerBuilder.map(_(this)).getOrElse(throw new IllegalStateException("No manager builder"))
-//    lazy val outputPort: OP = outputPortBuilder.map(_(this)).getOrElse(throw new IllegalStateException("No output port builder"))
-//    lazy val driven: C = component
-//
-//    def main(args: Array[String]): Unit =
-//      // With view
-//      val paramsWithView = StationEditorParams(
-//        name = "Station Editor",
-//        viewBuilder = Some(StationEditorView.apply)
-//      )
-//
-//      val componentWithView = ComponentBuilder(
-//        BidirectionalConfig[
-//          StationEditorController,
-//          InputAdapter2,
-//          Manager2,
-//          OutputAdapter2,
-//          StationEditorView,
-//          StationEditorParams
-//        ]((inputs, outputs, params) =>
-//          StationEditorController(inputs, outputs, params)
-//        ),
-//        Some(manager => SingleInputPort(InputAdapter2(manager))),
-//        Some(outputPort => Manager2(outputPort)),
-//        Some(driven => SingleOutputPort(OutputAdapter2(driven))),
-//        paramsWithView
-//      )
-//
-//      // Without view
-//      val paramsWithoutView = StationEditorParams(
-//        name = "Station Editor",
-//        viewBuilder = None
-//      )
-//
-//      val componentWithoutView = ComponentBuilder(
-//        BidirectionalConfig[
-//          StationEditorController,
-//          InputAdapter2,
-//          Manager2,
-//          OutputAdapter2,
-//          StationEditorView,
-//          StationEditorParams
-//        ]((inputs, outputs, params) =>
-//          StationEditorController(inputs, outputs, params)
-//        ),
-//        Some(manager => SingleInputPort(InputAdapter2(manager))),
-//        Some(outputPort => Manager2(outputPort)),
-//        Some(driven => SingleOutputPort(OutputAdapter2(driven))),
-//        paramsWithoutView
-//      )
+object ApplicationComponents2:
+  // Base traits
+  trait Input
+  trait Output
+  trait Controller
+  trait View:
+    def show(): Unit
+
+  // TestImpl
+  class ViewImpl(controller: Controller) extends View:
+    override def show(): Unit = println("ViewImpl.show")
+  class ControllerImpl(using view: View, input: Input) extends Controller with Output
+  class InputImpl(using queue: String, output: Output) extends Input
+
+  @main def main2(): Unit =
+    given controller: ControllerImpl()
+    given InputImpl()
+    given String = "queue"
+    given view: ViewImpl(controller)
+
+    println(view.show()) // broken
+
+object ApplicationComponents3:
+  // Base traits
+  trait Input
+  trait Output
+  trait Controller
+  trait View:
+    def show(): Unit
+
+  // TestImpl
+  class ViewImpl(controller: Controller) extends View:
+    override def show(): Unit = println("ViewImpl.show")
+  class ControllerImpl(using view: View, input: Input) extends Controller with Output
+  class InputImpl(using queue: String, output: Output) extends Input
+
+  object Dependency:
+
+    trait Logger:
+      def log(s: String): Unit
+
+    class LoggerImpl extends Logger:
+      def log(s: String): Unit = println(s)
+
+    trait LoggerDependency:
+      val logger: Logger
+
+    trait User:
+      def loggableOperation: Unit
+
+    trait UserComponent:
+      loggerDependency: LoggerDependency =>
+      class UserImpl extends User:
+        def loggableOperation: Unit = loggerDependency.logger.log(" hello !")
+
+    object Application extends LoggerDependency with UserComponent:
+      override val logger: Logger = new LoggerImpl
+      def userFactory(): User     = new UserImpl
+
+    @main def mainApp =
+      val user = userFactory()
+
+  @main def main3(): Unit =
+    given controller: ControllerImpl()
+    given InputImpl()
+    given String = "queue"
+    given view: ViewImpl(controller)
+
+    println(view.show())
+
+object ModelModule:
+  trait Model:
+    def m(): Int
+  trait Provider:
+    val model: Model
+  case class ModelImpl() extends Model:
+    def m() = 1
+  trait Component:
+    val model: Model = ModelImpl()
+  trait Interface extends Provider with Component
+
+object ViewModule:
+  trait View:
+    def show(i: Int): Unit
+  trait Provider:
+    val view: View
+  type Requirements = ControllerModule.Provider
+
+  trait Component:
+    context: Requirements =>
+    case class ViewImpl() extends View:
+      def show(i: Int): Unit = println(i)
+      def update(): Unit     = context.controller.notifyChange(" changhed ")
+
+  trait Interface extends Provider with Component:
+    self: Requirements =>
+
+object ControllerModule:
+  type Requirements = ViewModule.Provider with ModelModule.Provider
+  trait Controller:
+    val context: Requirements
+    def notifyChange(s: String): Unit
+  trait Provider:
+    val controller: Controller
+  case class ControllerImpl(context: Requirements) extends Controller:
+    def notifyChange(s: String): Unit =
+      context.view.show(context.model.m())
+
+object MVC extends ModelModule.Interface
+    with ViewModule.Interface
+    with ControllerModule.Provider:
+  override val controller: ControllerImpl = ControllerImpl(this)
+  override val view: ViewImpl             = ViewImpl()
+
+  @main def main(): Unit =
+    view.show(1)
