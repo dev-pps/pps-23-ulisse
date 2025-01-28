@@ -1,3 +1,20 @@
+## [1.2.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.1.1...v1.2.0) (2025-01-28)
+
+### Features
+
+* add runAll utility for test ([56f8237](https://github.com/dev-pps/pps-23-ulisse/commit/56f8237442a3d033e2dfd8bb2e36ae82344d0785))
+* setup eventStream with lazy scanLeft ([5c07cd2](https://github.com/dev-pps/pps-23-ulisse/commit/5c07cd2142b27ac5dc07553cec26d0717b471a7f))
+* **StationEditorController:** make class generic a provide default given for station creation ([490e7c9](https://github.com/dev-pps/pps-23-ulisse/commit/490e7c9d7af4917d6f80f5a7cd0f2ee760281390))
+* **StationEditorControllerTest:** restore test ([a85f666](https://github.com/dev-pps/pps-23-ulisse/commit/a85f666f6d7ba7a7bb8a52957181a60a1ab4bfed))
+* **StationEdito:** restore view ([8624594](https://github.com/dev-pps/pps-23-ulisse/commit/86245945917d988762095e3f08eb242bb5bda12c))
+* **StationMap:** implement unchecked StationMap and use as default constructor ([750b948](https://github.com/dev-pps/pps-23-ulisse/commit/750b94851f771ccb7cca8655f563b7cb1778a445))
+* **StationMapView:** update API usage ([68993a4](https://github.com/dev-pps/pps-23-ulisse/commit/68993a494d0f20216debdf8579eaad887a85c279))
+
+### Bug Fixes
+
+* infinite await in tests ([c2df14b](https://github.com/dev-pps/pps-23-ulisse/commit/c2df14b07a1dcd1cbe613219514a7a19bafa37fa))
+* show stationEditorView when start the app ([7c07ee9](https://github.com/dev-pps/pps-23-ulisse/commit/7c07ee92831a43c4b435ee70df5480cd61279686))
+
 ## [1.1.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.1.0...v1.1.1) (2025-01-20)
 
 ### Bug Fixes
