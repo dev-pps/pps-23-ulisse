@@ -1,4 +1,4 @@
-package ulisse.infrastructures.view
+package ulisse.infrastructures.view.map
 
 import ulisse.entities.Coordinates
 import ulisse.entities.Coordinates.{Coordinate, UIPoint}
@@ -25,6 +25,8 @@ object MapPanel:
 
     private val routeUrl   = getClass.getResource("/route.png")
     private val routeImage = ImageIO.read(routeUrl)
+
+    opaque = false
 
     override def setPoints(points: List[((String, Coordinates.Geo), (String, Coordinates.Geo))]): Unit =
       this.points = points.map((p1, p2) =>
