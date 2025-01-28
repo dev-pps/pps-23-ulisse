@@ -1,27 +1,34 @@
 package ulisse.infrastructures.view.components
 
-import ulisse.infrastructures.view.components.JStyle.ColorPalette
+import ulisse.infrastructures.view.components.JStyle.{Border, ColorPalette, StyleService}
 
 import java.awt.{BasicStroke, Color, RenderingHints}
 import scala.swing.{event, Button, Font, Graphics2D}
 
 object JComponents:
 
-  object JButton:
-    def apply(text: String): JButton = JButton(text)
+  trait JButton:
+    val button: Button
+    val styleService: StyleService
+    def setColorPalette(colorPalette: ColorPalette): JButton
 
-    case class JButton(text: String):
-      val colorPalette: ColorPalette =
-        ColorPalette(Color.decode("#FFA07A"), Color.decode("#FF4500"), Color.decode("#FF6347"))
+  object JButton:
+    def apply(text: String): JButton = JButtonImpl(
+      text,
+      StyleService(
+        ColorPalette(Color.decode("#FFA07A"), Color.decode("#FF4500"), Color.decode("#FF6347")),
+        Border(Color.decode("#FF4500"), 2, 20)
+      )
+    )
+
+    private case class JButtonImpl(text: String, styleService: StyleService) extends JButton:
+      override def setColorPalette(colorPalette: ColorPalette): JButton =
+        copy(styleService = JStyle.change(styleService, colorPalette))
 
       val button: Button = new Button(text):
         @SuppressWarnings(Array("org.wartremover.warts.Var"))
-        private var currentBackground = colorPalette.background
-
-        private val strokeWidth = 2
-        private val sizeArc     = 20
-        private val borderColor = Color.decode("#FF4500")
-
+        private var currentBackground =
+          styleService.colorPalette.getOrElse(ColorPalette(Color.WHITE, Color.WHITE, Color.WHITE)).background
         focusPainted = false
         contentAreaFilled = false
         opaque = false
@@ -29,20 +36,29 @@ object JComponents:
         font = Font("Arial", Font.Bold, 14)
 
         listenTo(mouse.moves, mouse.clicks)
-        reactions += {
-          case event.MouseExited(_, _, _)         => currentBackground = colorPalette.background; repaint()
-          case event.MouseReleased(_, _, _, _, _) => currentBackground = colorPalette.background; repaint()
-          case event.MousePressed(_, _, _, _, _)  => currentBackground = colorPalette.click; repaint()
-          case event.MouseEntered(_, _, _)        => currentBackground = colorPalette.hover; repaint()
-        }
+
+        styleService.colorPalette.map(palette =>
+          reactions += {
+            case event.MouseExited(_, _, _)         => currentBackground = palette.background; repaint()
+            case event.MouseReleased(_, _, _, _, _) => currentBackground = palette.background; repaint()
+            case event.MousePressed(_, _, _, _, _)  => currentBackground = palette.click; repaint()
+            case event.MouseEntered(_, _, _)        => currentBackground = palette.hover; repaint()
+          }
+        )
 
         override protected def paintComponent(g: Graphics2D): Unit =
           g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-          g.setStroke(BasicStroke(strokeWidth))
-          g.setColor(currentBackground)
-          g.fillRoundRect(0, 0, size.width, size.height, sizeArc, sizeArc)
-          g.setColor(borderColor)
-          val strokeSpace       = strokeWidth / 2
-          val sizeWithoutStroke = (size.width - strokeWidth, size.height - strokeWidth)
-          g.drawRoundRect(strokeSpace, strokeSpace, sizeWithoutStroke._1, sizeWithoutStroke._2, sizeArc, sizeArc)
+          for {
+            colorPalette <- styleService.colorPalette
+            border       <- styleService.border
+          } yield {
+            g.setStroke(BasicStroke(border.width))
+            g.setColor(currentBackground)
+            g.fillRoundRect(0, 0, size.width, size.height, border.arc, border.arc)
+            g.setColor(border.color)
+            val borderPosition = border.width / 2
+            val borderSize     = (size.width - border.width, size.height - border.width)
+            g.drawRoundRect(borderPosition, borderPosition, borderSize._1, borderSize._2, border.arc, border.arc)
+          }
+
           super.paintComponent(g)

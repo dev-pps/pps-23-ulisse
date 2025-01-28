@@ -2,9 +2,20 @@ package ulisse.infrastructures.view.components
 
 import scala.swing.Color
 
-object JStyle:
+trait JStyle
 
-  trait ColorPalette:
+object JStyle:
+  def empty(): StyleService               = StyleService()
+  def apply(style: JStyle*): StyleService = StyleService(style: _*)
+  def change[T <: JStyle](styleService: StyleService, style: T): StyleService =
+    StyleService(styleService.all.filterNot(_.isInstanceOf[T]).appended(style): _*)
+
+  case class StyleService(style: JStyle*):
+    val colorPalette: Option[ColorPalette] = style.collectFirst { case c: ColorPalette => c }
+    val border: Option[Border]             = style.collectFirst { case b: Border => b }
+    val all: Seq[JStyle]                   = colorPalette.toList ++ border.toList
+
+  trait ColorPalette extends JStyle:
     val background: Color
     val click: Color
     val hover: Color
@@ -26,7 +37,7 @@ object JStyle:
       def setClick(newClick: Color): ColorPaletteImpl           = copy(click = newClick)
       def setHover(newHover: Color): ColorPaletteImpl           = copy(hover = newHover)
 
-  trait Border:
+  trait Border extends JStyle:
     val color: Color
     val width: Int
     val arc: Int

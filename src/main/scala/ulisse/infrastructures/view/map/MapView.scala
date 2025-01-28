@@ -5,7 +5,8 @@ import ulisse.applications.ports.RoutePorts.UIPort
 import ulisse.applications.useCases.RouteManager
 import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
-import ulisse.infrastructures.view.components.JComponents.JButton.JButton
+import ulisse.infrastructures.view.components.JComponents.JButton
+import ulisse.infrastructures.view.components.JComponents.JButton.JButtonImpl
 import ulisse.infrastructures.view.form.RouteForm
 
 import scala.concurrent.ExecutionContext
