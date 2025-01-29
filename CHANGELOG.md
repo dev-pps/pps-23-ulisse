@@ -1,3 +1,15 @@
+## [1.3.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.2.0...v1.3.0) (2025-01-29)
+
+### Features
+
+* added train editor demo launcher ([0950640](https://github.com/dev-pps/pps-23-ulisse/commit/09506405986887154018b0a006a995319c352d37))
+* new TechnologyManager class and tests ([1db6ec9](https://github.com/dev-pps/pps-23-ulisse/commit/1db6ec9c652ed43088b68a0ea79749caf56aebfc))
+
+### Bug Fixes
+
+* add technology method fixed ([2de653d](https://github.com/dev-pps/pps-23-ulisse/commit/2de653d4294ba9658147520e7b4213364a8e3fa2))
+* added check on negative wagon capacity and train length, renamed wagonCount into length ([6683717](https://github.com/dev-pps/pps-23-ulisse/commit/6683717856f430d1ef8a185007a12d631c19825f))
+
 ## [1.2.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.1.1...v1.2.0) (2025-01-28)
 
 ### Features
