@@ -1,12 +1,8 @@
 package ulisse.infrastructures.view.components
 
-import scala.annotation.targetName
-import scala.swing.Color
+import ulisse.utils.TypeCheckers._
 
-// type
-extension (a: Class[?])
-  @targetName("equals")
-  def ===(b: Class[?]): Boolean = a.getName contentEquals b.getName
+import scala.swing.Color
 
 trait JStyle
 
@@ -16,7 +12,7 @@ object JStyle:
 
   extension (service: StyleService)
     def change[T <: JStyle](styles: T*): StyleService =
-      val newStyle = service.all.filterNot(style => styles.exists(_.getClass === style.getClass)) ++ styles
+      val newStyle = service.all.filterNot(style => styles.exists(_ identicalClass style)) ++ styles
       StyleService(newStyle: _*)
 
   case class StyleService(style: JStyle*):
