@@ -1,16 +1,16 @@
-package ulisse.infrastructure.view.components
+package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyle.Border
+import ulisse.infrastructures.view.components.JStyle
 
 import java.awt.Color
 
-class BorderStyleTest extends AnyFlatSpec with Matchers:
+class BorderStyle extends AnyFlatSpec with Matchers:
   val color  = Color.BLACK
   val width  = 2
   val arc    = 20
-  val border = Border(color, width, arc)
+  val border = JStyle.border(color, width, arc)
 
   "BorderStyle" should "have color, width and arc" in:
     border.color must be(color)

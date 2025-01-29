@@ -1,63 +1,44 @@
 package ulisse.infrastructures.view.components
 
-import ulisse.utils.TypeCheckers._
+import ulisse.utils.TypeCheckers.identicalClassIs
 
-import scala.swing.Color
+import java.awt.Color
 
 trait JStyle
 
 object JStyle:
-  def empty(): StyleService                = StyleService()
-  def apply(styles: JStyle*): StyleService = StyleService(styles: _*)
+  def palette(background: Color, click: Color, hover: Color): ColorPalette = ColorPalette(background, click, hover)
+  def border(color: Color, width: Int, arc: Int): Border                   = Border(color, width, arc)
 
-  extension (service: StyleService)
-    def change[T <: JStyle](styles: T*): StyleService =
+  def empty(): JStyleService                = JStyleService()
+  def apply(styles: JStyle*): JStyleService = JStyleService(styles: _*)
+
+  extension (service: JStyleService)
+    def change[T <: JStyle](styles: T*): JStyleService =
       val newStyle = service.all.filterNot(style => styles.exists(_ identicalClassIs style)) ++ styles
-      StyleService(newStyle: _*)
+      JStyleService(newStyle: _*)
 
-  case class StyleService(style: JStyle*):
-    val colorPalette: Option[ColorPalette] = style.collectFirst { case c: ColorPalette => c }
-    val border: Option[Border]             = style.collectFirst { case b: Border => b }
-    val all: Seq[JStyle]                   = colorPalette.toList ++ border.toList
+  val defaultPalette: ColorPalette = palette(Color.WHITE, Color.WHITE, Color.WHITE)
+  val orangePalette: ColorPalette  = palette(Color.decode("#FFA07A"), Color.decode("#FF4500"), Color.decode("#FF6347"))
 
-  trait ColorPalette extends JStyle:
-    val background: Color
-    val click: Color
-    val hover: Color
-    def setAll(newBackground: Color, newClick: Color, newHover: Color): ColorPalette
-    def setBackground(newBackground: Color): ColorPalette
-    def setClick(newClick: Color): ColorPalette
-    def setHover(newHover: Color): ColorPalette
+  val defaultBorder: Border = border(Color.BLACK, 1, 10)
+  val orangeBorder: Border  = border(Color.decode("#FF4500"), 2, 20)
 
-  object ColorPalette:
+  case class JStyleService(style: JStyle*):
+    val colorPalette: ColorPalette = style.collectFirst { case c: ColorPalette => c }.getOrElse(defaultPalette)
+    val border: Border             = style.collectFirst { case b: Border => b }.getOrElse(defaultBorder)
+    val all: Seq[JStyle]           = Seq(colorPalette, border)
 
-    def apply(background: Color, click: Color, hover: Color): ColorPalette =
-      ColorPaletteImpl(background, click, hover)
+  case class ColorPalette(background: Color, click: Color, hover: Color) extends JStyle:
+    def setAll(newBackground: Color, newClick: Color, newHover: Color): ColorPalette =
+      copy(background = newBackground, click = newClick, hover = newHover)
+    def setBackground(newBackground: Color): ColorPalette = copy(background = newBackground)
+    def setClick(newClick: Color): ColorPalette           = copy(click = newClick)
+    def setHover(newHover: Color): ColorPalette           = copy(hover = newHover)
 
-    private case class ColorPaletteImpl(background: Color, click: Color, hover: Color) extends ColorPalette:
-      def setAll(newBackground: Color, newClick: Color, newHover: Color): ColorPaletteImpl =
-        copy(background = newBackground, click = newClick, hover = newHover)
-
-      def setBackground(newBackground: Color): ColorPaletteImpl = copy(background = newBackground)
-      def setClick(newClick: Color): ColorPaletteImpl           = copy(click = newClick)
-      def setHover(newHover: Color): ColorPaletteImpl           = copy(hover = newHover)
-
-  trait Border extends JStyle:
-    val color: Color
-    val width: Int
-    val arc: Int
-    def setAll(newColor: Color, newWidth: Int, newArc: Int): Border
-    def setColor(newColor: Color): Border
-    def setWidth(newWidth: Int): Border
-    def setArc(newArc: Int): Border
-
-  object Border:
-    def apply(color: Color, width: Int, arc: Int): Border = BorderImpl(color, width, arc)
-
-    private case class BorderImpl(color: Color, width: Int, arc: Int) extends Border:
-      def setAll(newColor: Color, newWidth: Int, newArc: Int): BorderImpl =
-        copy(color = newColor, width = newWidth, arc = newArc)
-
-      def setColor(newColor: Color): BorderImpl = copy(color = newColor)
-      def setWidth(newWidth: Int): BorderImpl   = copy(width = newWidth)
-      def setArc(newArc: Int): BorderImpl       = copy(arc = newArc)
+  case class Border(color: Color, width: Int, arc: Int) extends JStyle:
+    def setAll(newColor: Color, newWidth: Int, newArc: Int): Border =
+      copy(color = newColor, width = newWidth, arc = newArc)
+    def setColor(newColor: Color): Border = copy(color = newColor)
+    def setWidth(newWidth: Int): Border   = copy(width = newWidth)
+    def setArc(newArc: Int): Border       = copy(arc = newArc)
