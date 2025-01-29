@@ -5,8 +5,8 @@ import ulisse.applications.ports.RoutePorts.UIPort
 import ulisse.applications.useCases.RouteManager
 import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
-import ulisse.infrastructures.view.components.JComponents.JButton
-import ulisse.infrastructures.view.components.JComponents.JButton.JButtonImpl
+import ulisse.infrastructures.view.components.JStyle.JStyleService
+import ulisse.infrastructures.view.components.{JComponent, JStyle}
 import ulisse.infrastructures.view.form.RouteForm
 
 import scala.concurrent.ExecutionContext
@@ -25,6 +25,8 @@ object MapView:
   def apply(uiPort: UIPort): MapView = MapViewImpl(uiPort)
 
   private case class MapViewImpl(uiPort: UIPort) extends MainFrame, MapView:
+    given style: JStyleService = JStyle(JStyle.orangePalette)
+
     title = "Map"
     visible = true
     preferredSize = new Dimension(800, 800)
@@ -38,10 +40,11 @@ object MapView:
     val formPanel: RouteForm = RouteForm()
 
     // Main content pane with BorderLayout
-    val contentPane  = new BorderPanel
-    val glassPane    = new BorderPanel
-    val createButton = JButton("Form Route")
-    val northPanel   = new FlowPanel(createButton.button, info, error)
+    val contentPane = new BorderPanel
+    val glassPane   = new BorderPanel
+
+    val createButton = JComponent.button("Form Route")
+    val northPanel   = new FlowPanel(createButton, info, error)
 
     info.text = s"$countLabel 0"
     error.text = errorStr + "ddd"
@@ -50,16 +53,13 @@ object MapView:
     glassPane.visible = false
     formPanel.setVisible(true)
 
-    private val dialog = new Dialog(this) {
+    private val dialog = new Dialog(this):
       title = "Dialogo Mobile"
-      //          modal = true // Blocca interazione col MainFrame finché non chiuso
       contents = formPanel.panel()
-//      preferredSize = new Dimension(300, 200)
       centerOnScreen()
-    }
 
     // Create button action
-    listenTo(createButton.button)
+    listenTo(createButton)
     reactions += {
       case event.ButtonClicked(_) =>
         dialog.open()

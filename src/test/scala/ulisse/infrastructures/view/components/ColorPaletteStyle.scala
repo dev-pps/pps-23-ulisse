@@ -1,13 +1,13 @@
-package ulisse.infrastructure.view.components
+package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyle.ColorPalette
+import ulisse.infrastructures.view.components.JStyle
 
 import java.awt.Color
 
-class ColorPaletteStyleTest extends AnyFlatSpec with Matchers:
-  val paletteColor = ColorPalette(Color.BLACK, Color.RED, Color.BLUE)
+class ColorPaletteStyle extends AnyFlatSpec with Matchers:
+  val paletteColor = JStyle.palette(Color.BLACK, Color.RED, Color.BLUE)
 
   "palette color" should "have background, click and hover color" in:
     paletteColor.background must be(Color.BLACK)
