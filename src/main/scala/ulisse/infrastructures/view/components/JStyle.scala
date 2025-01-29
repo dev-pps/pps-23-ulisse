@@ -12,7 +12,7 @@ object JStyle:
 
   extension (service: StyleService)
     def change[T <: JStyle](styles: T*): StyleService =
-      val newStyle = service.all.filterNot(style => styles.exists(_ isIdenticalClass style)) ++ styles
+      val newStyle = service.all.filterNot(style => styles.exists(_ identicalClassIs style)) ++ styles
       StyleService(newStyle: _*)
 
   case class StyleService(style: JStyle*):
