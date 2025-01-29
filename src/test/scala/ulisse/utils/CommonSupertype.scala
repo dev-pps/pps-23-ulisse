@@ -29,8 +29,3 @@ class CommonSupertype extends AnyFlatSpec with Matchers:
     val a1: A = new A {}
     val a2: A = new A {}
     a1 hasCommonSupertype a2 must be(true)
-
-//  "check A multiple common trait B" should "be false" in:
-//    val a: A = new A {}
-//    val b: B = new B {}
-//    a hasMultipleCommonSupertypes b must be(false)
