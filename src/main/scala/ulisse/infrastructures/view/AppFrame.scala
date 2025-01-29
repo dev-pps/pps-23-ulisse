@@ -2,21 +2,24 @@ package ulisse.infrastructures.view
 
 import scala.swing.*
 
-final case class AppFrame() extends MainFrame:
+trait Updatable:
+  this: MainFrame | LayoutContainer =>
+  def update(component: Component): Unit
+
+trait BaseView:
+  val updatable: Updatable
+
+final case class StationEditorView(updatable: Updatable) extends BorderPanel with BaseView with Updatable:
+  def update(component: Component): Unit =
+    layout(component) = BorderPanel.Position.Center
+    repaint()
+
+final case class AppFrame() extends MainFrame with Updatable:
+  def update(component: Component): Unit =
+    contents = component
+    repaint()
   title = "Station Editor"
   minimumSize = new Dimension(400, 300)
   preferredSize = new Dimension(800, 600)
   pack()
   centerOnScreen()
-////  private val model: Manger = Manger()
-////  private lazy val stationEditorController: StationEditorController =
-////    StationEditorController(stationEditorView, model)
-////  private val stationEditorView: StationEditorView =
-////    StationEditorView(stationEditorController)
-////  title = "Station Editor"
-////  minimumSize = new Dimension(400, 300)
-////  preferredSize = new Dimension(800, 600)
-////  contents = stationEditorView
-////  pack()
-////  centerOnScreen()
-//
