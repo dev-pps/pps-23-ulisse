@@ -16,8 +16,8 @@ class JButtonTest extends AnyFlatSpec with Matchers:
 
   "change color palette" should "have new color palette" in:
     val newPalette = JStyle.ColorPalette(Color.BLACK, Color.RED, Color.GREEN)
-    button.setColorPalette(newPalette)
+    val newButton  = button.setColorPalette(newPalette)
 
-    button.styleService.colorPalette match
+    newButton.styleService.colorPalette match
       case Some(palette) => palette must be(newPalette)
       case None          => fail("Palette not found")

@@ -15,22 +15,22 @@ class IdenticalClass extends AnyFlatSpec with Matchers:
   case class CC() extends C
   case class DD() extends D
 
-  "check A identical type B" should "be false" in:
+  "check A identical class B" should "be false" in:
     val a: A = AA()
     val b: B = BB()
-    a identicalClass b must be(false)
+    a isIdenticalClass b must be(false)
 
-  "check A identical type C" should "be false" in:
+  "check A identical class C" should "be false" in:
     val a: A = AA()
-    val c: B = BB()
-    a identicalClass c must be(false)
+    val c: C = CC()
+    a isIdenticalClass c must be(false)
 
-  "check A identical type D" should "be false" in:
+  "check A identical class D" should "be false" in:
     val a: A = AA()
-    val d: B = BB()
-    a identicalClass d must be(false)
+    val d: D = DD()
+    a isIdenticalClass d must be(false)
 
-  "check A identical type A" should "be true" in:
+  "check A identical class A" should "be true" in:
     val a1: A = AA()
     val a2: A = AA()
-    a1 identicalClass a2 must be(true)
+    a1 isIdenticalClass a2 must be(true)
