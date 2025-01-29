@@ -1,15 +1,26 @@
 package applicationComponent
 
-import applicationComponent.ApplicationComponents.{Controller, DriverRequirement}
-import applicationComponent.ApplicationComponents3.Dependency.Application.userFactory
-import applicationComponent.ApplicationComponents4.Application.StationPort
-import applicationComponent.ApplicationComponents4.Application.UseCases.StationManagerImpl
-import applicationComponent.ControllerModule.ControllerImpl
+import applicationComponent.ApplicationComponent4.ControllerModule.ControllerImpl
+import applicationComponent.ApplicationComponents3.Application.userFactory
 
+//first experiment trying to implement generic component builder
 object ApplicationComponents:
+
+  trait Input
+  trait Output
+  trait Manager
+  trait Controller
+
+  trait InputPortRequirement[M]:
+    def manager: M
+  trait OutputPortRequirement[D]:
+    def driven: D
+  trait DriverRequirement[IP]:
+    def inputPort: IP
+  trait ManagerRequirement[OP]:
+    def outputPort: OP
   trait ViewRequirement[C]:
     def controller: C
-
   trait ControllerRequirement[V]:
     def view: V
 
@@ -51,23 +62,6 @@ object ApplicationComponents:
     lazy val outputPort: OutputPort = outputPortBuilder(this)
     val driven: Driven              = drivenBuilder()
 
-  trait InputPortRequirement[M]:
-    def manager: M
-
-  trait OutputPortRequirement[D]:
-    def driven: D
-
-  trait DriverRequirement[IP]:
-    def inputPort: IP
-
-  trait ManagerRequirement[OP]:
-    def outputPort: OP
-
-  trait Input
-  trait Output
-  trait Manager
-  trait Controller
-
   case class StationEditorController(inputPort: DriverRequirement[InputAdapter2])   extends Controller
   case class InputAdapter2(manager: InputPortRequirement[Manager2])                 extends Input
   case class Manager2(outputPort: ManagerRequirement[OutputAdapter2])               extends Manager
@@ -86,16 +80,16 @@ object ApplicationComponents:
     lazy val outputPort: OutputAdapter2 = outputPortBuilder(this)
 
   BidirectionalComponent(StationEditorController.apply, InputAdapter2.apply, Manager2.apply, OutputAdapter2.apply)
-//
+
+//it would have been great if it worked but unfortunately nothing is lazy so it loops
 object ApplicationComponents2:
-  // Base traits
+
   trait Input
   trait Output
   trait Controller
   trait View:
     def show(): Unit
 
-  // TestImpl
   class ViewImpl(controller: Controller) extends View:
     override def show(): Unit = println("ViewImpl.show")
   class ControllerImpl(using view: View, input: Input) extends Controller with Output
@@ -106,164 +100,84 @@ object ApplicationComponents2:
     given InputImpl()
     given String = "queue"
     given view: ViewImpl(controller)
-
     println(view.show()) // broken
 
+//first example of cake pattern and self types
 object ApplicationComponents3:
-  // Base traits
-  trait Input
-  trait Output
-  trait Controller
-  trait View:
-    def show(): Unit
+  trait Logger:
+    def log(s: String): Unit
 
-  // TestImpl
-  class ViewImpl(controller: Controller) extends View:
-    override def show(): Unit = println("ViewImpl.show")
-  class ControllerImpl(using view: View, input: Input) extends Controller with Output
-  class InputImpl(using queue: String, output: Output) extends Input
+  class LoggerImpl extends Logger:
+    def log(s: String): Unit = println(s)
 
-  object Dependency:
+  trait LoggerDependency:
+    val logger: Logger
 
-    trait Logger:
-      def log(s: String): Unit
+  trait User:
+    def loggableOperation: Unit
 
-    class LoggerImpl extends Logger:
-      def log(s: String): Unit = println(s)
+  trait UserComponent:
+    loggerDependency: LoggerDependency =>
+    class UserImpl extends User:
+      def loggableOperation: Unit = loggerDependency.logger.log(" hello !")
 
-    trait LoggerDependency:
-      val logger: Logger
+  object Application extends LoggerDependency with UserComponent:
+    override val logger: Logger = new LoggerImpl
+    def userFactory(): User     = new UserImpl
 
-    trait User:
-      def loggableOperation: Unit
+  @main def main3 =
+    val user = userFactory()
 
-    trait UserComponent:
-      loggerDependency: LoggerDependency =>
-      class UserImpl extends User:
-        def loggableOperation: Unit = loggerDependency.logger.log(" hello !")
+//complete example of cake pattern and self types
+object ApplicationComponent4:
+  object ModelModule:
+    trait Model:
+      def m(): Int
+    trait Provider:
+      val model: Model
+    case class ModelImpl() extends Model:
+      def m() = 1
+    trait Component:
+      val model: Model = ModelImpl()
+    trait Interface extends Provider with Component
 
-    object Application extends LoggerDependency with UserComponent:
-      override val logger: Logger = new LoggerImpl
-      def userFactory(): User     = new UserImpl
+  object ViewModule:
+    trait View:
+      def show(i: Int): Unit
+    trait Provider:
+      val view: View
+    type Requirements = ControllerModule.Provider
 
-    @main def mainApp =
-      val user = userFactory()
+    trait Component:
+      context: Requirements =>
+      case class ViewImpl() extends View:
+        def show(i: Int): Unit = println(i)
+        def update(): Unit     = context.controller.notifyChange(" changhed ")
 
-  @main def main3(): Unit =
-    given controller: ControllerImpl()
-    given InputImpl()
-    given String = "queue"
-    given view: ViewImpl(controller)
+    trait Interface extends Provider with Component:
+      self: Requirements =>
 
-    println(view.show())
+  object ControllerModule:
+    type Requirements = ViewModule.Provider with ModelModule.Provider
+    trait Controller:
+      val context: Requirements
+      def notifyChange(s: String): Unit
+    trait Provider:
+      val controller: Controller
+    case class ControllerImpl(context: Requirements) extends Controller:
+      def notifyChange(s: String): Unit =
+        context.view.show(context.model.m())
 
-object ModelModule:
-  trait Model:
-    def m(): Int
-  trait Provider:
-    val model: Model
-  case class ModelImpl() extends Model:
-    def m() = 1
-  trait Component:
-    val model: Model = ModelImpl()
-  trait Interface extends Provider with Component
+  object MVC extends ModelModule.Interface
+      with ViewModule.Interface
+      with ControllerModule.Provider:
+    override val controller: ControllerImpl = ControllerImpl(this)
+    override val view: ViewImpl             = ViewImpl()
 
-object ViewModule:
-  trait View:
-    def show(i: Int): Unit
-  trait Provider:
-    val view: View
-  type Requirements = ControllerModule.Provider
+    @main def main4(): Unit =
+      view.show(1)
 
-  trait Component:
-    context: Requirements =>
-    case class ViewImpl() extends View:
-      def show(i: Int): Unit = println(i)
-      def update(): Unit     = context.controller.notifyChange(" changhed ")
-
-  trait Interface extends Provider with Component:
-    self: Requirements =>
-
-object ControllerModule:
-  type Requirements = ViewModule.Provider with ModelModule.Provider
-  trait Controller:
-    val context: Requirements
-    def notifyChange(s: String): Unit
-  trait Provider:
-    val controller: Controller
-  case class ControllerImpl(context: Requirements) extends Controller:
-    def notifyChange(s: String): Unit =
-      context.view.show(context.model.m())
-
-object MVC extends ModelModule.Interface
-    with ViewModule.Interface
-    with ControllerModule.Provider:
-  override val controller: ControllerImpl = ControllerImpl(this)
-  override val view: ViewImpl             = ViewImpl()
-
-  @main def main(): Unit =
-    view.show(1)
-
-object ApplicationComponents4:
-
-  object Application:
-    object StationPort:
-      trait InputProvider:
-        val inputPort: Input
-
-      trait Input:
-        def metodoInput(): Unit
-
-      trait OutputProvider:
-        val outputPort: Output
-
-      trait Output:
-        def metodoOutput(): Unit
-
-    object UseCases:
-      trait StationManagerProvider:
-        val stationManager: StationManager
-
-      trait StationManager extends StationPort.Input:
-        val outputPort: StationPort.Output
-        def metodoManager(): Unit
-
-      final case class StationManagerImpl(outputPort: StationPort.Output) extends StationManager:
-        def metodoInput(): Unit   = println("StationManagerImpl.metodoInput")
-        def metodoManager(): Unit = println("StationManagerImpl.metodoManager")
-
-  object Swing:
-    object StationEditor:
-      trait ViewProvider:
-        val view: StationEditorView
-
-      trait StationEditorView:
-        val controller: StationEditorController
-        def metodoView(): Unit
-
-      final case class StationEditorViewImpl(controller: StationEditorController) extends StationEditorView:
-        def metodoView(): Unit = println("StationEditorViewImpl.metodoView")
-
-      trait ControllerProvider:
-        val controller: StationEditorController
-
-      trait StationEditorController extends Application.StationPort.Output:
-        val inputPort: Application.StationPort.Input
-        val view: StationEditorView
-        def metodoController(): Unit
-
-        final case class StationEditorControllerImpl(inputPort: Application.StationPort.Input, view: StationEditorView)
-            extends StationEditorController:
-          def metodoOutput(): Unit     = println("StationEditorControllerImpl.metodoOutput")
-          def metodoController(): Unit = println("StationEditorControllerImpl.metodoController")
-
-//    final case class StationEditorComponent() extends Application.StationPort.InputProvider with Swing.StationEditor.ViewProvider with Swing.StationEditor.ControllerProvider:
-//      override val inputPort: StationManager = StationManagerImpl()
-//      override val controller: StationEditorController = StationEditorControllerImpl(inputPort, view)
-//      override val view: StationEditorView = StationEditorViewImpl(controller)
-//  @main def main4(): Unit =
-//    println(Component().view.show())
-
+//complete example of cake pattern with constructor DI
 object ApplicationComponents5:
   trait Model[S <: Model.State]:
     def state: S
@@ -360,3 +274,12 @@ object ApplicationComponents5:
     override lazy val controller: C = controllerFactory(this)
 
   val page = ApplicationPage(Model(ApplicationState()), HomeViewImpl.apply, HomeController.apply)
+
+//CONCLUSION: maybe we can group together the components that will satisfy
+//some common View.Provider but since our components are in general very
+//different with each other in term of single component requirements
+//is not possible to make a simple component wrapper like ApplicationPage
+//later if some common pattern is discover there are rooms to rethink a possible factorization
+//e.g. mixing using params for independent components like queue
+//(so linear dependencies can be satisfied directly)
+//and use bidirectional builder for circular dependencies
