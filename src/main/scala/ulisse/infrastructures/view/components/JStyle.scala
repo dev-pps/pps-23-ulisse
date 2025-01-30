@@ -18,15 +18,15 @@ object JStyle:
   def rect(): Rect              = new Rect(defaultArcShape)
   def roundRect(arc: Int): Rect = new Rect(arc)
 
-  def backgroundPalette(background: Color): Palette          = new Palette(background)
-  def clickPalette(background: Color, click: Color): Palette = Palette(background, Some(click), Option.empty)
   def hoverPalette(background: Color, click: Color, hover: Color): Palette =
     Palette(background, Some(click), Some(hover))
-  def palette(): Palette = backgroundPalette(defaultBackgroundColor)
+  def clickPalette(background: Color, click: Color): Palette = Palette(background, Some(click), Option.empty)
+  def backgroundPalette(background: Color): Palette          = new Palette(background)
+  def palette(): Palette                                     = backgroundPalette(defaultBackgroundColor)
 
-  def border(): Border                                  = Border(defaultBorderColor, defaultStroke)
-  def colorBorder(color: Color): Border                 = Border(color, defaultStroke)
   def completeBorder(color: Color, stroke: Int): Border = Border(color, stroke)
+  def colorBorder(color: Color): Border                 = completeBorder(color, defaultStroke)
+  def border(): Border                                  = completeBorder(defaultBorderColor, defaultStroke)
 
   def empty(): JStyleService                = JStyleService()
   def apply(styles: JStyle*): JStyleService = JStyleService(styles: _*)
