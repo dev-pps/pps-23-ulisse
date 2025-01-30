@@ -4,19 +4,20 @@ import ulisse.infrastructures.view.menu.AppMenu
 
 import scala.swing.*
 
-trait Updatable:
+trait UpdatableContainer:
   this: MainFrame | LayoutContainer =>
   def update(component: Component): Unit
 
 trait BaseView:
-  val updatable: Updatable
+  val updatable: UpdatableContainer
 
-final case class StationEditorView(updatable: Updatable) extends BorderPanel with BaseView with Updatable:
+final case class StationEditorView(updatable: UpdatableContainer) extends BorderPanel with BaseView
+    with UpdatableContainer:
   def update(component: Component): Unit =
     layout(component) = BorderPanel.Position.Center
     repaint()
 
-final case class AppFrame() extends MainFrame with Updatable:
+final case class AppFrame() extends MainFrame with UpdatableContainer:
   def update(component: Component): Unit =
     contents = component
     repaint()
