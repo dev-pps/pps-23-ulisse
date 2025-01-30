@@ -1,5 +1,7 @@
 package ulisse.infrastructures.view.menu
 
+import com.formdev.flatlaf.extras.FlatSVGIcon
+import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
 import scaredOfArchunit.StationSettings
 import ulisse.infrastructures.view.UpdatableContainer
 import ulisse.infrastructures.view.simulation.MenuBar
@@ -32,6 +34,23 @@ def drawCross(preferredLength: Int, preferredThickness: Int)(element: UIElement)
   g.fillRect(center._1 - length / 2, center._2 - thickness / 2, length, thickness)
   g.setColor(oldColor)
 
+final case class SVGCard(svg: String, text: String) extends BoxPanel(Orientation.Vertical):
+  val button = new Panel:
+    val rawIcon = new FlatSVGIcon(svg)
+    rawIcon.setColorFilter(ColorFilter(color => Color.GREEN))
+    override def paint(g: Graphics2D): Unit =
+      val icon = rawIcon.derive(size.width / 2, size.height / 2)
+      icon.paintIcon(this.peer, g, (size.width - icon.getWidth) / 2, (size.height - icon.getHeight) / 2)
+
+  val description = new Label(text)
+  val descriptionContainer = new BoxPanel(Orientation.Horizontal):
+    contents += Swing.HGlue
+    contents += description
+    contents += Swing.HGlue
+  border = new LineBorder(Color.BLACK, 2)
+  contents += button
+  contents += descriptionContainer
+
 final case class Card(icon: UIElement => Graphics2D => Unit, text: String) extends BoxPanel(Orientation.Vertical):
   val configuredIcon = icon(this)
   val button = new Panel:
@@ -58,6 +77,16 @@ final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
       root.update(StationSettings().stationEditorView)
   }
 
+  val card2 = SVGCard("icon/mapIcon.svg", "Cross")
+  card2.preferredSize = new Dimension(100, 100)
+  card2.maximumSize = new Dimension(100, 100)
+  card2.minimumSize = new Dimension(100, 100)
+  card2.listenTo(card.mouse.clicks)
+  card2.reactions += {
+    case MouseClicked(_, _, _, _, _) =>
+      root.update(StationSettings().stationEditorView)
+  }
+
   val menuBar = MenuBar()
   menuBar.preferredSize = new Dimension(600, 50)
   menuBar.maximumSize = new Dimension(600, 50)
@@ -80,6 +109,8 @@ final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
     contents += new BoxPanel(Orientation.Horizontal):
       contents += Swing.HGlue
       contents += card
+      contents += Swing.HStrut(10)
+      contents += card2
       contents += Swing.HGlue
     contents += Swing.VGlue
   layout(centerPanel) = BorderPanel.Position.Center
