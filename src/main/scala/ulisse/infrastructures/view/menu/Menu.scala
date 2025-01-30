@@ -1,5 +1,7 @@
 package ulisse.infrastructures.view.menu
 
+import ulisse.infrastructures.view.Updatable
+
 import java.awt.{Color, Graphics}
 import javax.swing.border.{EmptyBorder, LineBorder}
 import scala.swing.{
@@ -31,7 +33,6 @@ final case class Card(icon: UIElement => Graphics2D => Unit, text: String) exten
   val configuredIcon = icon(this)
   val button = new Panel:
     override def paint(g: Graphics2D): Unit = configuredIcon(g)
-  size
   val description = new Label(text)
   val descriptionContainer = new BoxPanel(Orientation.Horizontal):
     contents += Swing.HGlue
@@ -40,13 +41,17 @@ final case class Card(icon: UIElement => Graphics2D => Unit, text: String) exten
   border = new LineBorder(Color.BLACK, 2)
   contents += button
   contents += descriptionContainer
+  listenTo(button.mouse.clicks)
 
-final case class AppMenu() extends BorderPanel:
+final case class AppMenu(root: Updatable) extends BorderPanel:
   preferredSize = new Dimension(600, 400)
   val card = Card(drawCross(20, 2), "Cross")
   card.preferredSize = new Dimension(100, 100)
   card.maximumSize = new Dimension(100, 100)
   card.minimumSize = new Dimension(100, 100)
+  card.reactions += {
+    case _ => root.update(new Label("Cross clicked"))
+  }
   private val centerPanel = new BoxPanel(Orientation.Vertical):
     contents += Swing.VGlue
     contents += new BoxPanel(Orientation.Horizontal):
