@@ -13,10 +13,22 @@ trait JComponent(var styleService: JStyleService) extends Component:
   listenTo(mouse.moves, mouse.clicks)
 
   reactions += {
-    case event.MouseExited(_, _, _)         => currentBackground = styleService.colorPalette.background; repaint()
-    case event.MouseReleased(_, _, _, _, _) => currentBackground = styleService.colorPalette.background; repaint()
-    case event.MousePressed(_, _, _, _, _)  => currentBackground = styleService.colorPalette.click; repaint()
-    case event.MouseEntered(_, _, _)        => currentBackground = styleService.colorPalette.hover; repaint()
+    case event.MouseEntered(_, _, _) => styleService.colorPalette.hover.map(color =>
+        currentBackground = color
+        repaint()
+      )
+    case event.MouseExited(_, _, _) => styleService.colorPalette.hover.map(_ =>
+        currentBackground = styleService.colorPalette.background
+        repaint()
+      )
+    case event.MousePressed(_, _, _, _, _) => styleService.colorPalette.click.map(color =>
+        currentBackground = color
+        repaint()
+      )
+    case event.MouseReleased(_, _, _, _, _) => styleService.colorPalette.click.map(_ =>
+        currentBackground = styleService.colorPalette.background
+        repaint()
+      )
   }
 
   protected override def paintComponent(g: Graphics2D): Unit =
