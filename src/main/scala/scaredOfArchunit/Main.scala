@@ -1,3 +1,5 @@
+package scaredOfArchunit
+
 import StationTypes.*
 import ulisse.adapters.StationPortOutputAdapter
 import ulisse.applications.AppState
@@ -21,13 +23,15 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.MapView
 import scala.swing.*
 
+val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+
 @main def launchApp(): Unit =
   val app = AppFrame()
   app.contents = AppMenu(app)
   app.open()
 
   val initialState = AppState[N, C, S](StationMap.createCheckedStationMap())
-  LazyList.continually(settings.eventStream.take()).foldLeft(initialState)((state, event) =>
+  LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
 
@@ -37,15 +41,14 @@ import scala.swing.*
   app.contents = settings.stationEditorView
   app.open()
 
-  val initialState = AppState[N, C, S](StationManager.createCheckedStationMap())
-  LazyList.continually(settings.eventStream.take()).foldLeft(initialState)((state, event) =>
+  val initialState = AppState[N, C, S](StationMap.createCheckedStationMap())
+  LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
 
 final case class StationSettings():
-  lazy val outputAdapter: StationPortOutputAdapter[N, C, S] = StationPortOutputAdapter(stationEditorController)
-  lazy val inputAdapter: StationPortInputService[N, C, S]   = StationPortInputService(eventStream, outputAdapter)
-  val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+  lazy val outputAdapter: StationPortOutputAdapter[N, C, S]     = StationPortOutputAdapter(stationEditorController)
+  lazy val inputAdapter: StationPortInputAdapter[N, C, S]       = StationPortInputAdapter(eventStream, outputAdapter)
   val stationEditorController: StationEditorController[N, C, S] = StationEditorController(inputAdapter)
   val stationEditorView: StationEditorView                      = StationEditorView(stationEditorController)
 
