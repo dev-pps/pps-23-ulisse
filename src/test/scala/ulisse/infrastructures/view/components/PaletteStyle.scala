@@ -38,30 +38,30 @@ class PaletteStyle extends AnyFlatSpec with Matchers:
     newPaletteColor.hover must be(Some(hover))
 
   "change background color" should "have new background color" in:
-    val newBackground   = Color.GREEN
+    val newBackground   = Color.green
     val newPaletteColor = defaultPalette.withBackground(newBackground)
     newPaletteColor.background must be(newBackground)
     newPaletteColor.click must be(JStyle.withOutColor)
     newPaletteColor.hover must be(JStyle.withOutColor)
 
   "change click color" should "have new click color" in:
-    val newClick        = Color.GREEN
+    val newClick        = Color.green
     val newPaletteColor = defaultPalette.withClick(newClick)
     newPaletteColor.background must be(JStyle.defaultBackgroundColor)
     newPaletteColor.click must be(Some(newClick))
     newPaletteColor.hover must be(JStyle.withOutColor)
 
   "change hover color" should "have new hover color" in:
-    val newHover        = Color.GREEN
+    val newHover        = Color.green
     val newPaletteColor = defaultPalette.withHover(newHover)
     newPaletteColor.background must be(JStyle.defaultBackgroundColor)
     newPaletteColor.click must be(JStyle.withOutColor)
     newPaletteColor.hover must be(Some(newHover))
 
   "change all colors" should "have new colors" in:
-    val newBackground   = Color.GREEN
-    val newClick        = Color.YELLOW
-    val newHover        = Color.CYAN
+    val newBackground   = Color.green
+    val newClick        = Color.yellow
+    val newHover        = Color.cyan
     val newPaletteColor = defaultPalette.withAll(newBackground, newClick, newHover)
     newPaletteColor.background must be(newBackground)
     newPaletteColor.click must be(Some(newClick))

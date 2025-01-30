@@ -34,14 +34,14 @@ trait JComponent(var styleService: JStyleService) extends Component:
   protected override def paintComponent(g: Graphics2D): Unit =
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     val border         = styleService.border
-    val borderPosition = border.width / 2
-    val borderSize     = (size.width - border.width, size.height - border.width)
+    val borderPosition = border.stroke / 2
+    val borderSize     = (size.width - border.stroke, size.height - border.stroke)
 
-    g.setColor(currentBackground)
-    g.setStroke(BasicStroke(border.width))
-    g.fillRoundRect(0, 0, size.width, size.height, border.arc, border.arc)
-    g.setColor(border.color)
-    g.drawRoundRect(borderPosition, borderPosition, borderSize._1, borderSize._2, border.arc, border.arc)
+//    g.setColor(currentBackground)
+//    g.setStroke(BasicStroke(border.stroke))
+//    g.fillRoundRect(0, 0, size.width, size.height, border.arc, border.arc)
+//    g.setColor(border.color)
+//    g.drawRoundRect(borderPosition, borderPosition, borderSize._1, borderSize._2, border.arc, border.arc)
     super.paintComponent(g)
 
   def setColorPalette(palette: JStyle.Palette): Unit =
