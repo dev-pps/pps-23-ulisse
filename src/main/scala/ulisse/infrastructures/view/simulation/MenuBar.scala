@@ -52,5 +52,5 @@ final case class MenuBar() extends BoxPanel(Orientation.Vertical):
     contents += buttonMenu
     contents += Swing.HStrut(10)
     contents += projectName
-    contents += Swing.HGlue
+    contents += gluePanel
   contents += Swing.VStrut(10)
