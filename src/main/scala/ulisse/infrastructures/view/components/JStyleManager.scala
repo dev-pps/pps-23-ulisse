@@ -17,6 +17,7 @@ object JStyleManager:
   def apply(): JStyleManager                        = JStyleManager(rect(), palette(), withoutBorder)
 
   case class JStyleManager(rect: Rect, palette: Palette, border: Option[Border]):
+    export rect._, palette._
     val all: Seq[JStyle] = border.map(style => Seq(rect, palette, style)).getOrElse(Seq(rect, palette))
 
     def withRect(newRect: Rect): JStyleManager          = copy(rect = newRect)
@@ -25,12 +26,12 @@ object JStyleManager:
 
   trait JStyle
   private object JStyle:
-    private val defaultRoundRect: Int = 0
+    val defaultRoundRect: Int = 0
 
-    private val defaultColor: Color         = Color.white
-    private val withOutColor: Option[Color] = Option.empty
+    val defaultColor: Color         = Color.white
+    val withOutColor: Option[Color] = Option.empty
 
-    private val defaultStroke: Int = 1
+    val defaultStroke: Int = 1
 
     def rect(): Rect              = new Rect(defaultRoundRect)
     def roundRect(arc: Int): Rect = new Rect(arc)
@@ -46,10 +47,10 @@ object JStyleManager:
     def colorBorder(color: Color): Border                 = completeBorder(color, defaultStroke)
     def border(): Border                                  = completeBorder(defaultColor, defaultStroke)
 
-    case class Rect(arcTopSx: Int, arcTopDx: Int, arcBottomSx: Int, arcBottomDx: Int) extends JStyle:
-      def this(arc: Int) = this(arc, arc, arc, arc)
+    case class Rect(arcWidth: Int, arcHeight: Int) extends JStyle:
+      def this(arc: Int) = this(arc, arc)
 
-      def setArc(arc: Int): Rect = copy(arcTopSx = arc, arcTopDx = arc, arcBottomSx = arc, arcBottomDx = arc)
+      def setArc(arc: Int): Rect = copy(arcWidth = arc, arcHeight = arc)
 
     case class Palette(background: Color, click: Option[Color], hover: Option[Color]) extends JStyle:
       def this(background: Color) = this(background, Option.empty, Option.empty)
