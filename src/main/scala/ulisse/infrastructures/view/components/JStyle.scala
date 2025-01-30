@@ -1,7 +1,5 @@
 package ulisse.infrastructures.view.components
 
-import ulisse.utils.TypeCheckers.identicalClassIs
-
 import java.awt.Color
 
 trait JStyle
@@ -10,10 +8,14 @@ object JStyle:
   val defaultArcShape: Int = 0
 
   val defaultBackgroundColor: Color = Color.white
-  val withOutColor                  = Option.empty[Color]
+  val withOutColor: Option[Color]   = Option.empty
 
   val defaultBorderColor: Color = defaultBackgroundColor
   val defaultStroke: Int        = 1
+
+  val defaultRect: Rect             = rect()
+  val defaultPalette: Palette       = palette()
+  val withoutBorder: Option[Border] = Option.empty
 
   def rect(): Rect              = new Rect(defaultArcShape)
   def roundRect(arc: Int): Rect = new Rect(arc)
@@ -28,16 +30,19 @@ object JStyle:
   def colorBorder(color: Color): Border                 = completeBorder(color, defaultStroke)
   def border(): Border                                  = completeBorder(defaultBorderColor, defaultStroke)
 
-  def empty(): JStyleService                = JStyleService()
-  def apply(styles: JStyle*): JStyleService = JStyleService(styles: _*)
+  def completeStyle(rect: Rect, palette: Palette, border: Border): JStyleManager =
+    JStyleManager(rect, palette, Some(border))
+  def borderStyle(border: Border): JStyleManager    = JStyleManager(rect(), palette(), Some(border))
+  def paletteStyle(palette: Palette): JStyleManager = JStyleManager(rect(), palette, withoutBorder)
+  def rectStyle(rect: Rect): JStyleManager          = JStyleManager(rect, palette(), withoutBorder)
+  def apply(): JStyleManager                        = JStyleManager(rect(), palette(), withoutBorder)
 
-  case class JStyleService(style: JStyle*):
-    val colorPalette: Palette = style.collectFirst { case c: Palette => c }.getOrElse(palette())
-    val border: Border        = style.collectFirst { case b: Border => b }.getOrElse(JStyle.border())
-    val all: Seq[JStyle]      = Seq(colorPalette, border)
+  case class JStyleManager(rect: Rect, palette: Palette, border: Option[Border]):
+    val all: Seq[JStyle] = border.map(style => Seq(rect, palette, style)).getOrElse(Seq(rect, palette))
 
-    def change[T <: JStyle](styles: T*): JStyleService =
-      JStyleService(all.filterNot(style => styles.exists(_ identicalClassIs style)) ++ styles: _*)
+    def withRect(newRect: Rect): JStyleManager          = copy(rect = newRect)
+    def withPalette(newPalette: Palette): JStyleManager = copy(palette = newPalette)
+    def withBorder(newBorder: Border): JStyleManager    = copy(border = Some(newBorder))
 
   case class Rect(arcTopSx: Int, arcTopDx: Int, arcBottomSx: Int, arcBottomDx: Int) extends JStyle:
     def this(arc: Int) = this(arc, arc, arc, arc)
