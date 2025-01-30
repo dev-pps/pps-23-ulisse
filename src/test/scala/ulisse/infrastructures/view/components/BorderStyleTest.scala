@@ -2,27 +2,27 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyle
+import ulisse.infrastructures.view.components.JStyleManager._
 
 import java.awt.Color
 
-class BorderStyle extends AnyFlatSpec with Matchers:
-  val defaultBorder = JStyle.border()
+class BorderStyleTest extends AnyFlatSpec with Matchers:
+  val defaultBorder = border()
 
   "default border" should "have color and stroke" in:
-    defaultBorder.color must be(JStyle.defaultColor)
-    defaultBorder.stroke must be(JStyle.defaultStroke)
+    defaultBorder.color must be(defaultColor)
+    defaultBorder.stroke must be(defaultStroke)
 
   "color border" should "have new color" in:
     val newColor  = Color.black
-    val newBorder = JStyle.colorBorder(newColor)
+    val newBorder = colorBorder(newColor)
     newBorder.color must be(newColor)
-    newBorder.stroke must be(JStyle.defaultStroke)
+    newBorder.stroke must be(defaultStroke)
 
   "complete border" should "have new color and stroke" in:
     val newColor  = Color.black
     val newStroke = 2
-    val newBorder = JStyle.completeBorder(newColor, newStroke)
+    val newBorder = completeBorder(newColor, newStroke)
     newBorder.color must be(newColor)
     newBorder.stroke must be(newStroke)
 
@@ -30,12 +30,12 @@ class BorderStyle extends AnyFlatSpec with Matchers:
     val newColor  = Color.green
     val newBorder = defaultBorder.withColor(newColor)
     newBorder.color must be(newColor)
-    newBorder.stroke must be(JStyle.defaultStroke)
+    newBorder.stroke must be(defaultStroke)
 
   "change stroke" should "have new width" in:
     val newStroke = 4
     val newBorder = defaultBorder.withStroke(newStroke)
-    newBorder.color must be(JStyle.defaultColor)
+    newBorder.color must be(defaultColor)
     newBorder.stroke must be(newStroke)
 
   "change all values" should "have new values" in:
