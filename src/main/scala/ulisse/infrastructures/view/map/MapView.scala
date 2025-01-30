@@ -6,7 +6,7 @@ import ulisse.applications.useCases.RouteManager
 import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
 import ulisse.infrastructures.view.components.JComponent
-import ulisse.infrastructures.view.components.JStyler
+import ulisse.infrastructures.view.components.JStyler._
 import ulisse.infrastructures.view.form.RouteForm
 
 import java.awt.Color
@@ -36,14 +36,14 @@ object MapView:
 
     val mapPark: MapPanel    = MapPanel.empty()
     val info: Label          = Label(s"$countLabel")
-    val error: Label         = JComponent.label(errorStr, JStyler())
+    val error: Label         = JComponent.label(errorStr, styler())
     val formPanel: RouteForm = RouteForm()
 
     // Main content pane with BorderLayout
     val contentPane = new BorderPanel
     val glassPane   = new BorderPanel
 
-    val createButton = JComponent.button("Form Route", JStyler.paletteStyler(JStyler.backgroundPalette(Color.green)))
+    val createButton = JComponent.button("Form Route", paletteStyler(hoverPalette(Color.green)))
     val northPanel   = new FlowPanel(createButton, info, error)
 
     info.text = s"$countLabel 0"

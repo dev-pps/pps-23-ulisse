@@ -14,7 +14,7 @@ object JStyler:
   def borderStyler(border: Border): JStyler    = JStyler(rect(), palette(), Some(border))
   def paletteStyler(palette: Palette): JStyler = JStyler(rect(), palette, withoutBorder)
   def rectStyler(rect: Rect): JStyler          = JStyler(rect, palette(), withoutBorder)
-  def apply(): JStyler                         = JStyler(rect(), palette(), withoutBorder)
+  def styler(): JStyler                        = JStyler(rect(), palette(), withoutBorder)
 
   def puzzleStyler(using rect: Rect)(using palette: Palette)(using border: Border): JStyler =
     completeStyler(rect, palette, border)
