@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.menu
 
-import ulisse.infrastructures.view.Updatable
+import ulisse.infrastructures.view.UpdatableContainer
 
 import java.awt.{Color, Graphics}
 import javax.swing.border.{EmptyBorder, LineBorder}
@@ -43,7 +43,7 @@ final case class Card(icon: UIElement => Graphics2D => Unit, text: String) exten
   contents += descriptionContainer
   listenTo(button.mouse.clicks)
 
-final case class AppMenu(root: Updatable) extends BorderPanel:
+final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
   preferredSize = new Dimension(600, 400)
   val card = Card(drawCross(20, 2), "Cross")
   card.preferredSize = new Dimension(100, 100)
