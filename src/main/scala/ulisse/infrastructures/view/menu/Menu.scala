@@ -64,6 +64,17 @@ final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
   menuBar.minimumSize = new Dimension(600, 50)
   layout(menuBar) = BorderPanel.Position.North
 
+  val sideMenu = new BoxPanel(Orientation.Vertical):
+    preferredSize = new Dimension(100, 400)
+    maximumSize = new Dimension(100, 400)
+    minimumSize = new Dimension(100, 400)
+    background = Color.DARK_GRAY
+    contents += Swing.VStrut(10)
+    contents += new Label("Side Menu")
+    contents += Swing.VStrut(10)
+
+  layout(sideMenu) = BorderPanel.Position.West
+
   private val centerPanel = new BoxPanel(Orientation.Vertical):
     contents += Swing.VGlue
     contents += new BoxPanel(Orientation.Horizontal):

@@ -36,7 +36,7 @@ class RunnerTest extends AnyWordSpec with Matchers:
 
     "correctly apply all transformations from the queue to the initial state" in:
       val queue = LinkedBlockingQueue[String => String]()
-      queue.add(state => state + "A")
-      queue.add(state => state + "B")
-      queue.add(state => state + "C")
+      queue.add(_ + "A")
+      queue.add(_ + "B")
+      queue.add(_ + "C")
       runAll("", queue) shouldEqual List("", "A", "AB", "ABC")
