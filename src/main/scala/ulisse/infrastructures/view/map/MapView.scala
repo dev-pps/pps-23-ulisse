@@ -25,7 +25,7 @@ object MapView:
   def apply(uiPort: UIPort): MapView = MapViewImpl(uiPort)
 
   private case class MapViewImpl(uiPort: UIPort) extends MainFrame, MapView:
-    given style: JStyleService = JStyle(JStyle.orangePalette)
+//    given style: JStyleService = JStyle(JStyle.orangePalette)
 
     title = "Map"
     visible = true
@@ -43,7 +43,7 @@ object MapView:
     val contentPane = new BorderPanel
     val glassPane   = new BorderPanel
 
-    val createButton = JComponent.button("Form Route")
+    val createButton = new Button("Form Route")
     val northPanel   = new FlowPanel(createButton, info, error)
 
     info.text = s"$countLabel 0"
