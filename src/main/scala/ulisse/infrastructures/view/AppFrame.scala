@@ -28,6 +28,6 @@ final case class AppFrame() extends MainFrame with Updatable:
 
 @main def testLayout(): Unit =
   val app  = AppFrame()
-  val view = AppMenu()
+  val view = AppMenu(app)
   app.contents = view
   app.open()
