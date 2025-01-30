@@ -61,13 +61,23 @@ trait JComponent(var styler: JStyler) extends Component:
     repaint()
 
 object JComponent:
-  def textField(text: String, manager: JStyler): JTextField = JTextField(text, manager)
-  def label(text: String, manager: JStyler): JLabel         = JLabel(text, manager)
-  def button(text: String, manager: JStyler): JButton       = JButton(text, manager)
+  def textField(text: String, styler: JStyler): JTextField = JTextField(text)(styler)
+  def label(text: String, styler: JStyler): JLabel         = JLabel(text)(styler)
+  def button(text: String, styler: JStyler): JButton       = JButton(text)(styler)
 
-  case class JTextField(label: String, jStyler: JStyler) extends TextField(label) with JComponent(jStyler)
-  case class JLabel(label: String, jStyler: JStyler)     extends Label(label) with JComponent(jStyler)
-  case class JButton(label: String, jStyler: JStyler) extends Button(label) with JComponent(jStyler):
+  def puzzleStylesButton(text: String)(using rect: Rect)(using palette: Palette)(using border: Border): JButton =
+    button(text, puzzleStyler)
+  def puzzleRectButton(text: String, palette: Palette, border: Border)(using rect: Rect): JButton =
+    button(text, puzzleRectStyler(palette, border))
+  def puzzlePaletteButton(text: String)(using palette: Palette)(using rect: Rect)(using border: Border): JButton =
+    button(text, puzzlePaletteStyler(rect, border))
+  def puzzleBorderButton(text: String)(using border: Border)(using rect: Rect)(using palette: Palette): JButton =
+    button(text, puzzleBorderStyler(rect, palette))
+  def puzzleStylerButton(text: String)(using styler: JStyler): JButton = button(text, styler)
+
+  case class JTextField(label: String)(jStyler: JStyler) extends TextField(label) with JComponent(jStyler)
+  case class JLabel(label: String)(jStyler: JStyler)     extends Label(label) with JComponent(jStyler)
+  case class JButton(label: String)(jStyler: JStyler) extends Button(label) with JComponent(jStyler):
     focusPainted = false
     contentAreaFilled = false
     borderPainted = false

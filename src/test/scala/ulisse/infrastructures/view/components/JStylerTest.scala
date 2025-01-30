@@ -7,7 +7,7 @@ import ulisse.infrastructures.view.components.JStyler._
 import java.awt.Color
 
 class JStylerTest extends AnyFlatSpec with Matchers:
-  val defaultManager = apply()
+  val defaultManager = styler()
 
   "default manager" should "have default style" in:
     defaultManager.rect must be(defaultRect)
