@@ -1,5 +1,7 @@
 package ulisse.infrastructures.view
 
+import ulisse.infrastructures.view.menu.AppMenu
+
 import scala.swing.*
 
 trait Updatable:
@@ -23,3 +25,9 @@ final case class AppFrame() extends MainFrame with Updatable:
   preferredSize = new Dimension(800, 600)
   pack()
   centerOnScreen()
+
+@main def testLayout(): Unit =
+  val app  = AppFrame()
+  val view = AppMenu()
+  app.contents = view
+  app.open()
