@@ -1,9 +1,10 @@
 package ulisse.infrastructures.view.menu
 
+import scaredOfArchunit.StationSettings
 import ulisse.infrastructures.view.UpdatableContainer
-
-import java.awt.{Color, Graphics}
-import javax.swing.border.{EmptyBorder, LineBorder}
+import java.awt.Color
+import javax.swing.border.LineBorder
+import scala.swing.event.MouseClicked
 import scala.swing.{
   BorderPanel,
   BoxPanel,
@@ -41,7 +42,7 @@ final case class Card(icon: UIElement => Graphics2D => Unit, text: String) exten
   border = new LineBorder(Color.BLACK, 2)
   contents += button
   contents += descriptionContainer
-  listenTo(button.mouse.clicks)
+  listenTo()
 
 final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
   preferredSize = new Dimension(600, 400)
@@ -49,9 +50,12 @@ final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
   card.preferredSize = new Dimension(100, 100)
   card.maximumSize = new Dimension(100, 100)
   card.minimumSize = new Dimension(100, 100)
+  card.listenTo(card.mouse.clicks)
   card.reactions += {
-    case _ => root.update(new Label("Cross clicked"))
+    case MouseClicked(_, _, _, _, _) =>
+      root.update(StationSettings().stationEditorView)
   }
+
   private val centerPanel = new BoxPanel(Orientation.Vertical):
     contents += Swing.VGlue
     contents += new BoxPanel(Orientation.Horizontal):
