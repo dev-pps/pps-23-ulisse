@@ -2,16 +2,16 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyle.{defaultArcShape, rect, roundRect}
+import ulisse.infrastructures.view.components.JStyle.{defaultRoundRect, rect, roundRect}
 
 class RectStyle extends AnyFlatSpec with Matchers:
   val defaultRect = rect()
 
   "default rect style" should "have zero round" in:
-    defaultRect.arcTopDx must be(defaultArcShape)
-    defaultRect.arcTopSx must be(defaultArcShape)
-    defaultRect.arcBottomDx must be(defaultArcShape)
-    defaultRect.arcBottomSx must be(defaultArcShape)
+    defaultRect.arcTopDx must be(defaultRoundRect)
+    defaultRect.arcTopSx must be(defaultRoundRect)
+    defaultRect.arcBottomDx must be(defaultRoundRect)
+    defaultRect.arcBottomSx must be(defaultRoundRect)
 
   "round rect style" should "have same round" in:
     val arc        = 10

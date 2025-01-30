@@ -10,7 +10,7 @@ class BorderStyle extends AnyFlatSpec with Matchers:
   val defaultBorder = JStyle.border()
 
   "default border" should "have color and stroke" in:
-    defaultBorder.color must be(JStyle.defaultBorderColor)
+    defaultBorder.color must be(JStyle.defaultColor)
     defaultBorder.stroke must be(JStyle.defaultStroke)
 
   "color border" should "have new color" in:
@@ -35,7 +35,7 @@ class BorderStyle extends AnyFlatSpec with Matchers:
   "change stroke" should "have new width" in:
     val newStroke = 4
     val newBorder = defaultBorder.withStroke(newStroke)
-    newBorder.color must be(JStyle.defaultBorderColor)
+    newBorder.color must be(JStyle.defaultColor)
     newBorder.stroke must be(newStroke)
 
   "change all values" should "have new values" in:
