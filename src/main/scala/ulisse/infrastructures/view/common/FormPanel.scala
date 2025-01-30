@@ -27,6 +27,7 @@ object FormPanel:
     private val exit   = new Button("exit")
 
     private val centralBox: BoxPanel    = BoxPanel(Orientation.Vertical)
+    private val northPanel: FlowPanel   = FlowPanel(title)
     private val southBox: BoxPanel      = BoxPanel(Orientation.Vertical)
     private val managerPanel: FlowPanel = FlowPanel(save, delete)
 
@@ -36,7 +37,7 @@ object FormPanel:
     title.font = Font("Arial", Style.Bold, 24)
 
     centralBox.contents += Swing.Glue
-    centralBox.contents += title
+    centralBox.contents += northPanel
     centralBox.contents ++= keyValuesPanel.map(_.panel())
     centralBox.contents += Swing.Glue
 
