@@ -6,7 +6,7 @@ import ulisse.infrastructures.view.components.JStyle
 
 import java.awt.Color
 
-class ColorPaletteStyle extends AnyFlatSpec with Matchers:
+class PaletteStyle extends AnyFlatSpec with Matchers:
   val paletteColor = JStyle.palette(Color.BLACK, Color.RED, Color.BLUE)
 
   "palette color" should "have background, click and hover color" in:

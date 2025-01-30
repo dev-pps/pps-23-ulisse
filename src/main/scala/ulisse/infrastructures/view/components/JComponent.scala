@@ -32,7 +32,7 @@ trait JComponent(var styleService: JStyleService) extends Component:
     g.drawRoundRect(borderPosition, borderPosition, borderSize._1, borderSize._2, border.arc, border.arc)
     super.paintComponent(g)
 
-  def setColorPalette(palette: JStyle.ColorPalette): Unit =
+  def setColorPalette(palette: JStyle.Palette): Unit =
     styleService = styleService.change(palette)
     repaint()
 
