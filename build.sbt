@@ -34,6 +34,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "com.formdev"             % "flatlaf"           % "3.5.4",
       "com.formdev"             % "flatlaf-extras"    % "3.5.4",
+      "com.miglayout" % "miglayout" % "3.7.4",
       "org.typelevel"          %% "cats-core"         % "2.12.0",
       "org.typelevel"          %% "cats-effect"       % "3.5.4",
       "org.scala-lang.modules" %% "scala-swing"       % "3.0.0",
@@ -43,6 +44,6 @@ lazy val root = (project in file("."))
       "io.cucumber"            %% "cucumber-scala"    % "8.25.1"   % Test,
       "com.tngtech.archunit"    % "archunit"          % "1.3.0"    % Test,
       "org.junit.jupiter"       % "junit-jupiter-api" % "5.10.3"   % Test
-    ),
+      ),
     Global / onLoad ~= (_ andThen ("hooks" :: _))
   )
