@@ -5,9 +5,11 @@ import ulisse.applications.ports.RoutePorts.UIPort
 import ulisse.applications.useCases.RouteManager
 import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
-import ulisse.infrastructures.view.components.{JComponent, JStyleManager}
+import ulisse.infrastructures.view.components.JComponent
+import ulisse.infrastructures.view.components.JStyler
 import ulisse.infrastructures.view.form.RouteForm
 
+import java.awt.Color
 import scala.concurrent.ExecutionContext
 import scala.swing.*
 import scala.swing.BorderPanel.Position.*
@@ -24,6 +26,7 @@ object MapView:
   def apply(uiPort: UIPort): MapView = MapViewImpl(uiPort)
 
   private case class MapViewImpl(uiPort: UIPort) extends MainFrame, MapView:
+
     title = "Map"
     visible = true
     preferredSize = new Dimension(800, 800)
@@ -33,14 +36,14 @@ object MapView:
 
     val mapPark: MapPanel    = MapPanel.empty()
     val info: Label          = Label(s"$countLabel")
-    val error: Label         = Label(errorStr)
+    val error: Label         = JComponent.label(errorStr, JStyler())
     val formPanel: RouteForm = RouteForm()
 
     // Main content pane with BorderLayout
     val contentPane = new BorderPanel
     val glassPane   = new BorderPanel
 
-    val createButton = JComponent.button("Form Route", JStyleManager())
+    val createButton = JComponent.button("Form Route", JStyler.paletteStyler(JStyler.backgroundPalette(Color.green)))
     val northPanel   = new FlowPanel(createButton, info, error)
 
     info.text = s"$countLabel 0"

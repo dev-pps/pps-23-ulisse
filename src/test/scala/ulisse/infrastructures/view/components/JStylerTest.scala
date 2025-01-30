@@ -2,11 +2,11 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyleManager._
+import ulisse.infrastructures.view.components.JStyler._
 
 import java.awt.Color
 
-class JStyleManagerTest extends AnyFlatSpec with Matchers:
+class JStylerTest extends AnyFlatSpec with Matchers:
   val defaultManager = apply()
 
   "default manager" should "have default style" in:
@@ -16,7 +16,7 @@ class JStyleManagerTest extends AnyFlatSpec with Matchers:
 
   "rect manager" should "have rect style" in:
     val newRect     = roundRect(10)
-    val rectManager = rectStyle(newRect)
+    val rectManager = rectStyler(newRect)
 
     rectManager.rect must be(newRect)
     rectManager.palette must be(defaultPalette)
@@ -25,7 +25,7 @@ class JStyleManagerTest extends AnyFlatSpec with Matchers:
 
   "palette manager" should "have palette style" in:
     val newPalette     = backgroundPalette(Color.green)
-    val paletteManager = paletteStyle(newPalette)
+    val paletteManager = paletteStyler(newPalette)
 
     paletteManager.rect must be(defaultRect)
     paletteManager.palette must be(newPalette)
@@ -34,7 +34,7 @@ class JStyleManagerTest extends AnyFlatSpec with Matchers:
 
   "border manager" should "have border style" in:
     val newBorder     = colorBorder(Color.green)
-    val borderManager = borderStyle(newBorder)
+    val borderManager = borderStyler(newBorder)
 
     borderManager.rect must be(defaultRect)
     borderManager.palette must be(defaultPalette)
@@ -44,7 +44,7 @@ class JStyleManagerTest extends AnyFlatSpec with Matchers:
     val newRect         = roundRect(10)
     val newPalette      = backgroundPalette(Color.green)
     val newBorder       = colorBorder(Color.green)
-    val completeManager = completeStyle(newRect, newPalette, newBorder)
+    val completeManager = completeStyler(newRect, newPalette, newBorder)
 
     completeManager.rect must be(newRect)
     completeManager.palette must be(newPalette)
