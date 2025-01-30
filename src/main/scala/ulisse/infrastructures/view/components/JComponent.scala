@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.components
 
-import ulisse.infrastructures.view.components.JStyle.JStyleManager
+import ulisse.infrastructures.view.components.JStyleManager._
 
 import java.awt.{BasicStroke, RenderingHints}
 import scala.swing.*
@@ -44,11 +44,11 @@ trait JComponent(var styleService: JStyleManager) extends Component:
 //    g.drawRoundRect(borderPosition, borderPosition, borderSize._1, borderSize._2, border.arc, border.arc)
     super.paintComponent(g)
 
-  def setColorPalette(palette: JStyle.Palette): Unit =
+  def setColorPalette(palette: Palette): Unit =
 //    styleService = styleService.change(palette)
     repaint()
 
-  def setBorder(border: JStyle.Border): Unit =
+  def setBorder(border: Border): Unit =
 //    styleService = styleService.change(border)
     repaint()
 

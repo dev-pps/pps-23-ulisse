@@ -2,11 +2,11 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyle.JStyleManager
+import ulisse.infrastructures.view.components.JStyleManagerTest
 
 import java.awt.Color
 
-class JComponents extends AnyFlatSpec with Matchers
+class JComponentTest extends AnyFlatSpec with Matchers
 //  given serviceStyle: JStyleManager = JStyle.empty()
 //
 //  val text   = "Hello"

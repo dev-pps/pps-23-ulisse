@@ -2,9 +2,9 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyle.{defaultRoundRect, rect, roundRect}
+import ulisse.infrastructures.view.components.JStyleManager._
 
-class RectStyle extends AnyFlatSpec with Matchers:
+class RectStyleTest extends AnyFlatSpec with Matchers:
   val defaultRect = rect()
 
   "default rect style" should "have zero round" in:
