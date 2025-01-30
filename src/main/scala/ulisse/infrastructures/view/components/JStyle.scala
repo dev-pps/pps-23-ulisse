@@ -5,30 +5,30 @@ import java.awt.Color
 trait JStyle
 
 object JStyle:
-  val defaultArcShape: Int = 0
+  val defaultRoundRect: Int = 0
 
-  val defaultBackgroundColor: Color = Color.white
-  val withOutColor: Option[Color]   = Option.empty
+  val defaultColor: Color         = Color.white
+  val withOutColor: Option[Color] = Option.empty
 
-  val defaultBorderColor: Color = defaultBackgroundColor
-  val defaultStroke: Int        = 1
+  val defaultStroke: Int = 1
 
   val defaultRect: Rect             = rect()
   val defaultPalette: Palette       = palette()
   val withoutBorder: Option[Border] = Option.empty
 
-  def rect(): Rect              = new Rect(defaultArcShape)
+  def rect(): Rect              = new Rect(defaultRoundRect)
   def roundRect(arc: Int): Rect = new Rect(arc)
 
-  def hoverPalette(background: Color, click: Color, hover: Color): Palette =
+  def completePalette(background: Color, click: Color, hover: Color): Palette =
     Palette(background, Some(click), Some(hover))
-  def clickPalette(background: Color, click: Color): Palette = Palette(background, Some(click), Option.empty)
-  def backgroundPalette(background: Color): Palette          = new Palette(background)
-  def palette(): Palette                                     = backgroundPalette(defaultBackgroundColor)
+  def hoverPalette(hover: Color): Palette           = Palette(defaultColor, withOutColor, Some(hover))
+  def clickPalette(click: Color): Palette           = Palette(defaultColor, Some(click), withOutColor)
+  def backgroundPalette(background: Color): Palette = new Palette(background)
+  def palette(): Palette                            = backgroundPalette(defaultColor)
 
   def completeBorder(color: Color, stroke: Int): Border = Border(color, stroke)
   def colorBorder(color: Color): Border                 = completeBorder(color, defaultStroke)
-  def border(): Border                                  = completeBorder(defaultBorderColor, defaultStroke)
+  def border(): Border                                  = completeBorder(defaultColor, defaultStroke)
 
   def completeStyle(rect: Rect, palette: Palette, border: Border): JStyleManager =
     JStyleManager(rect, palette, Some(border))

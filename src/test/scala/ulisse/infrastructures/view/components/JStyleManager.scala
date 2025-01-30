@@ -19,16 +19,16 @@ class JStyleManager extends AnyFlatSpec with Matchers:
 
     rectManager.rect must be(newRect)
     rectManager.palette must be(JStyle.defaultPalette)
-
+    rectManager.border must be(JStyle.withoutBorder)
     rectManager.all must be(Seq(newRect, JStyle.defaultPalette))
 
   "palette manager" should "have palette style" in:
-    val newPalette =
-      JStyle.hoverPalette(JStyle.defaultBackgroundColor, JStyle.defaultBackgroundColor, JStyle.defaultBackgroundColor)
+    val newPalette     = JStyle.backgroundPalette(Color.green)
     val paletteManager = JStyle.paletteStyle(newPalette)
 
     paletteManager.rect must be(JStyle.defaultRect)
     paletteManager.palette must be(newPalette)
+    paletteManager.border must be(JStyle.withoutBorder)
     paletteManager.all must be(Seq(JStyle.defaultRect, newPalette))
 
   "border manager" should "have border style" in:
@@ -40,9 +40,8 @@ class JStyleManager extends AnyFlatSpec with Matchers:
     borderManager.all must be(Seq(JStyle.defaultRect, JStyle.defaultPalette, newBorder))
 
   "complete manager" should "have complete style" in:
-    val newRect = JStyle.roundRect(10)
-    val newPalette =
-      JStyle.hoverPalette(JStyle.defaultBackgroundColor, JStyle.defaultBackgroundColor, JStyle.defaultBackgroundColor)
+    val newRect         = JStyle.roundRect(10)
+    val newPalette      = JStyle.backgroundPalette(Color.green)
     val newBorder       = JStyle.colorBorder(Color.green)
     val completeManager = JStyle.completeStyle(newRect, newPalette, newBorder)
 
@@ -60,8 +59,7 @@ class JStyleManager extends AnyFlatSpec with Matchers:
     rectManager.all must be(Seq(newRect, JStyle.defaultPalette))
 
   "change palette manager" should "have new palette" in:
-    val newPalette =
-      JStyle.hoverPalette(JStyle.defaultBackgroundColor, JStyle.defaultBackgroundColor, JStyle.defaultBackgroundColor)
+    val newPalette     = JStyle.backgroundPalette(Color.green)
     val paletteManager = defaultManager.withPalette(newPalette)
 
     paletteManager.rect must be(JStyle.defaultRect)

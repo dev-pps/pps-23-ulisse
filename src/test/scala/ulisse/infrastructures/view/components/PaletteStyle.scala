@@ -9,7 +9,7 @@ class PaletteStyle extends AnyFlatSpec with Matchers:
   val defaultPalette = JStyle.palette()
 
   "default palette " should "have only background" in:
-    defaultPalette.background must be(JStyle.defaultBackgroundColor)
+    defaultPalette.background must be(JStyle.defaultColor)
     defaultPalette.click must be(JStyle.withOutColor)
     defaultPalette.hover must be(JStyle.withOutColor)
 
@@ -21,18 +21,24 @@ class PaletteStyle extends AnyFlatSpec with Matchers:
     newPaletteColor.hover must be(JStyle.withOutColor)
 
   "click palette" should "have background color" in:
-    val background      = Color.green
     val click           = Color.blue
-    val newPaletteColor = JStyle.clickPalette(background, click)
-    newPaletteColor.background must be(background)
+    val newPaletteColor = JStyle.clickPalette(click)
+    newPaletteColor.background must be(JStyle.defaultColor)
     newPaletteColor.click must be(Some(click))
     newPaletteColor.hover must be(JStyle.withOutColor)
 
   "hover palette" should "have background and hover color" in:
+    val hover           = Color.red
+    val newPaletteColor = JStyle.hoverPalette(hover)
+    newPaletteColor.background must be(JStyle.defaultColor)
+    newPaletteColor.click must be(JStyle.withOutColor)
+    newPaletteColor.hover must be(Some(hover))
+
+  "complete palette" should "have all colors" in:
     val background      = Color.green
     val click           = Color.blue
     val hover           = Color.red
-    val newPaletteColor = JStyle.hoverPalette(background, click, hover)
+    val newPaletteColor = JStyle.completePalette(background, click, hover)
     newPaletteColor.background must be(background)
     newPaletteColor.click must be(Some(click))
     newPaletteColor.hover must be(Some(hover))
@@ -47,14 +53,14 @@ class PaletteStyle extends AnyFlatSpec with Matchers:
   "change click color" should "have new click color" in:
     val newClick        = Color.green
     val newPaletteColor = defaultPalette.withClick(newClick)
-    newPaletteColor.background must be(JStyle.defaultBackgroundColor)
+    newPaletteColor.background must be(JStyle.defaultColor)
     newPaletteColor.click must be(Some(newClick))
     newPaletteColor.hover must be(JStyle.withOutColor)
 
   "change hover color" should "have new hover color" in:
     val newHover        = Color.green
     val newPaletteColor = defaultPalette.withHover(newHover)
-    newPaletteColor.background must be(JStyle.defaultBackgroundColor)
+    newPaletteColor.background must be(JStyle.defaultColor)
     newPaletteColor.click must be(JStyle.withOutColor)
     newPaletteColor.hover must be(Some(newHover))
 
