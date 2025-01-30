@@ -16,7 +16,7 @@ class JComponents extends AnyFlatSpec with Matchers:
     button.text must be(text)
 
   "change color palette" should "have new color palette" in:
-    val newPalette = JStyle.ColorPalette(Color.BLACK, Color.RED, Color.GREEN)
+    val newPalette = JStyle.Palette(Color.BLACK, Color.RED, Color.GREEN)
     button.setColorPalette(newPalette)
     button.styleService.colorPalette must be(newPalette)
 

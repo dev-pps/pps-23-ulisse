@@ -33,7 +33,7 @@ class JStyleService extends AnyFlatSpec with Matchers:
     serviceWithAll.border must be(orangeBorder)
 
   "change style service with color palette" should "have new color palette" in:
-    val newPalette      = JStyle.ColorPalette(Color.RED, Color.GREEN, Color.BLUE)
+    val newPalette      = JStyle.Palette(Color.RED, Color.GREEN, Color.BLUE)
     val newStyleService = serviceWithPalette.change(newPalette)
 
     newStyleService.all must be(Seq(newPalette, defaultBorder))
@@ -47,7 +47,7 @@ class JStyleService extends AnyFlatSpec with Matchers:
     newStyleService.border must be(newBorder)
 
   "change style service with color palette and border" should "have new color palette and border" in:
-    val newPalette      = JStyle.ColorPalette(Color.RED, Color.GREEN, Color.BLUE)
+    val newPalette      = JStyle.Palette(Color.RED, Color.GREEN, Color.BLUE)
     val newBorder       = JStyle.Border(Color.RED, 4, 40)
     val newStyleService = serviceWithAll.change(newPalette, newBorder)
 
