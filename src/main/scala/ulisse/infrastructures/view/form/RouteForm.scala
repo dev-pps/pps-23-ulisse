@@ -23,10 +23,17 @@ object RouteForm:
   private def createForm(using opaque: Boolean): FormPanel[BorderPanel] =
     val typeRoute = KeyValuesPanel(FlowPanel())(Label("Route Type"), ComboBox(Seq("Normal", "AV")))
     val departureStation =
-      KeyValuesPanel(FlowPanel())(Label("Departure Station"), TextField(5), TextField(3), TextField(3))
-    val arrivalStation = KeyValuesPanel(FlowPanel())(Label("Arrival Station"), TextField(5), TextField(3), TextField(3))
-    val railsCount     = KeyValuesPanel(FlowPanel())(Label("Rails Count"), TextField(10))
-    val length         = KeyValuesPanel(FlowPanel())(Label("Length"), TextField(10))
+      KeyValuesPanel(FlowPanel())(
+        Label("Departure Station"),
+        TextField(5),
+        TextField(3),
+        TextField(3),
+        new Button("...")
+      )
+    val arrivalStation =
+      KeyValuesPanel(FlowPanel())(Label("Arrival Station"), TextField(5), TextField(3), TextField(3), new Button("..."))
+    val railsCount = KeyValuesPanel(FlowPanel())(Label("Rails Count"), TextField(10))
+    val length     = KeyValuesPanel(FlowPanel())(Label("Length"), TextField(10))
     FormPanel(BorderPanel(), typeRoute, departureStation, arrivalStation, length, railsCount)
 
   def apply()(using opaque: Boolean): RouteForm = RouteFormImpl(createForm)

@@ -1,13 +1,13 @@
 package ulisse.infrastructures.view.map
 
-import cats.syntax.either.*
 import ulisse.applications.ports.RoutePorts.UIPort
 import ulisse.applications.useCases.RouteManager
 import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
 import ulisse.infrastructures.view.components.JComponent
-import ulisse.infrastructures.view.components.JStyler._
+import ulisse.infrastructures.view.components.JStyler.*
 import ulisse.infrastructures.view.form.RouteForm
+import ulisse.utils.Swings.centerOf
 
 import java.awt.Color
 import scala.concurrent.ExecutionContext
@@ -43,8 +43,11 @@ object MapView:
     val contentPane = new BorderPanel
     val glassPane   = new BorderPanel
 
-    val createButton = JComponent.button("Form Route", paletteStyler(hoverPalette(Color.green)))
-    val northPanel   = new FlowPanel(createButton, info, error)
+    val createButton = JComponent.button(
+      "Form Route",
+      completeStyler(roundRect(20), hoverPalette(Color.green), completeBorder(Color.black, 2))
+    )
+    val northPanel = new FlowPanel(createButton, info, error)
 
     info.text = s"$countLabel 0"
     error.text = errorStr + "ddd"
@@ -56,13 +59,17 @@ object MapView:
     private val dialog = new Dialog(this):
       title = "Dialogo Mobile"
       contents = formPanel.panel()
-      centerOnScreen()
+      setLocationRelativeTo(MapViewImpl.this)
+      pack()
+      open()
+      visible = false
 
     // Create button action
     listenTo(createButton)
     reactions += {
       case event.ButtonClicked(_) =>
-        dialog.open()
+        dialog.centerOf(this)
+        dialog.visible = true
     }
 
     // formPanel button action
@@ -84,6 +91,7 @@ object MapView:
 
     formPanel.exitButton().reactions += {
       case event.ButtonClicked(_) =>
+//        formPanel.setVisible(false)
         dialog.close()
     }
 
@@ -105,3 +113,4 @@ object MapView:
 
     contents = contentPane
     peer.setGlassPane(glassPane.peer)
+    glassPane.visible = true
