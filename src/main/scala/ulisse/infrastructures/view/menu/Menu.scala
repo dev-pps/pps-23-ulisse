@@ -2,6 +2,8 @@ package ulisse.infrastructures.view.menu
 
 import scaredOfArchunit.StationSettings
 import ulisse.infrastructures.view.UpdatableContainer
+import ulisse.infrastructures.view.simulation.MenuBar
+
 import java.awt.Color
 import javax.swing.border.LineBorder
 import scala.swing.event.MouseClicked
@@ -55,6 +57,12 @@ final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
     case MouseClicked(_, _, _, _, _) =>
       root.update(StationSettings().stationEditorView)
   }
+
+  val menuBar = MenuBar()
+  menuBar.preferredSize = new Dimension(600, 50)
+  menuBar.maximumSize = new Dimension(600, 50)
+  menuBar.minimumSize = new Dimension(600, 50)
+  layout(menuBar) = BorderPanel.Position.North
 
   private val centerPanel = new BoxPanel(Orientation.Vertical):
     contents += Swing.VGlue

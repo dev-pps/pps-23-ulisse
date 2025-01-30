@@ -32,6 +32,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "pps-23-ulisse",
     libraryDependencies ++= Seq(
+      "com.miglayout" % "miglayout" % "3.7.4",
       "org.typelevel"          %% "cats-core"         % "2.12.0",
       "org.scala-lang.modules" %% "scala-swing"       % "3.0.0",
       "org.scala-lang.modules" %% "scala-swing"       % "3.0.0",
