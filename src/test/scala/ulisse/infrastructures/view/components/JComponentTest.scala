@@ -2,13 +2,13 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyleManager.*
+import ulisse.infrastructures.view.components.JStyler.*
 
 import java.awt.Color
 
 class JComponentTest extends AnyFlatSpec with Matchers:
-  val styleManager: JStyleManager = apply()
-  val text: String                = "Hello"
+  val styleManager: JStyler = apply()
+  val text: String          = "Hello"
 
   val button = JComponent.button(text, styleManager)
 
@@ -18,14 +18,14 @@ class JComponentTest extends AnyFlatSpec with Matchers:
   "change rect" should "have new rect" in:
     val newRect = roundRect(10)
     button.setRect(newRect)
-    button.styleManager.rect must be(newRect)
+    button.jStyler.rect must be(newRect)
 
   "change color palette" should "have new color palette" in:
     val newPalette = backgroundPalette(Color.black)
     button.setColorPalette(newPalette)
-    button.styleManager.palette must be(newPalette)
+    button.jStyler.palette must be(newPalette)
 
   "change border" should "have new border" in:
     val newBorder = colorBorder(Color.black)
     button.setBorder(newBorder)
-    button.styleManager.border must be(Some(newBorder))
+    button.jStyler.border must be(Some(newBorder))

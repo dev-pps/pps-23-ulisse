@@ -2,27 +2,36 @@ package ulisse.infrastructures.view.components
 
 import java.awt.Color
 
-object JStyleManager:
+object JStyler:
   export JStyle.*
 
   val defaultRect: Rect             = rect()
   val defaultPalette: Palette       = palette()
   val withoutBorder: Option[Border] = Option.empty
 
-  def completeStyle(rect: Rect, palette: Palette, border: Border): JStyleManager =
-    JStyleManager(rect, palette, Some(border))
-  def borderStyle(border: Border): JStyleManager    = JStyleManager(rect(), palette(), Some(border))
-  def paletteStyle(palette: Palette): JStyleManager = JStyleManager(rect(), palette, withoutBorder)
-  def rectStyle(rect: Rect): JStyleManager          = JStyleManager(rect, palette(), withoutBorder)
-  def apply(): JStyleManager                        = JStyleManager(rect(), palette(), withoutBorder)
+  def completeStyler(rect: Rect, palette: Palette, border: Border): JStyler =
+    JStyler(rect, palette, Some(border))
+  def borderStyler(border: Border): JStyler    = JStyler(rect(), palette(), Some(border))
+  def paletteStyler(palette: Palette): JStyler = JStyler(rect(), palette, withoutBorder)
+  def rectStyler(rect: Rect): JStyler          = JStyler(rect, palette(), withoutBorder)
+  def apply(): JStyler                         = JStyler(rect(), palette(), withoutBorder)
 
-  case class JStyleManager(rect: Rect, palette: Palette, border: Option[Border]):
+  def puzzleStyler(using rect: Rect)(using palette: Palette)(using border: Border): JStyler =
+    completeStyler(rect, palette, border)
+  def puzzleRectStyler(using rect: Rect)(palette: Palette, border: Border): JStyler =
+    completeStyler(rect, palette, border)
+  def puzzlePaletteStyler(using palette: Palette)(rect: Rect, border: Border): JStyler =
+    completeStyler(rect, palette, border)
+  def puzzleBorderStyler(using border: Border)(rect: Rect, palette: Palette): JStyler =
+    completeStyler(rect, palette, border)
+
+  case class JStyler(rect: Rect, palette: Palette, border: Option[Border]):
     export rect._, palette._
     val all: Seq[JStyle] = border.map(style => Seq(rect, palette, style)).getOrElse(Seq(rect, palette))
 
-    def withRect(newRect: Rect): JStyleManager          = copy(rect = newRect)
-    def withPalette(newPalette: Palette): JStyleManager = copy(palette = newPalette)
-    def withBorder(newBorder: Border): JStyleManager    = copy(border = Some(newBorder))
+    def withRect(newRect: Rect): JStyler          = copy(rect = newRect)
+    def withPalette(newPalette: Palette): JStyler = copy(palette = newPalette)
+    def withBorder(newBorder: Border): JStyler    = copy(border = Some(newBorder))
 
   trait JStyle
   private object JStyle:
@@ -36,6 +45,8 @@ object JStyleManager:
     def rect(): Rect              = new Rect(defaultRoundRect)
     def roundRect(arc: Int): Rect = new Rect(arc)
 
+    def puzzleRect(using arc: Int): Rect = new Rect(arc)
+
     def completePalette(background: Color, click: Color, hover: Color): Palette =
       Palette(background, Some(click), Some(hover))
     def hoverPalette(hover: Color): Palette           = Palette(defaultColor, withOutColor, Some(hover))
@@ -43,9 +54,23 @@ object JStyleManager:
     def backgroundPalette(background: Color): Palette = new Palette(background)
     def palette(): Palette                            = backgroundPalette(defaultColor)
 
+    def puzzlePalette(using background: Color)(using click: Color)(using hover: Color): Palette =
+      completePalette(background, click, hover)
+    def puzzleHoverPalette(using hover: Color)(background: Color, click: Color): Palette =
+      completePalette(background, click, hover)
+    def puzzleClickPalette(using click: Color)(background: Color, hover: Color): Palette =
+      completePalette(background, click, hover)
+    def puzzleBackgroundPalette(using background: Color)(click: Color, hover: Color): Palette =
+      completePalette(background, click, hover)
+
     def completeBorder(color: Color, stroke: Int): Border = Border(color, stroke)
+    def strokeBorder(stroke: Int): Border                 = completeBorder(defaultColor, stroke)
     def colorBorder(color: Color): Border                 = completeBorder(color, defaultStroke)
     def border(): Border                                  = completeBorder(defaultColor, defaultStroke)
+
+    def puzzleBorder(using color: Color)(using stroke: Int) = completeBorder(color, stroke)
+    def puzzleColorBorder(using color: Color)(stroke: Int)  = completeBorder(color, stroke)
+    def puzzleStrokeBorder(using stroke: Int)(color: Color) = completeBorder(color, stroke)
 
     case class Rect(arcWidth: Int, arcHeight: Int) extends JStyle:
       def this(arc: Int) = this(arc, arc)

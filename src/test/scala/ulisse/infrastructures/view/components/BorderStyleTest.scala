@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyleManager._
+import ulisse.infrastructures.view.components.JStyler._
 
 import java.awt.Color
 
@@ -18,6 +18,12 @@ class BorderStyleTest extends AnyFlatSpec with Matchers:
     val newBorder = colorBorder(newColor)
     newBorder.color must be(newColor)
     newBorder.stroke must be(defaultStroke)
+
+  "stroke border" should "have new stroke" in:
+    val newStroke = 2
+    val newBorder = strokeBorder(newStroke)
+    newBorder.color must be(defaultColor)
+    newBorder.stroke must be(newStroke)
 
   "complete border" should "have new color and stroke" in:
     val newColor  = Color.black
