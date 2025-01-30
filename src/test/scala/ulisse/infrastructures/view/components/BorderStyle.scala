@@ -7,42 +7,40 @@ import ulisse.infrastructures.view.components.JStyle
 import java.awt.Color
 
 class BorderStyle extends AnyFlatSpec with Matchers:
-  val color  = Color.BLACK
-  val width  = 2
-  val arc    = 20
-  val border = JStyle.border(color, width, arc)
+  val defaultBorder = JStyle.border()
 
-  "BorderStyle" should "have color, width and arc" in:
-    border.color must be(color)
-    border.width must be(width)
-    border.arc must be(arc)
+  "default border" should "have color and stroke" in:
+    defaultBorder.color must be(JStyle.defaultBorderColor)
+    defaultBorder.stroke must be(JStyle.defaultStroke)
+
+  "color border" should "have new color" in:
+    val newColor  = Color.black
+    val newBorder = JStyle.colorBorder(newColor)
+    newBorder.color must be(newColor)
+    newBorder.stroke must be(JStyle.defaultStroke)
+
+  "complete border" should "have new color and stroke" in:
+    val newColor  = Color.black
+    val newStroke = 2
+    val newBorder = JStyle.completeBorder(newColor, newStroke)
+    newBorder.color must be(newColor)
+    newBorder.stroke must be(newStroke)
 
   "change color" should "have new color" in:
-    val newColor  = Color.GREEN
-    val newBorder = border.setColor(newColor)
+    val newColor  = Color.green
+    val newBorder = defaultBorder.withColor(newColor)
     newBorder.color must be(newColor)
-    newBorder.width must be(width)
-    newBorder.arc must be(arc)
+    newBorder.stroke must be(JStyle.defaultStroke)
 
-  "change width" should "have new width" in:
-    val newWidth  = 4
-    val newBorder = border.setWidth(newWidth)
-    newBorder.color must be(color)
-    newBorder.width must be(newWidth)
-    newBorder.arc must be(arc)
-
-  "change arc" should "have new arc" in:
-    val newArc    = 40
-    val newBorder = border.setArc(newArc)
-    newBorder.color must be(color)
-    newBorder.width must be(width)
-    newBorder.arc must be(newArc)
+  "change stroke" should "have new width" in:
+    val newStroke = 4
+    val newBorder = defaultBorder.withStroke(newStroke)
+    newBorder.color must be(JStyle.defaultBorderColor)
+    newBorder.stroke must be(newStroke)
 
   "change all values" should "have new values" in:
     val newColor  = Color.GREEN
-    val newWidth  = 4
-    val newArc    = 40
-    val newBorder = border.setAll(newColor, newWidth, newArc)
+    val newStroke = 4
+    val newBorder = defaultBorder.withAll(newColor, newStroke)
     newBorder.color must be(newColor)
-    newBorder.width must be(newWidth)
-    newBorder.arc must be(newArc)
+    newBorder.stroke must be(newStroke)

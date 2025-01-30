@@ -12,8 +12,8 @@ object JStyle:
   val defaultBackgroundColor: Color = Color.white
   val withOutColor                  = Option.empty[Color]
 
-  val defaultBorder: Border = border(Color.BLACK, 1, 10)
-  val orangeBorder: Border  = border(Color.decode("#FF4500"), 2, 20)
+  val defaultBorderColor: Color = defaultBackgroundColor
+  val defaultStroke: Int        = 1
 
   def rect(): Rect              = new Rect(defaultArcShape)
   def roundRect(arc: Int): Rect = new Rect(arc)
@@ -24,14 +24,16 @@ object JStyle:
     Palette(background, Some(click), Some(hover))
   def palette(): Palette = backgroundPalette(defaultBackgroundColor)
 
-  def border(color: Color, width: Int, arc: Int): Border = Border(color, width, arc)
+  def border(): Border                                  = Border(defaultBorderColor, defaultStroke)
+  def colorBorder(color: Color): Border                 = Border(color, defaultStroke)
+  def completeBorder(color: Color, stroke: Int): Border = Border(color, stroke)
 
   def empty(): JStyleService                = JStyleService()
   def apply(styles: JStyle*): JStyleService = JStyleService(styles: _*)
 
   case class JStyleService(style: JStyle*):
     val colorPalette: Palette = style.collectFirst { case c: Palette => c }.getOrElse(palette())
-    val border: Border        = style.collectFirst { case b: Border => b }.getOrElse(defaultBorder)
+    val border: Border        = style.collectFirst { case b: Border => b }.getOrElse(JStyle.border())
     val all: Seq[JStyle]      = Seq(colorPalette, border)
 
     def change[T <: JStyle](styles: T*): JStyleService =
@@ -51,9 +53,7 @@ object JStyle:
     def withClick(newClick: Color): Palette           = copy(click = Some(newClick))
     def withHover(newHover: Color): Palette           = copy(hover = Some(newHover))
 
-  case class Border(color: Color, width: Int, arc: Int) extends JStyle:
-    def setAll(newColor: Color, newWidth: Int, newArc: Int): Border =
-      copy(color = newColor, width = newWidth, arc = newArc)
-    def setColor(newColor: Color): Border = copy(color = newColor)
-    def setWidth(newWidth: Int): Border   = copy(width = newWidth)
-    def setArc(newArc: Int): Border       = copy(arc = newArc)
+  case class Border(color: Color, stroke: Int) extends JStyle:
+    def withAll(newColor: Color, newStroke: Int): Border = copy(color = newColor, stroke = newStroke)
+    def withColor(newColor: Color): Border               = copy(color = newColor)
+    def withStroke(newWidth: Int): Border                = copy(stroke = newWidth)

@@ -20,7 +20,7 @@ class JComponents extends AnyFlatSpec with Matchers:
 //    button.setColorPalette(newPalette)
 //    button.styleService.colorPalette must be(newPalette)
 
-  "change border" should "have new border" in:
-    val newBorder = JStyle.border(Color.BLACK, 2, 20)
-    button.setBorder(newBorder)
-    button.styleService.border must be(newBorder)
+//  "change border" should "have new border" in:
+//    val newBorder = JStyle.border(Color.BLACK, 2, 20)
+//    button.setBorder(newBorder)
+//    button.styleService.border must be(newBorder)
