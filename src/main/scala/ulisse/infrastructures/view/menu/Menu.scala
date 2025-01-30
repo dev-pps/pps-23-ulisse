@@ -12,20 +12,25 @@ import scala.swing.{
   Orientation,
   Panel,
   Rectangle,
-  Swing
+  Swing,
+  UIElement
 }
 
-def drawCross(g: Graphics2D, center: (Int, Int), length: Int, thickness: Int): Unit =
+def drawCross(preferredLength: Int, preferredThickness: Int)(element: UIElement)(g: Graphics2D): Unit =
   val oldColor = g.getColor
   g.setColor(Color.ORANGE)
+  val center = (element.size.width / 2, element.size.height / 2)
+  println(center)
+  val length    = math.min(math.min(element.size.width / 2, element.size.height / 2), preferredLength)
+  val thickness = math.min(math.min(element.size.width / 2, element.size.height / 2), preferredThickness)
   g.fillRect(center._1 - thickness / 2, center._2 - length / 2, thickness, length)
   g.fillRect(center._1 - length / 2, center._2 - thickness / 2, length, thickness)
   g.setColor(oldColor)
 
-final case class Card(icon: Graphics2D => Unit, text: String) extends BoxPanel(Orientation.Vertical):
-  val button = new Panel {
-    override def paint(g: Graphics2D): Unit = icon(g)
-  }
+final case class Card(icon: UIElement => Graphics2D => Unit, text: String) extends BoxPanel(Orientation.Vertical):
+  val configuredIcon = icon(this)
+  val button = new Panel:
+    override def paint(g: Graphics2D): Unit = configuredIcon(g)
   size
   val description = new Label(text)
   val descriptionContainer = new BoxPanel(Orientation.Horizontal):
@@ -38,8 +43,7 @@ final case class Card(icon: Graphics2D => Unit, text: String) extends BoxPanel(O
 
 final case class AppMenu() extends BorderPanel:
   preferredSize = new Dimension(600, 400)
-  private val cardCross = (g: Graphics2D) => drawCross(g, (50, 50), 20, 2) // Adjust center point
-  val card              = Card(cardCross, "Cross")
+  val card = Card(drawCross(20, 2), "Cross")
   card.preferredSize = new Dimension(100, 100)
   card.maximumSize = new Dimension(100, 100)
   card.minimumSize = new Dimension(100, 100)
