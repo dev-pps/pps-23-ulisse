@@ -47,7 +47,7 @@ object MapView:
 
     val createButton = JComponent.button(
       "Form Route",
-      styler(rect(20), hoverPalette(Color.green), defaultFont, border(Color.black, 2))
+      styler(roundRect(20), hoverPalette(Color.green), defaultFont, border(Color.black, 2))
     )
     val northPanel = new FlowPanel(createButton, info, error)
 
