@@ -10,7 +10,7 @@ import scala.swing.*
 trait JComponent(var styler: JStyler) extends Component:
   private var currentBackground = styler.background
   opaque = false
-  font = Font("Lucida Grande", Font.Plain, 13)
+  font = styler.font
   listenTo(mouse.moves, mouse.clicks)
 
   reactions += {

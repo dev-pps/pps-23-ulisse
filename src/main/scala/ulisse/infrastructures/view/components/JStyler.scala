@@ -30,7 +30,7 @@ object JStyler:
   def puzzleBorderStyler(using border: Border)(rect: Rect, palette: Palette, jFont: JFont): JStyler =
     completeStyler(rect, palette, jFont, border)
 
-  case class JStyler(rect: Rect, palette: Palette, jFont: JFont, border: Option[Border]):
+  case class JStyler(rect: Rect, palette: Palette, private val jFont: JFont, border: Option[Border]):
     export rect._, palette._, jFont._
     val all: Seq[JStyle] = border.map(style => Seq(rect, palette, jFont, style)).getOrElse(Seq(rect, palette, jFont))
 
