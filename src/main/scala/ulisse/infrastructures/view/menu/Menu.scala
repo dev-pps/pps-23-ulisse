@@ -2,9 +2,9 @@ package ulisse.infrastructures.view.menu
 
 import scaredOfArchunit.StationSettings
 import ulisse.infrastructures.view.UpdatableContainer
-import ulisse.infrastructures.view.simulation.MenuBar
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentUtils.*
+import ulisse.infrastructures.view.dashboard.MenuBar
 
 import java.awt.Color
 import scala.swing.event.MouseClicked
@@ -17,6 +17,10 @@ final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
     .genericClickReaction(() => root.update(StationSettings().stationEditorView))
 
   val card2 = Example.svgCardExample
+    .fixedSize(100, 100)
+    .genericClickReaction(() => root.update(StationSettings().stationEditorView))
+
+  val card3 = Example.imageCardExample
     .fixedSize(100, 100)
     .genericClickReaction(() => root.update(StationSettings().stationEditorView))
 
@@ -39,6 +43,8 @@ final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
       contents += card
       contents += Swing.HStrut(10)
       contents += card2
+      contents += Swing.HStrut(10)
+      contents += card3
       contents += Swing.HGlue
     contents += Swing.VGlue
   layout(centerPanel) = BorderPanel.Position.Center

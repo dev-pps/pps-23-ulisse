@@ -1,8 +1,9 @@
-package ulisse.infrastructures.view.simulation
-import scala.swing.*
+package ulisse.infrastructures.view.dashboard
+
+import java.awt.event.{FocusAdapter, FocusEvent}
 import java.awt.{Color, Dimension}
 import javax.swing.{BorderFactory, Box}
-import java.awt.event.{FocusAdapter, FocusEvent}
+import scala.swing.*
 
 final case class MenuBar() extends BoxPanel(Orientation.Vertical):
   private val buttonMenu = new Button("File"):
