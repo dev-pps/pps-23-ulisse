@@ -7,7 +7,7 @@ import javax.swing.BorderFactory
 import scala.swing.{Font as SwingFont, *}
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
-trait JComponent(var styler: JStyler) extends Component:
+trait JComponent(private var styler: JStyler) extends Component:
   private var currentBackground = styler.background
   listenTo(mouse.moves, mouse.clicks)
   opaque = false
@@ -19,6 +19,10 @@ trait JComponent(var styler: JStyler) extends Component:
     font = styler.swingFont
     revalidate()
     repaint()
+
+  def modularStyler(using newStyler: JStyler): Unit =
+    styler = newStyler
+    initStyler()
 
   def setStyler(newStyler: JStyler): Unit =
     styler = newStyler
@@ -46,7 +50,6 @@ trait JComponent(var styler: JStyler) extends Component:
   protected override def paintComponent(g: Graphics2D): Unit =
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g.setColor(currentBackground)
-
     val arcWidth  = styler.arcWidth
     val arcHeight = styler.arcHeight
     g.fillRoundRect(0, 0, size.width, size.height, arcWidth, arcHeight)
@@ -63,23 +66,18 @@ trait JComponent(var styler: JStyler) extends Component:
 object JComponent:
   case class JPanel()(jStyler: JStyler) extends Panel with JComponent(jStyler):
     peer.setBorder(BorderFactory.createEmptyBorder())
-  case class JTextField(colum: Int)(jStyler: JStyler) extends TextField(colum) with JComponent(jStyler):
-    peer.setBorder(BorderFactory.createEmptyBorder())
-  case class JLabel(label: String)(jStyler: JStyler) extends Label(label) with JComponent(jStyler)
   case class JButton(label: String)(jStyler: JStyler) extends Button(label) with JComponent(jStyler):
     focusPainted = false
-    contentAreaFilled = false
     borderPainted = false
+    contentAreaFilled = false
+  case class JLabel(label: String)(jStyler: JStyler) extends Label(label) with JComponent(jStyler)
+  case class JTextField(colum: Int)(jStyler: JStyler) extends TextField(colum) with JComponent(jStyler):
+    peer.setBorder(BorderFactory.createEmptyBorder())
 
-  def textField(colum: Int, styler: JStyler): JTextField = JTextField(colum)(styler)
-  def label(text: String, styler: JStyler): JLabel       = JLabel(text)(styler)
   def button(text: String, styler: JStyler): JButton     = JButton(text)(styler)
+  def label(text: String, styler: JStyler): JLabel       = JLabel(text)(styler)
+  def textField(colum: Int, styler: JStyler): JTextField = JTextField(colum)(styler)
 
-  def modularStylerTextField(colum: Int)(using styler: JStyler) = textField(colum, styler)
-
-  def modularButton(text: String)(using rect: Rect)(using palette: Palette)(using font: Font)(using
-      border: Border
-  ): JButton =
-    button(text, modularStyler)
-  def modularRectButton(text: String, palette: Palette, font: Font, border: Border)(using rect: Rect): JButton =
-    button(text, modularRectStyler(palette, font, border))
+  def modularButton(text: String)(using styler: JStyler): JButton     = button(text, styler)
+  def modularLabel(text: String)(using styler: JStyler): JLabel       = label(text, styler)
+  def modularTextField(colum: Int)(using styler: JStyler): JTextField = textField(colum, styler)

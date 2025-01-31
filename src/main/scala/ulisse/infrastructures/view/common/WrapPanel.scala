@@ -10,21 +10,21 @@ trait WrapPanel[+P <: Panel]:
   def visible: Boolean
 
 object WrapPanel:
-  def apply[P <: Panel](panel: P)(components: Component*)(using opaque: Boolean): WrapPanel[P] =
+  def apply[P <: Panel](panel: P)(components: Component*): WrapPanel[P] =
     WrapPanelImpl(panel)(components: _*)
 
-  def flow(components: Component*)(using opaque: Boolean): WrapPanel[FlowPanel] =
+  def flow(components: Component*): WrapPanel[FlowPanel] =
     WrapPanel(FlowPanel())(components: _*)
 
-  def box(orientation: Orientation.Value)(components: Component*)(using opaque: Boolean): WrapPanel[BoxPanel] =
+  def box(orientation: Orientation.Value)(components: Component*): WrapPanel[BoxPanel] =
     WrapPanel(BoxPanel(orientation))(components: _*)
 
-  def border(components: Component*)(using opaque: Boolean): WrapPanel[BorderPanel] =
+  def border(components: Component*): WrapPanel[BorderPanel] =
     WrapPanel(BorderPanel())(components: _*)
 
-  private case class WrapPanelImpl[+P <: Panel](mainPanel: P)(items: Component*)(using opaque: Boolean)
+  private case class WrapPanelImpl[+P <: Panel](mainPanel: P)(items: Component*)
       extends WrapPanel[P]:
-    mainPanel.opaque = opaque
+    mainPanel.opaque = false
 
     override def panel(): P                         = mainPanel
     override def components(): Seq[Component]       = items

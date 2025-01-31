@@ -39,8 +39,6 @@ object MapView:
     val error: Label         = JComponent.label(errorStr, defaultStyler)
     val formPanel: RouteForm = RouteForm()
 
-    println(s"${info.font}")
-
     // Main content pane with BorderLayout
     val contentPane = new BorderPanel
     val glassPane   = new BorderPanel
@@ -61,6 +59,8 @@ object MapView:
     private val dialog = new Dialog(this):
       title = "Dialogo Mobile"
       contents = formPanel.panel()
+      formPanel.panel().background = Color.decode("#f7f8ff")
+      background = Color.decode("#f7f8ff")
       setLocationRelativeTo(MapViewImpl.this)
       pack()
       open()
@@ -75,7 +75,7 @@ object MapView:
     }
 
     // formPanel button action
-    formPanel.saveButton().reactions += {
+    formPanel.saveButton.reactions += {
       case event.ButtonClicked(_) =>
         uiPort.save(formPanel.create()).onComplete(future =>
           for {
@@ -91,7 +91,7 @@ object MapView:
         )
     }
 
-    formPanel.exitButton().reactions += {
+    formPanel.exitButton.reactions += {
       case event.ButtonClicked(_) =>
 //        formPanel.setVisible(false)
         dialog.close()

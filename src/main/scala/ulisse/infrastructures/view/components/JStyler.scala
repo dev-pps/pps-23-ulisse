@@ -16,6 +16,11 @@ object JStyler:
   def paletteStyler(palette: Palette): JStyler = JStyler(defaultRect, palette, defaultFont, withoutBorder)
   def rectStyler(rect: Rect): JStyler          = JStyler(rect, defaultPalette, defaultFont, withoutBorder)
 
+  def rectPaletteFontStyler(rect: Rect, palette: Palette, font: Font): JStyler =
+    JStyler(rect, palette, font, withoutBorder)
+  def rectPaletteStyler(rect: Rect, palette: Palette): JStyler =
+    JStyler(rect, palette, defaultFont, withoutBorder)
+
   def modularStyler(using rect: Rect)(using palette: Palette)(using font: Font)(using border: Border): JStyler =
     styler(rect, palette, font, border)
   def modularRectStyler(palette: Palette, font: Font, border: Border)(using rect: Rect): JStyler =
@@ -62,9 +67,10 @@ object JStyler:
     case class Font(nameFont: String, styleFont: StyleFont, sizeFont: Int)                      extends JStyle
     case class Border(color: Color, stroke: Int)                                                extends JStyle
 
-    def rect(size: Size, arc: Int): Rect = Rect(Some(size), arc, arc)
-    def sizeRect(size: Size): Rect       = rect(size, defaultRoundRect)
-    def roundRect(arc: Int): Rect        = Rect(defaultSizeRect, arc, arc)
+    def rect(width: Int, height: Int, arc: Int): Rect = rect(Size(width, height), arc)
+    def rect(size: Size, arc: Int): Rect              = Rect(Some(size), arc, arc)
+    def sizeRect(size: Size): Rect                    = rect(size, defaultRoundRect)
+    def roundRect(arc: Int): Rect                     = Rect(defaultSizeRect, arc, arc)
 
     def palette(background: Color, click: Color, hover: Color): Palette = Palette(background, Some(click), Some(hover))
     def hoverPalette(hover: Color): Palette           = Palette(defaultColor, withOutColor, Some(hover))

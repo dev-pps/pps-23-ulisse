@@ -22,37 +22,41 @@ trait RouteForm extends FormPanel[BorderPanel]:
   def create(): Option[Route]
 
 object RouteForm:
+  private val btnPalette: Palette = palette(Color.decode("#f7f8ff"), Color.decode("#7fd1ae"), Color.decode("#d6dbf5"))
+//  private val btnPalette: Palette = palette(Color.green, Color.red, Color.decode("#5fd7ff"))
+  private val buttonRect: Rect = rect(85, 20, 10)
+  given stylerButton: JStyler  = rectPaletteFontStyler(buttonRect, btnPalette, defaultFont)
 
   private def createForm(using opaque: Boolean): FormPanel[BorderPanel] =
-    given rectComponent: Rect      = roundRect(10)
-    given buttonPalette: Palette   = palette(Color.decode("#84f7fc"), Color.decode("#6ab2f4"), Color.decode("#5fd7ff"))
-    given textFieldStyler: JStyler = rectStyler(rectComponent)
+//    given rectComponent: Rect      = roundRect(10)
+//    given buttonPalette: Palette   = palette(Color.decode("#84f7fc"), Color.decode("#6ab2f4"), Color.decode("#5fd7ff"))
+//    given textFieldStyler: JStyler = rectStyler(rectComponent)
 
     val typeRoute = KeyValuesPanel(FlowPanel())(Label("Type"), ComboBox(Seq("Normal", "AV")))
 
     val departureStation =
       KeyValuesPanel(FlowPanel())(
         JComponent.label("Departure", paletteStyler(backgroundPalette(transparentColor))),
-        JComponent.modularStylerTextField(5),
-        JComponent.modularStylerTextField(4),
-        JComponent.modularStylerTextField(4),
-        JComponent.button("...", modularPaletteStylerWithoutBorder(rectComponent, defaultFont))
+        JComponent.modularTextField(5),
+        JComponent.modularTextField(4),
+        JComponent.modularTextField(4),
+        JComponent.modularButton("...")
       )
     val arrivalStation =
       KeyValuesPanel(FlowPanel())(
         JComponent.label("Arrival", paletteStyler(backgroundPalette(transparentColor))),
-        JComponent.modularStylerTextField(5),
-        JComponent.modularStylerTextField(4),
-        JComponent.modularStylerTextField(4),
-        JComponent.button("...", modularPaletteStylerWithoutBorder(rectComponent, defaultFont))
+        JComponent.modularTextField(5),
+        JComponent.modularTextField(4),
+        JComponent.modularTextField(4),
+        JComponent.modularButton("...")
       )
     val railsCount = KeyValuesPanel(FlowPanel())(
       Label("Rails Count"),
-      JComponent.modularStylerTextField(3)
+      JComponent.modularTextField(3)
     )
     val length = KeyValuesPanel(FlowPanel())(
       Label("Length"),
-      JComponent.modularStylerTextField(3)
+      JComponent.modularTextField(3)
     )
     FormPanel(BorderPanel(), typeRoute, departureStation, arrivalStation, length, railsCount)
 
@@ -67,13 +71,11 @@ object RouteForm:
 
   private case class RouteFormImpl(form: FormPanel[BorderPanel]) extends RouteForm:
     export form.*
-    private val buttonPalette: Palette =
-      palette(Color.decode("#84f7fc"), Color.decode("#6ab2f4"), Color.decode("#5fd7ff"))
-    private val stylerButton = paletteStyler(buttonPalette)
-
-    form.saveButton().styler_=(stylerButton)
-    form.deleteButton().styler_=(stylerButton)
-    form.exitButton().styler_=(stylerButton)
+    form.panel().opaque = true
+    form.panel().background = Color.decode("#f7f8ff")
+    saveButton.modularStyler
+    deleteButton.modularStyler
+    exitButton.modularStyler
 
     override def routeType: Option[ComboBox[String]] =
       form.keyValuesPanel(Fields.RouteType.index).values[ComboBox[String]].headOption
