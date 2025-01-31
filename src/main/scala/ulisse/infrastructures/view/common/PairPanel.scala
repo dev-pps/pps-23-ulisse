@@ -4,17 +4,17 @@ import scala.reflect.ClassTag
 import scala.swing.{Component, Dimension, Panel}
 
 trait KeyValuesPanel[+P <: Panel] extends WrapPanel[P]:
-  def values[T <: Component](implicit ct: reflect.ClassTag[T]): Seq[T];
+  def values[T <: Component](using ct: reflect.ClassTag[T]): Seq[T];
 
 object KeyValuesPanel:
-  def apply[P <: Panel](panel: P)(key: Component, values: Component*)(using opaque: Boolean): KeyValuesPanel[P] =
+  def apply[P <: Panel](panel: P)(key: Component, values: Component*): KeyValuesPanel[P] =
     KeyValuesPanelImpl(panel)(key, values: _*)
 
-  private case class KeyValuesPanelImpl[+P <: Panel](mainPanel: P)(key: Component, values: Component*)(using
-      opaque: Boolean
-  ) extends KeyValuesPanel[P]:
+  private case class KeyValuesPanelImpl[+P <: Panel](mainPanel: P)(key: Component, values: Component*)
+      extends KeyValuesPanel[P]:
     private val wrapPanel: WrapPanel[P] = WrapPanel(mainPanel)(Seq(key).appendedAll(values): _*)
-
+    key.opaque = false
+    values.foreach(_.opaque = false)
     mainPanel.peer.add(key.peer)
     values.foreach(component => mainPanel.peer.add(component.peer))
 
@@ -26,17 +26,17 @@ trait PairPanel[+P <: Panel, +A <: Component, +B <: Component] extends WrapPanel
   def value: B
 
 object PairPanel:
-  def apply[P <: Panel, A <: Component, B <: Component](panel: P, first: A, second: B)(using
-      opaque: Boolean
-  ): PairPanel[P, A, B] = PairPanelImpl(panel, first, second)
+  def apply[P <: Panel, A <: Component, B <: Component](panel: P, first: A, second: B): PairPanel[P, A, B] =
+    PairPanelImpl(panel, first, second)
 
-  private case class PairPanelImpl[+P <: Panel, +A <: Component, +B <: Component](mainPanel: P, first: A, second: B)(
-      using opaque: Boolean
-  ) extends PairPanel[P, A, B]:
+  private case class PairPanelImpl[+P <: Panel, +A <: Component, +B <: Component](mainPanel: P, first: A, second: B)
+      extends PairPanel[P, A, B]:
     private val wrapPanel: WrapPanel[P] = WrapPanel(mainPanel)(first, second)
     mainPanel.peer.add(first.peer)
     mainPanel.peer.add(second.peer)
     mainPanel.maximumSize = new Dimension(400, 40)
+    first.opaque = false
+    second.opaque = false
 
     export wrapPanel.*
     override def key: A   = first
