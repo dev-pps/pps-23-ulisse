@@ -7,16 +7,15 @@ import ulisse.infrastructures.view.components.JStyler.*
 import java.awt.Color
 
 class JComponentTest extends AnyFlatSpec with Matchers:
-  val styleManager: JStyler = styler()
-  val text: String          = "Hello"
+  val text: String = "Hello"
 
-  val button = JComponent.button(text, styleManager)
+  val button = JComponent.button(text, defaultStyler)
 
   "create JButton" should "with text" in:
     button.text must be(text)
 
   "change rect" should "have new rect" in:
-    val newRect = roundRect(10)
+    val newRect = rect(10)
     button.setRect(newRect)
     button.styler.rect must be(newRect)
 
