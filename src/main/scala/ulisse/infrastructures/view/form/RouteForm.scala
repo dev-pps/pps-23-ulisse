@@ -1,9 +1,11 @@
 package ulisse.infrastructures.view.form
 
-import ulisse.entities.Coordinates.{Coordinate, Geo}
+import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.Route
 import ulisse.entities.Route.TypeRoute
 import ulisse.infrastructures.view.common.{FormPanel, KeyValuesPanel}
+import ulisse.infrastructures.view.components.JComponent
+import ulisse.infrastructures.view.components.JStyler.*
 
 import scala.swing.*
 
@@ -21,19 +23,32 @@ trait RouteForm extends FormPanel[BorderPanel]:
 object RouteForm:
 
   private def createForm(using opaque: Boolean): FormPanel[BorderPanel] =
-    val typeRoute = KeyValuesPanel(FlowPanel())(Label("Route Type"), ComboBox(Seq("Normal", "AV")))
+    val typeRoute                  = KeyValuesPanel(FlowPanel())(Label("Route Type"), ComboBox(Seq("Normal", "AV")))
+    given textFieldStyler: JStyler = rectStyler(roundRect(5))
     val departureStation =
       KeyValuesPanel(FlowPanel())(
-        Label("Departure Station"),
-        TextField(5),
-        TextField(3),
-        TextField(3),
+        JComponent.label("Departure Station", styler()),
+        JComponent.puzzleStylerTextField(3),
+        JComponent.puzzleStylerTextField(3),
+        JComponent.puzzleStylerTextField(3),
         new Button("...")
       )
     val arrivalStation =
-      KeyValuesPanel(FlowPanel())(Label("Arrival Station"), TextField(5), TextField(3), TextField(3), new Button("..."))
-    val railsCount = KeyValuesPanel(FlowPanel())(Label("Rails Count"), TextField(10))
-    val length     = KeyValuesPanel(FlowPanel())(Label("Length"), TextField(10))
+      KeyValuesPanel(FlowPanel())(
+        JComponent.label("Arrival Station", styler()),
+        JComponent.puzzleStylerTextField(3),
+        JComponent.puzzleStylerTextField(3),
+        JComponent.puzzleStylerTextField(3),
+        new Button("...")
+      )
+    val railsCount = KeyValuesPanel(FlowPanel())(
+      Label("Rails Count"),
+      JComponent.puzzleStylerTextField(5)
+    )
+    val length = KeyValuesPanel(FlowPanel())(
+      Label("Length"),
+      JComponent.puzzleStylerTextField(5)
+    )
     FormPanel(BorderPanel(), typeRoute, departureStation, arrivalStation, length, railsCount)
 
   def apply()(using opaque: Boolean): RouteForm = RouteFormImpl(createForm)
