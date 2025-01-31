@@ -2,75 +2,98 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyler._
+import ulisse.infrastructures.view.components.JStyler.*
 
 import java.awt.Color
 
 class JStylerTest extends AnyFlatSpec with Matchers:
-  val defaultManager = styler()
+  val defaultStyler = styler()
 
-  "default manager" should "have default style" in:
-    defaultManager.rect must be(defaultRect)
-    defaultManager.palette must be(defaultPalette)
-    defaultManager.all must be(Seq(defaultRect, defaultPalette))
+  "default styler" should "have default style" in:
+    defaultStyler.rect must be(defaultRect)
+    defaultStyler.palette must be(defaultPalette)
+    defaultStyler.jFont must be(defaultFont)
+    defaultStyler.all must be(Seq(defaultRect, defaultPalette, defaultFont))
 
-  "rect manager" should "have rect style" in:
-    val newRect     = roundRect(10)
-    val rectManager = rectStyler(newRect)
+  "rect styler" should "have rect style" in:
+    val newRect = roundRect(10)
+    val styler  = rectStyler(newRect)
 
-    rectManager.rect must be(newRect)
-    rectManager.palette must be(defaultPalette)
-    rectManager.border must be(withoutBorder)
-    rectManager.all must be(Seq(newRect, defaultPalette))
+    styler.rect must be(newRect)
+    styler.palette must be(defaultPalette)
+    styler.jFont must be(defaultFont)
+    styler.border must be(withoutBorder)
+    styler.all must be(Seq(newRect, defaultPalette, defaultFont))
 
-  "palette manager" should "have palette style" in:
-    val newPalette     = backgroundPalette(Color.green)
-    val paletteManager = paletteStyler(newPalette)
+  "palette styler" should "have palette style" in:
+    val newPalette = backgroundPalette(Color.green)
+    val styler     = paletteStyler(newPalette)
 
-    paletteManager.rect must be(defaultRect)
-    paletteManager.palette must be(newPalette)
-    paletteManager.border must be(withoutBorder)
-    paletteManager.all must be(Seq(defaultRect, newPalette))
+    styler.rect must be(defaultRect)
+    styler.palette must be(newPalette)
+    styler.jFont must be(defaultFont)
+    styler.border must be(withoutBorder)
+    styler.all must be(Seq(defaultRect, newPalette, defaultFont))
 
-  "border manager" should "have border style" in:
-    val newBorder     = colorBorder(Color.green)
-    val borderManager = borderStyler(newBorder)
+  "font styler" should "have font style" in:
+    val newFont = sizeJFont(20)
+    val styler  = fontStyler(newFont)
 
-    borderManager.rect must be(defaultRect)
-    borderManager.palette must be(defaultPalette)
-    borderManager.all must be(Seq(defaultRect, defaultPalette, newBorder))
+    styler.rect must be(defaultRect)
+    styler.palette must be(defaultPalette)
+    styler.jFont must be(newFont)
+    styler.all must be(Seq(defaultRect, defaultPalette, newFont))
 
-  "complete manager" should "have complete style" in:
-    val newRect         = roundRect(10)
-    val newPalette      = backgroundPalette(Color.green)
-    val newBorder       = colorBorder(Color.green)
-    val completeManager = completeStyler(newRect, newPalette, newBorder)
+  "border styler" should "have border style" in:
+    val newBorder = colorBorder(Color.green)
+    val styler    = borderStyler(newBorder)
 
-    completeManager.rect must be(newRect)
-    completeManager.palette must be(newPalette)
-    completeManager.border must be(Some(newBorder))
-    completeManager.all must be(Seq(newRect, newPalette, newBorder))
+    styler.rect must be(defaultRect)
+    styler.palette must be(defaultPalette)
+    styler.all must be(Seq(defaultRect, defaultPalette, defaultFont, newBorder))
 
-  "change rect manager" should "have new rect" in:
-    val newRect     = roundRect(10)
-    val rectManager = defaultManager.withRect(newRect)
+  "complete styler" should "have complete style" in:
+    val newRect    = roundRect(10)
+    val newPalette = backgroundPalette(Color.green)
+    val font       = sizeJFont(20)
+    val newBorder  = colorBorder(Color.green)
+    val styler     = completeStyler(newRect, newPalette, font, newBorder)
 
-    rectManager.rect must be(newRect)
-    rectManager.palette must be(defaultPalette)
-    rectManager.all must be(Seq(newRect, defaultPalette))
+    styler.rect must be(newRect)
+    styler.palette must be(newPalette)
+    styler.jFont must be(font)
+    styler.border must be(Some(newBorder))
+    styler.all must be(Seq(newRect, newPalette, font, newBorder))
 
-  "change palette manager" should "have new palette" in:
-    val newPalette     = backgroundPalette(Color.green)
-    val paletteManager = defaultManager.withPalette(newPalette)
+  "change rect styler" should "have new rect" in:
+    val newRect    = roundRect(10)
+    val rectStyler = defaultStyler.withRect(newRect)
 
-    paletteManager.rect must be(defaultRect)
-    paletteManager.palette must be(newPalette)
-    paletteManager.all must be(Seq(defaultRect, newPalette))
+    rectStyler.rect must be(newRect)
+    rectStyler.palette must be(defaultPalette)
+    rectStyler.all must be(Seq(newRect, defaultPalette, defaultFont))
 
-  "change border manager" should "have new border" in:
-    val newBorder     = colorBorder(Color.green)
-    val borderManager = defaultManager.withBorder(newBorder)
+  "change palette styler" should "have new palette" in:
+    val newPalette    = backgroundPalette(Color.green)
+    val paletteStyler = defaultStyler.withPalette(newPalette)
 
-    borderManager.rect must be(defaultRect)
-    borderManager.palette must be(defaultPalette)
-    borderManager.all must be(Seq(defaultRect, defaultPalette, newBorder))
+    paletteStyler.rect must be(defaultRect)
+    paletteStyler.palette must be(newPalette)
+    paletteStyler.all must be(Seq(defaultRect, newPalette, defaultFont))
+
+  "change font styler" should "have new font" in:
+    val newFont    = sizeJFont(20)
+    val fontStyler = defaultStyler.withFont(newFont)
+
+    fontStyler.rect must be(defaultRect)
+    fontStyler.palette must be(defaultPalette)
+    fontStyler.jFont must be(newFont)
+    fontStyler.all must be(Seq(defaultRect, defaultPalette, newFont))
+
+  "change border styler" should "have new border" in:
+    val newBorder    = colorBorder(Color.green)
+    val borderStyler = defaultStyler.withBorder(newBorder)
+
+    borderStyler.rect must be(defaultRect)
+    borderStyler.palette must be(defaultPalette)
+    borderStyler.all must be(Seq(defaultRect, defaultPalette, defaultFont, newBorder))

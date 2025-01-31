@@ -1,15 +1,16 @@
 package ulisse.infrastructures.view.components
 
-import ulisse.infrastructures.view.components.JStyler.*
+import ulisse.infrastructures.view.components.JStyler._
 
 import java.awt.{BasicStroke, RenderingHints}
+import javax.swing.BorderFactory
 import scala.swing.*
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
 trait JComponent(var styler: JStyler) extends Component:
   private var currentBackground = styler.background
   opaque = false
-  font = Font("Arial", Font.Bold, 14)
+  font = Font("Lucida Grande", Font.Plain, 13)
   listenTo(mouse.moves, mouse.clicks)
 
   reactions += {
@@ -61,22 +62,21 @@ trait JComponent(var styler: JStyler) extends Component:
     repaint()
 
 object JComponent:
-  def textField(text: String, styler: JStyler): JTextField = JTextField(text)(styler)
-  def label(text: String, styler: JStyler): JLabel         = JLabel(text)(styler)
-  def button(text: String, styler: JStyler): JButton       = JButton(text)(styler)
+  def puzzleStylerTextField(colum: Int)(using styler: JStyler) = textField(colum, styler)
+  def textField(colum: Int, styler: JStyler): JTextField       = JTextField(colum)(styler)
+  def label(text: String, styler: JStyler): JLabel             = JLabel(text)(styler)
+  def button(text: String, styler: JStyler): JButton           = JButton(text)(styler)
 
-  def puzzleStylesButton(text: String)(using rect: Rect)(using palette: Palette)(using border: Border): JButton =
+  def puzzleStylesButton(text: String)(using rect: Rect)(using palette: Palette)(using font: JFont)(using
+      border: Border
+  ): JButton =
     button(text, puzzleStyler)
-  def puzzleRectButton(text: String, palette: Palette, border: Border)(using rect: Rect): JButton =
-    button(text, puzzleRectStyler(palette, border))
-  def puzzlePaletteButton(text: String)(using palette: Palette)(using rect: Rect)(using border: Border): JButton =
-    button(text, puzzlePaletteStyler(rect, border))
-  def puzzleBorderButton(text: String)(using border: Border)(using rect: Rect)(using palette: Palette): JButton =
-    button(text, puzzleBorderStyler(rect, palette))
-  def puzzleStylerButton(text: String)(using styler: JStyler): JButton = button(text, styler)
+  def puzzleRectButton(text: String, palette: Palette, font: JFont, border: Border)(using rect: Rect): JButton =
+    button(text, puzzleRectStyler(palette, font, border))
 
-  case class JTextField(label: String)(jStyler: JStyler) extends TextField(label) with JComponent(jStyler)
-  case class JLabel(label: String)(jStyler: JStyler)     extends Label(label) with JComponent(jStyler)
+  case class JTextField(colum: Int)(jStyler: JStyler) extends TextField(colum) with JComponent(jStyler):
+    peer.setBorder(BorderFactory.createEmptyBorder())
+  case class JLabel(label: String)(jStyler: JStyler) extends Label(label) with JComponent(jStyler)
   case class JButton(label: String)(jStyler: JStyler) extends Button(label) with JComponent(jStyler):
     focusPainted = false
     contentAreaFilled = false
