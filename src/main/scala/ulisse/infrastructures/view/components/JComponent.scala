@@ -7,27 +7,27 @@ import javax.swing.BorderFactory
 import scala.swing.{Font as SwingFont, *}
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
-trait JComponent(var styler: JStyler) extends Component:
-  private var currentBackground = styler.background
+trait JComponent(private var _styler: JStyler) extends Component:
+  private var currentBackground = _styler.background
   opaque = false
-  font = styler.swingFont
+  font = _styler.swingFont
   listenTo(mouse.moves, mouse.clicks)
 
   reactions += {
-    case event.MouseEntered(_, _, _) => styler.hoverColor.map(color =>
+    case event.MouseEntered(_, _, _) => _styler.hoverColor.map(color =>
         currentBackground = color
         repaint()
       )
-    case event.MouseExited(_, _, _) => styler.hoverColor.map(_ =>
-        currentBackground = styler.background
+    case event.MouseExited(_, _, _) => _styler.hoverColor.map(_ =>
+        currentBackground = _styler.background
         repaint()
       )
-    case event.MousePressed(_, _, _, _, _) => styler.clickColor.map(color =>
+    case event.MousePressed(_, _, _, _, _) => _styler.clickColor.map(color =>
         currentBackground = color
         repaint()
       )
-    case event.MouseReleased(_, _, _, _, _) => styler.clickColor.map(_ =>
-        currentBackground = styler.background
+    case event.MouseReleased(_, _, _, _, _) => _styler.clickColor.map(_ =>
+        currentBackground = _styler.background
         repaint()
       )
   }
@@ -35,12 +35,12 @@ trait JComponent(var styler: JStyler) extends Component:
   protected override def paintComponent(g: Graphics2D): Unit =
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g.setColor(currentBackground)
-    val arcWidth  = styler.arcWidth
-    val arcHeight = styler.arcHeight
+    val arcWidth  = _styler.arcWidth
+    val arcHeight = _styler.arcHeight
 
     g.fillRoundRect(0, 0, size.width, size.height, arcWidth, arcHeight)
 
-    styler.border.foreach(border =>
+    _styler.border.foreach(border =>
       val borderPosition = border.stroke / 2
       val borderSize     = (size.width - border.stroke, size.height - border.stroke)
       g.setColor(border.color)
@@ -49,19 +49,16 @@ trait JComponent(var styler: JStyler) extends Component:
     )
     super.paintComponent(g)
 
-  def setRect(rect: Rect): Unit =
-    styler = styler.copy(rect = rect)
+  def styler_=(newStyler: JStyler): Unit =
+    _styler = newStyler
+    currentBackground = _styler.background
+    font = newStyler.swingFont
     repaint()
-
-  def setColorPalette(palette: Palette): Unit =
-    styler = styler.copy(palette = palette)
-    repaint()
-
-  def setBorder(border: Border): Unit =
-    styler = styler.withBorder(border)
-    repaint()
+    revalidate()
 
 object JComponent:
+  case class JPanel()(jStyler: JStyler) extends Panel with JComponent(jStyler):
+    peer.setBorder(BorderFactory.createEmptyBorder())
   case class JTextField(colum: Int)(jStyler: JStyler) extends TextField(colum) with JComponent(jStyler):
     peer.setBorder(BorderFactory.createEmptyBorder())
   case class JLabel(label: String)(jStyler: JStyler) extends Label(label) with JComponent(jStyler)
