@@ -3,7 +3,8 @@ package ulisse.infrastructures.view.form
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.Route
 import ulisse.entities.Route.TypeRoute
-import ulisse.infrastructures.view.common.{FormPanel, KeyValuesPanel}
+import ulisse.infrastructures.view.common.Theme.Light
+import ulisse.infrastructures.view.common.{FormPanel, KeyValuesPanel, Theme}
 import ulisse.infrastructures.view.components.JComponent
 import ulisse.infrastructures.view.components.JStyler.*
 
@@ -22,7 +23,7 @@ trait RouteForm extends FormPanel[BorderPanel]:
   def create(): Option[Route]
 
 object RouteForm:
-  private val btnPalette: Palette = palette(Color.decode("#f7f8ff"), Color.decode("#7fd1ae"), Color.decode("#d6dbf5"))
+  private val btnPalette: Palette = palette(Light.element.color, Light.normalClick.color, Light.hover.color)
 //  private val btnPalette: Palette = palette(Color.green, Color.red, Color.decode("#5fd7ff"))
   private val buttonRect: Rect = rect(85, 20, 10)
   given stylerButton: JStyler  = rectPaletteFontStyler(buttonRect, btnPalette, defaultFont)
@@ -72,7 +73,8 @@ object RouteForm:
   private case class RouteFormImpl(form: FormPanel[BorderPanel]) extends RouteForm:
     export form.*
     form.panel().opaque = true
-    form.panel().background = Color.decode("#f7f8ff")
+    form.panel().background = Light.background.color
+
     saveButton.modularStyler
     deleteButton.modularStyler
     exitButton.modularStyler

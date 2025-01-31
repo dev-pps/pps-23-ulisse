@@ -15,7 +15,6 @@ class JComponentTest extends AnyFlatSpec with Matchers:
     button.text must be(text)
 
   "change styler" should "change background color" in:
-    val newRect   = roundRect(50)
-    val newStyler = button.styler.copy(rect = newRect)
-    button.modularStyler(newStyler)
-    button.styler.rect must be(newRect)
+    val newRect = roundRect(50)
+    button.setStyler(button.getStyler.copy(rect = newRect))
+    button.getStyler.rect must be(newRect)

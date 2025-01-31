@@ -24,6 +24,8 @@ trait JComponent(private var styler: JStyler) extends Component:
     styler = newStyler
     initStyler()
 
+  def getStyler: JStyler = styler
+
   def setStyler(newStyler: JStyler): Unit =
     styler = newStyler
     initStyler()
