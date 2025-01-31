@@ -3,13 +3,11 @@ package ulisse.infrastructures.view.components
 import com.formdev.flatlaf.extras.FlatSVGIcon
 import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
 
-import java.awt.image.BufferedImage
-import java.awt.{Color, Image}
-import java.io.File
+import java.awt.Color
 import javax.imageio.ImageIO
-import javax.swing.border.LineBorder
-import scala.swing.{BoxPanel, Component, Graphics2D, Label, Orientation, Panel, Swing, UIElement}
+import scala.swing.{BoxPanel, Component, Graphics2D, Label, Orientation, Panel, RadioButton, Swing, UIElement}
 
+@SuppressWarnings(Array("org.wartremover.warts.MutableDataStructures"))
 object Cards:
   trait Card extends Component
 
@@ -19,10 +17,12 @@ object Cards:
     def createDrawnCard(icon: (UIElement, Graphics2D) => Unit, text: Option[String]): Card = DrawnCard(icon, text)
 
   private def buildDescriptionContainer(text: Option[String]): Option[BoxPanel] =
-    for t <- text yield new BoxPanel(Orientation.Horizontal):
-      contents += Swing.HGlue
-      contents += new Label(t)
-      contents += Swing.HGlue
+    val bx =
+      for t <- text yield new BoxPanel(Orientation.Horizontal):
+        contents += Swing.HGlue
+        contents += new Label(t)
+        contents += Swing.HGlue
+    bx
 
   private final case class ImageCard(imageUrl: String, text: Option[String])
       extends BoxPanel(Orientation.Vertical) with Card:
@@ -35,11 +35,9 @@ object Cards:
 
   private final case class SVGCard(svg: String, color: Color, text: Option[String])
       extends BoxPanel(Orientation.Vertical) with Card:
-    border = new LineBorder(color, 2)
-
     contents += new Panel:
       val rawIcon = new FlatSVGIcon(svg)
-      rawIcon.setColorFilter(ColorFilter(color => Color.GREEN))
+      rawIcon.setColorFilter(ColorFilter(_ => color))
       override def paint(g: Graphics2D): Unit =
         val size = math.min(peer.getWidth, peer.getHeight) / 2
         val icon = rawIcon.derive(size, size)
@@ -48,13 +46,11 @@ object Cards:
 
   private final case class DrawnCard(icon: (UIElement, Graphics2D) => Unit, text: Option[String])
       extends BoxPanel(Orientation.Vertical) with Card:
-    border = new LineBorder(Color.BLACK, 2)
     contents += new Panel:
       override def paint(g: Graphics2D): Unit = icon(this, g)
     for dc <- buildDescriptionContainer(text) do contents += dc
 
   object Example:
-    import Cards.*
     def drawCross(preferredLength: Int, preferredThickness: Int, color: Color)(
         element: UIElement,
         g: Graphics2D
@@ -69,5 +65,5 @@ object Cards:
       g.setColor(oldColor)
 
     val imageCardExample: Card = Cards.Card.createImageCard("icon/logo.jpg", Some("Logo"))
-    val svgCardExample: Card   = Cards.Card.createSVGCard("icon/mapIcon.svg", Some("Map"), Color.RED)
+    val svgCardExample: Card   = Cards.Card.createSVGCard("icon/map.svg", Some("Map"), Color.RED)
     val drawnCardExample: Card = Cards.Card.createDrawnCard(drawCross(20, 2, Color.BLUE), Some("Cross"))
