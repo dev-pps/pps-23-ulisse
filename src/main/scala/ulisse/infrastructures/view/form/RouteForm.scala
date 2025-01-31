@@ -3,12 +3,11 @@ package ulisse.infrastructures.view.form
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.Route
 import ulisse.entities.Route.TypeRoute
-import ulisse.infrastructures.view.common.Theme.Light
+import ulisse.infrastructures.view.common.Theme.{light, Light}
 import ulisse.infrastructures.view.common.{FormPanel, KeyValuesPanel, Theme}
 import ulisse.infrastructures.view.components.JComponent
 import ulisse.infrastructures.view.components.JStyler.*
 
-import java.awt.Color
 import scala.swing.*
 
 trait RouteForm extends FormPanel[BorderPanel]:
@@ -23,41 +22,37 @@ trait RouteForm extends FormPanel[BorderPanel]:
   def create(): Option[Route]
 
 object RouteForm:
-  private val btnPalette: Palette = palette(Light.element.color, Light.normalClick.color, Light.hover.color)
-//  private val btnPalette: Palette = palette(Color.green, Color.red, Color.decode("#5fd7ff"))
-  private val buttonRect: Rect = rect(85, 20, 10)
-  given stylerButton: JStyler  = rectPaletteFontStyler(buttonRect, btnPalette, defaultFont)
+  private val buttonPickerStyler =
+    rectPaletteStyler(rect(40, 20, 10), palette(light.element, light.forwardClick, light.hover))
+  private val textFieldStyler =
+    rectPaletteStyler(rect(40, 20, 10), backgroundHoverPalette(light.element, light.hover))
 
   private def createForm(using opaque: Boolean): FormPanel[BorderPanel] =
-//    given rectComponent: Rect      = roundRect(10)
-//    given buttonPalette: Palette   = palette(Color.decode("#84f7fc"), Color.decode("#6ab2f4"), Color.decode("#5fd7ff"))
-//    given textFieldStyler: JStyler = rectStyler(rectComponent)
-
     val typeRoute = KeyValuesPanel(FlowPanel())(Label("Type"), ComboBox(Seq("Normal", "AV")))
 
     val departureStation =
       KeyValuesPanel(FlowPanel())(
         JComponent.label("Departure", paletteStyler(backgroundPalette(transparentColor))),
-        JComponent.modularTextField(5),
-        JComponent.modularTextField(4),
-        JComponent.modularTextField(4),
-        JComponent.modularButton("...")
+        JComponent.textField(5, textFieldStyler),
+        JComponent.textField(4, textFieldStyler),
+        JComponent.textField(4, textFieldStyler),
+        JComponent.button("...", buttonPickerStyler)
       )
     val arrivalStation =
       KeyValuesPanel(FlowPanel())(
         JComponent.label("Arrival", paletteStyler(backgroundPalette(transparentColor))),
-        JComponent.modularTextField(5),
-        JComponent.modularTextField(4),
-        JComponent.modularTextField(4),
-        JComponent.modularButton("...")
+        JComponent.textField(5, textFieldStyler),
+        JComponent.textField(4, textFieldStyler),
+        JComponent.textField(4, textFieldStyler),
+        JComponent.button("...", buttonPickerStyler)
       )
     val railsCount = KeyValuesPanel(FlowPanel())(
       Label("Rails Count"),
-      JComponent.modularTextField(3)
+      JComponent.textField(3, textFieldStyler)
     )
     val length = KeyValuesPanel(FlowPanel())(
       Label("Length"),
-      JComponent.modularTextField(3)
+      JComponent.textField(3, textFieldStyler)
     )
     FormPanel(BorderPanel(), typeRoute, departureStation, arrivalStation, length, railsCount)
 
@@ -73,11 +68,12 @@ object RouteForm:
   private case class RouteFormImpl(form: FormPanel[BorderPanel]) extends RouteForm:
     export form.*
     form.panel().opaque = true
-    form.panel().background = Light.background.color
+    form.panel().background = light.background
 
-    saveButton.modularStyler
-    deleteButton.modularStyler
-    exitButton.modularStyler
+    private val buttonRect: Rect = rect(85, 20, 10)
+    saveButton.setStyler(rectPaletteStyler(buttonRect, palette(light.element, light.trueClick, light.hover)))
+    deleteButton.setStyler(rectPaletteStyler(buttonRect, palette(light.element, light.falseClick, light.hover)))
+    exitButton.setStyler(rectPaletteStyler(buttonRect, palette(light.element, light.backwardClick, light.hover)))
 
     override def routeType: Option[ComboBox[String]] =
       form.keyValuesPanel(Fields.RouteType.index).values[ComboBox[String]].headOption

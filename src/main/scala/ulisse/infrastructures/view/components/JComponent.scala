@@ -67,7 +67,7 @@ trait JComponent(private var styler: JStyler) extends Component:
 
 object JComponent:
   case class JPanel()(jStyler: JStyler) extends Panel with JComponent(jStyler):
-    peer.setBorder(BorderFactory.createEmptyBorder())
+    peer.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5))
   case class JButton(label: String)(jStyler: JStyler) extends Button(label) with JComponent(jStyler):
     focusPainted = false
     borderPainted = false
