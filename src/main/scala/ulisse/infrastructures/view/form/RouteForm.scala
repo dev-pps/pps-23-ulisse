@@ -24,30 +24,30 @@ object RouteForm:
 
   private def createForm(using opaque: Boolean): FormPanel[BorderPanel] =
     val typeRoute                  = KeyValuesPanel(FlowPanel())(Label("Route Type"), ComboBox(Seq("Normal", "AV")))
-    given textFieldStyler: JStyler = rectStyler(roundRect(5))
+    given textFieldStyler: JStyler = rectStyler(rect(5))
     val departureStation =
       KeyValuesPanel(FlowPanel())(
-        JComponent.label("Departure Station", styler()),
-        JComponent.puzzleStylerTextField(3),
-        JComponent.puzzleStylerTextField(3),
-        JComponent.puzzleStylerTextField(3),
+        JComponent.label("Departure Station", defaultStyler),
+        JComponent.modularStylerTextField(3),
+        JComponent.modularStylerTextField(3),
+        JComponent.modularStylerTextField(3),
         new Button("...")
       )
     val arrivalStation =
       KeyValuesPanel(FlowPanel())(
-        JComponent.label("Arrival Station", styler()),
-        JComponent.puzzleStylerTextField(3),
-        JComponent.puzzleStylerTextField(3),
-        JComponent.puzzleStylerTextField(3),
+        JComponent.label("Arrival Station", defaultStyler),
+        JComponent.modularStylerTextField(3),
+        JComponent.modularStylerTextField(3),
+        JComponent.modularStylerTextField(3),
         new Button("...")
       )
     val railsCount = KeyValuesPanel(FlowPanel())(
       Label("Rails Count"),
-      JComponent.puzzleStylerTextField(5)
+      JComponent.modularStylerTextField(5)
     )
     val length = KeyValuesPanel(FlowPanel())(
       Label("Length"),
-      JComponent.puzzleStylerTextField(5)
+      JComponent.modularStylerTextField(5)
     )
     FormPanel(BorderPanel(), typeRoute, departureStation, arrivalStation, length, railsCount)
 

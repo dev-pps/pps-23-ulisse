@@ -5,7 +5,7 @@ import ulisse.applications.useCases.RouteManager
 import ulisse.applications.useCases.RouteManager.ErrorSaving
 import ulisse.entities.Route
 import ulisse.infrastructures.view.components.JComponent
-import ulisse.infrastructures.view.components.JStyler._
+import ulisse.infrastructures.view.components.JStyler.*
 import ulisse.infrastructures.view.form.RouteForm
 import ulisse.utils.Swings.centerOf
 
@@ -36,7 +36,7 @@ object MapView:
 
     val mapPark: MapPanel    = MapPanel.empty()
     val info: Label          = Label(s"$countLabel")
-    val error: Label         = JComponent.label(errorStr, styler())
+    val error: Label         = JComponent.label(errorStr, defaultStyler)
     val formPanel: RouteForm = RouteForm()
 
     println(s"${info.font}")
@@ -47,7 +47,7 @@ object MapView:
 
     val createButton = JComponent.button(
       "Form Route",
-      completeStyler(roundRect(20), hoverPalette(Color.green), jFont(), completeBorder(Color.black, 2))
+      styler(rect(20), hoverPalette(Color.green), defaultFont, border(Color.black, 2))
     )
     val northPanel = new FlowPanel(createButton, info, error)
 
