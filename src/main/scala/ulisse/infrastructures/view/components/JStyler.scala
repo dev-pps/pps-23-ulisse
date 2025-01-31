@@ -33,10 +33,8 @@ object JStyler:
 
   case class JStyler(rect: Rect, palette: Palette, font: Font, border: Option[Border]):
     export rect._, palette._, font._
-    val swingFont         = new SwingFont(font.nameFont, font.styleFont.id, font.sizeFont)
     val all: List[JStyle] = List(rect, palette, font) ++ border.toList
-
-    def withBorder(newBorder: Border): JStyler = copy(border = Some(newBorder))
+    val swingFont         = new SwingFont(font.nameFont, font.styleFont.id, font.sizeFont)
 
   trait JStyle
   private object JStyles:

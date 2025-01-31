@@ -11,20 +11,11 @@ class JComponentTest extends AnyFlatSpec with Matchers:
 
   val button = JComponent.button(text, defaultStyler)
 
-//  "create JButton" should "with text" in:
-//    button.text must be(text)
-//
-//  "change rect" should "have new rect" in:
-//    val newRect = rect(10)
-//    button.setRect(newRect)
-//    button.styler.rect must be(newRect)
-//
-//  "change color palette" should "have new color palette" in:
-//    val newPalette = backgroundPalette(Color.black)
-//    button.setColorPalette(newPalette)
-//    button.styler.palette must be(newPalette)
-//
-//  "change border" should "have new border" in:
-//    val newBorder = colorBorder(Color.black)
-//    button.setBorder(newBorder)
-//    button.styler.border must be(Some(newBorder))
+  "create JButton" should "with text" in:
+    button.text must be(text)
+
+  "change styler" should "change background color" in:
+    val newRect   = roundRect(50)
+    val newStyler = button.styler.copy(rect = newRect)
+    button.setStyler(newStyler)
+    button.styler.rect must be(newRect)
