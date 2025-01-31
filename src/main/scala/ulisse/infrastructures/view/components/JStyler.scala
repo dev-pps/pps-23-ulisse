@@ -77,6 +77,9 @@ object JStyler:
     def clickPalette(click: Color): Palette           = Palette(defaultColor, Some(click), withOutColor)
     def backgroundPalette(background: Color): Palette = Palette(background, withOutColor, withOutColor)
 
+    def backgroundHoverPalette(background: Color, hover: Color): Palette =
+      Palette(background, withOutColor, Some(hover))
+
     def font(name: String, style: StyleFont, size: Int): Font = Font(name, style, size)
     def sizeFont(size: Int): Font                             = font(defaultNameFont, defaultStyleFont, size)
     def styleFont(style: StyleFont): Font                     = font(defaultNameFont, style, defaultSizeFont)
