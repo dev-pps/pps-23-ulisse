@@ -1,6 +1,7 @@
 package ulisse.entities
 
 import Route.{Id, Path, TypeRoute}
+import ulisse.entities.Coordinates.{Coordinate, Geo}
 import ulisse.entities.station.Station
 
 trait Route(val id: Id, val length: Double, val railsCount: Int):
@@ -17,7 +18,7 @@ object Route:
     RouteImpl((typeRoute, path), length, railsCount)
 
   opaque type Id = (TypeRoute, Path)
-  type Station   = (String, ?)
+  type Station   = (String, Geo)
   type Path      = (Station, Station)
 
   enum TypeRoute:

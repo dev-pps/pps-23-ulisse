@@ -46,7 +46,7 @@ class PackagesTest extends AnyFlatSpec:
 
   "classes of ports package" should "have Port as the ending in the name" in:
     val portEndingName       = "Ports"
-    val inputPortEndingName  = "Input"
+    val inputPortEndingName  = "ViewInput"
     val outputPortEndingName = "Output"
     val rule = tripleEndingNameRulePossible(Packages.PORTS, portEndingName, inputPortEndingName, outputPortEndingName)
 
