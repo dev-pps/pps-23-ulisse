@@ -5,9 +5,9 @@ import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.TrainPorts.Input
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons.{UseType, Wagon}
+import ulisse.entities.train.Wagons.UseType
 import ulisse.utils.Errors
-import ulisse.utils.Errors.{BaseError, ErrorNotExist}
+import ulisse.utils.Errors.BaseError
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
