@@ -1,6 +1,12 @@
 package ulisse.entities.timetable
 
+import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.station.Station
+import ulisse.entities.timetable.ScheduleTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
 import ulisse.entities.train.Trains.Train
+import ulisse.utils.Times.ClockTime
+import ulisse.utils.Times.FluentDeclaration.h
+
 import scala.collection.immutable.ListMap
 
 /** Object containing traits and utility method for creation and use of TrainTimetable
@@ -9,44 +15,43 @@ object Timetables:
 
   private type Time     = ScheduleTime
   private type WaitTime = Int
-  private type Station  = String
+
+  private type N           = Int
+  private type C           = Coordinate[N]
+  private type StationType = Station[N, C]
 
   extension (i: Int)
     def toWaitTime: WaitTime = i
-
-  case class ClockTime(h: Int, m: Int)
-
-  case class ScheduleTime(arriving: Option[ClockTime], waitTime: Option[WaitTime]):
-    def departureTime: Option[ClockTime] =
-      for
-        a <- arriving
-        w <- waitTime
-      yield a.copy(m = a.m + w)
 
   extension (t: TrainTimetable)
     /** @return
       *   Stations where train stops
       */
-    def stopStations: List[Station] = t.table.filter(_._2.waitTime.nonEmpty).keys.toList
+    def stopStations: List[StationType] = t.table.filter(_._2.waitTime.nonEmpty).keys.toList
 
     /** @return
       *   Stations where train transits and not stops
       */
-    def transitStations: List[Station] =
+    def transitStations: List[StationType] =
       t.table.removedAll(List(t.arrivingStation, t.startStation)).filter(_._2.waitTime.isEmpty).keys.toList
 
     /** @return
       *   List of a couple of stations that compone train trip
       */
-    def routes: List[(Station, Station)] = t.table.keys.toList.zip(t.table.keys.drop(1))
+    def routes: List[(StationType, StationType)] = t.table.keys.toList.zip(t.table.keys.drop(1))
 
   /** Basilar info of a timetable
     */
   trait Timetable:
     /** @return
+      *   Timetable's train
+      */
+    def train: Train
+
+    /** @return
       *   Initial station of train trip
       */
-    def startStation: Station
+    def startStation: StationType
 
     /** @return
       *   Departure time
@@ -56,7 +61,7 @@ object Timetables:
     /** @return
       *   Map of Train Timetable containing station and its arriving time.
       */
-    def table: ListMap[Station, Time]
+    def table: ListMap[StationType, Time]
 
   /** Complete Train timetable
     */
@@ -64,50 +69,68 @@ object Timetables:
     /** @return
       *   Last station of train trip
       */
-    def arrivingStation: Station
+    def arrivingStation: StationType
 
     /** @return
       *   Time of arriving to last station
       */
-    def arrivingTime: Option[Time]
+    def arrivingTime: Option[ClockTime]
 
   /** Train timetable to be defined
     */
   trait PartialTimetable extends Timetable:
-    def stopsIn(station: String, waitTime: WaitTime): PartialTimetable
-    def transitIn(station: Station): PartialTimetable
-    def arrivesTo(station: Station): TrainTimetable
+    def stopsIn(station: StationType, waitTime: WaitTime): PartialTimetable
+    def transitIn(station: StationType): PartialTimetable
+    def arrivesTo(station: StationType): TrainTimetable
 
   /** Factory of PartialTimetable
     */
   object PartialTimetable:
-    def apply(train: Train, startFrom: Station, departureTime: ClockTime): PartialTimetable =
+    def apply(train: Train, startFrom: StationType, departureTime: ClockTime): PartialTimetable =
       PartialTrainTimetable(
         train,
         startFrom,
         departureTime,
-        ListMap((startFrom, ScheduleTime(None, None)))
+        ListMap((startFrom, StartScheduleTime(Some(departureTime))))
       )
 
     private case class PartialTrainTimetable(
         train: Train,
-        startStation: Station,
+        startStation: StationType,
         departureTime: ClockTime,
-        table: ListMap[Station, Time]
+        table: ListMap[StationType, Time]
     ) extends PartialTimetable:
-      override def stopsIn(station: Station, waitTime: WaitTime): PartialTimetable =
-        insertStation(station, ScheduleTime(None, Some(waitTime)))
-      override def transitIn(station: Station): PartialTimetable = insertStation(station, ScheduleTime(None, None))
-      override def arrivesTo(station: Station): TrainTimetable =
-        TrainTimetableImpl(insertStation(station, ScheduleTime(None, None)), station)
+      override def stopsIn(station: StationType, waitTime: WaitTime): PartialTimetable =
+        insertStation(station, AutoScheduleTime(estimateArrivingTime(station, train), Some(waitTime)))
 
-      private def insertStation(station: Station, time: Time): PartialTimetable =
+      override def transitIn(station: StationType): PartialTimetable =
+        insertStation(station, AutoScheduleTime(estimateArrivingTime(station, train), None))
+
+      override def arrivesTo(station: StationType): TrainTimetable =
+        TrainTimetableImpl(
+          insertStation(station, EndScheduleTime(estimateArrivingTime(station, train))),
+          station
+        )
+
+      private def insertStation(station: StationType, time: Time): PartialTimetable =
         this.copy(table = table.updated(station, time))
+
+      private def estimateArrivingTime(st: StationType, train: Train): Option[ClockTime] =
+        for
+          prevStation   <- table.lastOption
+          distance      <- Some(prevStation._1.coordinate.distance(st.coordinate))
+          travelMinutes <- Some((distance / train.maxSpeed) * 60)
+          prevDeparture <- prevStation._2.departure
+          arrivingTime  <- h(prevDeparture.h).m(prevDeparture.m + travelMinutes.toInt).toOption
+        yield arrivingTime
 
     private case class TrainTimetableImpl(
         private val partialTrainTimetable: PartialTimetable,
-        arrivingStation: Station
+        arrivingStation: StationType
     ) extends TrainTimetable:
-      export partialTrainTimetable.{departureTime, startStation, table}
-      override def arrivingTime: Option[Time] =
-        table.get(arrivingStation)
+      export partialTrainTimetable.{departureTime, startStation, table, train}
+      override def arrivingTime: Option[ClockTime] =
+        for
+          t  <- table.get(arrivingStation)
+          at <- t.arriving
+        yield at
