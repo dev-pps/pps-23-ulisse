@@ -4,7 +4,7 @@ import scaredOfArchunit.StationSettings
 import ulisse.infrastructures.view.UpdatableContainer
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.dashboard.{MenuBar, SideMenu}
+import ulisse.infrastructures.view.dashboard.{Dashboard, MenuBar, SideMenu}
 
 import java.awt.Color
 import scala.swing.event.MouseClicked
@@ -15,31 +15,17 @@ final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
   val card = Example.drawnCardExample
     .fixedSize(100, 100)
     .defaultBorder()
-    .genericClickReaction(() => root.update(StationSettings().stationEditorView))
+    .genericClickReaction(() => root.update(Dashboard(root)))
 
   val card2 = Example.svgCardExample
     .fixedSize(100, 100)
     .defaultBorder()
-    .genericClickReaction(() => root.update(StationSettings().stationEditorView))
+    .genericClickReaction(() => root.update(Dashboard(root)))
 
   val card3 = Example.imageCardExample
     .fixedSize(100, 100)
     .defaultBorder()
-    .genericClickReaction(() => root.update(StationSettings().stationEditorView))
-
-  val menuBar = MenuBar().fixedSize(600, 50)
-  layout(menuBar) = BorderPanel.Position.North
-
-  val sideMenu = SideMenu() // .fixedSize(100, 400)
-  sideMenu.background = Color.GREEN
-//  val sideMenu = new BoxPanel(Orientation.Vertical) {
-//    background = Color.DARK_GRAY
-//    contents += Swing.VStrut(10)
-//    contents += new Label("Side Menu")
-//    contents += Swing.VStrut(10)
-//  }.fixedSize(100, 400)
-
-  layout(sideMenu) = BorderPanel.Position.West
+    .genericClickReaction(() => root.update(Dashboard(root)))
 
   private val centerPanel = new BoxPanel(Orientation.Vertical):
     contents += Swing.VGlue
