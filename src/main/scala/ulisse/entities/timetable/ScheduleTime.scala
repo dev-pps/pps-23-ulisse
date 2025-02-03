@@ -27,7 +27,6 @@ object ScheduleTime:
     ScheduleTime(arriving = arriving, waitTime = None, departure = None)
 
   def AutoScheduleTime(arriving: Option[ClockTime], waitTime: Option[WaitTime]): ScheduleTime =
-    import ulisse.utils.Times.+
     import ulisse.utils.Times.FluentDeclaration
     val departure =
       for
