@@ -1,13 +1,31 @@
 package ulisse.infrastructures.view.components
 
-import java.awt.{BorderLayout, Color}
-import javax.swing.{DefaultButtonModel, JToggleButton}
+import java.awt
+import java.awt.{BorderLayout, Color, Graphics}
+import javax.swing.{DefaultButtonModel, Icon, JToggleButton}
 import javax.swing.JToggleButton.ToggleButtonModel
 import javax.swing.border.LineBorder
+import javax.swing.plaf.basic.BasicRadioButtonUI
 import scala.swing.event.MouseClicked
-import scala.swing.{AbstractButton, ButtonGroup, Component, Dimension, Graphics2D, Publisher, UIElement}
+import scala.swing.{
+  AbstractButton,
+  ButtonGroup,
+  Component,
+  Dimension,
+  Graphics2D,
+  Publisher,
+  RadioButton,
+  ToggleButton,
+  UIElement
+}
 
 object ComponentUtils:
+
+  private val emptyIcon = new Icon:
+    override def getIconWidth: Int                                              = 0
+    override def getIconHeight: Int                                             = 0
+    override def paintIcon(c: awt.Component, g: Graphics, x: Int, y: Int): Unit = ()
+
   extension [E <: UIElement](element: E)
     def fixedSize(width: Int, height: Int): E =
       element.preferredSize = new Dimension(width, height)
@@ -35,22 +53,13 @@ object ComponentUtils:
       component.listenTo(ps*)
       component
 
-    def makeSelectable(): AbstractButton =
-      new AbstractButton:
-        peer.setModel(new ToggleButtonModel)
-        peer.add(component.peer, BorderLayout.CENTER)
+    def makeSelectable(): RadioButton =
+      new RadioButton():
         this.opaque = true
-        listenTo(mouse.clicks)
-        reactions += {
-          case m: MouseClicked =>
-            peer.getModel.setSelected(true)
-        }
-
+        peer.setUI(new BasicRadioButtonUI { override def getDefaultIcon: Icon = emptyIcon })
+        peer.add(component.peer, BorderLayout.CENTER)
         peer.getModel.addChangeListener(_ => {
-          val isSelected = peer.getModel.isSelected
-          println(if (isSelected) "Selected" else "Not Selected")
-          peer.setBackground(if (isSelected) Color.LIGHT_GRAY else Color.WHITE)
-          repaint()
+          background = if peer.getModel.isSelected then Color.LIGHT_GRAY else Color.WHITE
         })
 
   extension [B <: AbstractButton](button: B)
