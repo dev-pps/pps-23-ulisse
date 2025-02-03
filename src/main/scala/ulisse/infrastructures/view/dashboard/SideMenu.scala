@@ -3,6 +3,7 @@ package ulisse.infrastructures.view.dashboard
 import net.miginfocom.swing.MigLayout
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentUtils.*
+import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 
 import java.awt.Color
 import scala.swing.event.MouseClicked
@@ -26,7 +27,7 @@ object SideMenu:
 
     peer.setLayout(new MigLayout("center, debug, insets 5 5 0 0", "[]", "[]10[]"))
     List(
-      Card.createSVGCard("icon/map.svg", None, Color.BLACK),
-      Card.createSVGCard("icon/train.svg", None, Color.BLACK),
-      Card.createSVGCard("icon/add.svg", None, Color.BLACK)
+      ImagePanel.createSVGPanel("icon/map.svg", Color.BLACK),
+      ImagePanel.createSVGPanel("icon/train.svg", Color.BLACK),
+      ImagePanel.createSVGPanel("icon/add.svg", Color.BLACK)
     ).foreach(configure andThen position)

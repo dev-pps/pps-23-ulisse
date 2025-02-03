@@ -1,18 +1,17 @@
 package ulisse.infrastructures.view.menu
 
-import scaredOfArchunit.StationSettings
 import ulisse.infrastructures.view.UpdatableContainer
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.dashboard.{Dashboard, MenuBar, SideMenu}
+import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
+import ulisse.infrastructures.view.dashboard.Dashboard
 
 import java.awt.Color
-import scala.swing.event.MouseClicked
-import scala.swing.{BorderPanel, BoxPanel, Dimension, Label, Orientation, Swing}
+import scala.swing.{BorderPanel, BoxPanel, Dimension, Orientation, Swing}
 
-final case class AppMenu(root: UpdatableContainer) extends BorderPanel:
+final case class Menu(root: UpdatableContainer) extends BorderPanel:
   preferredSize = new Dimension(600, 400)
-  val card = Card.createSVGCard("icon/add.svg", Some("new"), Color.BLACK)
+  private val card = Card.createImageCard(ImagePanel.createSVGPanel("icon/add.svg", Color.BLACK), "new")
     .fixedSize(100, 100)
     .defaultBorder()
     .genericClickReaction(() => root.update(Dashboard(root)))
