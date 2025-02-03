@@ -1,22 +1,11 @@
 package ulisse.infrastructures.view.components
 
-import java.awt.image.BufferedImage
 import java.awt.{BorderLayout, Color}
-import javax.swing.JToggleButton
+import javax.swing.{DefaultButtonModel, JToggleButton}
 import javax.swing.JToggleButton.ToggleButtonModel
 import javax.swing.border.LineBorder
 import scala.swing.event.MouseClicked
-import scala.swing.{
-  AbstractButton,
-  ButtonGroup,
-  Component,
-  Dimension,
-  Graphics2D,
-  Publisher,
-  RadioButton,
-  ToggleButton,
-  UIElement
-}
+import scala.swing.{AbstractButton, ButtonGroup, Component, Dimension, Graphics2D, Publisher, UIElement}
 
 object ComponentUtils:
   extension [E <: UIElement](element: E)
@@ -47,9 +36,22 @@ object ComponentUtils:
       component
 
     def makeSelectable(): AbstractButton =
-      new AbstractButton():
+      new AbstractButton:
         peer.setModel(new ToggleButtonModel)
         peer.add(component.peer, BorderLayout.CENTER)
+        this.opaque = true
+        listenTo(mouse.clicks)
+        reactions += {
+          case m: MouseClicked =>
+            peer.getModel.setSelected(true)
+        }
+
+        peer.getModel.addChangeListener(_ => {
+          val isSelected = peer.getModel.isSelected
+          println(if (isSelected) "Selected" else "Not Selected")
+          peer.setBackground(if (isSelected) Color.LIGHT_GRAY else Color.WHITE)
+          repaint()
+        })
 
   extension [B <: AbstractButton](button: B)
     def addToGroup(buttonGroup: ButtonGroup): B =
