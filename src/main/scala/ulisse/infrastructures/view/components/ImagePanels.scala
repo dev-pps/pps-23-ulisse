@@ -5,18 +5,7 @@ import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
 
 import java.awt.Color
 import javax.imageio.ImageIO
-import scala.swing.{
-  BorderPanel,
-  BoxPanel,
-  Component,
-  Graphics2D,
-  Label,
-  Orientation,
-  Panel,
-  RadioButton,
-  Swing,
-  UIElement
-}
+import scala.swing.{Graphics2D, Panel, UIElement}
 
 object ImagePanels:
   trait ImagePanel extends Panel
@@ -29,7 +18,7 @@ object ImagePanels:
   private final case class ImagePanelImpl(imagePath: String)
       extends ImagePanel:
     private val image = ImageIO.read(ClassLoader.getSystemResource(imagePath))
-    override def paint(g: Graphics2D): Unit =
+    override def paintComponent(g: Graphics2D): Unit =
       val size = math.min(peer.getWidth, peer.getHeight)
       g.drawImage(image, (peer.getWidth - size) / 2, (peer.getHeight - size) / 2, size, size, peer)
 
@@ -37,14 +26,14 @@ object ImagePanels:
       extends ImagePanel:
     private val rawIcon = new FlatSVGIcon(svgPath)
     rawIcon.setColorFilter(ColorFilter(_ => color))
-    override def paint(g: Graphics2D): Unit =
+    override def paintComponent(g: Graphics2D): Unit =
       val size = math.min(peer.getWidth, peer.getHeight)
       val icon = rawIcon.derive(size, size)
       icon.paintIcon(peer, g, (peer.getWidth - icon.getWidth) / 2, (peer.getHeight - icon.getHeight) / 2)
 
   private final case class DrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit)
       extends ImagePanel:
-    override def paint(g: Graphics2D): Unit = iconDrawer(this, g)
+    override def paintComponent(g: Graphics2D): Unit = iconDrawer(this, g)
 
   object Example:
     def drawCross(preferredLength: Int, preferredThickness: Int, color: Color)(
