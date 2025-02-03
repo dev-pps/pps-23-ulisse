@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.dashboard
-import scaredOfArchunit.StationSettings
-import ulisse.infrastructures.view.UpdatableContainer
+import ulisse.infrastructures.view.{StationSettings, UpdatableContainer}
 import ulisse.infrastructures.view.components.ComponentUtils.*
+
 import java.awt.Color
 import scala.swing.event.MouseClicked
 import scala.swing.{BorderPanel, BoxPanel, Dimension, Label, Orientation, Swing}

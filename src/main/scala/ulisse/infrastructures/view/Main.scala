@@ -1,4 +1,4 @@
-package scaredOfArchunit
+package ulisse.infrastructures.view
 
 import StationTypes.*
 import ulisse.adapters.StationPortOutputAdapter
@@ -11,6 +11,7 @@ import ulisse.entities.Coordinates.Grid
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
+import ulisse.infrastructures.view.StationTypes.*
 import ulisse.infrastructures.view.form.{CentralController, Form}
 import ulisse.infrastructures.view.map.GUIView
 import ulisse.infrastructures.view.adapter.StationPortOutputAdapter
