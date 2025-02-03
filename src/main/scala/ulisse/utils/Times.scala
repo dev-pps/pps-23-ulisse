@@ -23,11 +23,25 @@ object Times:
     private case class ClockTimeImpl(h: Int, m: Int) extends ClockTime
 
   object FluentDeclaration:
-
+    /** ClockTime builder
+      * @param hours
+      *   hours
+      */
     case class HoursBuilder(hours: Int)
+
+    /** @param h
+      *   hours
+      * @return
+      *   ClockTime builder
+      */
     infix def h(h: Int): HoursBuilder = HoursBuilder(h)
 
     extension (hb: HoursBuilder)
+      /** @param minutes
+        *   minute
+        * @return
+        *   ClockTime with minutes and previous given hours
+        */
       def m(minutes: Int): Either[ClockTimeErrors, ClockTime] = ClockTime(hb.hours, minutes)
 
   extension (time: Either[ClockTimeErrors, ClockTime])
