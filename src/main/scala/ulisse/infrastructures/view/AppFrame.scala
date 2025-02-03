@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view
 
-import ulisse.infrastructures.view.menu.AppMenu
+import ulisse.infrastructures.view.menu.Menu
 
 import scala.swing.*
 
@@ -29,6 +29,6 @@ final case class AppFrame() extends MainFrame with UpdatableContainer:
 
 @main def testLayout(): Unit =
   val app  = AppFrame()
-  val view = AppMenu(app)
+  val view = Menu(app)
   app.contents = view
   app.open()
