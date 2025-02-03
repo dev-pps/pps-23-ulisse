@@ -58,7 +58,13 @@ object ComponentUtils:
         this.opaque = true
         peer.setUI(new BasicRadioButtonUI { override def getDefaultIcon: Icon = emptyIcon })
         peer.add(component.peer, BorderLayout.CENTER)
+        listenTo(component.mouse.clicks)
+        reactions += {
+          case _: MouseClicked =>
+            peer.doClick()
+        }
         peer.getModel.addChangeListener(_ => {
+          println("change")
           background = if peer.getModel.isSelected then Color.LIGHT_GRAY else Color.WHITE
         })
 
