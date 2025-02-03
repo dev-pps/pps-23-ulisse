@@ -6,12 +6,11 @@ import org.scalatest.matchers.should.Matchers.should
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.ScheduleTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
-import ulisse.entities.timetable.Timetables.{PartialTimetable, TrainTimetable}
+import ulisse.entities.timetable.Timetables.{toWaitTime, PartialTimetable, TrainTimetable}
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons
-import ulisse.utils.Times.ClockTime
+import ulisse.utils.Times.{ClockTime, ClockTimeErrors}
 import ulisse.utils.Times.FluentDeclaration.h
-import ulisse.entities.timetable.Timetables.toWaitTime
 
 import scala.collection.immutable.ListMap
 
@@ -26,21 +25,26 @@ class TimetableTest extends AnyFlatSpec:
   private val stationD = Station("Station D", Coordinate(50, 0), 1) // 5 min from C
   private val stationF = Station("Station F", Coordinate(55, 0), 1) // 1 min from D
 
-  val partialTimetable: Option[PartialTimetable] =
-    for
-      depTime <- h(9).m(0).toOption
-    yield PartialTimetable(train = AV1000Train, startFrom = stationA, departureTime = depTime)
+  val partialTimetable: Either[ClockTimeErrors, PartialTimetable] =
+    PartialTimetable(train = AV1000Train, startFrom = stationA, departureTime = h(9).m(0))
 
-  val AV1000TimeTable: Option[TrainTimetable] =
+  val AV1000TimeTable: Either[ClockTimeErrors, TrainTimetable] =
     partialTimetable.map:
       _.stopsIn(stationB, waitTime = 5)
         .transitIn(stationC)
         .stopsIn(stationD, waitTime = 10)
         .arrivesTo(stationF)
 
-  extension (timetable: Option[TrainTimetable])
+  extension (timetable: Either[ClockTimeErrors, TrainTimetable])
     def performTest(test: TrainTimetable => Unit): Unit =
       timetable.foreach(test(_))
+
+  "When create new Timetable" should "be returned an error if departure time is not valid" in:
+    val invalidDepartureTime = h(50).m(0)
+    val invalidTimetable: Either[ClockTimeErrors, PartialTimetable] =
+      PartialTimetable(train = AV1000Train, startFrom = stationA, invalidDepartureTime)
+    import ulisse.utils.Times.InvalidHours
+    invalidTimetable should be(Left(InvalidHours()))
 
   "TrainTimetable" should "provide list of stations where train stops and where it only transits" in:
     AV1000TimeTable.performTest(t =>
