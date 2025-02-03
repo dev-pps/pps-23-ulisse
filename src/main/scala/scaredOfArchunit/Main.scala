@@ -9,7 +9,7 @@ import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
 import ulisse.infrastructures.view.adapter.StationPortOutputAdapter
-import ulisse.infrastructures.view.menu.AppMenu
+import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -18,7 +18,7 @@ val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
 
 @main def launchApp(): Unit =
   val app = AppFrame()
-  app.contents = AppMenu(app)
+  app.contents = Menu(app)
   app.open()
 
   val initialState = AppState[N, C, S](StationMap.createCheckedStationMap())
