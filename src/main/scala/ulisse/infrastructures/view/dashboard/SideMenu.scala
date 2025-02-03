@@ -22,7 +22,7 @@ object SideMenu:
       peer.add(component.peer)
 
     private val imagePanels = List(
-      ImagePanel.createSVGPanel("icon/map.svg", Color.BLACK),
+      ImagePanel.createSVGPanel("icon/map.svg", Color.BLACK).genericClickReaction(() => println("map")),
       ImagePanel.createSVGPanel("icon/train.svg", Color.BLACK),
       ImagePanel.createSVGPanel("icon/add.svg", Color.BLACK)
     ).map(configure)

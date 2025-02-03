@@ -8,7 +8,6 @@ import java.awt.Color
 import javax.imageio.ImageIO
 import scala.swing.{BoxPanel, Component, Graphics2D, Label, Orientation, Panel, RadioButton, Swing, UIElement}
 
-@SuppressWarnings(Array("org.wartremover.warts.MutableDataStructures"))
 object Cards:
   trait Card extends Component
 
