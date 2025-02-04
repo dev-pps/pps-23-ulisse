@@ -1,4 +1,4 @@
-package ulisse.applications.useCases
+package ulisse.applications.managers
 
 import ulisse.entities.Technology
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist, ErrorValidation}

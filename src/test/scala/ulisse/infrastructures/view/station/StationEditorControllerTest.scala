@@ -5,9 +5,9 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
 import ulisse.applications.AppState
-import ulisse.applications.adapters.StationPortInputAdapter
+import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
-import ulisse.applications.station.StationMap
+import ulisse.applications.useCases.StationPortInputService
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.station.StationEditorController
@@ -29,10 +29,10 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
   private val y             = 1
   private val numberOfTrack = 1
   private val station       = Station(stationName, Coordinate(x, y), numberOfTrack)
-  private val initialState  = AppState[N, C, S](StationMap.createCheckedStationMap())
+  private val initialState  = AppState[N, C, S](StationManager.createCheckedStationMap())
   private val eventStream   = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   private val inputPort =
-    StationPortInputAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream, outputPort)
+    StationPortInputService[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream, outputPort)
   private val controller    = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
   private def updateState() = runAll(initialState, eventStream)
 
@@ -53,7 +53,7 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
         val findStationResult = controller.findStationAt(Coordinate(x, y))
 
         updateState()
-        Await.result(addStationResult, Duration.Inf) shouldBe Right(StationMap(station))
+        Await.result(addStationResult, Duration.Inf) shouldBe Right(StationManager(station))
         Await.result(findStationResult, Duration.Inf) shouldBe Some(station)
 
       "replace the station when inputs are valid and oldStation is Some(station)" in:
@@ -84,9 +84,9 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
         val findOldStationAfterAddNewStationResult = controller.findStationAt(Coordinate(x, y))
 
         updateState()
-        Await.result(addOldStationResult, Duration.Inf) shouldBe Right(StationMap(oldStation))
+        Await.result(addOldStationResult, Duration.Inf) shouldBe Right(StationManager(oldStation))
         Await.result(findOldStationResult, Duration.Inf) shouldBe Some(oldStation)
-        Await.result(addNewStationResult, Duration.Inf) shouldBe Right(StationMap(newStation))
+        Await.result(addNewStationResult, Duration.Inf) shouldBe Right(StationManager(newStation))
         Await.result(findNewStationResult, Duration.Inf) shouldBe Some(newStation)
         Await.result(findOldStationAfterAddNewStationResult, Duration.Inf) shouldBe None
 

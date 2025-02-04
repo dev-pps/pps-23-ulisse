@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.station
 
+import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
-import ulisse.applications.station.StationMap
 import ulisse.entities.Coordinates.{Coordinate, Geo, Grid}
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
@@ -59,7 +59,7 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N], S <: St
       oldStation: Option[S]
   )(using coordinateGenerator: (N, N) => Either[BaseError, C])(using
       stationGenerator: (String, C, Int) => Either[BaseError, S]
-  ): Future[Either[BaseError, StationMap[N, C, S]]] =
+  ): Future[Either[BaseError, StationManager[N, C, S]]] =
     createStation(stationName, latitude, longitude, numberOfTrack, coordinateGenerator, stationGenerator) match
       case Left(value) => Future.successful(Left(value))
       case Right(value) =>

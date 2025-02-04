@@ -1,7 +1,7 @@
-package ulisse.applications.useCases
+package ulisse.applications.managers
 
 import cats.syntax.either.*
-import ulisse.applications.useCases.RouteManager.ErrorSaving
+import RouteManager.ErrorSaving
 import ulisse.entities.Route
 import ulisse.entities.Route.Id
 

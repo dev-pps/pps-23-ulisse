@@ -2,7 +2,7 @@ package ulisse.applications
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.applications.useCases.RouteManager
+import ulisse.applications.managers.RouteManager
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.Route.{Path, Station, TypeRoute}
 import ulisse.entities.Route

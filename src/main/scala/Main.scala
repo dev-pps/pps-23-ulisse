@@ -1,12 +1,12 @@
 import StationTypes.*
+import ulisse.adapters.StationPortOutputAdapter
 import ulisse.applications.AppState
-import ulisse.applications.adapters.StationPortInputAdapter
-import ulisse.applications.station.StationMap
+import ulisse.applications.managers.StationManager
+import ulisse.applications.useCases.StationPortInputService
 import ulisse.entities.Coordinates.Grid
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
-import ulisse.infrastructures.view.adapter.StationPortOutputAdapter
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -17,14 +17,14 @@ import java.util.concurrent.LinkedBlockingQueue
   app.contents = settings.stationEditorView
   app.open()
 
-  val initialState = AppState[N, C, S](StationMap.createCheckedStationMap())
+  val initialState = AppState[N, C, S](StationManager.createCheckedStationMap())
   LazyList.continually(settings.eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
 
 final case class StationSettings():
   lazy val outputAdapter: StationPortOutputAdapter[N, C, S] = StationPortOutputAdapter(stationEditorController)
-  lazy val inputAdapter: StationPortInputAdapter[N, C, S]   = StationPortInputAdapter(eventStream, outputAdapter)
+  lazy val inputAdapter: StationPortInputService[N, C, S]   = StationPortInputService(eventStream, outputAdapter)
   val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   val stationEditorController: StationEditorController[N, C, S] = StationEditorController(inputAdapter)
   val stationEditorView: StationEditorView                      = StationEditorView(stationEditorController)
@@ -35,10 +35,10 @@ object StationTypes:
   type S = CheckedStation[N, C]
 
 @main def trainDemoMain(): Unit =
-  import ulisse.applications.adapters.TrainServiceManagerAdapter
-  import ulisse.applications.useCases.TrainManagers.TrainManager
-  import ulisse.applications.useCases.TechnologyManagers.TechnologyManager
+  import ulisse.applications.managers.TrainManagers.TrainManager
+  import ulisse.applications.managers.TechnologyManagers.TechnologyManager
   import ulisse.applications.ports.TrainPorts
+  import ulisse.applications.useCases.TrainServiceManagerService
   import ulisse.entities.train.Trains.TrainTechnology
   import ulisse.infrastructures.view.train.TrainEditorView
 
@@ -46,7 +46,7 @@ object StationTypes:
   val stateEventQueue = LinkedBlockingQueue[AppState => AppState]
 
   // Train Fleet init
-  val trainPort: TrainPorts.Input = TrainServiceManagerAdapter(stateEventQueue)
+  val trainPort: TrainPorts.Input = TrainServiceManagerService(stateEventQueue)
   val trainView                   = TrainEditorView(trainPort)
   // trainView.open()
 

@@ -1,9 +1,9 @@
-package ulisse.applications.adapters
+package ulisse.applications.useCases
 
+import ulisse.applications.managers.TechnologyManagers.TechErrors.TechnologyNotExists
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.TrainPorts.Input
-import ulisse.applications.useCases.TechnologyManagers.TechErrors.TechnologyNotExists
-import ulisse.applications.useCases.TechnologyManagers.TechnologyManager
-import ulisse.applications.useCases.TrainManagers.TrainManager
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Errors
@@ -14,7 +14,7 @@ import scala.concurrent.{Future, Promise}
 
 type AppState = (TrainManager, TechnologyManager[TrainTechnology])
 
-final case class TrainServiceManagerAdapter(stateEventQueue: LinkedBlockingQueue[AppState => AppState])
+final case class TrainServiceManagerService(stateEventQueue: LinkedBlockingQueue[AppState => AppState])
     extends Input:
 
   def removeTrain(name: String): Future[Either[BaseError, List[Train]]] =
