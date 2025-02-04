@@ -1,4 +1,4 @@
-package ulisse.applications.useCases
+package ulisse.applications.managers
 
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}

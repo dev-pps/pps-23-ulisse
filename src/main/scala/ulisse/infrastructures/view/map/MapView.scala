@@ -1,8 +1,8 @@
 package ulisse.infrastructures.view.map
 
-import ulisse.applications.ports.RoutePorts.UIPort
-import ulisse.applications.useCases.RouteManager
-import ulisse.applications.useCases.RouteManager.ErrorSaving
+import ulisse.applications.managers.RouteManager
+import ulisse.applications.ports.RoutePorts.UIInputPort
+import RouteManager.ErrorSaving
 import ulisse.entities.Route
 import ulisse.infrastructures.view.components.JComponent
 import ulisse.infrastructures.view.components.JStyler.*
@@ -23,9 +23,9 @@ trait MapView
 object MapView:
   given transparentPanel: Boolean = true
 
-  def apply(uiPort: UIPort): MapView = MapViewImpl(uiPort)
+  def apply(uiPort: UIInputPort): MapView = MapViewImpl(uiPort)
 
-  private case class MapViewImpl(uiPort: UIPort) extends MainFrame, MapView:
+  private case class MapViewImpl(uiPort: UIInputPort) extends MainFrame, MapView:
 
     title = "Map"
     visible = true

@@ -2,19 +2,19 @@ package ulisse.applications.station
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import ulisse.applications.station.StationMap
-import ulisse.applications.station.StationMap.CheckedStationMap
+import ulisse.applications.managers.StationManager
+import StationManager.CheckedStationManager
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
 
-class StationMapTest extends AnyWordSpec with Matchers:
+class StationManagerTest extends AnyWordSpec with Matchers:
 
   private val station = Station("StationA", Coordinate(0, 0), 1)
 
   "A StationMap" when:
     "created" should:
       "be empty" in:
-        StationMap.createCheckedStationMap[
+        StationManager.createCheckedStationMap[
           Int,
           Coordinate[Int],
           Station[Int, Coordinate[Int]]
@@ -22,7 +22,7 @@ class StationMapTest extends AnyWordSpec with Matchers:
 
     "a new station is added" should:
       "contain the new station" in:
-        StationMap.createCheckedStationMap().addStation(station).map(_.stations) match
+        StationManager.createCheckedStationMap().addStation(station).map(_.stations) match
           case Right(stations) =>
             stations should contain only station
           case Left(_) => fail()
@@ -30,20 +30,20 @@ class StationMapTest extends AnyWordSpec with Matchers:
     "another station with same name is added" should:
       "not be added and returns error" in:
         val otherStation = Station("StationA", Coordinate(1, 1), 1)
-        StationMap.createCheckedStationMap().addStation(station).flatMap(
+        StationManager.createCheckedStationMap().addStation(station).flatMap(
           _.addStation(otherStation)
-        ) shouldBe Left(CheckedStationMap.Error.DuplicateStationName)
+        ) shouldBe Left(CheckedStationManager.Error.DuplicateStationName)
 
     "another station with same location is added" should:
       "not be added and returns error" in:
         val otherStation = Station("StationB", Coordinate(0, 0), 1)
-        StationMap.createCheckedStationMap().addStation(station).flatMap(
+        StationManager.createCheckedStationMap().addStation(station).flatMap(
           _.addStation(otherStation)
-        ) shouldBe Left(CheckedStationMap.Error.DuplicateStationLocation)
+        ) shouldBe Left(CheckedStationManager.Error.DuplicateStationLocation)
 
     "existing station is removed" should:
       "no longer be present" in:
-        StationMap.createCheckedStationMap().addStation(station).flatMap(
+        StationManager.createCheckedStationMap().addStation(station).flatMap(
           _.removeStation(station)
         ).map(_.stations) match
           case Right(stations) => stations should not contain station
@@ -51,6 +51,6 @@ class StationMapTest extends AnyWordSpec with Matchers:
 
     "non-existing station is removed" should:
       "return error" in:
-        StationMap.createCheckedStationMap().removeStation(station) shouldBe Left(
-          CheckedStationMap.Error.StationNotFound
+        StationManager.createCheckedStationMap().removeStation(station) shouldBe Left(
+          CheckedStationManager.Error.StationNotFound
         )

@@ -1,20 +1,20 @@
-package ulisse.applications.adapters
+package ulisse.applications.useCases
 
 import ulisse.applications.AppState
+import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.applications.ports.StationPorts
-import ulisse.applications.station.StationMap.CheckedStationMap
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
-final case class StationPortInputAdapter[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
+final case class StationPortInputService[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
     eventQueue: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]],
     outputPort: StationPorts.Output
 ) extends StationPorts.Input[N, C, S]:
-  type SM = CheckedStationMap[N, C, S]
-  type E  = CheckedStationMap.Error
+  type SM = CheckedStationManager[N, C, S]
+  type E  = CheckedStationManager.Error
 
   override def stationMap: Future[SM] =
     val p = Promise[SM]()

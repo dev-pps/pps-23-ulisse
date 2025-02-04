@@ -1,7 +1,7 @@
 package ulisse.applications.ports
 
-import ulisse.applications.station.StationMap
-import ulisse.applications.station.StationMap.CheckedStationMap
+import ulisse.applications.managers.StationManager
+import StationManager.CheckedStationManager
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
@@ -23,8 +23,8 @@ object StationPorts:
     */
   trait Input[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
 
-    private type SM = CheckedStationMap[N, C, S]
-    private type E  = CheckedStationMap.Error
+    private type SM = CheckedStationManager[N, C, S]
+    private type E  = CheckedStationManager.Error
 
     /** Retrieves the current station map.
       *

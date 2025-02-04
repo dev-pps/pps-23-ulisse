@@ -1,4 +1,4 @@
-package ulisse.applications.station
+package ulisse.applications.managers
 
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
@@ -14,7 +14,7 @@ import ulisse.utils.ValidationUtils.validateUniqueItems
   * @tparam C
   *   A type that extends `Coordinate[N]`, which represents the station's location.
   */
-trait StationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
+trait StationManager[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
 
   /** The type representing the collection of stations. */
   type StationMapType <: Seq[S]
@@ -44,8 +44,8 @@ trait StationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
     *   `true` if both station maps have the same stations, `false` otherwise.
     */
   override def equals(other: Any): Boolean = other match
-    case that: StationMap[_, _, _] => that.stations == stations
-    case _                         => false
+    case that: StationManager[_, _, _] => that.stations == stations
+    case _                             => false
 
   /** Adds a station to the map.
     *
@@ -74,8 +74,8 @@ trait StationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
     */
   def findStationAt(coordinate: C): Option[S]
 
-/** Factory for [[StationMap]] instances. */
-object StationMap:
+/** Factory for [[StationManager]] instances. */
+object StationManager:
   /** Creates a `StationMap` instance.
     *
     * @tparam N
@@ -85,8 +85,8 @@ object StationMap:
     * @return
     *   A `StationMap` instance.
     */
-  def apply[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](stations: S*): StationMap[N, C, S] =
-    BaseStationMap(stations.toList)
+  def apply[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](stations: S*): StationManager[N, C, S] =
+    BaseStationManager(stations.toList)
 
   /** Creates a `CheckedStationMap` instance, which is a `StationMap` with validation for unique names and locations.
     *
@@ -97,8 +97,8 @@ object StationMap:
     * @return
     *   An empty `CheckedStationMap` instance.
     */
-  def createCheckedStationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](): CheckedStationMap[N, C, S] =
-    CheckedStationMap(List.empty)
+  def createCheckedStationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](): CheckedStationManager[N, C, S] =
+    CheckedStationManager(List.empty)
 
   /** A case class that implements the `StationMap` trait with validation for unique station names and locations.
     *
@@ -110,48 +110,49 @@ object StationMap:
     *   The list of stations in the map. **Note**: Instances of `Grid` can only be created through the
     *   `Coordinates.createGrid` method to ensure validation.
     */
-  final case class CheckedStationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]] private[StationMap] (
+  final case class CheckedStationManager[N: Numeric, C <: Coordinate[N], S <: Station[N, C]] private[StationManager] (
       stations: List[S]
-  ) extends StationMap[N, C, S]:
+  ) extends StationManager[N, C, S]:
     type StationMapType = List[S]
-    type R              = Either[CheckedStationMap.Error, CheckedStationMap[N, C, S]]
+    type R              = Either[CheckedStationManager.Error, CheckedStationManager[N, C, S]]
 
     def addStation(station: S): R =
       val updatedStations = station :: stations
       for
-        _ <- validateUniqueItems(updatedStations.map(_.name), CheckedStationMap.Error.DuplicateStationName)
-        _ <- validateUniqueItems(updatedStations.map(_.coordinate), CheckedStationMap.Error.DuplicateStationLocation)
-      yield CheckedStationMap(updatedStations)
+        _ <- validateUniqueItems(updatedStations.map(_.name), CheckedStationManager.Error.DuplicateStationName)
+        _ <-
+          validateUniqueItems(updatedStations.map(_.coordinate), CheckedStationManager.Error.DuplicateStationLocation)
+      yield CheckedStationManager(updatedStations)
 
     def removeStation(station: S): R =
       if stations.exists(_.coordinate === station.coordinate) then
-        Right(CheckedStationMap(stations.filterNot(_.coordinate === station.coordinate)))
+        Right(CheckedStationManager(stations.filterNot(_.coordinate === station.coordinate)))
       else
-        Left(CheckedStationMap.Error.StationNotFound)
+        Left(CheckedStationManager.Error.StationNotFound)
 
     def findStationAt(coordinate: C): Option[S] =
       stations.find(_.coordinate === coordinate)
 
     export stations.map
 
-  private final case class BaseStationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
+  private final case class BaseStationManager[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
       stations: List[S]
-  ) extends StationMap[N, C, S]:
+  ) extends StationManager[N, C, S]:
     type StationMapType = List[S]
-    type R              = BaseStationMap[N, C, S]
+    type R              = BaseStationManager[N, C, S]
 
     def addStation(station: S): R =
-      BaseStationMap(station :: stations)
+      BaseStationManager(station :: stations)
 
     def removeStation(station: S): R =
-      BaseStationMap(stations.filterNot(_.coordinate === station.coordinate))
+      BaseStationManager(stations.filterNot(_.coordinate === station.coordinate))
 
     def findStationAt(coordinate: C): Option[S] =
       stations.find(_.coordinate === coordinate)
 
     export stations.map
 
-  object CheckedStationMap:
-    /** Represents errors that can occur during [[CheckedStationMap]] creation. */
+  object CheckedStationManager:
+    /** Represents errors that can occur during [[CheckedStationManager]] creation. */
     enum Error extends BaseError:
       case DuplicateStationName, DuplicateStationLocation, StationNotFound

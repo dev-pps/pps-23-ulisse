@@ -1,6 +1,5 @@
-package ulisse.applications.useCases
+package ulisse.applications.managers
 
-import ulisse.applications.station.StationMap
 import ulisse.entities.Coordinates.{Coordinate, Geo}
 import ulisse.entities.station.Station
 

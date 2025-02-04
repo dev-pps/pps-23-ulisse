@@ -5,9 +5,9 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.must.Matchers.{be, not}
 import org.scalatest.matchers.should.Matchers.should
-import ulisse.applications.useCases.TrainManagers
-import ulisse.applications.useCases.TrainManagers.TrainManager
-import ulisse.applications.useCases.TrainManagers.TrainErrors.{NegativeValue, TrainAlreadyExists}
+import ulisse.applications.managers.TrainManagers
+import TrainManagers.TrainManager
+import TrainManagers.TrainErrors.{NegativeValue, TrainAlreadyExists}
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.UseType
 import ulisse.entities.train.{Trains, Wagons}

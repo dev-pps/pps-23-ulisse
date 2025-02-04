@@ -1,4 +1,4 @@
-package ulisse.infrastructures.view.adapter
+package ulisse.adapters
 
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinates.Coordinate
