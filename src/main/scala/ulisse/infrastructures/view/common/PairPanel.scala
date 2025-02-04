@@ -19,7 +19,7 @@ object KeyValuesPanel:
     values.foreach(component => mainPanel.peer.add(component.peer))
 
     export wrapPanel.*
-    override def values[T <: Component](implicit ct: ClassTag[T]): Seq[T] = wrapPanel.componentsOf[T]
+    override def values[T <: Component](using ct: ClassTag[T]): Seq[T] = wrapPanel.componentsOf[T]
 
 trait PairPanel[+P <: Panel, +A <: Component, +B <: Component] extends WrapPanel[P]:
   def key: A
