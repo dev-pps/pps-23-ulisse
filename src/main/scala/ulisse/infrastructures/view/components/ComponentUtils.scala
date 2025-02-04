@@ -41,6 +41,10 @@ object ComponentUtils:
       }
       component
 
+    def visible(value: Boolean): C =
+      component.visible = value
+      component
+
     def opaque(value: Boolean): C =
       component.opaque = value
       component

@@ -30,15 +30,20 @@ final case class Dashboard(root: UpdatableContainer) extends BorderPanel:
 
   layout(Component.wrap(dashboardContent)) = BorderPanel.Position.Center
 
+  override def revalidate(): Unit =
+    super.revalidate()
+    println("revalidateee")
+    val bounds = dashboardContent.getBounds()
+    val width  = bounds.getWidth.toInt
+    val height = bounds.getHeight.toInt
+    println(sideMenu.peer.getLayout.minimumLayoutSize(sideMenu.peer))
+    println(sideMenu.peer.getLayout.preferredLayoutSize(sideMenu.peer))
+    sideMenu.peer.setBounds(0, 0, sideMenu.preferredSize.width, height)
+    centerComponent.peer.setBounds(0, 0, width, height)
+    repaint()
+
   peer.addComponentListener(new java.awt.event.ComponentAdapter() {
     override def componentResized(e: java.awt.event.ComponentEvent): Unit = {
-      val bounds = dashboardContent.getBounds()
-      val width  = bounds.getWidth.toInt
-      val height = bounds.getHeight.toInt
-      println(sideMenu.peer.getLayout.minimumLayoutSize(sideMenu.peer))
-      println(sideMenu.peer.getLayout.preferredLayoutSize(sideMenu.peer))
-      sideMenu.peer.setBounds(0, 0, sideMenu.preferredSize.width, height)
-      centerComponent.peer.setBounds(0, 0, width, height)
       revalidate()
       repaint()
     }

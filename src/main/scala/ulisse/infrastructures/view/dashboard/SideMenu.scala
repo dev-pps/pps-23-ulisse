@@ -5,7 +5,7 @@ import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 
-import java.awt.Color
+import java.awt.{Color, ComponentOrientation}
 import javax.swing.BoxLayout
 import scala.swing.event.MouseClicked
 import scala.swing.{
@@ -34,40 +34,61 @@ object SideMenu:
     private def position[C <: Component](component: C): Unit =
       contents += component
 
-    val openMenu: ImagePanel = ImagePanel.createSVGPanel("icon/keyboard_double_arrow_right.svg", Color.BLACK)
-      .genericClickReaction(() =>
-        SideMenuImpl.this.preferredSize = new Dimension(200, 400)
-        openMenu.visible = false
-        closeMenu.visible = true
-      )
-    val closeMenu: AbstractButton =
-      configure(ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK)
-        .genericClickReaction(() =>
-          SideMenuImpl.this.preferredSize = new Dimension(58, 400)
-          openMenu.visible = true
-          closeMenu.visible = false
-        ))
-    closeMenu.visible = false
+    val menuCallback = () => {
+      menuCards.foreach(_.toggleLabel())
+      updateSize()
+      revalidate()
+      repaint()
+    }
 
-    private val menuCards = List(
+    def updateSize(): Unit =
+      val maxCardWidth = menuCards.foldLeft(0)((m, c) => math.max(m, c.realPreferredSize().width))
+      println(s"ua $maxCardWidth")
+      menuCards.foreach: card =>
+        card.fixedSize(maxCardWidth, card.preferredSize.height)
+      SideMenuImpl.this.preferredSize = new Dimension(maxCardWidth, 400)
+      SideMenuImpl.this.peer.setBounds(0, 0, maxCardWidth, SideMenuImpl.this.peer.getHeight)
+
+    private val menuCards: List[TC] = List(
+      HeaderCard(ImagePanel.createSVGPanel("icon/keyboard_double_arrow_right.svg", Color.BLACK), "Dashboard").visible(
+        false
+      ).genericClickReaction(menuCallback),
+      HeaderCard(
+        ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK),
+        "Infrastructure"
+      ).genericClickReaction(menuCallback),
       MenuCard(ImagePanel.createSVGPanel("icon/simulation.svg", Color.BLACK), "Simulation"),
       MenuCard(ImagePanel.createSVGPanel("icon/map.svg", Color.BLACK), "Editors"),
       MenuCard(ImagePanel.createSVGPanel("icon/train.svg", Color.BLACK), "Trains"),
       MenuCard(ImagePanel.createSVGPanel("icon/settings.svg", Color.BLACK), "Settings")
-    ).map(configure)
+    )
 
-    private val maxCardWidth = menuCards.foldLeft(0)((m, c) => math.max(m,c.preferredSize.width))
-    menuCards.foreach:
-      card => card.fixedSize(maxCardWidth, card.preferredSize.height)
+    updateSize()
 
-    position(openMenu)
-    private val (topMenu, bottomMenu) = menuCards.splitAt(3)
+    private val (header, content) = menuCards.splitAt(2)
+    header.foreach(position)
+    content.map(configure)
+
+    private val (topMenu, bottomMenu) = content.splitAt(3)
     topMenu.foreach(position)
     position(Swing.VGlue)
     bottomMenu.foreach(position)
 
-final case class MenuCard(imagePanel: ImagePanel, text: String) extends BoxPanel(Orientation.Horizontal):
-  contents += imagePanel.fixedSize(50, 50)
-  contents += new Label(text)
+trait TC extends Component:
+  val imagePanel: ImagePanel
+  val textLabel: Label
+  def realPreferredSize(): Dimension =
+    new Dimension(50 + (if textLabel.visible then textLabel.preferredSize.width else 0), 50)
+  def toggleLabel(): Unit = textLabel.visible = !textLabel.visible
+
+final case class HeaderCard(imagePanel: ImagePanel, text: String) extends BoxPanel(Orientation.Horizontal) with TC:
+  val textLabel = new Label(text)
+  contents += textLabel
   contents += Swing.HGlue
-  def toggleLabel(): Unit = peer.getComponent(1).setVisible(!peer.getComponent(1).isVisible)
+  contents += imagePanel.fixedSize(50, 50)
+
+final case class MenuCard(imagePanel: ImagePanel, text: String) extends BoxPanel(Orientation.Horizontal) with TC:
+  val textLabel = new Label(text)
+  contents += imagePanel.fixedSize(50, 50)
+  contents += textLabel
+  contents += Swing.HGlue
