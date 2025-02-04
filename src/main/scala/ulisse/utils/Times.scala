@@ -13,6 +13,8 @@ object Times:
     def h: Int
     def m: Int
 
+    override def toString: String = s"$h:$m"
+
   object ClockTime:
     def apply(h: Int, m: Int): Either[ClockTimeErrors, ClockTime] =
       for
@@ -44,14 +46,54 @@ object Times:
         */
       def m(minutes: Int): Either[ClockTimeErrors, ClockTime] = ClockTime(hb.hours, minutes)
 
+  given Ordering[ClockTime] with
+    override def compare(x: ClockTime, y: ClockTime): Int =
+      val hoursComparison = x.h.compare(y.h)
+      hoursComparison match
+        case _ if hoursComparison == 0 => x.m.compare(y.m)
+        case _                         => hoursComparison
+
+  /** @param t
+    *   first TimeClock
+    * @param t2
+    *   second TimeClock
+    * @param predicate
+    *   Predicate to convert compare result into boolean
+    * @return
+    *   True if predicate is satisfied
+    */
+  private def checkCondition(
+      t: Either[ClockTimeErrors, ClockTime],
+      t2: Either[ClockTimeErrors, ClockTime]
+  )(predicate: Int => Boolean): Boolean =
+    val res = extractAndPerform[Boolean](t, t2): (t, t2) =>
+      Right(predicate(summon[Ordering[ClockTime]].compare(t, t2)))
+    res.getOrElse(false)
+
+  private def extractAndPerform[R](
+      t: Either[ClockTimeErrors, ClockTime],
+      t2: Either[ClockTimeErrors, ClockTime]
+  )(f: (ClockTime, ClockTime) => Either[ClockTimeErrors, R]): Either[ClockTimeErrors, R] =
+    for
+      time  <- t
+      time2 <- t2
+      res   <- f(time, time2)
+    yield res
+
   extension (time: Either[ClockTimeErrors, ClockTime])
     @targetName("add")
     def +(time2: Either[ClockTimeErrors, ClockTime]): Either[ClockTimeErrors, ClockTime] =
-      for
-        t   <- time
-        t2  <- time2
-        sum <- calculateSum(t, t2)
-      yield sum
+      extractAndPerform(time, time2): (t, t2) =>
+        calculateSum(t, t2)
+
+    def greaterEqThan(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
+      checkCondition(time, time2)(_ >= 0)
+
+    def greaterThan(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
+      checkCondition(time, time2)(_ > 0)
+
+    def sameAs(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
+      checkCondition(time, time2)(_ == 0)
 
   extension (time: ClockTime)
     @targetName("add")
@@ -60,6 +102,18 @@ object Times:
         t2  <- time2
         sum <- calculateSum(time, t2)
       yield sum
+
+    @targetName("greaterEquals")
+    def >=(time2: ClockTime): Boolean =
+      summon[Ordering[ClockTime]].compare(time, time2) >= 0
+
+    @targetName("greater")
+    def >(time2: ClockTime): Boolean =
+      summon[Ordering[ClockTime]].compare(time, time2) > 0
+
+    @targetName("equals")
+    def ===(time2: ClockTime): Boolean =
+      summon[Ordering[ClockTime]].compare(time, time2) == 0
 
   private def calculateSum(t: ClockTime, t2: ClockTime): Either[ClockTimeErrors, ClockTime] =
     val totalMinutes = t.m + t2.m

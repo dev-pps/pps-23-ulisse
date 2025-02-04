@@ -3,7 +3,7 @@ package ulisse.utils
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.utils.Times.*
-import ulisse.utils.Times.FluentDeclaration.{h, HoursBuilder}
+import ulisse.utils.Times.FluentDeclaration.h
 
 import scala.language.postfixOps
 
@@ -20,6 +20,14 @@ class ClockTimeTest extends AnyWordSpec with Matchers:
       h(10).m(59) + h(0).m(1) should be(h(11).m(0))
       h(0).m(59) + h(0).m(59) should be(h(1).m(58))
       h(23).m(59) + h(0).m(1) should be(h(0).m(0))
+
+    "comparable to other ClockTime" in:
+      h(10).m(45) greaterEqThan h(10).m(45) should be(true)
+      h(10).m(45) greaterEqThan h(2).m(30) should be(true)
+      h(2).m(30) greaterEqThan h(10).m(45) should be(false)
+      h(2).m(30) sameAs h(10).m(45) should be(false)
+      h(2).m(30) greaterThan h(10).m(45) should be(false)
+
 //
 //    "be subtracted to another ClockTimes" in :
 //      ClockTime(10, 25) - ClockTime(1, 25) should be(ClockTime(11, 50))
