@@ -5,14 +5,19 @@ import scala.annotation.targetName
 
 object Times:
 
+  /** Errors that can be returned on ClockTime creation.
+    */
   sealed trait ClockTimeErrors
   final case class InvalidHours()   extends ClockTimeErrors with ErrorMessage("hours not in range [0,24]")
   final case class InvalidMinutes() extends ClockTimeErrors with ErrorMessage("minutes not in range [0,59]")
 
+  /** Represent clock time:
+    *   - hours (`h`) must be between 0 and 23
+    *   - minutes (`m`) must be between 0 and 59
+    */
   trait ClockTime:
     def h: Int
     def m: Int
-
     override def toString: String = s"$h:$m"
 
   object ClockTime:
@@ -46,6 +51,10 @@ object Times:
         */
       def m(minutes: Int): Either[ClockTimeErrors, ClockTime] = ClockTime(hb.hours, minutes)
 
+  /** Ordering implementation for ClockTime.
+    *
+    * ClockTimes are compared by hours (`h`) and then by minutes (`m`) if hours are equals.
+    */
   given Ordering[ClockTime] with
     override def compare(x: ClockTime, y: ClockTime): Int =
       val hoursComparison = x.h.compare(y.h)
