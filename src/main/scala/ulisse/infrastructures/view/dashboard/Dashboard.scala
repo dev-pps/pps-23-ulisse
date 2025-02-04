@@ -37,8 +37,9 @@ final case class Dashboard(root: UpdatableContainer) extends BorderPanel:
       val height = bounds.getHeight.toInt
       println(sideMenu.peer.getLayout.minimumLayoutSize(sideMenu.peer))
       println(sideMenu.peer.getLayout.preferredLayoutSize(sideMenu.peer))
-      sideMenu.peer.setBounds(0, 0, sideMenu.peer.getLayout.preferredLayoutSize(sideMenu.peer).width, height)
+      sideMenu.peer.setBounds(0, 0, sideMenu.preferredSize.width, height)
       centerComponent.peer.setBounds(0, 0, width, height)
+      revalidate()
       repaint()
     }
   })
