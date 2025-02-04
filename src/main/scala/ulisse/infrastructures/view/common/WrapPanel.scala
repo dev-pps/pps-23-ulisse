@@ -5,7 +5,7 @@ import scala.swing.*
 trait WrapPanel[+P <: Panel]:
   def panel(): P
   def components(): Seq[Component]
-  def componentsOf[T <: Component](implicit ct: reflect.ClassTag[T]): Seq[T] = components().collect({ case c: T => c })
+  def componentsOf[T <: Component](using ct: reflect.ClassTag[T]): Seq[T] = components().collect({ case c: T => c })
   def setVisible(visible: Boolean): Unit
   def visible: Boolean
 
