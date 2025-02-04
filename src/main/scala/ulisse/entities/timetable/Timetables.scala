@@ -91,7 +91,10 @@ object Timetables:
       */
     def ETA(trainTable: ListMap[StationType, Time], endStation: StationType, train: Train): Option[ClockTime]
 
-  /** */
+  /** Default context TimeEstimator strategy.
+    *
+    * ETA is calculated considering just speed of train and distance between last previous station and `endStation`.
+    */
   private object UnrealTimeEstimator extends TimeEstimator:
     def ETA(trainTable: ListMap[StationType, Time], endStation: StationType, train: Train): Option[ClockTime] =
       for
