@@ -3,19 +3,17 @@ package ulisse.architecture
 import com.tngtech.archunit.core.importer.{ClassFileImporter, Location}
 
 object Packages:
-  private val applications    = "applications"
-  private val infrastructures = "infrastructures"
-  private val adapters        = "adapters"
+  val PROJECT = "..ulisse.."
 
-  val PROJECT         = "..ulisse.."
   val ENTITIES        = "..entities.."
-  val APPLICATIONS    = ".." + applications + ".."
-  val INFRASTRUCTURES = ".." + infrastructures + ".."
+  val APPLICATIONS    = "..applications.."
+  val INFRASTRUCTURES = "..infrastructures.."
+  val ADAPTERS        = "..adapters.."
+  val UTILS           = "..utils.."
 
-  val PORTS          = "..ports.."
-  val USE_CASES      = "..useCases.."
-  val INPUT_ADAPTER  = ".." + applications + "." + adapters + ".."
-  val OUTPUT_ADAPTER = ".." + infrastructures + "." + adapters + ".."
+  val PORTS     = "..ports.."
+  val MANAGERS  = "..managers.."
+  val USE_CASES = "..useCases.."
 
 object ArchUnits:
   private val DO_NOT_INCLUDE_SCALA_COMPILED_FILE: Location => Boolean = !_.contains("$")
