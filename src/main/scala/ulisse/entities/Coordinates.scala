@@ -110,6 +110,7 @@ object Coordinates:
       */
     def apply[T: Numeric](x: T, y: T): Coordinate[T] = CoordinateImpl(x, y)
 
+    @Deprecated("Use createGeo method that is the safe constructor for type Geo")
     def geo(latitude: Double, longitude: Double): Geo = Geo(latitude, longitude)
 
     def uiPoint(x: Double, y: Double): UIPoint = UIPoint(x, y)

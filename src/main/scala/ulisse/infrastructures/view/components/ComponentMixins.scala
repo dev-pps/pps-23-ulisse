@@ -20,4 +20,3 @@ object ComponentMixins:
     def rotation_=(newRotation: Int): Unit =
       _rotation = newRotation
       repaint()
-
