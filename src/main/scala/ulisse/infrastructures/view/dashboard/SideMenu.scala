@@ -5,7 +5,8 @@ import ulisse.infrastructures.view.common.Theme
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
-import ulisse.infrastructures.view.components.{JComponent, JStyler}
+import ulisse.infrastructures.view.components.JComponent
+import ulisse.infrastructures.view.components.{JComponent, JPanel, JStyler}
 
 import java.awt.{Color, ComponentOrientation}
 import javax.swing.BoxLayout
@@ -33,16 +34,14 @@ object SideMenu:
 
 ////    private def configure[C <: Component](component: C): Component =
 ////      component.opaque(true)//.makeSelectable().addToGroup(buttonGroup)
-//
-//    contents += Swing.HStrut(10)
-//    contents += menu
-//    contents += Swing.HStrut(10)
+
     contents += Swing.VStrut(10)
     private def position[C <: Component](component: C): Unit =
       contents += component
       contents += Swing.VStrut(10)
 
-    val menuCallback = () => {
+    val menuCallback: () => Unit = () => {
+      headerLeftContent.visible = !headerLeftContent.visible
       menuCards.foreach(_.toggleLabel())
       revalidate()
       updateSize()
@@ -62,13 +61,21 @@ object SideMenu:
       revalidate()
       repaint()
 
-    private val headerContent =
-      ImageCard.horizontal(ImagePanel.createImagePanel("icon/logo.jpg").fixedSize(50, 50), Label("Ulisse").alignLeft())
+    private val headerLeftContent = ImageCard.horizontal(
+      ImagePanel.createImagePanel("icon/logo.jpg").fixedSize(50, 50),
+      Label("Ulisse").alignLeft()
+    ).styler(menuCardStyle.copy(palette = JStyler.transparentPalette))
+    private val headerRightContent = ImageCard.horizontal(
+      ImagePanel.createSVGPanel("icon/keyboard_double_arrow_right.svg", Color.BLACK).fixedSize(25, 25),
+      Label("").alignRight()
+    ).styler(menuCardStyle).genericClickReaction(menuCallback).alignRight()
+    private val header = new BoxPanel(Orientation.Horizontal):
+      opaque = false
+      contents += headerLeftContent
+//      contents += Swing.HGlue
+      contents += headerRightContent
+      listenTo(headerRightContent.mouse.clicks, headerRightContent.mouse.moves)
     private val menuCards: List[ImageCard] = List(
-      ImageCard.horizontal(
-        ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(25, 25),
-        headerContent
-      ).genericClickReaction(menuCallback),
       ImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/simulation.svg", Color.BLACK).fixedSize(50, 50),
         Label("Simulation").alignLeft()
@@ -87,11 +94,11 @@ object SideMenu:
       )
     ).map(_.styler(menuCardStyle))
 
-    private val (header, content) = menuCards.splitAt(1)
-    header.foreach(position)
+    position(header)
+//    contents += headerContent
 //    content.map(configure)
 
-    private val (topMenu, bottomMenu) = content.splitAt(3)
+    private val (topMenu, bottomMenu) = menuCards.splitAt(3)
     topMenu.foreach(position)
     position(Swing.VGlue)
     bottomMenu.foreach(position)
