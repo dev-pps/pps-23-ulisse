@@ -15,7 +15,7 @@ import scala.swing.{BorderPanel, BoxPanel, Dimension, Label, Orientation, Swing}
 final case class Menu(root: UpdatableContainer) extends BorderPanel:
   preferredSize = new Dimension(600, 400)
   private val card =
-    ImageCard.vertical(ImagePanel.createSVGPanel("icon/add.svg", Color.BLACK), Label("new").centerHorizontally())
+    JImageCard.vertical(ImagePanel.createSVGPanel("icon/add.svg", Color.BLACK), Label("new").centerHorizontally())
       .fixedSize(100, 100)
       .genericClickReaction(() => root.update(Dashboard(root)))
       .styler(
