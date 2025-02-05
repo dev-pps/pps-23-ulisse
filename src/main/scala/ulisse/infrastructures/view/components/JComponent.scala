@@ -16,7 +16,11 @@ trait JComponent(private var styler: JStyler) extends Component:
   private def initStyler(): Unit =
     currentBackground = styler.background
     styler.size.foreach(size => preferredSize = new Dimension(size.width, size.height))
+    styler.border.foreach(style =>
+      border = BorderFactory.createEmptyBorder(style.stroke, style.stroke, style.stroke, style.stroke)
+    )
     font = styler.swingFont
+
     revalidate()
     repaint()
 
@@ -49,20 +53,21 @@ trait JComponent(private var styler: JStyler) extends Component:
       )
   }
 
-  protected override def paintComponent(g: Graphics2D): Unit =
+  override protected def paintBorder(g: Graphics2D): Unit =
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-    g.setColor(currentBackground)
-    val arcWidth  = styler.arcWidth
-    val arcHeight = styler.arcHeight
-    g.fillRoundRect(0, 0, size.width, size.height, arcWidth, arcHeight)
-
     styler.border.foreach(border =>
       val borderPosition = border.stroke / 2
       val borderSize     = (size.width - border.stroke, size.height - border.stroke)
       g.setColor(border.color)
       g.setStroke(BasicStroke(border.stroke))
-      g.drawRoundRect(borderPosition, borderPosition, borderSize._1, borderSize._2, arcWidth, arcHeight)
+      g.drawRoundRect(borderPosition, borderPosition, borderSize._1, borderSize._2, styler.arcWidth, styler.arcHeight)
     )
+    super.paintBorder(g)
+
+  protected override def paintComponent(g: Graphics2D): Unit =
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+    g.setColor(currentBackground)
+    g.fillRoundRect(0, 0, size.width, size.height, styler.arcWidth, styler.arcHeight)
     super.paintComponent(g)
 
 object JComponent:

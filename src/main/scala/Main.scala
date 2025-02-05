@@ -1,12 +1,16 @@
 import StationTypes.*
 import ulisse.adapters.StationPortOutputAdapter
 import ulisse.applications.AppState
-import ulisse.applications.managers.StationManager
+import ulisse.applications.managers.{RouteManager, StationManager}
+import ulisse.applications.ports.RoutePorts.UIInputPort
+import ulisse.applications.useCases.RouteUIInputService.RouteUIInputService
 import ulisse.applications.useCases.StationPortInputService
 import ulisse.entities.Coordinates.Grid
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
+import ulisse.infrastructures.view.components.JLabelComponent
+import ulisse.infrastructures.view.map.MapView
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -71,7 +75,7 @@ object StationTypes:
 
     // Creazione di un FlowPanel
     val northPanel = new FlowPanel() {
-      contents += new Label("North Panel")
+      contents += JLabelComponent.createTextField("title").component
     }
 
     // Creazione del BorderPanel
@@ -84,3 +88,7 @@ object StationTypes:
   }
 
   top.visible = true
+
+//  val list = LinkedBlockingQueue[RouteManager => RouteManager]
+//  val port = RouteUIInputService(list)
+//  val map = MapView.apply(port)
