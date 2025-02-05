@@ -10,6 +10,7 @@ import ulisse.infrastructures.view.AppFrame
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
 import java.util.concurrent.LinkedBlockingQueue
+import scala.swing.{BorderPanel, Dimension, FlowPanel, Frame, Label, MainFrame}
 
 @main def stationEditor(): Unit =
   val app      = AppFrame()
@@ -35,8 +36,8 @@ object StationTypes:
   type S = CheckedStation[N, C]
 
 @main def trainDemoMain(): Unit =
-  import ulisse.applications.managers.TrainManagers.TrainManager
   import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+  import ulisse.applications.managers.TrainManagers.TrainManager
   import ulisse.applications.ports.TrainPorts
   import ulisse.applications.useCases.TrainServiceManagerService
   import ulisse.entities.train.Trains.TrainTechnology
@@ -63,3 +64,23 @@ object StationTypes:
   ).foreach((appState: AppState) =>
     println(s"Stations: ${appState._1.trains}")
   )
+
+@main def testNewGraphicComponents(): Unit =
+  def top: Frame = new MainFrame {
+    title = "Scala Swing GUI"
+
+    // Creazione di un FlowPanel
+    val northPanel = new FlowPanel() {
+      contents += new Label("North Panel")
+    }
+
+    // Creazione del BorderPanel
+    val mainPanel = new BorderPanel {
+      layout(northPanel) = BorderPanel.Position.North
+    }
+
+    contents = mainPanel
+    size = new Dimension(400, 300)
+  }
+
+  top.visible = true
