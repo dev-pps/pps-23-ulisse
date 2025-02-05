@@ -9,7 +9,7 @@ import javax.imageio.ImageIO
 import scala.swing.{BoxPanel, Component, Graphics2D, Label, Orientation, Panel, RadioButton, Swing, UIElement}
 
 object Cards:
-  trait Card extends Component
+  trait Card extends JComponent
 
   object Card:
     def createImageCard(image: ImagePanel, text: String): Card = ImageCard(image, text)

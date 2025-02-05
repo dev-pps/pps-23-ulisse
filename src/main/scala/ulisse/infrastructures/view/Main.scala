@@ -1,5 +1,6 @@
 package ulisse.infrastructures.view
 
+import ulisse.adapters.StationPortOutputAdapter
 import StationTypes.*
 import ulisse.adapters.StationPortOutputAdapter
 import ulisse.applications.AppState
@@ -12,6 +13,7 @@ import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
 import ulisse.infrastructures.view.StationTypes.*
+import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.form.{CentralController, Form}
 import ulisse.infrastructures.view.map.GUIView
 import ulisse.infrastructures.view.adapter.StationPortOutputAdapter
@@ -22,6 +24,7 @@ import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
 import java.util.concurrent.LinkedBlockingQueue
+import scala.swing.{BorderPanel, Dimension, FlowPanel, Frame, MainFrame}
 import scala.collection.MapView
 import scala.swing.*
 
@@ -32,7 +35,7 @@ val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   app.contents = Menu(app)
   app.open()
 
-  val initialState = AppState[N, C, S](StationMap.createCheckedStationMap())
+  val initialState = AppState[N, C, S](StationManager.createCheckedStationMap())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
@@ -43,14 +46,14 @@ val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   app.contents = settings.stationEditorView
   app.open()
 
-  val initialState = AppState[N, C, S](StationMap.createCheckedStationMap())
+  val initialState = AppState[N, C, S](StationManager.createCheckedStationMap())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
 
 final case class StationSettings():
   lazy val outputAdapter: StationPortOutputAdapter[N, C, S]     = StationPortOutputAdapter(stationEditorController)
-  lazy val inputAdapter: StationPortInputAdapter[N, C, S]       = StationPortInputAdapter(eventStream, outputAdapter)
+  lazy val inputAdapter: StationPortInputService[N, C, S]       = StationPortInputService(eventStream, outputAdapter)
   val stationEditorController: StationEditorController[N, C, S] = StationEditorController(inputAdapter)
   val stationEditorView: StationEditorView                      = StationEditorView(stationEditorController)
 

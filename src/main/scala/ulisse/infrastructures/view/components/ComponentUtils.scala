@@ -59,7 +59,6 @@ object ComponentUtils:
 
     def makeSelectable(): RadioButton =
       new RadioButton():
-        this.opaque = true
         peer.setUI(new BasicRadioButtonUI { override def getDefaultIcon: Icon = emptyIcon })
         peer.add(component.peer, BorderLayout.CENTER)
         listenTo(component.mouse.clicks)
@@ -68,8 +67,8 @@ object ComponentUtils:
             peer.doClick()
         }
         peer.getModel.addChangeListener(_ => {
-          println("change")
-          background = if peer.getModel.isSelected then Color.LIGHT_GRAY else Color.WHITE
+          println(s"changed: ${peer.getModel.isSelected}")
+          component.background = if peer.getModel.isSelected then Color.LIGHT_GRAY else Color.WHITE
         })
 
   extension [B <: AbstractButton](button: B)
