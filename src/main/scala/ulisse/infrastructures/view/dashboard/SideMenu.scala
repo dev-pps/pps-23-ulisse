@@ -12,6 +12,7 @@ import javax.swing.BoxLayout
 import scala.swing.event.MouseClicked
 import scala.swing.{
   AbstractButton,
+  BorderPanel,
   BoxPanel,
   ButtonGroup,
   Component,
@@ -30,41 +31,44 @@ object SideMenu:
   private case class SideMenuImpl() extends BoxPanel(Orientation.Vertical) with SideMenu with Reactor:
     private val buttonGroup = new ButtonGroup()
 
-//    private def configure[C <: Component](component: C): Component =
-//      component.opaque(true)//.makeSelectable().addToGroup(buttonGroup)
-
+////    private def configure[C <: Component](component: C): Component =
+////      component.opaque(true)//.makeSelectable().addToGroup(buttonGroup)
+//
+//    contents += Swing.HStrut(10)
+//    contents += menu
+//    contents += Swing.HStrut(10)
+    contents += Swing.VStrut(10)
     private def position[C <: Component](component: C): Unit =
       contents += component
+      contents += Swing.VStrut(10)
 
-//    val menuCallback = () => {
-//      menuCards.foreach(_.toggleLabel())
-//      updateSize()
-//      revalidate()
-//      repaint()
-//    }
-//
+    val menuCallback = () => {
+      menuCards.foreach(_.toggleLabel())
+      revalidate()
+      updateSize()
+    }
+
     private val menuCardStyle = JStyler.rectPaletteStyler(
       JStyler.roundRect(10),
       JStyler.palette(Theme.light.element, Theme.light.hover, Theme.light.forwardClick)
     )
+
     def updateSize(): Unit =
       val maxCardWidth = menuCards.foldLeft(0)((m, c) => math.max(m, c.realPreferredSize().width))
-      println(s"ua $maxCardWidth")
       menuCards.foreach: card =>
         card.fixedSize(maxCardWidth, card.preferredSize.height)
-      SideMenuImpl.this.preferredSize = new Dimension(maxCardWidth, 400)
-      SideMenuImpl.this.peer.setBounds(0, 0, maxCardWidth, SideMenuImpl.this.peer.getHeight)
+      this.peer.setPreferredSize(new Dimension(20 + maxCardWidth, this.peer.getHeight))
+      this.peer.setBounds(0, 0, 20 + maxCardWidth, this.peer.getHeight)
+      revalidate()
+      repaint()
 
     private val headerContent =
       ImageCard.horizontal(ImagePanel.createImagePanel("icon/logo.jpg").fixedSize(50, 50), Label("Ulisse").alignLeft())
     private val menuCards: List[ImageCard] = List(
-//      HeaderCard(ImagePanel.createSVGPanel("icon/keyboard_double_arrow_right.svg", Color.BLACK), "Dashboard").visible(
-//        false
-//      ).genericClickReaction(menuCallback),
       ImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(25, 25),
         headerContent
-      ).genericClickReaction(() => headerContent.toggleLabel()),
+      ).genericClickReaction(menuCallback),
       ImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/simulation.svg", Color.BLACK).fixedSize(50, 50),
         Label("Simulation").alignLeft()
@@ -83,9 +87,7 @@ object SideMenu:
       )
     ).map(_.styler(menuCardStyle))
 
-    updateSize()
-
-    private val (header, content) = menuCards.splitAt(2)
+    private val (header, content) = menuCards.splitAt(1)
     header.foreach(position)
 //    content.map(configure)
 
@@ -94,6 +96,7 @@ object SideMenu:
     position(Swing.VGlue)
     bottomMenu.foreach(position)
 
+    updateSize()
 extension (imageCard: ImageCard)
   def realPreferredSize(): Dimension =
     new Dimension(50 + (if imageCard.content.visible then imageCard.content.preferredSize.width else 0), 50)
