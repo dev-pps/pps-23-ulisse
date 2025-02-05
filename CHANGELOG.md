@@ -1,3 +1,9 @@
+## [1.5.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.5.0...v1.5.1) (2025-02-05)
+
+### Bug Fixes
+
+* fixed wrong url in retrospective file ([2303049](https://github.com/dev-pps/pps-23-ulisse/commit/23030493b3800b49a9a3fea88964c01f4f1a2134))
+
 ## [1.5.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.4.0...v1.5.0) (2025-02-05)
 
 ### Features
