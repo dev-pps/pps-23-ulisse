@@ -4,6 +4,7 @@ import com.formdev.flatlaf.extras.FlatSVGIcon
 import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 import ulisse.infrastructures.view.components.ComponentUtils.*
+import ulisse.infrastructures.view.components.ComponentMixins.Selectable
 
 import java.awt.{Color, ComponentOrientation}
 import javax.imageio.ImageIO
@@ -21,7 +22,7 @@ import scala.swing.{
 }
 
 object Cards:
-  trait ImageCard extends Component with SequentialContainer.Wrapper:
+  trait ImageCard extends Component with SequentialContainer.Wrapper with Selectable:
     val image: ImagePanel
     val content: Component
     def reverse(): ImageCard =
@@ -35,25 +36,81 @@ object Cards:
 
   object ImageCard:
     def horizontal(image: ImagePanel, component: Component): ImageCard =
-      ImageCardImpl(image, component, Orientation.Horizontal)
+      ImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Horizontal)
     def vertical(image: ImagePanel, component: Component): ImageCard =
-      ImageCardImpl(image, component, Orientation.Vertical)
+      ImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Vertical)
+    def horizontalWithConfiguration(
+        imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
+        component: Component
+    ): ImageCard =
+      ImageCardImpl(
+        imageWithConfiguration.component,
+        imageWithConfiguration.configuration,
+        component,
+        Orientation.Horizontal
+      )
+    def verticalWithConfiguration(
+        imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
+        component: Component
+    ): ImageCard =
+      ImageCardImpl(
+        imageWithConfiguration.component,
+        imageWithConfiguration.configuration,
+        component,
+        Orientation.Vertical
+      )
 
   object JImageCard:
     def horizontal(image: ImagePanel, component: Component): JImageCard =
-      JImageCardImpl(image, component, Orientation.Horizontal)
+      JImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Horizontal)
+
     def vertical(image: ImagePanel, component: Component): JImageCard =
-      JImageCardImpl(image, component, Orientation.Vertical)
+      JImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Vertical)
 
-  private final case class ImageCardImpl(image: ImagePanel, content: Component, orientation: Orientation.Value)
-      extends BoxPanel(orientation) with ImageCard:
+    def horizontalWithConfiguration(
+        imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
+        component: Component
+    ): JImageCard =
+      JImageCardImpl(
+        imageWithConfiguration.component,
+        imageWithConfiguration.configuration,
+        component,
+        Orientation.Horizontal
+      )
+
+    def verticalWithConfiguration(
+        imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
+        component: Component
+    ): JImageCard =
+      JImageCardImpl(
+        imageWithConfiguration.component,
+        imageWithConfiguration.configuration,
+        component,
+        Orientation.Vertical
+      )
+
+  private final case class ImageCardImpl(
+      image: ImagePanel,
+      imageConfiguration: ComponentConfiguration,
+      content: Component,
+      orientation: Orientation.Value
+  ) extends BoxPanel(orientation) with ImageCard:
     opaque = false
-    contents += image.center(); contents += content
+    contents += image.align(imageConfiguration.alignment); contents += content
 
-  private final case class JImageCardImpl(image: ImagePanel, content: Component, orientation: Orientation.Value)
-      extends BoxPanel(orientation) with JImageCard with JComponent(JStyler.defaultStyler):
+  private final case class JImageCardImpl(
+      image: ImagePanel,
+      imageConfiguration: ComponentConfiguration,
+      content: Component,
+      orientation: Orientation.Value
+  ) extends BoxPanel(orientation) with JImageCard with JComponent(JStyler.defaultStyler):
+    private val styler = getStyler
     listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
-    contents += image; contents += content
+    contents += image.align(imageConfiguration.alignment); contents += content
+    override def selected_=(newSelected: Boolean): Unit =
+      if newSelected then setStyler(styler)
+      else setStyler(styler.copy(palette = styler.palette.copy(background = JStyler.transparentColor)))
+      super.selected_=(newSelected)
 
   object Example:
     val imageCardExample: ImageCard =
