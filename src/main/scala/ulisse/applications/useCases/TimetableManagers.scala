@@ -4,7 +4,6 @@ import ulisse.applications.useCases.TimetableManagers.TimetableManagerErrors.{Ac
 import ulisse.entities.timetable.Timetables.TrainTimetable
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist}
-import ulisse.utils.Times.ClockTime
 
 object TimetableManagers:
 
@@ -15,7 +14,16 @@ object TimetableManagers:
     final case class TimetableNotFound(trainName: String)
         extends ErrorNotExist(s"No timetables exist for train $trainName") with TimetableManagerErrors
 
+  /** A rules specification for acceptance checks of new `timetable`. Checks are done by method `accept`.
+    */
   trait AcceptanceContextPolicy:
+    /** @param timetable
+      *   [[TrainTimetable]] to check.
+      * @param tables
+      *   all TrainTimetables used by acceptance policy.
+      * @return
+      *   returns the timetable otherwise if timetable not pass policy rules is returned an [[AcceptanceError]]
+      */
     def accept(timetable: TrainTimetable, tables: List[TrainTimetable]): Either[AcceptanceError, TrainTimetable]
 
   private object DefaultAcceptancePolicy extends AcceptanceContextPolicy:
@@ -43,10 +51,25 @@ object TimetableManagers:
     TimetableManager(Map.empty)
 
   trait TimetableManager:
+    /** Save new timetable for a train. Timetable is accepted if passes the `acceptancePolicy` rules.
+      * @param timetable
+      *   `TrainTimetable` to add
+      * @param acceptancePolicy
+      *   `AcceptanceContextPolicy` that defines timetable acceptance rules
+      * @return
+      *   `Right` of updated `TimetableManager`, in case of error and `Left` of `TimetableManagerErrors`
+      */
     def save(timetable: TrainTimetable)(using
         acceptancePolicy: AcceptanceContextPolicy
     ): Either[TimetableManagerErrors, TimetableManager]
 //    def delete(trainName: String, departureTime: ClockTime): Either[TimetableNotFound, TimetableManager]
+
+    /** Gets all timetables of a train.
+      * @param trainName
+      *   Train's name
+      * @return
+      *   If al least one timetable is saved returns List of TrainTimetables, otherwise a Left of `TimetableNotFound`
+      */
     def tablesOf(trainName: String): Either[TimetableNotFound, List[TrainTimetable]]
 
   object TimetableManager:
