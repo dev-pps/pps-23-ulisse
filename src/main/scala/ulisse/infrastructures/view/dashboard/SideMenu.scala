@@ -43,6 +43,10 @@ object SideMenu:
 //      repaint()
 //    }
 //
+    private val menuCardStyle = JStyler.rectPaletteStyler(
+      JStyler.roundRect(10),
+      JStyler.palette(Theme.light.element, Theme.light.hover, Theme.light.forwardClick)
+    )
     def updateSize(): Unit =
       val maxCardWidth = menuCards.foldLeft(0)((m, c) => math.max(m, c.realPreferredSize().width))
       println(s"ua $maxCardWidth")
@@ -51,24 +55,38 @@ object SideMenu:
       SideMenuImpl.this.preferredSize = new Dimension(maxCardWidth, 400)
       SideMenuImpl.this.peer.setBounds(0, 0, maxCardWidth, SideMenuImpl.this.peer.getHeight)
 
-    private val menuCards: List[MenuCard] = List(
+    private val headerContent =
+      ImageCard.horizontal(ImagePanel.createImagePanel("icon/logo.jpg").fixedSize(50, 50), Label("Ulisse").alignLeft())
+    private val menuCards: List[ImageCard] = List(
 //      HeaderCard(ImagePanel.createSVGPanel("icon/keyboard_double_arrow_right.svg", Color.BLACK), "Dashboard").visible(
 //        false
 //      ).genericClickReaction(menuCallback),
-//      HeaderCard(
-//        ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK),
-//        "Infrastructure"
-//      ).genericClickReaction(menuCallback),
-      MenuCard(ImagePanel.createSVGPanel("icon/simulation.svg", Color.BLACK), "Simulation"),
-      MenuCard(ImagePanel.createSVGPanel("icon/map.svg", Color.BLACK), "Editors"),
-      MenuCard(ImagePanel.createSVGPanel("icon/train.svg", Color.BLACK), "Trains"),
-      MenuCard(ImagePanel.createSVGPanel("icon/settings.svg", Color.BLACK), "Settings")
-    )
+      ImageCard.horizontal(
+        ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(25, 25),
+        headerContent
+      ).genericClickReaction(() => headerContent.toggleLabel()),
+      ImageCard.horizontal(
+        ImagePanel.createSVGPanel("icon/simulation.svg", Color.BLACK).fixedSize(50, 50),
+        Label("Simulation").alignLeft()
+      ),
+      ImageCard.horizontal(
+        ImagePanel.createSVGPanel("icon/map.svg", Color.BLACK).fixedSize(50, 50),
+        Label("Editors").alignLeft()
+      ),
+      ImageCard.horizontal(
+        ImagePanel.createSVGPanel("icon/train.svg", Color.BLACK).fixedSize(50, 50),
+        Label("Trains").alignLeft()
+      ),
+      ImageCard.horizontal(
+        ImagePanel.createSVGPanel("icon/settings.svg", Color.BLACK).fixedSize(50, 50),
+        Label("Settings").alignLeft()
+      )
+    ).map(_.styler(menuCardStyle))
 
     updateSize()
 
     private val (header, content) = menuCards.splitAt(2)
-//    header.foreach(position)
+    header.foreach(position)
 //    content.map(configure)
 
     private val (topMenu, bottomMenu) = content.splitAt(3)
@@ -76,31 +94,7 @@ object SideMenu:
     position(Swing.VGlue)
     bottomMenu.foreach(position)
 
-trait TC extends Component:
-  val imagePanel: ImagePanel
-  val textLabel: Label
+extension (imageCard: ImageCard)
   def realPreferredSize(): Dimension =
-    new Dimension(50 + (if textLabel.visible then textLabel.preferredSize.width else 0), 50)
-  def toggleLabel(): Unit = textLabel.visible = !textLabel.visible
-
-final case class HeaderCard(imagePanel: ImagePanel, text: String) extends BoxPanel(Orientation.Horizontal) with TC:
-  val textLabel = new Label(text)
-  contents += textLabel
-  contents += Swing.HGlue
-  contents += imagePanel.fixedSize(50, 50)
-
-final case class MenuCard(imagePanel: ImagePanel, text: String) extends BoxPanel(Orientation.Horizontal)
-    with JComponent(
-      JStyler.rectPaletteStyler(
-        JStyler.roundRect(10),
-        JStyler.palette(Theme.light.element, Theme.light.hover, Theme.light.backwardClick)
-      )
-    ):
-  val textLabel = new Label(text)
-  contents += imagePanel.fixedSize(50, 50)
-  contents += textLabel
-  contents += Swing.HGlue
-  def realPreferredSize(): Dimension =
-    new Dimension(50 + (if textLabel.visible then textLabel.preferredSize.width else 0), 50)
-
-  def toggleLabel(): Unit = textLabel.visible = !textLabel.visible
+    new Dimension(50 + (if imageCard.content.visible then imageCard.content.preferredSize.width else 0), 50)
+  def toggleLabel(): Unit = imageCard.content.visible = !imageCard.content.visible
