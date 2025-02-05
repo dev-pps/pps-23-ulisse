@@ -3,8 +3,8 @@ package ulisse.infrastructures.view.components
 import ulisse.infrastructures.view.common.Theme
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel.createSVGPanel
 
-import java.awt.Dimension
-import scala.swing.{event, Component, Orientation}
+import java.awt.{Dimension, FlowLayout}
+import scala.swing.{event, Component, Orientation, Panel}
 
 trait JComponent:
   def component[T >: Component]: T
@@ -12,7 +12,8 @@ trait JComponent:
 object JComponent:
   def createInfoTextField(text: String): JInfoTextField           = JInfoTextField(text)
   def createIconLabel(iconPath: String, text: String): JIconLabel = JIconLabel(iconPath, text)
-  def createMenuIconLabel(JIconLabel: JIconLabel*): JNavBar       = JNavBar(JIconLabel: _*)
+  def createNavBar(JIconLabel: JIconLabel*): JNavBar              = JNavBar(JIconLabel: _*)
+  def createTabbedPane(JIconLabel: JIconLabel*): JTabbedPane      = JTabbedPane(JIconLabel: _*)
 
   private val transparentStyler = JStyler.paletteStyler(JStyler.transparentPalette)
   private val labelStyler       = JStyler.paletteStyler(JStyler.transparentPalette)
@@ -58,6 +59,7 @@ object JComponent:
     mainPanel.contents ++= iconLabels.map(_.component)
     iconLabels.foreach(_.showIcon())
 
+    mainPanel.listenTo(mainPanel.mouse.clicks)
     iconLabels.foreach(iconLabel =>
       iconLabel.component.reactions += {
         case event.MousePressed(_, _, _, _, _) =>
@@ -67,3 +69,26 @@ object JComponent:
     )
 
     override def component[T >: Component]: T = mainPanel
+
+  case class JTabbedPane(iconLabels: JIconLabel*) extends JComponent:
+    private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, transparentStyler)
+    private val navBar    = createNavBar(iconLabels: _*)
+    private val panels: Map[JIconLabel, JItem.JFlowPanelItem] =
+      iconLabels.map(iconLabel => (iconLabel, JItem.createFlowPanel(transparentStyler))).toMap
+
+    panels.values.foreach(_.visible = false)
+
+    mainPanel.contents += navBar.component
+    mainPanel.contents ++= panels.values
+
+    mainPanel.listenTo(navBar.component.mouse.clicks)
+    iconLabels.foreach(iconLabel =>
+      iconLabel.component.reactions += {
+        case event.MousePressed(_, _, _, _, _) =>
+          panels.values.foreach(_.visible = false)
+          paneOf(iconLabel).visible = true
+      }
+    )
+
+    def paneOf(label: JIconLabel): JItem.JFlowPanelItem = panels(label)
+    override def component[T >: Component]: T           = mainPanel
