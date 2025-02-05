@@ -3,6 +3,7 @@ package ulisse.infrastructures.view.components
 import ulisse.infrastructures.view.common.Theme
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel.createSVGPanel
 
+import java.awt
 import java.awt.Dimension
 import scala.swing.{event, Component, Orientation, Swing}
 
@@ -14,8 +15,11 @@ object JComponent:
   def createIconLabel(iconPath: String, text: String): JIconLabel = JIconLabel(iconPath, text)
   def createNavbar(JIconLabel: JIconLabel*): JNavBar              = JNavBar(JIconLabel: _*)
   def createTabbedPane(JIconLabel: JIconLabel*): JTabbedPane      = JTabbedPane(JIconLabel: _*)
+
   def createBaseForm(title: String, JInfoTextField: JInfoTextField*): JBaseForm =
     JBaseForm(title, JInfoTextField: _*)
+  def createToggleIconButton(onIconPath: String, offIconPath: String): JToggleIconButton =
+    JToggleIconButton(onIconPath, offIconPath)
 
   private val transparentStyler = JStyler.paletteStyler(JStyler.transparentPalette)
   private val labelStyler       = JStyler.paletteStyler(JStyler.transparentPalette)
@@ -113,5 +117,29 @@ object JComponent:
 
     mainPanel.contents += Swing.VStrut(space)
     mainPanel.contents += formPanel
+
+    override def component[T >: Component]: T = mainPanel
+
+  case class JToggleIconButton(onIconPath: String, offIconPath: String) extends JComponent:
+    private val mainPanel = JItem.createFlowPanel(transparentStyler)
+    private val onIcon    = createSVGPanel(onIconPath, Theme.light.background)
+    private val offIcon   = createSVGPanel(offIconPath, Theme.light.background)
+    private val size      = 40
+
+    onIcon.preferredSize = Dimension(size, size)
+    offIcon.preferredSize = Dimension(size, size)
+    offIcon.visible = false
+
+    mainPanel.listenTo(mainPanel.mouse.clicks)
+    mainPanel.reactions += {
+      case event.MousePressed(_, _, _, _, _) => toggle()
+    }
+
+    mainPanel.contents += onIcon
+    mainPanel.contents += offIcon
+
+    private def toggle(): Unit =
+      onIcon.visible = !onIcon.visible
+      offIcon.visible = !offIcon.visible
 
     override def component[T >: Component]: T = mainPanel
