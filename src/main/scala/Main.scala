@@ -7,9 +7,10 @@ import ulisse.entities.Coordinates.Grid
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
-import ulisse.infrastructures.view.components.JComponent
+import ulisse.infrastructures.view.components.{JComponent, JStyler}
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
+import java.awt.Color
 import java.util.concurrent.LinkedBlockingQueue
 import scala.swing.*
 
@@ -73,15 +74,25 @@ object StationTypes:
     val station = JComponent.createIconLabel("icons/station.svg", "station")
     val route   = JComponent.createIconLabel("icons/route.svg", "route")
     val train   = JComponent.createIconLabel("icons/train.svg", "train")
+    val tabPane = JComponent.createTabbedPane(station, route, train)
 
+    tabPane.paneOf(station).contents += new Label("Station")
+    tabPane.paneOf(route).contents += new Label("Route")
+    tabPane.paneOf(train).contents += new Label("Train")
+
+    tabPane.paneOf(station).setStyler(JStyler.paletteStyler(JStyler.backgroundPalette(Color.RED)))
+    tabPane.paneOf(route).setStyler(JStyler.paletteStyler(JStyler.backgroundPalette(Color.GRAY)))
+    tabPane.paneOf(train).setStyler(JStyler.paletteStyler(JStyler.backgroundPalette(Color.RED)))
+
+    listenTo(tabPane.component.mouse.clicks)
     // Creazione di un FlowPanel
     val northPanel = new FlowPanel() {
-      contents += JComponent.createMenuIconLabel(station, route, train).component
+      contents += tabPane.component
     }
 
     // Creazione del BorderPanel
     val mainPanel = new BorderPanel {
-      layout(northPanel) = BorderPanel.Position.North
+      layout(northPanel) = BorderPanel.Position.Center
     }
 
     contents = mainPanel
