@@ -1,20 +1,17 @@
 import StationTypes.*
 import ulisse.adapters.StationPortOutputAdapter
 import ulisse.applications.AppState
-import ulisse.applications.managers.{RouteManager, StationManager}
-import ulisse.applications.ports.RoutePorts.UIInputPort
-import ulisse.applications.useCases.RouteUIInputService.RouteUIInputService
+import ulisse.applications.managers.StationManager
 import ulisse.applications.useCases.StationPortInputService
 import ulisse.entities.Coordinates.Grid
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
-import ulisse.infrastructures.view.components.JLabelComponent
-import ulisse.infrastructures.view.map.MapView
+import ulisse.infrastructures.view.components.JComponent
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
 import java.util.concurrent.LinkedBlockingQueue
-import scala.swing.{BorderPanel, Dimension, FlowPanel, Frame, Label, MainFrame}
+import scala.swing.*
 
 @main def stationEditor(): Unit =
   val app      = AppFrame()
@@ -73,9 +70,13 @@ object StationTypes:
   def top: Frame = new MainFrame {
     title = "Scala Swing GUI"
 
+    val station = JComponent.createIconLabel("icons/station.svg", "station")
+    val route   = JComponent.createIconLabel("icons/route.svg", "route")
+    val train   = JComponent.createIconLabel("icons/train.svg", "train")
+
     // Creazione di un FlowPanel
     val northPanel = new FlowPanel() {
-      contents += JLabelComponent.createButton("icons/station.svg", "title").component
+      contents += JComponent.createMenuIconLabel(station, route, train).component
     }
 
     // Creazione del BorderPanel

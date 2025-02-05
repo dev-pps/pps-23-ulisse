@@ -5,7 +5,7 @@ import ulisse.entities.Route
 import ulisse.entities.Route.TypeRoute
 import ulisse.infrastructures.view.common.Theme.{light, Light}
 import ulisse.infrastructures.view.common.{FormPanel, KeyValuesPanel, Theme}
-import ulisse.infrastructures.view.components.JComponent
+import ulisse.infrastructures.view.components.JItem
 import ulisse.infrastructures.view.components.JStyler.*
 
 import scala.swing.*
@@ -32,27 +32,27 @@ object RouteForm:
 
     val departureStation =
       KeyValuesPanel(FlowPanel())(
-        JComponent.label("Departure", paletteStyler(backgroundPalette(transparentColor))),
-        JComponent.textField(5, textFieldStyler),
-        JComponent.textField(4, textFieldStyler),
-        JComponent.textField(4, textFieldStyler),
-        JComponent.button("...", buttonPickerStyler)
+        JItem.label("Departure", paletteStyler(backgroundPalette(transparentColor))),
+        JItem.textField(5, textFieldStyler),
+        JItem.textField(4, textFieldStyler),
+        JItem.textField(4, textFieldStyler),
+        JItem.button("...", buttonPickerStyler)
       )
     val arrivalStation =
       KeyValuesPanel(FlowPanel())(
-        JComponent.label("Arrival", paletteStyler(backgroundPalette(transparentColor))),
-        JComponent.textField(5, textFieldStyler),
-        JComponent.textField(4, textFieldStyler),
-        JComponent.textField(4, textFieldStyler),
-        JComponent.button("...", buttonPickerStyler)
+        JItem.label("Arrival", paletteStyler(backgroundPalette(transparentColor))),
+        JItem.textField(5, textFieldStyler),
+        JItem.textField(4, textFieldStyler),
+        JItem.textField(4, textFieldStyler),
+        JItem.button("...", buttonPickerStyler)
       )
     val railsCount = KeyValuesPanel(FlowPanel())(
       Label("Rails Count"),
-      JComponent.textField(3, textFieldStyler)
+      JItem.textField(3, textFieldStyler)
     )
     val length = KeyValuesPanel(FlowPanel())(
       Label("Length"),
-      JComponent.textField(3, textFieldStyler)
+      JItem.textField(3, textFieldStyler)
     )
     FormPanel(BorderPanel(), typeRoute, departureStation, arrivalStation, length, railsCount)
 

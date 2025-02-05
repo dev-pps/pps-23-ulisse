@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.common
 
-import ulisse.infrastructures.view.components.JComponent
-import ulisse.infrastructures.view.components.JComponent.JButton
+import ulisse.infrastructures.view.components.JItem
+import ulisse.infrastructures.view.components.JItem.JButtonItem
 import ulisse.infrastructures.view.components.JStyler.*
 
 import scala.swing.BorderPanel.Position.{Center, South}
@@ -9,9 +9,9 @@ import scala.swing.Font.Style
 import scala.swing.{Font as SwingFont, *}
 
 trait FormPanel[+MP <: Panel] extends WrapPanel[MP]:
-  val saveButton: JButton
-  val deleteButton: JButton
-  val exitButton: JButton
+  val saveButton: JButtonItem
+  val deleteButton: JButtonItem
+  val exitButton: JButtonItem
 
   def keyValuesPanel: Seq[KeyValuesPanel[Panel]]
 
@@ -22,10 +22,10 @@ object FormPanel:
   private case class FormPanelImpl[+MP <: BorderPanel, +P <: Panel](mainPanel: MP, keyValuesPanel: KeyValuesPanel[P]*)(
       using opaque: Boolean
   ) extends FormPanel[MP]:
-    private val title                  = Label("Route")
-    override val saveButton: JButton   = JComponent.button("save", defaultStyler)
-    override val deleteButton: JButton = JComponent.button("delete", defaultStyler)
-    override val exitButton: JButton   = JComponent.button("exit", defaultStyler)
+    private val title                      = Label("Route")
+    override val saveButton: JButtonItem   = JItem.button("save", defaultStyler)
+    override val deleteButton: JButtonItem = JItem.button("delete", defaultStyler)
+    override val exitButton: JButtonItem   = JItem.button("exit", defaultStyler)
 
     private val centralBox: BoxPanel     = BoxPanel(Orientation.Vertical)
     private val northPanel: FlowPanel    = FlowPanel(title)
