@@ -21,7 +21,7 @@ import scala.swing.{
 }
 
 object Cards:
-  trait ImageCard extends JComponent with SequentialContainer.Wrapper:
+  trait ImageCard extends Component with SequentialContainer.Wrapper:
     val image: ImagePanel
     val content: Component
     def reverse(): ImageCard =
@@ -31,21 +31,34 @@ object Cards:
       this.contents ++= reversedContent
       this
 
+  trait JImageCard extends ImageCard with JComponent
+
   object ImageCard:
     def horizontal(image: ImagePanel, component: Component): ImageCard =
       ImageCardImpl(image, component, Orientation.Horizontal)
     def vertical(image: ImagePanel, component: Component): ImageCard =
       ImageCardImpl(image, component, Orientation.Vertical)
 
+  object JImageCard:
+    def horizontal(image: ImagePanel, component: Component): JImageCard =
+      JImageCardImpl(image, component, Orientation.Horizontal)
+    def vertical(image: ImagePanel, component: Component): JImageCard =
+      JImageCardImpl(image, component, Orientation.Vertical)
+
   private final case class ImageCardImpl(image: ImagePanel, content: Component, orientation: Orientation.Value)
-      extends BoxPanel(orientation) with ImageCard with JComponent(JStyler.defaultStyler):
+      extends BoxPanel(orientation) with ImageCard:
+    opaque = false
+    contents += image.center(); contents += content
+
+  private final case class JImageCardImpl(image: ImagePanel, content: Component, orientation: Orientation.Value)
+      extends BoxPanel(orientation) with JImageCard with JComponent(JStyler.defaultStyler):
     listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
     contents += image; contents += content
 
   object Example:
     val imageCardExample: ImageCard =
-      Cards.ImageCard.vertical(ImagePanels.Example.imagePanelExample, Label("Logo").centerHorizontally())
+      Cards.JImageCard.vertical(ImagePanels.Example.imagePanelExample, Label("Logo").centerHorizontally())
     val svgCardExample: ImageCard =
-      Cards.ImageCard.horizontal(ImagePanels.Example.svgPanelExample, Label("Map").centerHorizontally())
+      Cards.JImageCard.horizontal(ImagePanels.Example.svgPanelExample, Label("Map").centerHorizontally())
     val drawnCardExample: ImageCard =
-      Cards.ImageCard.horizontal(ImagePanels.Example.drawnPanelExample, Label("Cross").centerHorizontally())
+      Cards.JImageCard.horizontal(ImagePanels.Example.drawnPanelExample, Label("Cross").centerHorizontally())

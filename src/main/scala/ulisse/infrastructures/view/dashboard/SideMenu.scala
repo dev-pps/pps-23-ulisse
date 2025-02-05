@@ -41,8 +41,8 @@ object SideMenu:
       contents += Swing.VStrut(10)
 
     val menuCallback: () => Unit = () => {
-      headerLeftContent.visible = !headerLeftContent.visible
-      menuCards.foreach(_.toggleLabel())
+      menuContent.foreach(_.toggleLabel())
+      header.image.rotation = header.image.rotation + 180
       revalidate()
       updateSize()
     }
@@ -53,51 +53,51 @@ object SideMenu:
     )
 
     def updateSize(): Unit =
-      val maxCardWidth = menuCards.foldLeft(0)((m, c) => math.max(m, c.realPreferredSize().width))
-      menuCards.foreach: card =>
-        card.fixedSize(maxCardWidth, card.preferredSize.height)
-      this.peer.setPreferredSize(new Dimension(20 + maxCardWidth, this.peer.getHeight))
-      this.peer.setBounds(0, 0, 20 + maxCardWidth, this.peer.getHeight)
+      val maxContentWidth = menuContent.foldLeft(0)((m, c) => math.max(m, c.realPreferredSize().width))
+
+      menuContent.foreach: content =>
+        content.fixedSize(maxContentWidth, content.preferredSize.height)
+
+      this.peer.setPreferredSize(new Dimension(20 + maxContentWidth, this.peer.getHeight))
+      this.peer.setBounds(0, 0, 20 + maxContentWidth, this.peer.getHeight)
       revalidate()
       repaint()
 
     private val headerLeftContent = ImageCard.horizontal(
-      ImagePanel.createImagePanel("icon/logo.jpg").fixedSize(50, 50),
+      ImagePanel.createImagePanel("icon/logo_circular.png").fixedSize(50, 50),
       Label("Ulisse").alignLeft()
-    ).styler(menuCardStyle.copy(palette = JStyler.transparentPalette))
-    private val headerRightContent = ImageCard.horizontal(
-      ImagePanel.createSVGPanel("icon/keyboard_double_arrow_right.svg", Color.BLACK).fixedSize(25, 25),
-      Label("").alignRight()
-    ).styler(menuCardStyle).genericClickReaction(menuCallback).alignRight()
-    private val header = new BoxPanel(Orientation.Horizontal):
-      opaque = false
-      contents += headerLeftContent
-//      contents += Swing.HGlue
-      contents += headerRightContent
-      listenTo(headerRightContent.mouse.clicks, headerRightContent.mouse.moves)
-    private val menuCards: List[ImageCard] = List(
-      ImageCard.horizontal(
+    )
+    private val headerRightContent =
+      ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(25, 25).styler(
+        menuCardStyle
+      ).genericClickReaction(menuCallback)
+
+    private val header = ImageCard.horizontal(
+      headerRightContent,
+      headerLeftContent
+    ).reverse()
+
+    private val menuCards: List[JImageCard] = List[JImageCard](
+      JImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/simulation.svg", Color.BLACK).fixedSize(50, 50),
         Label("Simulation").alignLeft()
       ),
-      ImageCard.horizontal(
+      JImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/map.svg", Color.BLACK).fixedSize(50, 50),
         Label("Editors").alignLeft()
       ),
-      ImageCard.horizontal(
+      JImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/train.svg", Color.BLACK).fixedSize(50, 50),
         Label("Trains").alignLeft()
       ),
-      ImageCard.horizontal(
+      JImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/settings.svg", Color.BLACK).fixedSize(50, 50),
         Label("Settings").alignLeft()
       )
     ).map(_.styler(menuCardStyle))
+    private val menuContent = header +: menuCards
 
     position(header)
-//    contents += headerContent
-//    content.map(configure)
-
     private val (topMenu, bottomMenu) = menuCards.splitAt(3)
     topMenu.foreach(position)
     position(Swing.VGlue)

@@ -21,7 +21,9 @@ object ImagePanels:
       extends ImagePanel with JComponent(JStyler.defaultStyler.copy(palette = JStyler.transparentPalette)):
     private val image = ImageIO.read(ClassLoader.getSystemResource(imagePath))
     override def paintComponent(g: Graphics2D): Unit =
+      super.paintComponent(g)
       val size = math.min(peer.getWidth, peer.getHeight)
+      g.rotate(math.toRadians(rotation), peer.getWidth / 2, peer.getHeight / 2)
       g.drawImage(image, (peer.getWidth - size) / 2, (peer.getHeight - size) / 2, size, size, peer)
 
   private final case class SVGPanel(svgPath: String, _color: Color)
@@ -36,13 +38,17 @@ object ImagePanels:
       repaint()
 
     override def paintComponent(g: Graphics2D): Unit =
+      super.paintComponent(g)
+      g.rotate(math.toRadians(rotation), peer.getWidth / 2, peer.getHeight / 2)
       val size = math.min(peer.getWidth, peer.getHeight)
       val icon = rawIcon.derive(size, size)
       icon.paintIcon(peer, g, (peer.getWidth - icon.getWidth) / 2, (peer.getHeight - icon.getHeight) / 2)
 
   private final case class DrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit)
       extends ImagePanel with JComponent(JStyler.defaultStyler.copy(palette = JStyler.transparentPalette)):
-    override def paintComponent(g: Graphics2D): Unit = iconDrawer(this, g)
+    override def paintComponent(g: Graphics2D): Unit =
+      super.paintComponent(g)
+      iconDrawer(this, g)
 
   object Example:
     def drawCross(preferredLength: Int, preferredThickness: Int, color: Color)(
