@@ -71,18 +71,34 @@ object StationTypes:
   def top: Frame = new MainFrame {
     title = "Scala Swing GUI"
 
-    val station = JComponent.createIconLabel("icons/station.svg", "station")
-    val route   = JComponent.createIconLabel("icons/route.svg", "route")
-    val train   = JComponent.createIconLabel("icons/train.svg", "train")
-    val tabPane = JComponent.createTabbedPane(station, route, train)
+    val station  = JComponent.createIconLabel("icons/station.svg", "station")
+    val route    = JComponent.createIconLabel("icons/route.svg", "route")
+    val schedule = JComponent.createIconLabel("icons/train.svg", "schedule")
+    val tabPane  = JComponent.createTabbedPane(station, route, schedule)
 
-    tabPane.paneOf(station).contents += new Label("Station")
-    tabPane.paneOf(route).contents += new Label("Route")
-    tabPane.paneOf(train).contents += new Label("Train")
+    val stationNameForm      = JComponent.createInfoTextField("Name")
+    val stationLatitudeForm  = JComponent.createInfoTextField("Latitude")
+    val stationLongitudeForm = JComponent.createInfoTextField("Longitude")
 
-    tabPane.paneOf(station).setStyler(JStyler.paletteStyler(JStyler.backgroundPalette(Color.RED)))
-    tabPane.paneOf(route).setStyler(JStyler.paletteStyler(JStyler.backgroundPalette(Color.GRAY)))
-    tabPane.paneOf(train).setStyler(JStyler.paletteStyler(JStyler.backgroundPalette(Color.RED)))
+    val routeDepartureStationForm = JComponent.createInfoTextField("Departure Station")
+    val routeArrivalStationForm   = JComponent.createInfoTextField("Arrival Station")
+    val routeTypeForm             = JComponent.createInfoTextField("Type")
+
+    tabPane.paneOf(station).contents += JComponent.createBaseForm(
+      "Station",
+      stationNameForm,
+      stationLatitudeForm,
+      stationLongitudeForm
+    ).component
+
+    tabPane.paneOf(route).contents += JComponent.createBaseForm(
+      "Route",
+      routeDepartureStationForm,
+      routeArrivalStationForm,
+      routeTypeForm
+    ).component
+
+    tabPane.paneOf(schedule).contents += new Label("Simulation")
 
     listenTo(tabPane.component.mouse.clicks)
     // Creazione di un FlowPanel

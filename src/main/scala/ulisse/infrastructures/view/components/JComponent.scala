@@ -3,8 +3,8 @@ package ulisse.infrastructures.view.components
 import ulisse.infrastructures.view.common.Theme
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel.createSVGPanel
 
-import java.awt.{Dimension, FlowLayout}
-import scala.swing.{event, Component, Orientation, Panel}
+import java.awt.Dimension
+import scala.swing.{event, Component, Orientation, Swing}
 
 trait JComponent:
   def component[T >: Component]: T
@@ -12,8 +12,10 @@ trait JComponent:
 object JComponent:
   def createInfoTextField(text: String): JInfoTextField           = JInfoTextField(text)
   def createIconLabel(iconPath: String, text: String): JIconLabel = JIconLabel(iconPath, text)
-  def createNavBar(JIconLabel: JIconLabel*): JNavBar              = JNavBar(JIconLabel: _*)
+  def createNavbar(JIconLabel: JIconLabel*): JNavBar              = JNavBar(JIconLabel: _*)
   def createTabbedPane(JIconLabel: JIconLabel*): JTabbedPane      = JTabbedPane(JIconLabel: _*)
+  def createBaseForm(title: String, JInfoTextField: JInfoTextField*): JBaseForm =
+    JBaseForm(title, JInfoTextField: _*)
 
   private val transparentStyler = JStyler.paletteStyler(JStyler.transparentPalette)
   private val labelStyler       = JStyler.paletteStyler(JStyler.transparentPalette)
@@ -21,9 +23,11 @@ object JComponent:
     JStyler.rectPaletteStyler(JStyler.roundRect(10), JStyler.backgroundPalette(Theme.light.element))
 
   case class JInfoTextField(text: String) extends JComponent:
+    private val colum = 15
+
     private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, transparentStyler)
     private val label     = JItem.label(text, labelStyler)
-    private val textField = JItem.textField(10, elementStyler)
+    private val textField = JItem.textField(colum, elementStyler)
 
     private val northPanel = JItem.createFlowPanel(transparentStyler)
     northPanel.contents += label
@@ -72,7 +76,7 @@ object JComponent:
 
   case class JTabbedPane(iconLabels: JIconLabel*) extends JComponent:
     private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, transparentStyler)
-    private val navBar    = createNavBar(iconLabels: _*)
+    private val navBar    = createNavbar(iconLabels: _*)
     private val panels: Map[JIconLabel, JItem.JFlowPanelItem] =
       iconLabels.map(iconLabel => (iconLabel, JItem.createFlowPanel(transparentStyler))).toMap
 
@@ -92,3 +96,22 @@ object JComponent:
 
     def paneOf(label: JIconLabel): JItem.JFlowPanelItem = panels(label)
     override def component[T >: Component]: T           = mainPanel
+
+  case class JBaseForm(title: String, infoTextField: JInfoTextField*) extends JComponent:
+    private val mainPanel  = JItem.createBoxPanel(Orientation.Vertical, transparentStyler)
+    private val titlePanel = JItem.createFlowPanel(transparentStyler)
+    private val formPanel  = JItem.createBoxPanel(Orientation.Vertical, transparentStyler)
+
+    private val titleLabel = JItem.label(title, labelStyler)
+    private val space      = 10
+
+    titlePanel.contents += titleLabel
+    formPanel.contents += titlePanel
+
+    private val fields = infoTextField.flatMap(field => List(Swing.VStrut(space), field.component))
+    formPanel.contents ++= fields
+
+    mainPanel.contents += Swing.VStrut(space)
+    mainPanel.contents += formPanel
+
+    override def component[T >: Component]: T = mainPanel
