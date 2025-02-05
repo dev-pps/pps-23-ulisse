@@ -70,14 +70,21 @@ object ComponentUtils:
 
     def center(): Component =
       centerHorizontally().centerVertically()
-
+    
+    def reverse(): Component =
+      component.contents 
+//      wrapper.contents += component
+//      wrapper.contents += Swing.VGlue
+//      wrapper.contents += Swing.VStrut(10)
+//      wrapper
+    
     def genericClickReaction(action: () => Unit): C =
       component.listenTo(component.mouse.clicks)
       component.reactions += {
         case _: MouseClicked => action()
       }
       component
-
+    
     def visible(value: Boolean): C =
       component.visible = value
       component
