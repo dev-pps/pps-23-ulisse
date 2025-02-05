@@ -1,3 +1,11 @@
+## [1.5.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.4.0...v1.5.0) (2025-02-05)
+
+### Features
+
+* change architecture and relative tests ([914d085](https://github.com/dev-pps/pps-23-ulisse/commit/914d085b08ffb764f999bcf53fc14d73020f5363))
+* create label-textField component ([87f3d61](https://github.com/dev-pps/pps-23-ulisse/commit/87f3d618d98cbeacfefd91d128276d0fc3e4fdf2))
+* created custom mode to create a panel ([bd5c5d0](https://github.com/dev-pps/pps-23-ulisse/commit/bd5c5d04139e9fa4c1219a1cfc08082003d566ba))
+
 ## [1.4.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.3.0...v1.4.0) (2025-02-04)
 
 ### Features
