@@ -1,5 +1,7 @@
 package ulisse.infrastructures.view.components
 
+import ulisse.infrastructures.view.components.JStyler.JStyler
+
 import java.awt
 import java.awt.{BorderLayout, Color, Graphics}
 import javax.swing.{DefaultButtonModel, Icon, JToggleButton}
@@ -9,18 +11,20 @@ import javax.swing.plaf.basic.BasicRadioButtonUI
 import scala.swing.event.MouseClicked
 import scala.swing.{
   AbstractButton,
+  BoxPanel,
   ButtonGroup,
   Component,
   Dimension,
   Graphics2D,
+  Orientation,
   Publisher,
   RadioButton,
+  Swing,
   ToggleButton,
   UIElement
 }
 
 object ComponentUtils:
-
   private val emptyIcon = new Icon:
     override def getIconWidth: Int                                              = 0
     override def getIconHeight: Int                                             = 0
@@ -34,6 +38,39 @@ object ComponentUtils:
       element
 
   extension [C <: Component](component: C)
+    def alignLeft(): Component =
+      val wrapper = JPanel.createBox(Orientation.Horizontal)
+      wrapper.contents += component
+      wrapper.contents += Swing.HGlue
+      wrapper
+
+    def alignRight(): Component =
+      val wrapper = JPanel.createBox(Orientation.Horizontal)
+      wrapper.contents += Swing.HGlue
+      wrapper.contents += component
+      wrapper
+
+    def alignTop(): Component =
+      val wrapper = JPanel.createBox(Orientation.Vertical)
+      wrapper.contents += component
+      wrapper.contents += Swing.VGlue
+      wrapper
+
+    def alignBottom(): Component =
+      val wrapper = JPanel.createBox(Orientation.Vertical)
+      wrapper.contents += Swing.VGlue
+      wrapper.contents += component
+      wrapper
+
+    def centerHorizontally(): Component =
+      alignLeft().alignRight()
+
+    def centerVertically(): Component =
+      alignTop().alignBottom()
+
+    def center(): Component =
+      centerHorizontally().centerVertically()
+
     def genericClickReaction(action: () => Unit): C =
       component.listenTo(component.mouse.clicks)
       component.reactions += {
@@ -49,6 +86,7 @@ object ComponentUtils:
       component.opaque = value
       component
 
+    @Deprecated("Use JStyler Border")
     def defaultBorder(): C =
       component.border = new LineBorder(Color.BLACK, 2)
       component
@@ -75,3 +113,8 @@ object ComponentUtils:
     def addToGroup(buttonGroup: ButtonGroup): B =
       buttonGroup.peer.add(button.peer)
       button
+
+  extension [JC <: JComponent](jc: JC)
+    def styler(styler: JStyler): JC =
+      jc.setStyler(styler)
+      jc

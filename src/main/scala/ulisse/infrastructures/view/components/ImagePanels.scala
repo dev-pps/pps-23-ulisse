@@ -27,6 +27,7 @@ object ImagePanels:
   private final case class SVGPanel(svgPath: String, _color: Color)
       extends ColorableImagePanel with JComponent(JStyler.defaultStyler):
     private val rawIcon = new FlatSVGIcon(svgPath)
+    opaque = false
     rawIcon.setColorFilter(ColorFilter(_ => color))
     opaque = false
 
@@ -39,7 +40,7 @@ object ImagePanels:
       val size = math.min(peer.getWidth, peer.getHeight)
       val icon = rawIcon.derive(size, size)
       icon.paintIcon(peer, g, (peer.getWidth - icon.getWidth) / 2, (peer.getHeight - icon.getHeight) / 2)
-
+      super.paintComponent(g)
   private final case class DrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit)
       extends ImagePanel with JComponent(JStyler.defaultStyler):
     override def paintComponent(g: Graphics2D): Unit = iconDrawer(this, g)

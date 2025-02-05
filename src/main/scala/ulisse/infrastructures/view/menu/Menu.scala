@@ -14,29 +14,18 @@ import scala.swing.{BorderPanel, BoxPanel, Dimension, Label, Orientation, Swing}
 
 final case class Menu(root: UpdatableContainer) extends BorderPanel:
   preferredSize = new Dimension(600, 400)
-//  private val card = Card.createImageCard(ImagePanel.createSVGPanel("icon/add.svg", Color.BLACK), "new")
-//    .fixedSize(100, 100)
-//    .defaultBorder()
-//    .genericClickReaction(() => root.update(Dashboard(root)))
-
-  final case class MenuCard(imagePanel: ImagePanel, text: String) extends BoxPanel(Orientation.Horizontal)
-      with JComponent(
-        JStyler.rectPaletteStyler(
-          JStyler.roundRect(10),
-          JStyler.palette(Theme.light.element, Theme.light.hover, Theme.light.backwardClick)
+  private val card =
+    ImageCard.vertical(ImagePanel.createSVGPanel("icon/add.svg", Color.BLACK), Label("new").centerHorizontally())
+      .fixedSize(100, 100)
+      .genericClickReaction(() => root.update(Dashboard(root)))
+      .styler(
+        JStyler.styler(
+          JStyler.roundRect(25),
+          JStyler.palette(Theme.light.element, Theme.light.hover, Theme.light.forwardClick),
+          JStyler.defaultFont,
+          JStyler.border(Color.DARK_GRAY, 1)
         )
-      ):
-    val textLabel = new Label(text)
-    contents += imagePanel.fixedSize(50, 50)
-    contents += textLabel
-    contents += Swing.HGlue
-    opaque = false
-
-  private val card = MenuCard(ImagePanel.createSVGPanel("icon/add.svg", Color.BLACK), "new")
-    .fixedSize(100, 100)
-    .defaultBorder()
-    .genericClickReaction(() => root.update(Dashboard(root)))
-
+      )
   private val centerPanel = new BoxPanel(Orientation.Vertical):
     contents += Swing.VGlue
     contents += new BoxPanel(Orientation.Horizontal):
