@@ -20,7 +20,7 @@ object MapPanel:
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class MapPanelImpl(var points: List[((Int, Int), (Int, Int))]) extends Panel with MapPanel:
-    private val stationUrl   = ClassLoader.getSystemResource("station.png")
+    private val stationUrl   = ClassLoader.getSystemResource("icons/station.svg")
     private val stationImage = ImageIO.read(stationUrl)
 
     private val routeUrl   = getClass.getResource("/route.png")

@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.components.JStyler.*
 
-import java.awt.{BasicStroke, RenderingHints}
+import java.awt.{BasicStroke, FlowLayout, RenderingHints}
 import javax.swing.BorderFactory
 import scala.swing.{Font as SwingFont, *}
 
@@ -71,15 +71,31 @@ trait JComponent(private var styler: JStyler) extends Component:
     super.paintComponent(g)
 
 object JComponent:
+
+  case class JFlowPanel()(jStyler: JStyler) extends FlowPanel with JComponent(jStyler):
+    private val layout = new FlowLayout(FlowLayout.CENTER, 0, 0)
+    peer.setLayout(layout)
+    opaque = false
+
+  case class JBoxPanel(orientation: Orientation.Value)(jStyler: JStyler) extends BoxPanel(orientation)
+      with JComponent(jStyler):
+    opaque = false
+
   case class JPanel()(jStyler: JStyler) extends Panel with JComponent(jStyler):
     peer.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5))
+
   case class JButton(label: String)(jStyler: JStyler) extends Button(label) with JComponent(jStyler):
     focusPainted = false
     borderPainted = false
     contentAreaFilled = false
+
   case class JLabel(label: String)(jStyler: JStyler) extends Label(label) with JComponent(jStyler)
+
   case class JTextField(colum: Int)(jStyler: JStyler) extends TextField(colum) with JComponent(jStyler):
     peer.setBorder(BorderFactory.createEmptyBorder())
+
+  def createFlowPanel(styler: JStyler): JFlowPanel                               = JFlowPanel()(styler)
+  def createBoxPanel(orientation: Orientation.Value, styler: JStyler): JBoxPanel = JBoxPanel(orientation)(styler)
 
   def button(text: String, styler: JStyler): JButton     = JButton(text)(styler)
   def label(text: String, styler: JStyler): JLabel       = JLabel(text)(styler)
