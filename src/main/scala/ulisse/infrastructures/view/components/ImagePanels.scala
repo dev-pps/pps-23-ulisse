@@ -18,14 +18,14 @@ object ImagePanels:
     def createDrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit): ImagePanel = DrawnPanel(iconDrawer)
 
   private final case class ImagePanelImpl(imagePath: String)
-      extends ImagePanel with JComponent(JStyler.defaultStyler):
+      extends ImagePanel with JComponent(JStyler.defaultStyler.copy(palette = JStyler.transparentPalette)):
     private val image = ImageIO.read(ClassLoader.getSystemResource(imagePath))
     override def paintComponent(g: Graphics2D): Unit =
       val size = math.min(peer.getWidth, peer.getHeight)
       g.drawImage(image, (peer.getWidth - size) / 2, (peer.getHeight - size) / 2, size, size, peer)
 
   private final case class SVGPanel(svgPath: String, _color: Color)
-      extends ColorableImagePanel with JComponent(JStyler.defaultStyler):
+      extends ColorableImagePanel with JComponent(JStyler.defaultStyler.copy(palette = JStyler.transparentPalette)):
     private val rawIcon = new FlatSVGIcon(svgPath)
     rawIcon.setColorFilter(ColorFilter(_ => color))
     opaque = false
@@ -41,7 +41,7 @@ object ImagePanels:
       icon.paintIcon(peer, g, (peer.getWidth - icon.getWidth) / 2, (peer.getHeight - icon.getHeight) / 2)
 
   private final case class DrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit)
-      extends ImagePanel with JComponent(JStyler.defaultStyler):
+      extends ImagePanel with JComponent(JStyler.defaultStyler.copy(palette = JStyler.transparentPalette)):
     override def paintComponent(g: Graphics2D): Unit = iconDrawer(this, g)
 
   object Example:
