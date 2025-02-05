@@ -5,6 +5,7 @@ import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ComponentMixins.Selectable
+import ulisse.infrastructures.view.components.JStyler
 
 import java.awt.{Color, ComponentOrientation}
 import javax.imageio.ImageIO
@@ -61,32 +62,36 @@ object Cards:
       )
 
   object JImageCard:
-    def horizontal(image: ImagePanel, component: Component): JImageCard =
-      JImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Horizontal)
+    def horizontal(image: ImagePanel, component: Component, styler: JStyler.JStyler): JImageCard =
+      JImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Horizontal, styler)
 
-    def vertical(image: ImagePanel, component: Component): JImageCard =
-      JImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Vertical)
+    def vertical(image: ImagePanel, component: Component, styler: JStyler.JStyler): JImageCard =
+      JImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Vertical, styler)
 
     def horizontalWithConfiguration(
         imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
-        component: Component
+        component: Component,
+        styler: JStyler.JStyler
     ): JImageCard =
       JImageCardImpl(
         imageWithConfiguration.component,
         imageWithConfiguration.configuration,
         component,
-        Orientation.Horizontal
+        Orientation.Horizontal,
+        styler
       )
 
     def verticalWithConfiguration(
         imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
-        component: Component
+        component: Component,
+        styler: JStyler.JStyler
     ): JImageCard =
       JImageCardImpl(
         imageWithConfiguration.component,
         imageWithConfiguration.configuration,
         component,
-        Orientation.Vertical
+        Orientation.Vertical,
+        styler
       )
 
   private final case class ImageCardImpl(
@@ -102,9 +107,9 @@ object Cards:
       image: ImagePanel,
       imageConfiguration: ComponentConfiguration,
       content: Component,
-      orientation: Orientation.Value
-  ) extends BoxPanel(orientation) with JImageCard with JComponent(JStyler.defaultStyler):
-    private val styler = getStyler
+      orientation: Orientation.Value,
+      styler: JStyler.JStyler
+  ) extends BoxPanel(orientation) with JImageCard with JComponent(styler):
     listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
     contents += image.align(imageConfiguration.alignment); contents += content
     override def selected_=(newSelected: Boolean): Unit =
@@ -114,8 +119,20 @@ object Cards:
 
   object Example:
     val imageCardExample: ImageCard =
-      Cards.JImageCard.vertical(ImagePanels.Example.imagePanelExample, Label("Logo").centerHorizontally())
+      Cards.JImageCard.vertical(
+        ImagePanels.Example.imagePanelExample,
+        Label("Logo").centerHorizontally(),
+        JStyler.defaultStyler
+      )
     val svgCardExample: ImageCard =
-      Cards.JImageCard.horizontal(ImagePanels.Example.svgPanelExample, Label("Map").centerHorizontally())
+      Cards.JImageCard.horizontal(
+        ImagePanels.Example.svgPanelExample,
+        Label("Map").centerHorizontally(),
+        JStyler.defaultStyler
+      )
     val drawnCardExample: ImageCard =
-      Cards.JImageCard.horizontal(ImagePanels.Example.drawnPanelExample, Label("Cross").centerHorizontally())
+      Cards.JImageCard.horizontal(
+        ImagePanels.Example.drawnPanelExample,
+        Label("Cross").centerHorizontally(),
+        JStyler.defaultStyler
+      )

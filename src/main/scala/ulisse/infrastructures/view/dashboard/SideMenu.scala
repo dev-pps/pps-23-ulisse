@@ -67,7 +67,7 @@ object SideMenu:
     )
     private val headerRightContent =
       ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(25, 25).styler(
-        menuCardStyle
+        menuCardStyle.copy(palette = menuCardStyle.palette.copy(background = JStyler.transparentColor))
       ).genericClickReaction(menuCallback)
 
     private val header = ImageCard.horizontalWithConfiguration(
@@ -78,24 +78,28 @@ object SideMenu:
     private val menuCards: List[JImageCard] = List[JImageCard](
       JImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/simulation.svg", Color.BLACK).fixedSize(50, 50),
-        Label("Simulation").alignLeft()
+        Label("Simulation").alignLeft(),
+        menuCardStyle
       ),
       JImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/map.svg", Color.BLACK).fixedSize(50, 50),
-        Label("Editors").alignLeft()
+        Label("Editors").alignLeft(),
+        menuCardStyle
       ),
       JImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/train.svg", Color.BLACK).fixedSize(50, 50),
-        Label("Trains").alignLeft()
+        Label("Trains").alignLeft(),
+        menuCardStyle
       ),
       JImageCard.horizontal(
         ImagePanel.createSVGPanel("icon/settings.svg", Color.BLACK).fixedSize(50, 50),
-        Label("Settings").alignLeft()
+        Label("Settings").alignLeft(),
+        menuCardStyle
       )
-    ).map(_.styler(menuCardStyle))
+    )
 
-//    private val buttonGroup: SelectableGroup = SelectableGroup(menuCards*)
-    private val menuContent = header +: menuCards
+    private val buttonGroup: SelectableGroup = SelectableGroup(menuCards*)
+    private val menuContent                  = header +: menuCards
 
     position(header)
     private val (topMenu, bottomMenu) = menuCards.splitAt(3)
