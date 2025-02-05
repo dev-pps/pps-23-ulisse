@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.components
 
-import ulisse.infrastructures.view.components.JStyler.JStyler
+import ulisse.infrastructures.view.components.JStyler
 
 import java.awt
 import java.awt.{BorderLayout, Color, Graphics}
@@ -28,6 +28,19 @@ import scala.swing.{
 }
 
 object ComponentUtils:
+
+  enum Alignment:
+    case Left, Right, Top, Bottom, Center
+
+  trait ComponentConfiguration:
+    val alignment: Option[Alignment]
+
+  object ComponentConfiguration:
+    def empty(): ComponentConfiguration                     = ComponentConfigurationImpl(None)
+    def apply(alignment: Alignment): ComponentConfiguration = ComponentConfigurationImpl(Some(alignment))
+
+    private case class ComponentConfigurationImpl(alignment: Option[Alignment]) extends ComponentConfiguration
+  case class ComponentWithConfiguration[C <: Component](component: C, configuration: ComponentConfiguration)
   private val emptyIcon = new Icon:
     override def getIconWidth: Int                                              = 0
     override def getIconHeight: Int                                             = 0
@@ -41,6 +54,15 @@ object ComponentUtils:
       element
 
   extension [C <: Component](component: C)
+    def align(alignment: Option[Alignment]): Component = alignment match
+      case Some(value) => value match
+          case Alignment.Left   => component.alignLeft()
+          case Alignment.Right  => component.alignRight()
+          case Alignment.Top    => component.alignTop()
+          case Alignment.Bottom => component.alignBottom()
+          case Alignment.Center => component.center()
+      case None => component
+
     def alignLeft(): Component =
       val wrapper = JPanel.createBox(Orientation.Horizontal)
       wrapper.contents += component
@@ -98,26 +120,7 @@ object ComponentUtils:
       component.listenTo(ps*)
       component
 
-    def makeSelectable(): RadioButton =
-      new RadioButton():
-        peer.setUI(new BasicRadioButtonUI { override def getDefaultIcon: Icon = emptyIcon })
-        peer.add(component.peer, BorderLayout.CENTER)
-        listenTo(component.mouse.clicks)
-        reactions += {
-          case _: MouseClicked =>
-            peer.doClick()
-        }
-        peer.getModel.addChangeListener(_ => {
-          println(s"changed: ${peer.getModel.isSelected}")
-          component.background = if peer.getModel.isSelected then Color.LIGHT_GRAY else Color.WHITE
-        })
-
-  extension [B <: AbstractButton](button: B)
-    def addToGroup(buttonGroup: ButtonGroup): B =
-      buttonGroup.peer.add(button.peer)
-      button
-
   extension [JC <: JComponent](jc: JC)
-    def styler(styler: JStyler): JC =
+    def styler(styler: JStyler.JStyler): JC =
       jc.setStyler(styler)
       jc

@@ -5,8 +5,7 @@ import ulisse.infrastructures.view.common.Theme
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
-import ulisse.infrastructures.view.components.JComponent
-import ulisse.infrastructures.view.components.{JComponent, JPanel, JStyler}
+import ulisse.infrastructures.view.components.{JComponent, JPanel, JStyler, SelectableGroup}
 
 import java.awt.{Color, ComponentOrientation}
 import javax.swing.BoxLayout
@@ -30,7 +29,6 @@ trait SideMenu extends Component
 object SideMenu:
   def apply(): SideMenu = SideMenuImpl()
   private case class SideMenuImpl() extends BoxPanel(Orientation.Vertical) with SideMenu with Reactor:
-    private val buttonGroup = new ButtonGroup()
 
 ////    private def configure[C <: Component](component: C): Component =
 ////      component.opaque(true)//.makeSelectable().addToGroup(buttonGroup)
@@ -72,8 +70,8 @@ object SideMenu:
         menuCardStyle
       ).genericClickReaction(menuCallback)
 
-    private val header = ImageCard.horizontal(
-      headerRightContent,
+    private val header = ImageCard.horizontalWithConfiguration(
+      ComponentWithConfiguration(headerRightContent, ComponentConfiguration(Alignment.Center)),
       headerLeftContent
     ).reverse()
 
@@ -95,6 +93,8 @@ object SideMenu:
         Label("Settings").alignLeft()
       )
     ).map(_.styler(menuCardStyle))
+
+//    private val buttonGroup: SelectableGroup = SelectableGroup(menuCards*)
     private val menuContent = header +: menuCards
 
     position(header)

@@ -20,3 +20,10 @@ object ComponentMixins:
     def rotation_=(newRotation: Int): Unit =
       _rotation = newRotation
       repaint()
+
+  trait Selectable extends Component:
+    private var _selected: Boolean = true
+    def selected: Boolean          = _selected
+    def selected_=(newSelected: Boolean): Unit =
+      _selected = newSelected
+      repaint()
