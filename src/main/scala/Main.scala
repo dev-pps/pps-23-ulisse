@@ -75,7 +75,7 @@ object StationTypes:
 
     // Creazione di un FlowPanel
     val northPanel = new FlowPanel() {
-      contents += JLabelComponent.createTextField("title").component
+      contents += JLabelComponent.createButton("icons/station.svg", "title").component
     }
 
     // Creazione del BorderPanel
@@ -88,7 +88,7 @@ object StationTypes:
   }
 
   top.visible = true
-
+//
 //  val list = LinkedBlockingQueue[RouteManager => RouteManager]
 //  val port = RouteUIInputService(list)
 //  val map = MapView.apply(port)
