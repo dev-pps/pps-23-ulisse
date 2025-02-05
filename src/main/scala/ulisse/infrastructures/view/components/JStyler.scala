@@ -61,6 +61,8 @@ object JStyler:
     val defaultFont: Font       = font(defaultNameFont, defaultStyleFont, defaultSizeFont)
     val defaultBorder: Border   = border(defaultColor, defaultStroke)
 
+    val transparentPalette: Palette = Palette(transparentColor, withOutColor, withOutColor)
+
     case class Size(width: Int, height: Int)
     case class Rect(size: Option[Size], arcWidth: Int, arcHeight: Int)                          extends JStyle
     case class Palette(background: Color, clickColor: Option[Color], hoverColor: Option[Color]) extends JStyle
