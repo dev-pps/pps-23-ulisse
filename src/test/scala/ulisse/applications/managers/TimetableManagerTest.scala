@@ -1,10 +1,10 @@
-package ulisse.applications.useCases
+package ulisse.applications.managers
 
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
-import ulisse.applications.useCases.TimetableManagers.TimetableManagerErrors.{AcceptanceError, TimetableNotFound}
+import TimetableManagers.TimetableManagerErrors.{AcceptanceError, TimetableNotFound}
 import ulisse.entities.timetable.Timetables.{PartialTimetable, TrainTimetable}
 import ulisse.utils.Times.FluentDeclaration.h
 

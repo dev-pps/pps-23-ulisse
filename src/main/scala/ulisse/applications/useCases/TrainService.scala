@@ -14,7 +14,7 @@ import scala.concurrent.{Future, Promise}
 
 type AppState = (TrainManager, TechnologyManager[TrainTechnology])
 
-final case class TrainServiceManagerService(stateEventQueue: LinkedBlockingQueue[AppState => AppState])
+final case class TrainService(stateEventQueue: LinkedBlockingQueue[AppState => AppState])
     extends Input:
 
   def removeTrain(name: String): Future[Either[BaseError, List[Train]]] =
