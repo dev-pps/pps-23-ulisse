@@ -1,17 +1,19 @@
 import StationTypes.*
 import ulisse.adapters.StationPortOutputAdapter
 import ulisse.applications.AppState
-import ulisse.applications.managers.StationManager
+import ulisse.applications.managers.{RouteManager, StationManager}
+import ulisse.applications.useCases.RouteUIInputService.RouteUIInputService
 import ulisse.applications.useCases.StationPortInputService
 import ulisse.entities.Coordinates.Grid
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
-import ulisse.infrastructures.view.components.JComponent
 import ulisse.infrastructures.view.form.{CentralController, Form}
+import ulisse.infrastructures.view.map.GUIView
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
 import java.util.concurrent.LinkedBlockingQueue
+import scala.collection.MapView
 import scala.swing.*
 
 @main def stationEditor(): Unit =
@@ -68,28 +70,6 @@ object StationTypes:
   )
 
 @main def testNewGraphicComponents(): Unit =
-  def top: Frame = new MainFrame {
-    title = "Scala Swing GUI"
-
-    val mapMenu = CentralController.createMap()
-
-    listenTo(mapMenu.component.mouse.clicks)
-    // Creazione di un FlowPanel
-    val northPanel = new FlowPanel() {
-      contents += mapMenu.component
-    }
-
-    // Creazione del BorderPanel
-    val mainPanel = new BorderPanel {
-      layout(northPanel) = BorderPanel.Position.Center
-    }
-
-    contents = mainPanel
-    size = new Dimension(400, 800)
-  }
-
-  top.visible = true
-//
-//  val list = LinkedBlockingQueue[RouteManager => RouteManager]
-//  val port = RouteUIInputService(list)
-//  val map = MapView.apply(port)
+  val list = LinkedBlockingQueue[RouteManager => RouteManager]
+  val port = RouteUIInputService(list)
+  val map  = GUIView(port)
