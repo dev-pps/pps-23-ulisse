@@ -1,9 +1,9 @@
-package ulisse.applications.station
+package ulisse.applications.managers
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.applications.managers.StationManager
-import StationManager.CheckedStationManager
+import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
 

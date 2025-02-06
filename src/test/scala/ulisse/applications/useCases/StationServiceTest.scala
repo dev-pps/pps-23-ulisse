@@ -1,4 +1,4 @@
-package ulisse.applications.adapters
+package ulisse.applications.useCases
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -6,8 +6,8 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
 import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager
+import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.applications.ports.StationPorts
-import StationManager.CheckedStationManager
 import ulisse.applications.useCases.StationService
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
@@ -17,7 +17,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.Right
 
-class StationPortInputServiceTest extends AnyWordSpec with Matchers:
+class StationServiceTest extends AnyWordSpec with Matchers:
 
   private type N = Int
   private type C = Coordinate[N]

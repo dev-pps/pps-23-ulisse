@@ -1,10 +1,10 @@
-package ulisse.infrastructure.view.station
+package ulisse.applications.adapters.input
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
-import ulisse.adapters.input.StationEditorController
+import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
@@ -17,7 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class StationEditorControllerTest extends AnyWordSpec with Matchers:
+class StationEditorAdapterTest extends AnyWordSpec with Matchers:
 
   private type N = Int
   private type C = Coordinate[N]
@@ -33,7 +33,7 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
   private val eventStream   = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   private val inputPort =
     StationService[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream, outputPort)
-  private val controller    = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
+  private val controller    = StationEditorAdapter[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
   private def updateState() = runAll(initialState, eventStream)
 
   "StationEditorController" when:
@@ -120,11 +120,11 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
 
         updateState()
         Await.result(addStationWithWrongRowResult, Duration.Inf) shouldBe Left(
-          StationEditorController.Error.InvalidRowFormat
+          StationEditorAdapter.Error.InvalidRowFormat
         )
         Await.result(addStationWithWrongColumnResult, Duration.Inf) shouldBe Left(
-          StationEditorController.Error.InvalidColumnFormat
+          StationEditorAdapter.Error.InvalidColumnFormat
         )
         Await.result(addStationWithWrongNumberOfTrackResult, Duration.Inf) shouldBe Left(
-          StationEditorController.Error.InvalidNumberOfTrackFormat
+          StationEditorAdapter.Error.InvalidNumberOfTrackFormat
         )

@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.station
 
-import ulisse.adapters.input.StationEditorController
+import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
@@ -76,7 +76,7 @@ final case class EmptyMapCard(
   *   The form where location details are added when an EmptyMapCard is clicked.
   */
 final case class StationMapView(
-    controller: StationEditorController[N, C, S],
+    controller: StationEditorAdapter[N, C, S],
     openStationForm: Option[S] => Unit,
     stationForm: Option[StationForm]
 ) extends GridPanel(5, 5):
@@ -149,7 +149,7 @@ final case class StationEditorMenu(onCreateClick: () => Unit)
   *   The station to be edited.
   */
 final case class StationForm(
-    controller: StationEditorController[N, C, S],
+    controller: StationEditorAdapter[N, C, S],
     onBackClick: () => Unit,
     station: Option[S]
 ) extends GridBagPanel:
@@ -293,7 +293,7 @@ final case class StationEditorContent(
   * @param controller
   *   The associated StationEditorController.
   */
-final case class StationEditorView(controller: StationEditorController[N, C, S])
+final case class StationEditorView(controller: StationEditorAdapter[N, C, S])
     extends BorderPanel:
 
   private val updateContentTemplate: Panel => Unit =
