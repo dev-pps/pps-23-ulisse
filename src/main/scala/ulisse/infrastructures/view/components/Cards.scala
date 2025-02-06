@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.components.ComponentMixins.Selectable
+import ulisse.infrastructures.view.components.Selectables.Selectable
 
 import scala.swing.{BoxPanel, Component, Label, Orientation, SequentialContainer}
 
