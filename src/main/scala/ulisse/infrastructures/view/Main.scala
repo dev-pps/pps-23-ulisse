@@ -16,10 +16,6 @@ import ulisse.infrastructures.view.StationTypes.*
 import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.form.{CentralController, Form}
 import ulisse.infrastructures.view.map.GUIView
-import ulisse.infrastructures.view.adapter.StationPortOutputAdapter
-import ulisse.infrastructures.view.menu.AppMenu
-import ulisse.infrastructures.view.components.JLabelComponent
-import ulisse.infrastructures.view.map.MapView
 import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 

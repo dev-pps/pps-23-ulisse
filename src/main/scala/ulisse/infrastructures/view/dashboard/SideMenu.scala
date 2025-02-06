@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.dashboard
 
-import ulisse.infrastructures.view.common.Theme
+import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
@@ -20,8 +20,8 @@ object SideMenu:
     private val menu_item_height     = 50
     private val menu_item_image_size = 16
     private val menuCardStyle = JStyler.rectPaletteStyler(
-      JStyler.roundRect(25),
-      JStyler.palette(Theme.light.element, Theme.light.hover, Theme.light.forwardClick)
+      JStyler.rect(JStyler.defaultSizeRect, JStyler.Dimension2D(0, 0), 25),
+      JStyler.palette(Theme.light.element, Theme.light.overlayElement, Theme.light.forwardClick)
     )
 
     private val header = buildHeader()
@@ -63,11 +63,12 @@ object SideMenu:
       val headerLeftContent = JImageCard.horizontal(
         ImagePanel.createImagePanel("icon/logo_circular.png").fixedSize(50, 50),
         Label("Ulisse").alignLeft(),
-        JStyler.transparentStyler
+        JStyler.transparent
       )
       val headerRightContent =
-        ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(25, 25).styler(
-          menuCardStyle.copy(palette = menuCardStyle.palette.copy(background = JStyler.transparentColor))
+        ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(
+          25,
+          25
         ).genericClickReaction(menuCallback)
 
       JImageCard.horizontalWithConfiguration(

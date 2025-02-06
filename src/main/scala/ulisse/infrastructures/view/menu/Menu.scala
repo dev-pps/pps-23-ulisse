@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.menu
 
 import ulisse.infrastructures.view.UpdatableContainer
-import ulisse.infrastructures.view.common.Theme
+import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
@@ -18,14 +18,14 @@ final case class Menu(root: UpdatableContainer) extends BorderPanel:
     JImageCard.vertical(
       ImagePanel.createSVGPanel("icon/add.svg", Color.BLACK),
       Label("new").centerHorizontally(),
-      JStyler.defaultStyler
+      JStyler.default
     )
       .fixedSize(100, 100)
       .genericClickReaction(() => root.update(Dashboard(root)))
       .styler(
         JStyler.styler(
-          JStyler.roundRect(25),
-          JStyler.palette(Theme.light.element, Theme.light.hover, Theme.light.forwardClick),
+          JStyler.rect(JStyler.defaultSizeRect, JStyler.Dimension2D(0, 0), 25),
+          JStyler.palette(Theme.light.element, Theme.light.overlayElement, Theme.light.forwardClick),
           JStyler.defaultFont,
           JStyler.border(Color.DARK_GRAY, 1)
         )
