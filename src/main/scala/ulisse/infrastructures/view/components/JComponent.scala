@@ -30,7 +30,7 @@ object JComponent:
 
     private val styler =
       JStyler.rectPaletteStyler(
-        JStyler.defaultRect.copy(padding = JStyler.createPadding(10, 10), arc = 10),
+        JStyler.defaultRect.copy(padding = JStyler.createPadding(10, 5), arc = 10),
         JStyler.backgroundPalette(Theme.light.background.withAlpha(50))
       )
 
