@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.components
 
-import ulisse.infrastructures.view.common.Theme
+import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel.createSVGPanel
 
 import java.awt
@@ -23,14 +23,20 @@ object JComponent:
 
   private val labelStyler = JStyler.paletteStyler(JStyler.transparentPalette)
   private val elementStyler =
-    JStyler.rectPaletteStyler(JStyler.roundRect(10), JStyler.backgroundPalette(Theme.light.element))
+    JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.overlayElement))
 
   case class JInfoTextField(text: String) extends JComponent:
     private val colum = 15
 
+    private val styler =
+      JStyler.rectPaletteStyler(
+        JStyler.defaultRect.copy(padding = JStyler.createPadding(10, 10), arc = 10),
+        JStyler.backgroundPalette(Theme.light.background.withAlpha(50))
+      )
+
     private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
     private val label     = JItem.label(text, labelStyler)
-    private val textField = JItem.textField(colum, elementStyler)
+    private val textField = JItem.textField(colum, styler)
 
     private val northPanel = JItem.createFlowPanel(JStyler.transparent)
     northPanel.contents += label
@@ -78,15 +84,20 @@ object JComponent:
     override def component[T >: Component]: T = mainPanel
 
   case class JTabbedPane(iconLabels: JIconLabel*) extends JComponent:
-    private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
+    private val styler =
+      JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.element))
+
+    private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, styler)
     private val navBar    = createNavbar(iconLabels: _*)
     private val panels: Map[JIconLabel, JItem.JFlowPanelItem] =
       iconLabels.map(iconLabel => (iconLabel, JItem.createFlowPanel(JStyler.transparent))).toMap
 
     panels.values.foreach(_.visible = false)
 
+    mainPanel.contents += Swing.VGlue
     mainPanel.contents += navBar.component
     mainPanel.contents ++= panels.values
+    mainPanel.contents += Swing.VGlue
 
     mainPanel.listenTo(navBar.component.mouse.clicks)
     iconLabels.foreach(iconLabel =>

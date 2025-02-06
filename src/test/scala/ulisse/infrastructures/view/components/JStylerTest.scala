@@ -14,7 +14,7 @@ class JStylerTest extends AnyFlatSpec with Matchers:
     default.all must be(List(defaultRect, defaultPalette, defaultFont))
 
   "rect styler" should "have rect style" in:
-    val newRect = roundRect(10)
+    val newRect = defaultRect.copy(arc = 10)
     val styler  = rectStyler(newRect)
 
     styler.rect must be(newRect)
@@ -51,7 +51,7 @@ class JStylerTest extends AnyFlatSpec with Matchers:
     styler.all must be(Seq(defaultRect, defaultPalette, defaultFont, newBorder))
 
   "new styler" should "have complete style" in:
-    val newRect    = roundRect(10)
+    val newRect    = defaultRect.copy(arc = 10)
     val newPalette = backgroundPalette(Color.green)
     val font       = sizeFont(20)
     val newBorder  = colorBorder(Color.green)
