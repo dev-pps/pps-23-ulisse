@@ -13,11 +13,14 @@ class RectStyleTest extends AnyFlatSpec with Matchers:
     val size = createSize(10, 20)
     val rect = defaultRect.copy(size)
     rect.size must be(size)
+    rect.padding must be(defaultPaddingRect)
     rect.arc must be(defaultRoundRect)
 
   "round rect style" should "have same round" in:
     val arc  = 10
     val rect = defaultRect.copy(arc = 10)
+    rect.size must be(defaultSizeRect)
+    rect.padding must be(defaultPaddingRect)
     rect.arc must be(arc)
 
   "new rect style" should "have new round" in:
