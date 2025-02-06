@@ -1,8 +1,9 @@
 package ulisse.infrastructures.view.form
 
-import ulisse.infrastructures.view.common.Themes._
+import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.{JComponent, JItem, JStyler}
 
+import scala.swing.Font.Style
 import scala.swing.{Component, Orientation, Swing}
 
 trait Form:
@@ -14,22 +15,37 @@ object Form:
   def createStation(): StationForm   = StationForm()
   def createSchedule(): ScheduleForm = ScheduleForm()
 
-  private val elementStyler =
-    JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.element))
+  private val titleFont = JStyler.defaultFont.copy(styleFont = Style.Bold, colorFont = Theme.light.text, sizeFont = 36)
+
+  private val formStyler =
+    JStyler.rectPaletteStyler(
+      JStyler.defaultRect.copy(padding = JStyler.createPadding(40, 0), arc = 15),
+      JStyler.backgroundPalette(Theme.light.element)
+    )
+
   private val buttonStyler =
-    JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.overlayElement))
+    JStyler.rectPaletteFontStyler(
+      JStyler.defaultRect.copy(padding = JStyler.createPadding(20, 10), arc = 10),
+      JStyler.backgroundHoverPalette(Theme.light.text, Theme.light.forwardClick),
+      JStyler.defaultFont.copy(colorFont = Theme.light.background)
+    )
+
+  private val trueButtonStyler =
+    buttonStyler.copy(palette = buttonStyler.palette.copy(clickColor = Some(Theme.light.trueClick)))
+  private val falseButtonStyler =
+    buttonStyler.copy(palette = buttonStyler.palette.copy(clickColor = Some(Theme.light.falseClick)))
 
   private case class BaseForm(title: String, fields: JComponent.JInfoTextField*) extends Form:
-    private val mainPanel: JItem.JBoxPanelItem     = JItem.createBoxPanel(Orientation.Vertical, elementStyler)
+    private val mainPanel: JItem.JBoxPanelItem     = JItem.createBoxPanel(Orientation.Vertical, formStyler)
     private val insertForm: JComponent.JInsertForm = JComponent.createInsertForm(title, fields: _*)
     val buttonPanel: JItem.JFlowPanelItem          = JItem.createFlowPanel(JStyler.transparent)
 
+    insertForm.titleLabel.setStyler(insertForm.titleLabel.getStyler.copy(font = titleFont))
     private val space = 10
 
     buttonPanel.hGap = space
 
     mainPanel.contents += insertForm.component
-    mainPanel.contents += Swing.VStrut(space)
     mainPanel.contents += buttonPanel
     mainPanel.contents += Swing.VStrut(space)
 
@@ -43,8 +59,8 @@ object Form:
     private val length           = JComponent.createInfoTextField("Length")
 
     private val form         = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
-    private val saveButton   = JItem.button("Save", buttonStyler)
-    private val deleteButton = JItem.button("Delete", buttonStyler)
+    private val saveButton   = JItem.button("Save", trueButtonStyler)
+    private val deleteButton = JItem.button("Delete", falseButtonStyler)
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
@@ -57,10 +73,10 @@ object Form:
     private val longitude = JComponent.createInfoTextField("Longitude")
     private val tracks    = JComponent.createInfoTextField("Tracks")
 
-    private val form = BaseForm("Route", name, latitude, longitude, tracks)
+    private val form = BaseForm("Station", name, latitude, longitude, tracks)
 
-    private val saveButton   = JItem.button("Save", buttonStyler)
-    private val deleteButton = JItem.button("Delete", buttonStyler)
+    private val saveButton   = JItem.button("Save", trueButtonStyler)
+    private val deleteButton = JItem.button("Delete", falseButtonStyler)
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
@@ -74,8 +90,8 @@ object Form:
 
     private val form = BaseForm("Schedule", field, field1, field2)
 
-    private val saveButton   = JItem.button("Save", buttonStyler)
-    private val deleteButton = JItem.button("Delete", buttonStyler)
+    private val saveButton   = JItem.button("Save", trueButtonStyler)
+    private val deleteButton = JItem.button("Delete", falseButtonStyler)
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton

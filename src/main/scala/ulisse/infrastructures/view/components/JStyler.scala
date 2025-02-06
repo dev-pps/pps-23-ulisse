@@ -58,11 +58,12 @@ object JStyler:
 
     val defaultNameFont: String     = "Lucida Grande"
     val defaultStyleFont: StyleFont = SwingFont.Plain
+    val defaultColorFont: Color     = Color.black
     val defaultSizeFont: Int        = 13
 
     val defaultRect: Rect       = rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)
     val defaultPalette: Palette = backgroundPalette(defaultColor)
-    val defaultFont: Font       = font(defaultNameFont, defaultStyleFont, defaultSizeFont)
+    val defaultFont: Font       = font(defaultNameFont, defaultStyleFont, defaultColorFont, defaultSizeFont)
     val defaultBorder: Border   = border(defaultColor, defaultStroke)
 
     val transparentPalette: Palette = Palette(transparentColor, withOutColor, withOutColor)
@@ -73,7 +74,7 @@ object JStyler:
 
     case class Rect(size: Size, padding: Padding, arc: Int)                                     extends JStyle
     case class Palette(background: Color, clickColor: Option[Color], hoverColor: Option[Color]) extends JStyle
-    case class Font(nameFont: String, styleFont: StyleFont, sizeFont: Int)                      extends JStyle
+    case class Font(nameFont: String, styleFont: StyleFont, colorFont: Color, sizeFont: Int)    extends JStyle
     case class Border(color: Color, stroke: Int)                                                extends JStyle
 
     def createSize(width: Int, height: Int): Size = Dimension2D(Some(width), Some(height))
@@ -94,10 +95,11 @@ object JStyler:
     def backgroundHoverPalette(background: Color, hover: Color): Palette =
       Palette(background, withOutColor, Some(hover))
 
-    def font(name: String, style: StyleFont, size: Int): Font = Font(name, style, size)
-    def sizeFont(size: Int): Font                             = font(defaultNameFont, defaultStyleFont, size)
-    def styleFont(style: StyleFont): Font                     = font(defaultNameFont, style, defaultSizeFont)
-    def nameFont(name: String): Font                          = font(name, defaultStyleFont, defaultSizeFont)
+    def font(name: String, style: StyleFont, color: Color, size: Int): Font = Font(name, style, color, size)
+    def sizeFont(size: Int): Font         = font(defaultNameFont, defaultStyleFont, defaultColorFont, size)
+    def colorFont(color: Color): Font     = font(defaultNameFont, defaultStyleFont, color, defaultSizeFont)
+    def styleFont(style: StyleFont): Font = font(defaultNameFont, style, defaultColorFont, defaultSizeFont)
+    def nameFont(name: String): Font      = font(name, defaultStyleFont, defaultColorFont, defaultSizeFont)
 
     def border(color: Color, stroke: Int): Border = Border(color, stroke)
     def strokeBorder(stroke: Int): Border         = border(defaultColor, stroke)

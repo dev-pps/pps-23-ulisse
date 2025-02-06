@@ -9,6 +9,7 @@ object Themes:
 
   trait Theme(
       val background: Color,
+      val text: Color,
       val element: Color,
       val overlayElement: Color,
       val forwardClick: Color,
@@ -22,6 +23,7 @@ object Themes:
 
     private case class Light() extends Theme(
           Color.decode("#f7f8ff"),
+          Color.decode("#2C2C2C"),
           Color.decode("#d6dbf5"),
           Color.decode("#a2aace"),
           Color.decode("#418dff"),

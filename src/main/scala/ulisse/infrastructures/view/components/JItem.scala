@@ -26,6 +26,7 @@ trait JItem(private var styler: JStyler) extends Component:
     )
 
     font = styler.swingFont
+    foreground = styler.colorFont
 
     revalidate()
     repaint()
@@ -78,6 +79,9 @@ trait JItem(private var styler: JStyler) extends Component:
 
 object JItem:
 
+  case class JBorderPanelItem()(jStyler: JStyler) extends BorderPanel with JItem(jStyler):
+    opaque = false
+
   case class JFlowPanelItem()(jStyler: JStyler) extends FlowPanel with JItem(jStyler):
     private val layout = new FlowLayout(FlowLayout.CENTER, 0, 0)
     peer.setLayout(layout)
@@ -98,7 +102,8 @@ object JItem:
   case class JLabelItem(label: String)(jStyler: JStyler)  extends Label(label) with JItem(jStyler)
   case class JTextFieldItem(colum: Int)(jStyler: JStyler) extends TextField(colum) with JItem(jStyler)
 
-  def createFlowPanel(styler: JStyler): JFlowPanelItem = JFlowPanelItem()(styler)
+  def createBorderPanel(styler: JStyler): JBorderPanelItem = JBorderPanelItem()(styler)
+  def createFlowPanel(styler: JStyler): JFlowPanelItem     = JFlowPanelItem()(styler)
   def createBoxPanel(orientation: Orientation.Value, styler: JStyler): JBoxPanelItem =
     JBoxPanelItem(orientation)(styler)
 
