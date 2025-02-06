@@ -8,7 +8,7 @@ import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
 import StationManager.CheckedStationManager
-import ulisse.applications.useCases.StationPortInputService
+import ulisse.applications.useCases.StationService
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
 
@@ -27,7 +27,7 @@ class StationPortInputServiceTest extends AnyWordSpec with Matchers:
   private val initialState = AppState[N, C, S](StationManager.createCheckedStationMap())
   private val eventStream  = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   private val inputPort =
-    StationPortInputService[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream, outputPort)
+    StationService[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream, outputPort)
   private def updateState() = runAll(initialState, eventStream)
 
   "StationPortInputAdapter" should:

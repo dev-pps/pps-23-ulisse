@@ -1,5 +1,6 @@
 package ulisse.infrastructures.view.components
 
+import ulisse.infrastructures.view.components.ComponentConfigurations.Alignment
 import ulisse.infrastructures.view.components.JStyler
 
 import java.awt
@@ -28,23 +29,6 @@ import scala.swing.{
 }
 
 object ComponentUtils:
-
-  enum Alignment:
-    case Left, Right, Top, Bottom, Center
-
-  trait ComponentConfiguration:
-    val alignment: Option[Alignment]
-
-  object ComponentConfiguration:
-    def empty(): ComponentConfiguration                     = ComponentConfigurationImpl(None)
-    def apply(alignment: Alignment): ComponentConfiguration = ComponentConfigurationImpl(Some(alignment))
-
-    private case class ComponentConfigurationImpl(alignment: Option[Alignment]) extends ComponentConfiguration
-  case class ComponentWithConfiguration[C <: Component](component: C, configuration: ComponentConfiguration)
-  private val emptyIcon = new Icon:
-    override def getIconWidth: Int                                              = 0
-    override def getIconHeight: Int                                             = 0
-    override def paintIcon(c: awt.Component, g: Graphics, x: Int, y: Int): Unit = ()
 
   extension [E <: UIElement](element: E)
     def fixedSize(width: Int, height: Int): E =

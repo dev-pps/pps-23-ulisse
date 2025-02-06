@@ -1,5 +1,6 @@
 package ulisse.infrastructures.view.station
 
+import ulisse.adapters.input.StationEditorController
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station

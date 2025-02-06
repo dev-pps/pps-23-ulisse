@@ -1,8 +1,14 @@
 package ulisse.infrastructures.view.dashboard
 
-import ulisse.infrastructures.view.{StationSettings, UpdatableContainer}
+import ulisse.infrastructures.view.StationSettings
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.Cards.*
+import ulisse.infrastructures.view.components.ComponentConfigurations.{
+  Alignment,
+  ComponentConfiguration,
+  ComponentWithConfiguration
+}
+import ulisse.infrastructures.view.components.ComponentMixins.UpdatableContainer
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 import ulisse.infrastructures.view.components.JStyler
@@ -16,13 +22,14 @@ import scala.swing.{BoxPanel, Component, Dimension, Label, Orientation, Reactor,
 trait SideMenu extends Component
 object SideMenu:
   def apply(uc: UpdatableContainer): SideMenu = SideMenuImpl(uc: UpdatableContainer)
-  private case class SideMenuImpl(uc: UpdatableContainer) extends BoxPanel(Orientation.Vertical) with SideMenu
-      with Reactor:
+  private case class SideMenuImpl(uc: UpdatableContainer) extends BoxPanel(Orientation.Vertical) with SideMenu:
 
-    private val layout_bounds     = Insets(16, 16, 16, 16)
-    private val header_spacing    = 24
-    private val menu_item_spacing = 24
-    private val menu_item_height  = 50
+    private val layout_bounds       = Insets(16, 16, 16, 16)
+    private val header_spacing      = 24
+    private val menu_item_spacing   = 24
+    private val menu_item_height    = 50
+    private val logo_size           = 50
+    private val openCloseButtonSize = 25
     private val menuCardStyle = JStyler.rectPaletteStyler(
       JStyler.rect(JStyler.defaultSizeRect, JStyler.Dimension2D(5, 5), 25),
       JStyler.palette(Theme.light.forwardClick.withAlpha(150), Theme.light.overlayElement, Theme.light.forwardClick)
@@ -34,8 +41,8 @@ object SideMenu:
       buildMenuCard("icon/simulation.svg", "Simulation").genericClickReaction(() =>
         uc.update(StationSettings().stationEditorView)
       ),
-      buildMenuCard("icon/map.svg", "Editors").genericClickReaction(() => uc.update(Menu(uc))),
-      buildMenuCard("icon/train.svg", "Trains").genericClickReaction(() => uc.update(EditorsView())),
+      buildMenuCard("icon/map.svg", "Editors").genericClickReaction(() => uc.update(EditorsView())),
+      buildMenuCard("icon/train.svg", "Trains").genericClickReaction(() => uc.update(Menu(uc))),
       buildMenuCard("icon/settings.svg", "Settings")
     )
 
@@ -67,14 +74,14 @@ object SideMenu:
 
     private def buildHeader(): JImageCard =
       val headerLeftContent = JImageCard.horizontal(
-        ImagePanel.createImagePanel("icon/logo_circular.png").fixedSize(50, 50),
+        ImagePanel.createImagePanel("icon/logo_circular.png").fixedSize(logo_size, logo_size),
         Label("Ulisse").alignLeft(),
         JStyler.transparent.copy(rect = JStyler.defaultRect.copy(padding = JStyler.createPadding(10, 10)))
       )
       val headerRightContent =
         ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(
-          25,
-          25
+          openCloseButtonSize,
+          openCloseButtonSize
         ).styler(
           menuCardStyle.copy(palette = menuCardStyle.palette.copy(background = JStyler.transparentColor))
         ).genericClickReaction(menuCallback)
@@ -100,14 +107,13 @@ object SideMenu:
       this.peer.setBounds(0, 0, preferredSize.width, preferredSize.height)
       revalidate()
       repaint()
-
     build_layout()
 
-extension (imageCard: JImageCard)
-  def realPreferredSize(): Dimension =
-    new Dimension(
-      50 + (if imageCard.content.visible then imageCard.content.preferredSize.width
-            else 0) + 2 * imageCard.getStyler.rect.padding.width,
-      50 + 2 * imageCard.getStyler.rect.padding.height
-    )
-  def toggleLabel(): Unit = imageCard.content.visible = !imageCard.content.visible
+    extension (imageCard: JImageCard)
+      private def realPreferredSize(): Dimension =
+        new Dimension(
+          menu_item_height + (if imageCard.content.visible then imageCard.content.preferredSize.width
+                              else 0) + 2 * imageCard.getStyler.rect.padding.width,
+          menu_item_height + 2 * imageCard.getStyler.rect.padding.height
+        )
+      private def toggleLabel(): Unit = imageCard.content.visible = !imageCard.content.visible
