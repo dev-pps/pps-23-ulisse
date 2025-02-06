@@ -103,7 +103,7 @@ object StationTypes:
     listenTo(tabPane.component.mouse.clicks)
     // Creazione di un FlowPanel
     val northPanel = new FlowPanel() {
-      contents += JComponent.createToggleIconButton("icons/train.svg", "icons/station.svg").component
+      contents += tabPane.component
     }
 
     // Creazione del BorderPanel
