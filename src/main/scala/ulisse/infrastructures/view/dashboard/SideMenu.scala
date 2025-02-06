@@ -7,7 +7,6 @@ import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 import ulisse.infrastructures.view.components.{JStyler, SelectableGroup}
 
 import java.awt.{Color, Insets}
-import javax.swing.border.EmptyBorder
 import scala.swing.{BoxPanel, Component, Dimension, Label, Orientation, Reactor, Swing}
 
 trait SideMenu extends Component
@@ -57,22 +56,26 @@ object SideMenu:
       position(Swing.VGlue)
       bottomMenu.foreach(position)
       lastItem.foreach(position)
-      contents += Swing.VStrut(layout_bounds.bottom - menu_item_spacing)
+      contents += Swing.VStrut(layout_bounds.bottom)
       updateSize()
 
-    private def buildHeader(): ImageCard =
-      val headerLeftContent = ImageCard.horizontal(
+    private def buildHeader(): JImageCard =
+      val headerLeftContent = JImageCard.horizontal(
         ImagePanel.createImagePanel("icon/logo_circular.png").fixedSize(50, 50),
-        Label("Ulisse").alignLeft()
+        Label("Ulisse").alignLeft(),
+        JStyler.transparentStyler
       )
       val headerRightContent =
         ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(25, 25).styler(
           menuCardStyle.copy(palette = menuCardStyle.palette.copy(background = JStyler.transparentColor))
         ).genericClickReaction(menuCallback)
 
-      ImageCard.horizontalWithConfiguration(
+      JImageCard.horizontalWithConfiguration(
         ComponentWithConfiguration(headerRightContent, ComponentConfiguration(Alignment.Center)),
-        headerLeftContent
+        headerLeftContent,
+        menuCardStyle.copy(palette =
+          JStyler.palette(JStyler.transparentColor, JStyler.transparentColor, JStyler.transparentColor)
+        )
       ).reverse()
 
     private def buildMenuCard(imagePath: String, label: String): JImageCard =
@@ -93,7 +96,7 @@ object SideMenu:
 
     build_layout()
 
-extension (imageCard: ImageCard)
+extension (imageCard: JImageCard)
   def realPreferredSize(): Dimension =
     new Dimension(50 + (if imageCard.content.visible then imageCard.content.preferredSize.width else 0), 50)
   def toggleLabel(): Unit = imageCard.content.visible = !imageCard.content.visible
