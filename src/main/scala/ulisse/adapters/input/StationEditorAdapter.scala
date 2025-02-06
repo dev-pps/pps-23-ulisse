@@ -9,7 +9,7 @@ import ulisse.utils.Errors.BaseError
 
 import scala.concurrent.Future
 
-object StationEditorController:
+object StationEditorAdapter:
 
   enum Error extends BaseError:
     case InvalidRowFormat, InvalidColumnFormat, InvalidNumberOfTrackFormat
@@ -27,7 +27,7 @@ object StationEditorController:
   *   A type that extends `Coordinate[N]`, which represents the station's location.
   *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
   */
-final case class StationEditorController[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
+final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
     appPort: StationPorts.Input[N, C, S]
 ):
 
@@ -75,10 +75,10 @@ final case class StationEditorController[N: Numeric, C <: Coordinate[N], S <: St
       stationGenerator: (String, C, Int) => Either[BaseError, S]
   )(using numeric: Numeric[N]): Either[BaseError, S] =
     for
-      latitude      <- numeric.parseString(latitude).toRight(StationEditorController.Error.InvalidRowFormat)
-      longitude     <- numeric.parseString(longitude).toRight(StationEditorController.Error.InvalidColumnFormat)
+      latitude      <- numeric.parseString(latitude).toRight(StationEditorAdapter.Error.InvalidRowFormat)
+      longitude     <- numeric.parseString(longitude).toRight(StationEditorAdapter.Error.InvalidColumnFormat)
       coordinate    <- coordinateGenerator(latitude, longitude)
-      numberOfTrack <- numberOfTrack.toIntOption.toRight(StationEditorController.Error.InvalidNumberOfTrackFormat)
+      numberOfTrack <- numberOfTrack.toIntOption.toRight(StationEditorAdapter.Error.InvalidNumberOfTrackFormat)
       station       <- stationGenerator(name, coordinate, numberOfTrack)
     yield station
 
