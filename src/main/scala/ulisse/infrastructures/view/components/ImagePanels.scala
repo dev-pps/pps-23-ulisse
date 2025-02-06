@@ -12,7 +12,7 @@ object ImagePanels:
 
   object ImagePanel:
     def createImagePanel(imagePath: String): ImagePanel                           = ImagePanelImpl(imagePath)
-    def createSVGPanel(svgPath: String, color: Color): ImagePanel                 = SVGPanel(svgPath, color)
+    def createSVGPanel(svgPath: String, color: Color): SVGPanel                   = SVGPanel(svgPath, color)
     def createDrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit): ImagePanel = DrawnPanel(iconDrawer)
 
   private final case class ImagePanelImpl(imagePath: String)
@@ -22,11 +22,17 @@ object ImagePanels:
       val size = math.min(peer.getWidth, peer.getHeight)
       g.drawImage(image, (peer.getWidth - size) / 2, (peer.getHeight - size) / 2, size, size, peer)
 
-  private final case class SVGPanel(svgPath: String, color: Color)
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
+  final case class SVGPanel(svgPath: String, var color: Color)
       extends ImagePanel:
     private val rawIcon = new FlatSVGIcon(svgPath)
     rawIcon.setColorFilter(ColorFilter(_ => color))
     opaque = false
+
+    def setColor(newColor: Color): Unit =
+      color = newColor
+      rawIcon.setColorFilter(ColorFilter(_ => color))
+      repaint()
 
     override def paintComponent(g: Graphics2D): Unit =
       val size = math.min(peer.getWidth, peer.getHeight)

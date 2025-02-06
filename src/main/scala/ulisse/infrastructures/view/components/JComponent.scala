@@ -5,7 +5,7 @@ import ulisse.infrastructures.view.components.ImagePanels.ImagePanel.createSVGPa
 
 import java.awt
 import java.awt.Dimension
-import scala.swing.{event, Component, Orientation, Swing}
+import scala.swing.*
 
 trait JComponent:
   def component[T >: Component]: T
@@ -35,7 +35,7 @@ object JComponent:
       )
 
     private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
-    private val label     = JItem.label(text, labelStyler)
+    private val label     = JItem.label(text, JStyler.transparent)
     private val textField = JItem.textField(colum, styler)
 
     private val northPanel = JItem.createFlowPanel(JStyler.transparent)
@@ -50,23 +50,48 @@ object JComponent:
     private val width  = 100
     private val height = 40
 
-    private val mainPanel = JItem.createBoxPanel(Orientation.Horizontal, elementStyler)
+    private val openStyler = JStyler.rectPaletteStyler(
+      JStyler.defaultRect.copy(arc = 10),
+      JStyler.palette(Theme.light.background.withAlpha(50), Theme.light.forwardClick, Theme.light.forwardClick)
+    )
+    private val closeStyler = JStyler.rectPaletteStyler(
+      JStyler.defaultRect.copy(arc = 10),
+      JStyler.palette(Theme.light.overlayElement, Theme.light.forwardClick, Theme.light.forwardClick)
+    )
+
+    private val mainPanel = JItem.createBoxPanel(Orientation.Horizontal, openStyler)
     private val icon      = createSVGPanel(iconPath, Theme.light.background)
-    private val label     = JItem.label(text, labelStyler)
+    private val label     = JItem.label(text, JStyler.transparent)
 
     icon.preferredSize = Dimension(height, height)
     label.preferredSize = Dimension(width, height)
 
+    mainPanel.listenTo(label.mouse.clicks, label.mouse.moves, icon.mouse.clicks, icon.mouse.moves)
+
     mainPanel.contents += icon
     mainPanel.contents += label
 
-    def showIconAndText(): Unit = label.visible = true
-    def showIcon(): Unit        = label.visible = false
+    mainPanel.reactions += {
+      case event.MouseEntered(_, _, _) => icon.setColor(Theme.light.background)
+    }
+
+    def showIconAndText(): Unit =
+      icon.setColor(Theme.light.overlayElement)
+      mainPanel.setStyler(openStyler)
+      label.visible = true
+
+    def showIcon(): Unit =
+      icon.setColor(Theme.light.background)
+      mainPanel.setStyler(closeStyler)
+      label.visible = false
 
     override def component[T >: Component]: T = mainPanel
 
   case class JNavBar(iconLabels: JIconLabel*) extends JComponent:
-    private val mainPanel = JItem.createFlowPanel(JStyler.transparent)
+    private val styler =
+      JStyler.transparent.copy(rect = JStyler.defaultRect.copy(padding = JStyler.createPadding(40, 20)))
+
+    private val mainPanel = JItem.createFlowPanel(styler)
     mainPanel.hGap = 5
 
     mainPanel.contents ++= iconLabels.map(_.component)
@@ -87,37 +112,38 @@ object JComponent:
     private val styler =
       JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.element))
 
-    private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, styler)
-    private val navBar    = createNavbar(iconLabels: _*)
-    private val panels: Map[JIconLabel, JItem.JFlowPanelItem] =
+    private val mainPanel  = JItem.createBorderPanel(styler)
+    private val pagesPanel = JItem.createFlowPanel(JStyler.transparent)
+
+    private val navBar = createNavbar(iconLabels: _*)
+    private val pages: Map[JIconLabel, JItem.JFlowPanelItem] =
       iconLabels.map(iconLabel => (iconLabel, JItem.createFlowPanel(JStyler.transparent))).toMap
 
-    panels.values.foreach(_.visible = false)
+    pages.values.foreach(_.visible = false)
+    pagesPanel.contents ++= pages.values
 
-    mainPanel.contents += Swing.VGlue
-    mainPanel.contents += navBar.component
-    mainPanel.contents ++= panels.values
-    mainPanel.contents += Swing.VGlue
+    mainPanel.layout(navBar.component) = BorderPanel.Position.North
+    mainPanel.layout(pagesPanel) = BorderPanel.Position.Center
 
     mainPanel.listenTo(navBar.component.mouse.clicks)
     iconLabels.foreach(iconLabel =>
       iconLabel.component.reactions += {
         case event.MousePressed(_, _, _, _, _) =>
-          panels.values.foreach(_.visible = false)
+          pages.values.foreach(_.visible = false)
           paneOf(iconLabel).visible = true
       }
     )
 
-    def paneOf(label: JIconLabel): JItem.JFlowPanelItem = panels(label)
+    def paneOf(label: JIconLabel): JItem.JFlowPanelItem = pages(label)
     override def component[T >: Component]: T           = mainPanel
 
   case class JInsertForm(title: String, infoTextField: JInfoTextField*) extends JComponent:
     private val mainPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
     private val titlePanel = JItem.createFlowPanel(JStyler.transparent)
     private val formPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
-
-    private val titleLabel = JItem.label(title, labelStyler)
     private val space      = 10
+
+    val titleLabel = JItem.label(title, labelStyler)
 
     titlePanel.contents += titleLabel
     formPanel.contents += titlePanel
@@ -127,6 +153,7 @@ object JComponent:
 
     mainPanel.contents += Swing.VStrut(space)
     mainPanel.contents += formPanel
+    mainPanel.contents += Swing.VStrut(space)
 
     override def component[T >: Component]: T = mainPanel
 
