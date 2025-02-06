@@ -21,15 +21,11 @@ object GUIView:
     visible = true
     preferredSize = new Dimension(800, 800)
 
-    private val countLabel = "Count Route: "
-    private val errorStr   = "Error: "
+    private val mainPane  = BorderPanel()
+    private val glassPane = BorderPanel()
 
-    val mapPark: MapPanel = MapPanel.empty()
-    val mapController     = CentralController.createMap()
-
-    // Main content pane with BorderLayout
-    val mainPane  = BorderPanel()
-    val glassPane = BorderPanel()
+    private val mapPark       = MapPanel.empty()
+    private val mapController = CentralController.createMap()
 
     glassPane.opaque = false
     glassPane.visible = true
@@ -40,32 +36,3 @@ object GUIView:
     contents = mainPane
     peer.setGlassPane(glassPane.peer)
     glassPane.visible = true
-
-    // formPanel button action
-//    formPanel.saveButton.reactions += {
-//      case event.ButtonClicked(_) =>
-//        uiPort.save(formPanel.create()).onComplete(future =>
-//          for {
-//            either <- future
-//          } yield {
-//            either match
-//              case Left(errorSaving) => error.text = s"$errorStr + $errorSaving"
-//              case Right(routes) =>
-//                mapPark.setPoints(routes.map(router => router.path))
-//                mapPark.repaint()
-//                info.text = s"$countLabel ${routes.size}"
-//          }
-//        )
-//    }
-
-//    @SuppressWarnings(Array("org.wartremover.warts.Var"))
-//    private var field = 0
-//    mapPark.listenTo(mapPark.mouse.clicks)
-//    mapPark.reactions += {
-//      case event.MousePressed(_, point, _, _, _) =>
-//        if formPanel.visible then
-//          field match
-//            case 0 => formPanel.setDepartureStation("station", point.getX, point.getY)
-//            case 1 => formPanel.setArrivalStation("station", point.getX, point.getY)
-//          field = (field + 1) % 2
-//    }
