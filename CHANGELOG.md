@@ -1,3 +1,21 @@
+## [1.6.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.5.1...v1.6.0) (2025-02-06)
+
+### Features
+
+* complete mapController graphic ([456bef7](https://github.com/dev-pps/pps-23-ulisse/commit/456bef779b72c1961088210ebfc6467924f32530))
+* create central controller to map ([9cf87e7](https://github.com/dev-pps/pps-23-ulisse/commit/9cf87e7a0c9c8578e7725fad79bf76b50709f0f0))
+* create icon label ([18a692e](https://github.com/dev-pps/pps-23-ulisse/commit/18a692e2fa316cac127151f578e3f8f2fef4efe2))
+* create JBaseForm ([bed0021](https://github.com/dev-pps/pps-23-ulisse/commit/bed0021043bc252dd650e69f56f59d8bce354fba))
+* create navbar ([f4a0bdc](https://github.com/dev-pps/pps-23-ulisse/commit/f4a0bdc4bdf371b4a92464b4854d5fb1bf8d0721))
+* create new graphic components ([b26df97](https://github.com/dev-pps/pps-23-ulisse/commit/b26df97c112c7e4d885fa51c33b11b71aff2468f))
+* create padding ([62fdccf](https://github.com/dev-pps/pps-23-ulisse/commit/62fdccfa91e0e8500f45a61d7aa80a415b1f6c97))
+* create route form ([4c797e2](https://github.com/dev-pps/pps-23-ulisse/commit/4c797e2502baac099ff0283452cbfe2d97077d4b))
+* create station form ([61075d2](https://github.com/dev-pps/pps-23-ulisse/commit/61075d2f8fc8884d620ffe29d4313d36ba575bff))
+* create tabbedPane ([3c3d102](https://github.com/dev-pps/pps-23-ulisse/commit/3c3d102cacea9c6f97a3849ca5bab19a2e0ba8f1))
+* create toggle icon button ([ff35567](https://github.com/dev-pps/pps-23-ulisse/commit/ff35567105c32b5df4bc45c9287a5e1534b3efb2))
+* delete old forms ([3ed592e](https://github.com/dev-pps/pps-23-ulisse/commit/3ed592e7ec39407f84c12f91e071467e7183adec))
+* improve form space ([51370dc](https://github.com/dev-pps/pps-23-ulisse/commit/51370dcf4b0f58c8fd831d194b2787198e771bb1))
+
 ## [1.5.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.5.0...v1.5.1) (2025-02-05)
 
 ### Bug Fixes
