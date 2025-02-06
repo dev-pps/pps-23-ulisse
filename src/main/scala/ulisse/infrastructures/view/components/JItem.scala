@@ -15,10 +15,16 @@ trait JItem(private var styler: JStyler) extends Component:
 
   private def initStyler(): Unit =
     currentBackground = styler.background
-    styler.size.foreach(size => preferredSize = new Dimension(size.width, size.height))
-    styler.border.foreach(style =>
-      border = BorderFactory.createEmptyBorder(style.stroke, style.stroke, style.stroke, style.stroke)
+    val width  = styler.size.width.getOrElse(size.width)
+    val height = styler.size.height.getOrElse(size.height)
+    size.setSize(width, height)
+    border = BorderFactory.createEmptyBorder(
+      styler.padding.height,
+      styler.padding.width,
+      styler.padding.height,
+      styler.padding.width
     )
+
     font = styler.swingFont
 
     revalidate()
@@ -60,14 +66,14 @@ trait JItem(private var styler: JStyler) extends Component:
       val borderSize     = (size.width - border.stroke, size.height - border.stroke)
       g.setColor(border.color)
       g.setStroke(BasicStroke(border.stroke))
-      g.drawRoundRect(borderPosition, borderPosition, borderSize._1, borderSize._2, styler.arcWidth, styler.arcHeight)
+      g.drawRoundRect(borderPosition, borderPosition, borderSize._1, borderSize._2, styler.arc, styler.arc)
     )
     super.paintBorder(g)
 
   protected override def paintComponent(g: Graphics2D): Unit =
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g.setColor(currentBackground)
-    g.fillRoundRect(0, 0, size.width, size.height, styler.arcWidth, styler.arcHeight)
+    g.fillRoundRect(0, 0, size.width, size.height, styler.arc, styler.arc)
     super.paintComponent(g)
 
 object JItem:
@@ -82,18 +88,15 @@ object JItem:
       with JItem(jStyler):
     opaque = false
 
-  case class JPanelItem()(jStyler: JStyler) extends Panel with JItem(jStyler):
-    peer.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5))
+  case class JPanelItem()(jStyler: JStyler) extends Panel with JItem(jStyler)
 
   case class JButtonItem(label: String)(jStyler: JStyler) extends Button(label) with JItem(jStyler):
     focusPainted = false
     borderPainted = false
     contentAreaFilled = false
 
-  case class JLabelItem(label: String)(jStyler: JStyler) extends Label(label) with JItem(jStyler)
-
-  case class JTextFieldItem(colum: Int)(jStyler: JStyler) extends TextField(colum) with JItem(jStyler):
-    peer.setBorder(BorderFactory.createEmptyBorder())
+  case class JLabelItem(label: String)(jStyler: JStyler)  extends Label(label) with JItem(jStyler)
+  case class JTextFieldItem(colum: Int)(jStyler: JStyler) extends TextField(colum) with JItem(jStyler)
 
   def createFlowPanel(styler: JStyler): JFlowPanelItem = JFlowPanelItem()(styler)
   def createBoxPanel(orientation: Orientation.Value, styler: JStyler): JBoxPanelItem =

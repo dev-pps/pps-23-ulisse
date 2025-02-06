@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.form
 
-import ulisse.infrastructures.view.common.Theme
+import ulisse.infrastructures.view.common.Themes._
 import ulisse.infrastructures.view.components.{JComponent, JItem, JStyler}
 
 import scala.swing.{Component, Orientation, Swing}
@@ -15,9 +15,9 @@ object Form:
   def createSchedule(): ScheduleForm = ScheduleForm()
 
   private val elementStyler =
-    JStyler.rectPaletteStyler(JStyler.roundRect(10), JStyler.backgroundPalette(Theme.light.element))
+    JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.element))
   private val buttonStyler =
-    JStyler.rectPaletteStyler(JStyler.roundRect(10), JStyler.backgroundPalette(Theme.light.hover))
+    JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.overlayElement))
 
   private case class BaseForm(title: String, fields: JComponent.JInfoTextField*) extends Form:
     private val mainPanel: JItem.JBoxPanelItem     = JItem.createBoxPanel(Orientation.Vertical, elementStyler)

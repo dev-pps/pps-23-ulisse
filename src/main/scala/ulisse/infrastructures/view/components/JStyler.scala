@@ -46,8 +46,9 @@ object JStyler:
 
   trait JStyle
   private object JStyles:
-    val defaultSizeRect: Option[Size] = Option.empty
-    val defaultRoundRect: Int         = 0
+    val defaultSizeRect: Size       = Dimension2D(Option.empty, Option.empty)
+    val defaultPaddingRect: Padding = Dimension2D(0, 0)
+    val defaultRoundRect: Int       = 0
 
     val transparentColor: Color     = new Color(0, 0, 0, 0)
     val defaultColor: Color         = Color.white
@@ -59,23 +60,31 @@ object JStyler:
     val defaultStyleFont: StyleFont = SwingFont.Plain
     val defaultSizeFont: Int        = 13
 
-    val defaultRect: Rect       = roundRect(defaultRoundRect)
+    val defaultRect: Rect       = rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)
     val defaultPalette: Palette = backgroundPalette(defaultColor)
     val defaultFont: Font       = font(defaultNameFont, defaultStyleFont, defaultSizeFont)
     val defaultBorder: Border   = border(defaultColor, defaultStroke)
 
     val transparentPalette: Palette = Palette(transparentColor, withOutColor, withOutColor)
 
-    case class Size(width: Int, height: Int)
-    case class Rect(size: Option[Size], arcWidth: Int, arcHeight: Int)                          extends JStyle
+    case class Dimension2D[T](width: T, height: T)
+    type Size    = Dimension2D[Option[Int]]
+    type Padding = Dimension2D[Int]
+
+    case class Rect(size: Size, padding: Padding, arc: Int)                                     extends JStyle
     case class Palette(background: Color, clickColor: Option[Color], hoverColor: Option[Color]) extends JStyle
     case class Font(nameFont: String, styleFont: StyleFont, sizeFont: Int)                      extends JStyle
     case class Border(color: Color, stroke: Int)                                                extends JStyle
 
-    def rect(width: Int, height: Int, arc: Int): Rect = rect(Size(width, height), arc)
-    def rect(size: Size, arc: Int): Rect              = Rect(Some(size), arc, arc)
-    def sizeRect(size: Size): Rect                    = rect(size, defaultRoundRect)
-    def roundRect(arc: Int): Rect                     = Rect(defaultSizeRect, arc, arc)
+    def createSize(width: Int, height: Int): Size = Dimension2D(Some(width), Some(height))
+    def createWidthSize(width: Int): Size         = Dimension2D(Some(width), defaultSizeRect.height)
+    def createHeightSize(height: Int): Size       = Dimension2D(defaultSizeRect.width, Some(height))
+
+    def createPadding(width: Int, height: Int): Padding = Dimension2D(width, height)
+    def widthPadding(width: Int): Padding               = Dimension2D(width, defaultPaddingRect.height)
+    def heightPadding(height: Int): Padding             = Dimension2D(defaultPaddingRect.width, height)
+
+    def rect(size: Size, padding: Padding, arc: Int): Rect = Rect(size, padding, arc)
 
     def palette(background: Color, click: Color, hover: Color): Palette = Palette(background, Some(click), Some(hover))
     def hoverPalette(hover: Color): Palette           = Palette(defaultColor, withOutColor, Some(hover))
