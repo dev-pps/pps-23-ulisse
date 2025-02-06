@@ -1,6 +1,6 @@
-package ulisse.applications.useCases
+package ulisse.applications.managers
 
-import ulisse.applications.useCases.TimetableManagers.TimetableManagerErrors.{AcceptanceError, TimetableNotFound}
+import ulisse.applications.managers.TimetableManagers.TimetableManagerErrors.{AcceptanceError, TimetableNotFound}
 import ulisse.entities.timetable.Timetables.TrainTimetable
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist}
