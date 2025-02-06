@@ -1,16 +1,11 @@
-package ulisse.applications.useCases
+package ulisse.applications.managers
 
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
-
-import ulisse.applications.managers.TechnologyManagers.TechErrors.{
-  InvalidSpeed,
-  TechnologyAlreadyExists,
-  TechnologyNotExists
-}
-import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+import TechnologyManagers.TechErrors.{InvalidSpeed, TechnologyAlreadyExists, TechnologyNotExists}
+import TechnologyManagers.TechnologyManager
 import ulisse.entities.Technology
 
 class TechnologyManagerTest extends AnyFeatureSpec with GivenWhenThen:
