@@ -30,11 +30,5 @@ final case class Menu(root: UpdatableContainer) extends BorderPanel:
           JStyler.border(Color.DARK_GRAY, 1)
         )
       )
-  private val centerPanel = new BoxPanel(Orientation.Vertical):
-    contents += Swing.VGlue
-    contents += new BoxPanel(Orientation.Horizontal):
-      contents += Swing.HGlue
-      contents += card
-      contents += Swing.HGlue
-    contents += Swing.VGlue
-  layout(centerPanel) = BorderPanel.Position.Center
+
+  layout(card.center()) = BorderPanel.Position.Center
