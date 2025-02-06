@@ -4,6 +4,7 @@ import ulisse.applications.useCases.TimetableManagers.TimetableManagerErrors.{Ac
 import ulisse.entities.timetable.Timetables.TrainTimetable
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist}
+import ulisse.utils.Times.ClockTime
 
 object TimetableManagers:
 
@@ -48,7 +49,7 @@ object TimetableManagers:
   given defaultAcceptancePolicy: AcceptanceContextPolicy = DefaultAcceptancePolicy
 
   def emptyManager(): TimetableManager =
-    TimetableManager(Map.empty)
+    TimetableManager(List.empty)
 
   trait TimetableManager:
     /** Save new timetable for a train. Timetable is accepted if passes the `acceptancePolicy` rules.
@@ -62,7 +63,16 @@ object TimetableManagers:
     def save(timetable: TrainTimetable)(using
         acceptancePolicy: AcceptanceContextPolicy
     ): Either[TimetableManagerErrors, TimetableManager]
-//    def delete(trainName: String, departureTime: ClockTime): Either[TimetableNotFound, TimetableManager]
+
+    /** Removes train's timetable identified by `trainName` and `departureTime`
+      * @param trainName
+      *   Train name
+      * @param departureTime
+      *   departure time of train
+      * @return
+      *   Updated TimetableManager otherwise Left of [[TimetableNotFound]]
+      */
+    def remove(trainName: String, departureTime: ClockTime): Either[TimetableNotFound, TimetableManager]
 
     /** Gets all timetables of a train.
       * @param trainName
@@ -73,8 +83,8 @@ object TimetableManagers:
     def tablesOf(trainName: String): Either[TimetableNotFound, List[TrainTimetable]]
 
   object TimetableManager:
-    def apply(timetables: Map[Train, List[TrainTimetable]]): TimetableManager =
-      TimetableManagerImpl(timetables)
+    def apply(timetables: List[TrainTimetable]): TimetableManager =
+      TimetableManagerImpl(timetables.groupBy(_.train))
 
     private case class TimetableManagerImpl(timetables: Map[Train, List[TrainTimetable]]) extends TimetableManager:
 
@@ -84,18 +94,23 @@ object TimetableManagers:
         for
           ts <- tablesOf(timetable.train.name).orElse(Right(List.empty))
           t  <- acceptancePolicy.accept(timetable, ts)
-        yield TimetableManager(timetables.updatedWith(t.train) {
+        yield TimetableManagerImpl(timetables.updatedWith(t.train) {
           case Some(l) => Some(l.appended(t))
           case None    => Some(List(t))
         })
 
-//      override def delete(train: Train, departureTime: ClockTime): Either[TimetableNotFound, TimetableManager] =
-//        for
-//          trainTimetables <- tablesOf(train.name)
-//          table <- trainTimetables.find(t => t.departureTime === departureTime).toRight(TimetableNotFound(
-//            s"not table found with ${train.name} and departure time $departureTime"
-//          ))
-//        yield timetables.updatedWith(train)()
+      override def remove(trainName: String, departureTime: ClockTime): Either[TimetableNotFound, TimetableManager] =
+        for
+          trainTimetables <- tablesOf(trainName)
+          train           <- timetables.keys.find(_.name.contentEquals(trainName)).toRight(TimetableNotFound(trainName))
+          table <- trainTimetables.find(t => t.departureTime === departureTime).toRight(TimetableNotFound(
+            s"not table found with $trainName and departure time $departureTime"
+          ))
+          updatedTimetables <- Right(timetables.updatedWith(train) {
+            case Some(t) if t.sizeIs > 1 => Some(trainTimetables.filter(_ == table))
+            case _                       => None
+          })
+        yield TimetableManagerImpl(updatedTimetables)
 
       override def tablesOf(trainName: String): Either[TimetableNotFound, List[TrainTimetable]] =
         timetables.find((k, _) => k.name.contentEquals(trainName)).map(_._2).toRight(TimetableNotFound(trainName))
