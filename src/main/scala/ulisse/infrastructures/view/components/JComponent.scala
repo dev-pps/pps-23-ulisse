@@ -16,24 +16,23 @@ object JComponent:
   def createNavbar(JIconLabel: JIconLabel*): JNavBar              = JNavBar(JIconLabel: _*)
   def createTabbedPane(JIconLabel: JIconLabel*): JTabbedPane      = JTabbedPane(JIconLabel: _*)
 
-  def createBaseForm(title: String, JInfoTextField: JInfoTextField*): JBaseForm =
-    JBaseForm(title, JInfoTextField: _*)
+  def createInsertForm(title: String, JInfoTextField: JInfoTextField*): JInsertForm =
+    JInsertForm(title, JInfoTextField: _*)
   def createToggleIconButton(onIconPath: String, offIconPath: String): JToggleIconButton =
     JToggleIconButton(onIconPath, offIconPath)
 
-  private val transparentStyler = JStyler.paletteStyler(JStyler.transparentPalette)
-  private val labelStyler       = JStyler.paletteStyler(JStyler.transparentPalette)
+  private val labelStyler = JStyler.paletteStyler(JStyler.transparentPalette)
   private val elementStyler =
     JStyler.rectPaletteStyler(JStyler.roundRect(10), JStyler.backgroundPalette(Theme.light.element))
 
   case class JInfoTextField(text: String) extends JComponent:
     private val colum = 15
 
-    private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, transparentStyler)
+    private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
     private val label     = JItem.label(text, labelStyler)
     private val textField = JItem.textField(colum, elementStyler)
 
-    private val northPanel = JItem.createFlowPanel(transparentStyler)
+    private val northPanel = JItem.createFlowPanel(JStyler.transparent)
     northPanel.contents += label
 
     mainPanel.contents += northPanel
@@ -61,7 +60,7 @@ object JComponent:
     override def component[T >: Component]: T = mainPanel
 
   case class JNavBar(iconLabels: JIconLabel*) extends JComponent:
-    private val mainPanel = JItem.createFlowPanel(transparentStyler)
+    private val mainPanel = JItem.createFlowPanel(JStyler.transparent)
     mainPanel.hGap = 5
 
     mainPanel.contents ++= iconLabels.map(_.component)
@@ -79,10 +78,10 @@ object JComponent:
     override def component[T >: Component]: T = mainPanel
 
   case class JTabbedPane(iconLabels: JIconLabel*) extends JComponent:
-    private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, transparentStyler)
+    private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
     private val navBar    = createNavbar(iconLabels: _*)
     private val panels: Map[JIconLabel, JItem.JFlowPanelItem] =
-      iconLabels.map(iconLabel => (iconLabel, JItem.createFlowPanel(transparentStyler))).toMap
+      iconLabels.map(iconLabel => (iconLabel, JItem.createFlowPanel(JStyler.transparent))).toMap
 
     panels.values.foreach(_.visible = false)
 
@@ -101,10 +100,10 @@ object JComponent:
     def paneOf(label: JIconLabel): JItem.JFlowPanelItem = panels(label)
     override def component[T >: Component]: T           = mainPanel
 
-  case class JBaseForm(title: String, infoTextField: JInfoTextField*) extends JComponent:
-    private val mainPanel  = JItem.createBoxPanel(Orientation.Vertical, transparentStyler)
-    private val titlePanel = JItem.createFlowPanel(transparentStyler)
-    private val formPanel  = JItem.createBoxPanel(Orientation.Vertical, transparentStyler)
+  case class JInsertForm(title: String, infoTextField: JInfoTextField*) extends JComponent:
+    private val mainPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
+    private val titlePanel = JItem.createFlowPanel(JStyler.transparent)
+    private val formPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
 
     private val titleLabel = JItem.label(title, labelStyler)
     private val space      = 10
@@ -121,7 +120,7 @@ object JComponent:
     override def component[T >: Component]: T = mainPanel
 
   case class JToggleIconButton(onIconPath: String, offIconPath: String) extends JComponent:
-    private val mainPanel = JItem.createFlowPanel(transparentStyler)
+    private val mainPanel = JItem.createFlowPanel(JStyler.transparent)
     private val onIcon    = createSVGPanel(onIconPath, Theme.light.background)
     private val offIcon   = createSVGPanel(offIconPath, Theme.light.background)
     private val size      = 40
