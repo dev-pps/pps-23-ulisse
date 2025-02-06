@@ -6,7 +6,7 @@ import RouteManager.ErrorSaving
 import ulisse.entities.Route
 import ulisse.infrastructures.view.components.JItem
 import ulisse.infrastructures.view.components.JStyler.*
-import ulisse.infrastructures.view.form.RouteForm
+import ulisse.infrastructures.view.form.OldRouteForm
 import ulisse.utils.Swings.centerOf
 
 import java.awt.Color
@@ -34,10 +34,10 @@ object MapView:
     private val countLabel = "Count Route: "
     private val errorStr   = "Error: "
 
-    val mapPark: MapPanel    = MapPanel.empty()
-    val info: Label          = Label(s"$countLabel")
-    val error: Label         = JItem.label(errorStr, defaultStyler)
-    val formPanel: RouteForm = RouteForm()
+    val mapPark: MapPanel       = MapPanel.empty()
+    val info: Label             = Label(s"$countLabel")
+    val error: Label            = JItem.label(errorStr, default)
+    val formPanel: OldRouteForm = OldRouteForm()
 
     // Main content pane with BorderLayout
     val contentPane = new BorderPanel

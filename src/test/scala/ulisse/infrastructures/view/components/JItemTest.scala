@@ -9,7 +9,7 @@ import java.awt.Color
 class JItemTest extends AnyFlatSpec with Matchers:
   val text: String = "Hello"
 
-  val button = JItem.button(text, defaultStyler)
+  val button = JItem.button(text, default)
 
   "create JButton" should "with text" in:
     button.text must be(text)

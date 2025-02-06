@@ -23,9 +23,9 @@ object FormPanel:
       using opaque: Boolean
   ) extends FormPanel[MP]:
     private val title                      = Label("Route")
-    override val saveButton: JButtonItem   = JItem.button("save", defaultStyler)
-    override val deleteButton: JButtonItem = JItem.button("delete", defaultStyler)
-    override val exitButton: JButtonItem   = JItem.button("exit", defaultStyler)
+    override val saveButton: JButtonItem   = JItem.button("save", default)
+    override val deleteButton: JButtonItem = JItem.button("delete", default)
+    override val exitButton: JButtonItem   = JItem.button("exit", default)
 
     private val centralBox: BoxPanel     = BoxPanel(Orientation.Vertical)
     private val northPanel: FlowPanel    = FlowPanel(title)

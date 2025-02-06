@@ -1,111 +1,45 @@
 package ulisse.infrastructures.view.form
 
-import ulisse.entities.Coordinates.Coordinate
-import ulisse.entities.Route
-import ulisse.entities.Route.TypeRoute
-import ulisse.infrastructures.view.common.Theme.{light, Light}
-import ulisse.infrastructures.view.common.{FormPanel, KeyValuesPanel, Theme}
-import ulisse.infrastructures.view.components.JItem
-import ulisse.infrastructures.view.components.JStyler.*
+import ulisse.infrastructures.view.common.Theme
+import ulisse.infrastructures.view.components.{JComponent, JItem, JStyler}
 
-import scala.swing.*
+import scala.swing.{Component, Orientation, Swing}
 
-trait RouteForm extends FormPanel[BorderPanel]:
-  def routeType: Option[ComboBox[String]]
-  def departureStation: Seq[TextField]
-  def arrivalStation: Seq[TextField]
-  def railsCount: Option[TextField]
-  def length: Option[TextField]
-
-  def setDepartureStation(name: String, x: Double, y: Double): Unit
-  def setArrivalStation(name: String, x: Double, y: Double): Unit
-  def create(): Option[Route]
+trait RouteForm:
+  def component[T >: Component]: T
 
 object RouteForm:
-  private val buttonPickerStyler =
-    rectPaletteStyler(rect(40, 20, 10), palette(light.element, light.forwardClick, light.hover))
-  private val textFieldStyler =
-    rectPaletteStyler(rect(40, 20, 10), backgroundHoverPalette(light.element, light.hover))
 
-  private def createForm(using opaque: Boolean): FormPanel[BorderPanel] =
-    val typeRoute = KeyValuesPanel(FlowPanel())(Label("Type"), ComboBox(Seq("Normal", "AV")))
+  def apply(): RouteForm = RouteFormImpl()
 
-    val departureStation =
-      KeyValuesPanel(FlowPanel())(
-        JItem.label("Departure", paletteStyler(backgroundPalette(transparentColor))),
-        JItem.textField(5, textFieldStyler),
-        JItem.textField(4, textFieldStyler),
-        JItem.textField(4, textFieldStyler),
-        JItem.button("...", buttonPickerStyler)
-      )
-    val arrivalStation =
-      KeyValuesPanel(FlowPanel())(
-        JItem.label("Arrival", paletteStyler(backgroundPalette(transparentColor))),
-        JItem.textField(5, textFieldStyler),
-        JItem.textField(4, textFieldStyler),
-        JItem.textField(4, textFieldStyler),
-        JItem.button("...", buttonPickerStyler)
-      )
-    val railsCount = KeyValuesPanel(FlowPanel())(
-      Label("Rails Count"),
-      JItem.textField(3, textFieldStyler)
-    )
-    val length = KeyValuesPanel(FlowPanel())(
-      Label("Length"),
-      JItem.textField(3, textFieldStyler)
-    )
-    FormPanel(BorderPanel(), typeRoute, departureStation, arrivalStation, length, railsCount)
+  private val elementStyler =
+    JStyler.rectPaletteStyler(JStyler.roundRect(10), JStyler.backgroundPalette(Theme.light.element))
+  private val buttonStyler =
+    JStyler.rectPaletteStyler(JStyler.roundRect(10), JStyler.backgroundPalette(Theme.light.hover))
 
-  def apply()(using opaque: Boolean): RouteForm = RouteFormImpl(createForm)
+  private case class RouteFormImpl() extends RouteForm:
+    private val title = "Route"
+    private val space = 10
 
-  private enum Fields(val index: Int):
-    case RouteType        extends Fields(0)
-    case DepartureStation extends Fields(1)
-    case ArrivalStation   extends Fields(2)
-    case RailsCount       extends Fields(3)
-    case Length           extends Fields(4)
+    private val departureStation = JComponent.createInfoTextField("Departure Station")
+    private val arrivalStation   = JComponent.createInfoTextField("Arrival Station")
+    private val routeType        = JComponent.createInfoTextField("Type")
+    private val rails            = JComponent.createInfoTextField("Rails")
+    private val length           = JComponent.createInfoTextField("Length")
 
-  private case class RouteFormImpl(form: FormPanel[BorderPanel]) extends RouteForm:
-    export form.*
-    form.panel().opaque = true
-    form.panel().background = light.background
+    private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, elementStyler)
+    private val insertForm =
+      JComponent.createInsertForm(title, departureStation, arrivalStation, routeType, rails, length)
+    private val buttonPanel  = JItem.createFlowPanel(JStyler.transparent)
+    private val saveButton   = JItem.button("Save", buttonStyler)
+    private val deleteButton = JItem.button("Delete", buttonStyler)
 
-    private val buttonRect: Rect = rect(85, 20, 10)
-    saveButton.setStyler(rectPaletteStyler(buttonRect, palette(light.element, light.trueClick, light.hover)))
-    deleteButton.setStyler(rectPaletteStyler(buttonRect, palette(light.element, light.falseClick, light.hover)))
-    exitButton.setStyler(rectPaletteStyler(buttonRect, palette(light.element, light.backwardClick, light.hover)))
+    buttonPanel.hGap = space
+    buttonPanel.contents += saveButton
+    buttonPanel.contents += deleteButton
 
-    override def routeType: Option[ComboBox[String]] =
-      form.keyValuesPanel(Fields.RouteType.index).values[ComboBox[String]].headOption
+    mainPanel.contents += insertForm.component
+    mainPanel.contents += buttonPanel
+    mainPanel.contents += Swing.VStrut(space)
 
-    override def departureStation: Seq[TextField] = form.keyValuesPanel(Fields.DepartureStation.index).values[TextField]
-
-    override def arrivalStation: Seq[TextField] = form.keyValuesPanel(2).values[TextField]
-
-    override def railsCount: Option[TextField] = form.keyValuesPanel(3).values[TextField].headOption
-
-    override def length: Option[TextField] = form.keyValuesPanel(4).values[TextField].headOption
-
-    override def setDepartureStation(name: String, x: Double, y: Double): Unit =
-      List(name, x.toString, y.toString).zip(departureStation).foreach((v, f) => f.text = v)
-
-    override def setArrivalStation(name: String, x: Double, y: Double): Unit =
-      List(name, x.toString, y.toString).zip(arrivalStation).foreach((v, f) => f.text = v)
-
-    override def create(): Option[Route] =
-      for {
-        typeRoute  <- form.keyValuesPanel(0).values[ComboBox[String]].headOption
-        length     <- form.keyValuesPanel(3).values[TextField].headOption
-        railsCount <- form.keyValuesPanel(4).values[TextField].headOption
-      } yield Route(
-        TypeRoute.valueOf(typeRoute.selection.item),
-        (
-          (
-            departureStation(0).text,
-            Coordinate.geo(departureStation(1).text.toDouble, departureStation(2).text.toDouble)
-          ),
-          (arrivalStation(0).text, Coordinate.geo(arrivalStation(1).text.toDouble, arrivalStation(2).text.toDouble))
-        ),
-        30.0d,
-        2
-      )
+    override def component[T >: Component]: T = mainPanel

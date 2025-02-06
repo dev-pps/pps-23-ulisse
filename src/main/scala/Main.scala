@@ -8,6 +8,7 @@ import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
 import ulisse.infrastructures.view.components.{JComponent, JStyler}
+import ulisse.infrastructures.view.form.RouteForm
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
 import java.awt.Color
@@ -80,25 +81,15 @@ object StationTypes:
     val stationLatitudeForm  = JComponent.createInfoTextField("Latitude")
     val stationLongitudeForm = JComponent.createInfoTextField("Longitude")
 
-    val routeDepartureStationForm = JComponent.createInfoTextField("Departure Station")
-    val routeArrivalStationForm   = JComponent.createInfoTextField("Arrival Station")
-    val routeTypeForm             = JComponent.createInfoTextField("Type")
-
-    tabPane.paneOf(station).contents += JComponent.createBaseForm(
+    tabPane.paneOf(station).contents += JComponent.createInsertForm(
       "Station",
       stationNameForm,
       stationLatitudeForm,
       stationLongitudeForm
     ).component
 
-    tabPane.paneOf(route).contents += JComponent.createBaseForm(
-      "Route",
-      routeDepartureStationForm,
-      routeArrivalStationForm,
-      routeTypeForm
-    ).component
-
-    tabPane.paneOf(schedule).contents += new Label("Simulation")
+    tabPane.paneOf(route).contents += RouteForm().component
+    tabPane.paneOf(schedule).contents += new Label("Schedule")
 
     listenTo(tabPane.component.mouse.clicks)
     // Creazione di un FlowPanel
@@ -112,7 +103,7 @@ object StationTypes:
     }
 
     contents = mainPanel
-    size = new Dimension(400, 300)
+    size = new Dimension(400, 800)
   }
 
   top.visible = true

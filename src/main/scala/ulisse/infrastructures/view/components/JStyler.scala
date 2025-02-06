@@ -6,8 +6,11 @@ import scala.swing.Font.Style.Value as StyleFont
 
 object JStyler:
   export JStyles._
+
   val withoutBorder: Option[Border] = Option.empty
-  val defaultStyler: JStyler        = JStyler(defaultRect, defaultPalette, defaultFont, withoutBorder)
+
+  val default: JStyler     = JStyler(defaultRect, defaultPalette, defaultFont, withoutBorder)
+  val transparent: JStyler = paletteStyler(transparentPalette)
 
   def styler(rect: Rect, palette: Palette, font: Font, border: Border): JStyler =
     JStyler(rect, palette, font, Some(border))

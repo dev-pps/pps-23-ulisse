@@ -8,10 +8,10 @@ import java.awt.Color
 
 class JStylerTest extends AnyFlatSpec with Matchers:
   "default styler" should "have default style" in:
-    defaultStyler.rect must be(defaultRect)
-    defaultStyler.palette must be(defaultPalette)
-    defaultStyler.font must be(defaultFont)
-    defaultStyler.all must be(List(defaultRect, defaultPalette, defaultFont))
+    default.rect must be(defaultRect)
+    default.palette must be(defaultPalette)
+    default.font must be(defaultFont)
+    default.all must be(List(defaultRect, defaultPalette, defaultFont))
 
   "rect styler" should "have rect style" in:
     val newRect = roundRect(10)
