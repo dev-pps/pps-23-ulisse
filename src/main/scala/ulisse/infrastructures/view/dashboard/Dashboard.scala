@@ -1,4 +1,5 @@
 package ulisse.infrastructures.view.dashboard
+import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.{StationSettings, UpdatableContainer}
 import ulisse.infrastructures.view.components.ComponentUtils.*
 
@@ -19,13 +20,18 @@ import scala.swing.{BorderPanel, BoxPanel, Component, Dimension, Label, Orientat
 //  override def getLayoutAlignmentX(parent: java.awt.Container): Float = 0.5f
 //  override def getLayoutAlignmentY(parent: java.awt.Container): Float = 0.5f
 
-final case class Dashboard(root: UpdatableContainer) extends BorderPanel:
+final case class Dashboard(root: UpdatableContainer) extends BorderPanel with UpdatableContainer:
   preferredSize = new Dimension(600, 400)
   private val dashboardContent   = new JLayeredPane()
-  private val defaultLayerLayout = StationSettings().stationEditorView
+  private val defaultLayerLayout = new BorderPanel()
 
-  private val sideMenu = SideMenu()
-  sideMenu.background = Color.decode("#adc4db")
+  private val sideMenu = SideMenu(this)
+  sideMenu.background = Theme.light.element
+
+  override def update(component: Component): Unit =
+    defaultLayerLayout.layout(component) = BorderPanel.Position.Center
+    revalidate()
+    repaint()
 
   dashboardContent.add(defaultLayerLayout.peer)
   dashboardContent.add(sideMenu.peer, JLayeredPane.PALETTE_LAYER)
