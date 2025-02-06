@@ -1,4 +1,4 @@
-package ulisse.infrastructures.view.station
+package ulisse.adapters.input
 
 import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts

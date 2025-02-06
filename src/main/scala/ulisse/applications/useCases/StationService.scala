@@ -9,7 +9,7 @@ import ulisse.entities.station.Station
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
-final case class StationPortInputService[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
+final case class StationService[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
     eventQueue: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]],
     outputPort: StationPorts.Output
 ) extends StationPorts.Input[N, C, S]:

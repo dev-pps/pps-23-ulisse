@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.components
 
 import java.awt.Color
-import scala.swing.Component
+import scala.swing.{Component, LayoutContainer, MainFrame}
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
 object ComponentMixins:
@@ -20,3 +20,7 @@ object ComponentMixins:
     def rotation_=(newRotation: Int): Unit =
       _rotation = newRotation
       repaint()
+
+  trait UpdatableContainer:
+    this: MainFrame | LayoutContainer =>
+    def update(component: Component): Unit

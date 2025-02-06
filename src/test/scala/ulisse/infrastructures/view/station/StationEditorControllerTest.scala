@@ -4,13 +4,13 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
+import ulisse.adapters.input.StationEditorController
 import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
-import ulisse.applications.useCases.StationPortInputService
+import ulisse.applications.useCases.StationService
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
-import ulisse.infrastructures.view.station.StationEditorController
 import ulisse.utils.Errors.BaseError
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -32,7 +32,7 @@ class StationEditorControllerTest extends AnyWordSpec with Matchers:
   private val initialState  = AppState[N, C, S](StationManager.createCheckedStationMap())
   private val eventStream   = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   private val inputPort =
-    StationPortInputService[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream, outputPort)
+    StationService[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream, outputPort)
   private val controller    = StationEditorController[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](inputPort)
   private def updateState() = runAll(initialState, eventStream)
 
