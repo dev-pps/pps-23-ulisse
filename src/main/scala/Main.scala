@@ -8,7 +8,7 @@ import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
 import ulisse.infrastructures.view.components.{JComponent, JStyler}
-import ulisse.infrastructures.view.form.RouteForm
+import ulisse.infrastructures.view.form.Form
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
 import java.awt.Color
@@ -77,18 +77,9 @@ object StationTypes:
     val schedule = JComponent.createIconLabel("icons/train.svg", "schedule")
     val tabPane  = JComponent.createTabbedPane(station, route, schedule)
 
-    val stationNameForm      = JComponent.createInfoTextField("Name")
-    val stationLatitudeForm  = JComponent.createInfoTextField("Latitude")
-    val stationLongitudeForm = JComponent.createInfoTextField("Longitude")
+    tabPane.paneOf(station).contents += Form.createStation().component
+    tabPane.paneOf(route).contents += Form.createRoute().component
 
-    tabPane.paneOf(station).contents += JComponent.createInsertForm(
-      "Station",
-      stationNameForm,
-      stationLatitudeForm,
-      stationLongitudeForm
-    ).component
-
-    tabPane.paneOf(route).contents += RouteForm().component
     tabPane.paneOf(schedule).contents += new Label("Schedule")
 
     listenTo(tabPane.component.mouse.clicks)
