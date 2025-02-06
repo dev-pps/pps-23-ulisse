@@ -14,11 +14,10 @@ object SideMenu:
   def apply(): SideMenu = SideMenuImpl()
   private case class SideMenuImpl() extends BoxPanel(Orientation.Vertical) with SideMenu with Reactor:
 
-    private val layout_bounds        = Insets(16, 16, 16, 16)
-    private val header_spacing       = 24
-    private val menu_item_spacing    = 24
-    private val menu_item_height     = 50
-    private val menu_item_image_size = 16
+    private val layout_bounds     = Insets(16, 16, 16, 16)
+    private val header_spacing    = 24
+    private val menu_item_spacing = 24
+    private val menu_item_height  = 50
     private val menuCardStyle = JStyler.rectPaletteStyler(
       JStyler.rect(JStyler.defaultSizeRect, JStyler.Dimension2D(0, 0), 25),
       JStyler.palette(Theme.light.element, Theme.light.overlayElement, Theme.light.forwardClick)
@@ -69,19 +68,17 @@ object SideMenu:
         ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(
           25,
           25
-        ).genericClickReaction(menuCallback)
+        ).styler(menuCardStyle).genericClickReaction(menuCallback)
 
       JImageCard.horizontalWithConfiguration(
         ComponentWithConfiguration(headerRightContent, ComponentConfiguration(Alignment.Center)),
         headerLeftContent,
-        menuCardStyle.copy(palette =
-          JStyler.palette(JStyler.transparentColor, JStyler.transparentColor, JStyler.transparentColor)
-        )
+        JStyler.transparent
       ).reverse()
 
     private def buildMenuCard(imagePath: String, label: String): JImageCard =
       JImageCard.horizontal(
-        ImagePanel.createSVGPanel(imagePath, Color.BLACK).fixedSize(menu_item_image_size, menu_item_image_size),
+        ImagePanel.createSVGPanel(imagePath, Color.BLACK).fixedSize(menu_item_height, menu_item_height),
         Label(label).alignLeft(),
         menuCardStyle
       )
