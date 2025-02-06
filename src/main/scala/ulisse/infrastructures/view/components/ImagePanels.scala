@@ -9,7 +9,7 @@ import javax.imageio.ImageIO
 import scala.swing.{Component, Graphics2D, Panel, UIElement}
 
 object ImagePanels:
-  trait ImagePanel          extends JComponent with Rotatable
+  trait ImagePanel          extends Component with Rotatable
   trait ColorableImagePanel extends ImagePanel with Colorable
 
   object ImagePanel:
@@ -18,7 +18,7 @@ object ImagePanels:
     def createDrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit): ImagePanel = DrawnPanel(iconDrawer)
 
   private final case class ImagePanelImpl(imagePath: String)
-      extends ImagePanel with JComponent(JStyler.defaultStyler.copy(palette = JStyler.transparentPalette)):
+      extends ImagePanel:
     private val image = ImageIO.read(ClassLoader.getSystemResource(imagePath))
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
@@ -27,25 +27,24 @@ object ImagePanels:
       g.drawImage(image, (peer.getWidth - size) / 2, (peer.getHeight - size) / 2, size, size, peer)
 
   private final case class SVGPanel(svgPath: String, _color: Color)
-      extends ColorableImagePanel with JComponent(JStyler.defaultStyler.copy(palette = JStyler.transparentPalette)):
+      extends ColorableImagePanel:
     private val rawIcon = new FlatSVGIcon(svgPath)
     rawIcon.setColorFilter(ColorFilter(_ => color))
     opaque = false
 
-    def setColor(newColor: Color): Unit =
-      color = newColor
+    override def color_=(newColor: Color): Unit =
       rawIcon.setColorFilter(ColorFilter(_ => color))
-      repaint()
+      super.color_=(newColor)
 
     override def paintComponent(g: Graphics2D): Unit =
-      super.paintComponent(g)
       g.rotate(math.toRadians(rotation), peer.getWidth / 2, peer.getHeight / 2)
       val size = math.min(peer.getWidth, peer.getHeight)
       val icon = rawIcon.derive(size, size)
       icon.paintIcon(peer, g, (peer.getWidth - icon.getWidth) / 2, (peer.getHeight - icon.getHeight) / 2)
+      super.paintComponent(g)
 
   private final case class DrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit)
-      extends ImagePanel with JComponent(JStyler.defaultStyler.copy(palette = JStyler.transparentPalette)):
+      extends ImagePanel:
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
       iconDrawer(this, g)

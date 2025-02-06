@@ -72,16 +72,16 @@ object JComponent:
     mainPanel.contents += label
 
     mainPanel.reactions += {
-      case event.MouseEntered(_, _, _) => icon.setColor(Theme.light.background)
+      case event.MouseEntered(_, _, _) => icon.color = Theme.light.background
     }
 
     def showIconAndText(): Unit =
-      icon.setColor(Theme.light.overlayElement)
+      icon.color = Theme.light.overlayElement
       mainPanel.setStyler(openStyler)
       label.visible = true
 
     def showIcon(): Unit =
-      icon.setColor(Theme.light.background)
+      icon.color = Theme.light.background
       mainPanel.setStyler(closeStyler)
       label.visible = false
 
