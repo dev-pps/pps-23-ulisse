@@ -72,17 +72,28 @@ object JComponent:
 
     mainPanel.reactions += {
       case event.MouseEntered(_, _, _) => icon.color = Theme.light.background
+      case event.MouseExited(_, _, _) =>
+        val color = if (label.visible) Theme.light.overlayElement else Theme.light.background
+        icon.color = color
+      case event.MousePressed(_, _, _, _, _) =>
+        if (label.visible) showIcon() else showIconAndText()
+      case event.MouseReleased(_, _, _, _, _) =>
+        if (label.visible) showIconAndText() else showIcon()
     }
 
     def showIconAndText(): Unit =
       icon.color = Theme.light.overlayElement
-      mainPanel.setStyler(openStyler)
       label.visible = true
+      mainPanel.setStyler(openStyler)
+      mainPanel.repaint()
+      mainPanel.validate()
 
     def showIcon(): Unit =
       icon.color = Theme.light.background
-      mainPanel.setStyler(closeStyler)
       label.visible = false
+      mainPanel.setStyler(closeStyler)
+      mainPanel.repaint()
+      mainPanel.validate()
 
     override def component[T >: Component]: T = mainPanel
 

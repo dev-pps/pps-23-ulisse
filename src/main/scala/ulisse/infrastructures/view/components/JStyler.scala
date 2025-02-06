@@ -1,8 +1,8 @@
 package ulisse.infrastructures.view.components
 
 import java.awt.Color
-import scala.swing.Font as SwingFont
 import scala.swing.Font.Style.Value as StyleFont
+import scala.swing.Font as SwingFont
 
 object JStyler:
   export JStyles._

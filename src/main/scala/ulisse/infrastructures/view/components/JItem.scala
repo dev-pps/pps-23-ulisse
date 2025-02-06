@@ -8,13 +8,13 @@ import scala.swing.{Font as SwingFont, *}
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
 trait JItem(private var styler: JStyler) extends Component:
-  private var currentBackground = styler.background
+  private var currentColor = styler.background
   listenTo(mouse.moves, mouse.clicks)
   opaque = false
   initStyler()
 
   private def initStyler(): Unit =
-    currentBackground = styler.background
+    currentColor = styler.background
     val width  = styler.size.width.getOrElse(size.width)
     val height = styler.size.height.getOrElse(size.height)
     size.setSize(width, height)
@@ -43,19 +43,19 @@ trait JItem(private var styler: JStyler) extends Component:
 
   reactions += {
     case event.MouseEntered(_, _, _) => styler.hoverColor.map(color =>
-        currentBackground = color
+        currentColor = color
         repaint()
       )
     case event.MouseExited(_, _, _) => styler.hoverColor.map(_ =>
-        currentBackground = styler.background
+        currentColor = styler.background
         repaint()
       )
     case event.MousePressed(_, _, _, _, _) => styler.clickColor.map(color =>
-        currentBackground = color
+        currentColor = color
         repaint()
       )
     case event.MouseReleased(_, _, _, _, _) => styler.clickColor.map(_ =>
-        currentBackground = styler.background
+        currentColor = styler.background
         repaint()
       )
   }
@@ -73,7 +73,7 @@ trait JItem(private var styler: JStyler) extends Component:
 
   protected override def paintComponent(g: Graphics2D): Unit =
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-    g.setColor(currentBackground)
+    g.setColor(currentColor)
     g.fillRoundRect(0, 0, size.width, size.height, styler.arc, styler.arc)
     super.paintComponent(g)
 
