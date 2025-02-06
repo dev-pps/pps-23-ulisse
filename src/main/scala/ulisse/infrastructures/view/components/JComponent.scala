@@ -141,19 +141,22 @@ object JComponent:
     private val mainPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
     private val titlePanel = JItem.createFlowPanel(JStyler.transparent)
     private val formPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
-    private val space      = 10
+
+    private val titleSpace  = 20
+    private val fieldsSpace = 15
+    private val buttonSpace = 20
 
     val titleLabel = JItem.label(title, labelStyler)
 
     titlePanel.contents += titleLabel
-    formPanel.contents += titlePanel
 
-    private val fields = infoTextField.flatMap(field => List(Swing.VStrut(space), field.component))
+    private val fields = infoTextField.flatMap(field => List(Swing.VStrut(fieldsSpace), field.component))
     formPanel.contents ++= fields
 
-    mainPanel.contents += Swing.VStrut(space)
+    mainPanel.contents += titlePanel
+    mainPanel.contents += Swing.VStrut(titleSpace)
     mainPanel.contents += formPanel
-    mainPanel.contents += Swing.VStrut(space)
+    mainPanel.contents += Swing.VStrut(buttonSpace)
 
     override def component[T >: Component]: T = mainPanel
 

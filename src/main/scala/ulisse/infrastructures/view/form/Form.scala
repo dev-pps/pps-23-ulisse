@@ -4,7 +4,7 @@ import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.{JComponent, JItem, JStyler}
 
 import scala.swing.Font.Style
-import scala.swing.{Component, Orientation, Swing}
+import scala.swing.{Component, Orientation}
 
 trait Form:
   def component[T >: Component]: T
@@ -38,16 +38,16 @@ object Form:
   private case class BaseForm(title: String, fields: JComponent.JInfoTextField*) extends Form:
     private val mainPanel: JItem.JBoxPanelItem     = JItem.createBoxPanel(Orientation.Vertical, formStyler)
     private val insertForm: JComponent.JInsertForm = JComponent.createInsertForm(title, fields: _*)
-    val buttonPanel: JItem.JFlowPanelItem          = JItem.createFlowPanel(JStyler.transparent)
+    private val space                              = 10
+
+    val buttonPanel: JItem.JFlowPanelItem = JItem.createFlowPanel(JStyler.transparent)
 
     insertForm.titleLabel.setStyler(insertForm.titleLabel.getStyler.copy(font = titleFont))
-    private val space = 10
 
     buttonPanel.hGap = space
 
     mainPanel.contents += insertForm.component
     mainPanel.contents += buttonPanel
-    mainPanel.contents += Swing.VStrut(space)
 
     override def component[T >: Component]: T = mainPanel
 
