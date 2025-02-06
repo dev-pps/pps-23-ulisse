@@ -1,26 +1,10 @@
 package ulisse.infrastructures.view.components
 
-import com.formdev.flatlaf.extras.FlatSVGIcon
-import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ComponentMixins.Selectable
-import ulisse.infrastructures.view.components.JStyler
 
-import java.awt.{Color, ComponentOrientation}
-import javax.imageio.ImageIO
-import scala.swing.{
-  BoxPanel,
-  Component,
-  Graphics2D,
-  Label,
-  Orientation,
-  Panel,
-  RadioButton,
-  SequentialContainer,
-  Swing,
-  UIElement
-}
+import scala.swing.{BoxPanel, Component, Label, Orientation, SequentialContainer}
 
 object Cards:
   trait ImageCard extends Component with SequentialContainer.Wrapper with Selectable:

@@ -21,11 +21,13 @@ import scala.swing.{BorderPanel, BoxPanel, Component, Dimension, Label, Orientat
 
 final case class Dashboard(root: UpdatableContainer) extends BorderPanel:
   preferredSize = new Dimension(600, 400)
-  val dashboardContent = new JLayeredPane()
-  val centerComponent  = StationSettings().stationEditorView
-  val sideMenu         = SideMenu()
-  sideMenu.background = Color.GREEN
-  dashboardContent.add(centerComponent.peer)
+  private val dashboardContent   = new JLayeredPane()
+  private val defaultLayerLayout = StationSettings().stationEditorView
+
+  private val sideMenu = SideMenu()
+  sideMenu.background = Color.decode("#adc4db")
+
+  dashboardContent.add(defaultLayerLayout.peer)
   dashboardContent.add(sideMenu.peer, JLayeredPane.PALETTE_LAYER)
 
   layout(Component.wrap(dashboardContent)) = BorderPanel.Position.Center
@@ -35,10 +37,34 @@ final case class Dashboard(root: UpdatableContainer) extends BorderPanel:
       val bounds = dashboardContent.getBounds()
       val width  = bounds.getWidth.toInt
       val height = bounds.getHeight.toInt
-      println(sideMenu.peer.getLayout.minimumLayoutSize(sideMenu.peer))
-      println(sideMenu.peer.getLayout.preferredLayoutSize(sideMenu.peer))
       sideMenu.peer.setBounds(0, 0, sideMenu.preferredSize.width, height)
-      centerComponent.peer.setBounds(0, 0, width, height)
+      defaultLayerLayout.peer.setBounds(0, 0, width, height)
       repaint()
     }
   })
+
+//GLASS PANE CONCEPT
+//final case class Dashboard(root: UpdatableContainer) extends BorderPanel:
+//  preferredSize = new Dimension(600, 400)
+//  val layeredPane = new JLayeredPane()
+//  val defaultComponent = StationSettings().stationEditorView
+//  val paletteComponent = BorderPanel().opaque(false)
+//
+//  val sideMenu = SideMenu()
+//  sideMenu.background = Color.decode("#adc4db")
+//  paletteComponent.layout(sideMenu) = BorderPanel.Position.West
+//  layeredPane.add(defaultComponent.peer)
+//  layeredPane.add(sideMenu.peer, JLayeredPane.PALETTE_LAYER)
+//
+//  layout(Component.wrap(layeredPane)) = BorderPanel.Position.Center
+//
+//  peer.addComponentListener(new java.awt.event.ComponentAdapter() {
+//    override def componentResized(e: java.awt.event.ComponentEvent): Unit = {
+//      val bounds = layeredPane.getBounds()
+//      val width = bounds.getWidth.toInt
+//      val height = bounds.getHeight.toInt
+//      defaultComponent.peer.setBounds(0, 0, width, height)
+//      paletteComponent.peer.setBounds(0, 0, width, height)
+//      repaint()
+//    }
+//  })

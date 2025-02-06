@@ -1,113 +1,98 @@
 package ulisse.infrastructures.view.dashboard
 
-import net.miginfocom.swing.MigLayout
 import ulisse.infrastructures.view.common.Theme
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
-import ulisse.infrastructures.view.components.{JComponent, JPanel, JStyler, SelectableGroup}
+import ulisse.infrastructures.view.components.{JStyler, SelectableGroup}
 
-import java.awt.{Color, ComponentOrientation}
-import javax.swing.BoxLayout
-import scala.swing.event.MouseClicked
-import scala.swing.{
-  AbstractButton,
-  BorderPanel,
-  BoxPanel,
-  ButtonGroup,
-  Component,
-  Dimension,
-  Label,
-  Orientation,
-  Panel,
-  Reactor,
-  Swing,
-  ToggleButton
-}
+import java.awt.{Color, Insets}
+import javax.swing.border.EmptyBorder
+import scala.swing.{BoxPanel, Component, Dimension, Label, Orientation, Reactor, Swing}
 
 trait SideMenu extends Component
 object SideMenu:
   def apply(): SideMenu = SideMenuImpl()
   private case class SideMenuImpl() extends BoxPanel(Orientation.Vertical) with SideMenu with Reactor:
 
-////    private def configure[C <: Component](component: C): Component =
-////      component.opaque(true)//.makeSelectable().addToGroup(buttonGroup)
-
-    contents += Swing.VStrut(10)
-    private def position[C <: Component](component: C): Unit =
-      contents += component
-      contents += Swing.VStrut(10)
-
-    val menuCallback: () => Unit = () => {
-      menuContent.foreach(_.toggleLabel())
-      header.image.rotation = header.image.rotation + 180
-      revalidate()
-      updateSize()
-    }
-
+    private val layout_bounds        = Insets(16, 16, 16, 16)
+    private val header_spacing       = 24
+    private val menu_item_spacing    = 24
+    private val menu_item_height     = 50
+    private val menu_item_image_size = 16
     private val menuCardStyle = JStyler.rectPaletteStyler(
-      JStyler.roundRect(10),
+      JStyler.roundRect(25),
       JStyler.palette(Theme.light.element, Theme.light.hover, Theme.light.forwardClick)
     )
 
-    def updateSize(): Unit =
-      val maxContentWidth = menuContent.foldLeft(0)((m, c) => math.max(m, c.realPreferredSize().width))
+    private val header = buildHeader()
 
-      menuContent.foreach: content =>
-        content.fixedSize(maxContentWidth, content.preferredSize.height)
-
-      this.peer.setPreferredSize(new Dimension(20 + maxContentWidth, this.peer.getHeight))
-      this.peer.setBounds(0, 0, 20 + maxContentWidth, this.peer.getHeight)
-      revalidate()
-      repaint()
-
-    private val headerLeftContent = ImageCard.horizontal(
-      ImagePanel.createImagePanel("icon/logo_circular.png").fixedSize(50, 50),
-      Label("Ulisse").alignLeft()
-    )
-    private val headerRightContent =
-      ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(25, 25).styler(
-        menuCardStyle.copy(palette = menuCardStyle.palette.copy(background = JStyler.transparentColor))
-      ).genericClickReaction(menuCallback)
-
-    private val header = ImageCard.horizontalWithConfiguration(
-      ComponentWithConfiguration(headerRightContent, ComponentConfiguration(Alignment.Center)),
-      headerLeftContent
-    ).reverse()
-
-    private val menuCards: List[JImageCard] = List[JImageCard](
-      JImageCard.horizontal(
-        ImagePanel.createSVGPanel("icon/simulation.svg", Color.BLACK).fixedSize(50, 50),
-        Label("Simulation").alignLeft(),
-        menuCardStyle
-      ),
-      JImageCard.horizontal(
-        ImagePanel.createSVGPanel("icon/map.svg", Color.BLACK).fixedSize(50, 50),
-        Label("Editors").alignLeft(),
-        menuCardStyle
-      ),
-      JImageCard.horizontal(
-        ImagePanel.createSVGPanel("icon/train.svg", Color.BLACK).fixedSize(50, 50),
-        Label("Trains").alignLeft(),
-        menuCardStyle
-      ),
-      JImageCard.horizontal(
-        ImagePanel.createSVGPanel("icon/settings.svg", Color.BLACK).fixedSize(50, 50),
-        Label("Settings").alignLeft(),
-        menuCardStyle
-      )
+    private val menuCards: List[JImageCard] = List(
+      buildMenuCard("icon/simulation.svg", "Simulation"),
+      buildMenuCard("icon/map.svg", "Editors"),
+      buildMenuCard("icon/train.svg", "Trains"),
+      buildMenuCard("icon/settings.svg", "Settings")
     )
 
     private val buttonGroup: SelectableGroup = SelectableGroup(menuCards*)
     private val menuContent                  = header +: menuCards
 
-    position(header)
-    private val (topMenu, bottomMenu) = menuCards.splitAt(3)
-    topMenu.foreach(position)
-    position(Swing.VGlue)
-    bottomMenu.foreach(position)
+    private def menuCallback(): Unit =
+      menuContent.foreach(_.toggleLabel())
+      header.image.rotation = header.image.rotation + 180
+      revalidate()
+      updateSize()
 
-    updateSize()
+    private def build_layout(): Unit =
+      def position[C <: Component](component: C): Unit =
+        contents += component
+        contents += Swing.VStrut(menu_item_spacing)
+      println(s"Building layout $layout_bounds")
+      contents += Swing.VStrut(layout_bounds.top)
+      contents += header
+      contents += Swing.VStrut(header_spacing)
+      val (topMenu, other)       = menuCards.splitAt(3)
+      val (bottomMenu, lastItem) = other.splitAt(other.length - 1)
+      topMenu.foreach(position)
+      position(Swing.VGlue)
+      bottomMenu.foreach(position)
+      lastItem.foreach(position)
+      contents += Swing.VStrut(layout_bounds.bottom - menu_item_spacing)
+      updateSize()
+
+    private def buildHeader(): ImageCard =
+      val headerLeftContent = ImageCard.horizontal(
+        ImagePanel.createImagePanel("icon/logo_circular.png").fixedSize(50, 50),
+        Label("Ulisse").alignLeft()
+      )
+      val headerRightContent =
+        ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(25, 25).styler(
+          menuCardStyle.copy(palette = menuCardStyle.palette.copy(background = JStyler.transparentColor))
+        ).genericClickReaction(menuCallback)
+
+      ImageCard.horizontalWithConfiguration(
+        ComponentWithConfiguration(headerRightContent, ComponentConfiguration(Alignment.Center)),
+        headerLeftContent
+      ).reverse()
+
+    private def buildMenuCard(imagePath: String, label: String): JImageCard =
+      JImageCard.horizontal(
+        ImagePanel.createSVGPanel(imagePath, Color.BLACK).fixedSize(menu_item_image_size, menu_item_image_size),
+        Label(label).alignLeft(),
+        menuCardStyle
+      )
+
+    private def updateSize(): Unit =
+      val maxContentWidth = menuContent.foldLeft(0)((m, c) => math.max(m, c.realPreferredSize().width))
+      menuContent.foreach: content =>
+        content.fixedSize(maxContentWidth, menu_item_height)
+      preferredSize = new Dimension(layout_bounds.right + layout_bounds.left + maxContentWidth, this.peer.getHeight)
+      this.peer.setBounds(0, 0, preferredSize.width, preferredSize.height)
+      revalidate()
+      repaint()
+
+    build_layout()
+
 extension (imageCard: ImageCard)
   def realPreferredSize(): Dimension =
     new Dimension(50 + (if imageCard.content.visible then imageCard.content.preferredSize.width else 0), 50)
