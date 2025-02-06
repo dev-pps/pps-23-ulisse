@@ -10,8 +10,9 @@ trait Form:
 
 object Form:
 
-  def createRoute(): RouteForm     = RouteForm()
-  def createStation(): StationForm = StationForm()
+  def createRoute(): RouteForm       = RouteForm()
+  def createStation(): StationForm   = StationForm()
+  def createSchedule(): ScheduleForm = ScheduleForm()
 
   private val elementStyler =
     JStyler.rectPaletteStyler(JStyler.roundRect(10), JStyler.backgroundPalette(Theme.light.element))
@@ -23,9 +24,12 @@ object Form:
     private val insertForm: JComponent.JInsertForm = JComponent.createInsertForm(title, fields: _*)
     val buttonPanel: JItem.JFlowPanelItem          = JItem.createFlowPanel(JStyler.transparent)
 
-    val space = 10
+    private val space = 10
+
+    buttonPanel.hGap = space
 
     mainPanel.contents += insertForm.component
+    mainPanel.contents += Swing.VStrut(space)
     mainPanel.contents += buttonPanel
     mainPanel.contents += Swing.VStrut(space)
 
@@ -42,7 +46,6 @@ object Form:
     private val saveButton   = JItem.button("Save", buttonStyler)
     private val deleteButton = JItem.button("Delete", buttonStyler)
 
-    buttonPanel.hGap = form.space
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
 
@@ -59,7 +62,21 @@ object Form:
     private val saveButton   = JItem.button("Save", buttonStyler)
     private val deleteButton = JItem.button("Delete", buttonStyler)
 
-    buttonPanel.hGap = space
+    buttonPanel.contents += saveButton
+    buttonPanel.contents += deleteButton
+
+    export form._
+
+  case class ScheduleForm() extends Form:
+    private val field  = JComponent.createInfoTextField("Field")
+    private val field1 = JComponent.createInfoTextField("Field1")
+    private val field2 = JComponent.createInfoTextField("Field2")
+
+    private val form = BaseForm("Schedule", field, field1, field2)
+
+    private val saveButton   = JItem.button("Save", buttonStyler)
+    private val deleteButton = JItem.button("Delete", buttonStyler)
+
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
 

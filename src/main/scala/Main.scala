@@ -7,11 +7,10 @@ import ulisse.entities.Coordinates.Grid
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.AppFrame
-import ulisse.infrastructures.view.components.{JComponent, JStyler}
-import ulisse.infrastructures.view.form.Form
+import ulisse.infrastructures.view.components.JComponent
+import ulisse.infrastructures.view.form.{CentralController, Form}
 import ulisse.infrastructures.view.station.{StationEditorController, StationEditorView}
 
-import java.awt.Color
 import java.util.concurrent.LinkedBlockingQueue
 import scala.swing.*
 
@@ -72,20 +71,12 @@ object StationTypes:
   def top: Frame = new MainFrame {
     title = "Scala Swing GUI"
 
-    val station  = JComponent.createIconLabel("icons/station.svg", "station")
-    val route    = JComponent.createIconLabel("icons/route.svg", "route")
-    val schedule = JComponent.createIconLabel("icons/train.svg", "schedule")
-    val tabPane  = JComponent.createTabbedPane(station, route, schedule)
+    val mapMenu = CentralController.createMap()
 
-    tabPane.paneOf(station).contents += Form.createStation().component
-    tabPane.paneOf(route).contents += Form.createRoute().component
-
-    tabPane.paneOf(schedule).contents += new Label("Schedule")
-
-    listenTo(tabPane.component.mouse.clicks)
+    listenTo(mapMenu.component.mouse.clicks)
     // Creazione di un FlowPanel
     val northPanel = new FlowPanel() {
-      contents += tabPane.component
+      contents += mapMenu.component
     }
 
     // Creazione del BorderPanel
