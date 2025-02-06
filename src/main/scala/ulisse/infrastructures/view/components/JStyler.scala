@@ -54,7 +54,7 @@ object JStyler:
     val defaultColor: Color         = Color.white
     val withOutColor: Option[Color] = Option.empty
 
-    val defaultStroke: Int = 1
+    val defaultStroke: Int = 0
 
     val defaultNameFont: String     = "Lucida Grande"
     val defaultStyleFont: StyleFont = SwingFont.Plain
@@ -82,8 +82,8 @@ object JStyler:
     def createHeightSize(height: Int): Size       = Dimension2D(defaultSizeRect.width, Some(height))
 
     def createPadding(width: Int, height: Int): Padding = Dimension2D(width, height)
-    def widthPadding(width: Int): Padding               = Dimension2D(width, defaultPaddingRect.height)
-    def heightPadding(height: Int): Padding             = Dimension2D(defaultPaddingRect.width, height)
+    def widthPadding(width: Int): Padding               = createPadding(width, defaultPaddingRect.height)
+    def heightPadding(height: Int): Padding             = createPadding(defaultPaddingRect.width, height)
 
     def rect(size: Size, padding: Padding, arc: Int): Rect = Rect(size, padding, arc)
 

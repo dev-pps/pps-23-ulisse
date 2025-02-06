@@ -21,27 +21,26 @@ object JComponent:
   def createToggleIconButton(onIconPath: String, offIconPath: String): JToggleIconButton =
     JToggleIconButton(onIconPath, offIconPath)
 
-  private val labelStyler = JStyler.paletteStyler(JStyler.transparentPalette)
   private val elementStyler =
     JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.overlayElement))
 
   case class JInfoTextField(text: String) extends JComponent:
     private val colum = 15
 
-    private val styler =
+    private val textFieldStyler =
       JStyler.rectPaletteStyler(
         JStyler.defaultRect.copy(padding = JStyler.createPadding(10, 5), arc = 10),
         JStyler.backgroundPalette(Theme.light.background.withAlpha(50))
       )
 
-    private val mainPanel = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
+    private val mainPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
+    private val labelPanel = JItem.createFlowPanel(JStyler.transparent)
+
     private val label     = JItem.label(text, JStyler.transparent)
-    private val textField = JItem.textField(colum, styler)
+    private val textField = JItem.textField(colum, textFieldStyler)
 
-    private val northPanel = JItem.createFlowPanel(JStyler.transparent)
-    northPanel.contents += label
-
-    mainPanel.contents += northPanel
+    labelPanel.contents += label
+    mainPanel.contents += labelPanel
     mainPanel.contents += textField
 
     override def component[T >: Component]: T = mainPanel
@@ -116,8 +115,7 @@ object JComponent:
     private val pagesPanel = JItem.createFlowPanel(JStyler.transparent)
 
     private val navBar = createNavbar(iconLabels: _*)
-    private val pages: Map[JIconLabel, JItem.JFlowPanelItem] =
-      iconLabels.map(iconLabel => (iconLabel, JItem.createFlowPanel(JStyler.transparent))).toMap
+    private val pages  = iconLabels.map(iconLabel => (iconLabel, JItem.createFlowPanel(JStyler.transparent))).toMap
 
     pages.values.foreach(_.visible = false)
     pagesPanel.contents ++= pages.values
@@ -138,25 +136,22 @@ object JComponent:
     override def component[T >: Component]: T           = mainPanel
 
   case class JInsertForm(title: String, infoTextField: JInfoTextField*) extends JComponent:
-    private val mainPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
-    private val titlePanel = JItem.createFlowPanel(JStyler.transparent)
-    private val formPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
+    private val mainPanel = JItem.createBorderPanel(JStyler.transparent)
+    private val formPanel = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
+    val titleLabel        = JItem.label(title, JStyler.transparent)
 
-    private val titleSpace  = 20
+    private val titleSpace  = 5
     private val fieldsSpace = 15
-    private val buttonSpace = 20
+    private val buttonSpace = 5
 
-    val titleLabel = JItem.label(title, labelStyler)
+    private val fields = infoTextField.flatMap(field => List(field.component, Swing.VStrut(fieldsSpace)))
 
-    titlePanel.contents += titleLabel
-
-    private val fields = infoTextField.flatMap(field => List(Swing.VStrut(fieldsSpace), field.component))
+    formPanel.contents += Swing.VStrut(titleSpace)
     formPanel.contents ++= fields
+    formPanel.contents += Swing.VStrut(buttonSpace)
 
-    mainPanel.contents += titlePanel
-    mainPanel.contents += Swing.VStrut(titleSpace)
-    mainPanel.contents += formPanel
-    mainPanel.contents += Swing.VStrut(buttonSpace)
+    mainPanel.layout(titleLabel) = BorderPanel.Position.North
+    mainPanel.layout(formPanel) = BorderPanel.Position.Center
 
     override def component[T >: Component]: T = mainPanel
 
