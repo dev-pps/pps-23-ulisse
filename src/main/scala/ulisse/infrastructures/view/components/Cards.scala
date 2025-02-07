@@ -89,15 +89,24 @@ object Cards:
         styler
       )
 
+  private class BaseJImageCard(
+      image: ImagePanel,
+      imageConfiguration: ComponentConfiguration,
+      content: Component,
+      orientation: Orientation.Value,
+      styler: JStyler.JStyler
+  ) extends BoxPanel(orientation) with JItem(styler):
+    listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
+    contents += image.align(imageConfiguration.alignment); contents += content
+
   private final case class JImageCardImpl(
       image: ImagePanel,
       imageConfiguration: ComponentConfiguration,
       content: Component,
       orientation: Orientation.Value,
       styler: JStyler.JStyler
-  ) extends BoxPanel(orientation) with JImageCard with JItem(styler):
-    listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
-    contents += image.align(imageConfiguration.alignment); contents += content
+  ) extends BaseJImageCard(image, imageConfiguration, content, orientation, styler)
+      with JImageCard
 
   private final case class SelectableJImageCardImpl(
       image: ImagePanel,
@@ -105,10 +114,8 @@ object Cards:
       content: Component,
       orientation: Orientation.Value,
       styler: JStyler.JStyler
-  ) extends BoxPanel(orientation) with SelectableJImageCard with JItem(styler):
-    listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
-    contents += image.align(imageConfiguration.alignment);
-    contents += content
+  ) extends BaseJImageCard(image, imageConfiguration, content, orientation, styler)
+      with SelectableJImageCard:
     private val selectedStyler = styler.copy(palette =
       styler.palette.copy(background = styler.palette.clickColor.getOrElse(JStyler.transparentColor))
     )
