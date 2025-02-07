@@ -37,7 +37,7 @@ object SideMenu:
 
     private val header = buildHeader()
 
-    private val menuCards: List[JImageCard] = List(
+    private val menuCards: List[SelectableJImageCard] = List(
       buildMenuCard("icon/simulation.svg", "Simulation").genericClickReaction(() =>
         uc.update(StationSettings().stationEditorView)
       ),
@@ -82,9 +82,7 @@ object SideMenu:
         ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(
           openCloseButtonSize,
           openCloseButtonSize
-        ).styler(
-          menuCardStyle.copy(palette = menuCardStyle.palette.copy(background = JStyler.transparentColor))
-        ).genericClickReaction(menuCallback)
+        ).styler(menuCardStyle).genericClickReaction(menuCallback)
 
       JImageCard.horizontalWithConfiguration(
         ComponentWithConfiguration(headerRightContent, ComponentConfiguration(Alignment.Center)),
@@ -92,8 +90,8 @@ object SideMenu:
         JStyler.transparent
       ).reverse()
 
-    private def buildMenuCard(imagePath: String, label: String): JImageCard =
-      JImageCard.horizontal(
+    private def buildMenuCard(imagePath: String, label: String): SelectableJImageCard =
+      SelectableJImageCard.horizontal(
         ImagePanel.createSVGPanel(imagePath, Color.BLACK).fixedSize(menu_item_height, menu_item_height),
         Label(label).alignLeft(),
         menuCardStyle
