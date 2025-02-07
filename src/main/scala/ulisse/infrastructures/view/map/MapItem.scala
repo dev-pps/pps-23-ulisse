@@ -4,13 +4,14 @@ import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.components.JImages.*
 import ulisse.infrastructures.view.components.JStyler
 import ulisse.infrastructures.view.components.JStyler.JStyles
+import ulisse.infrastructures.view.map.ViewObservers.ViewObservable
 
 import java.awt
 import java.awt.Color
 import java.awt.image.ImageObserver
 import scala.swing.{Graphics2D, Point}
 
-trait MapItem:
+trait MapItem extends ViewObservable[Point]:
   def center: Position
   def dimension: Dimension
   def hasCollided(point: Point): Boolean
@@ -26,19 +27,20 @@ object MapItem:
     SingleItem(imagePath, JStyler.Dimension2D(x, y), defaultSize)
 
   sealed case class SingleItem(imagePath: String, pos: Position, dim: Dimension) extends MapItem:
-    private val image = JImage.createWithPosition(imagePath, pos, dim)
+    private val image          = JImage.createWithPosition(imagePath, pos, dim)
+    private val itemObservable = ViewObservers.createObservable[Point]
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var currentColorSilhouette: Color = JStyler.transparentColor
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var isSilhouetteShown: Boolean = false
 
-    export image._
+    export image._, itemObservable._
 
     override def hasCollided(point: Point): Boolean = point.hasCollided(image)
 
     override def drawItem(g: Graphics2D, observer: ImageObserver): Unit =
-      if (isSilhouetteShown) g.drawSilhouette(image, 1.2f, currentColorSilhouette, observer)
+      if (isSilhouetteShown) g.drawSilhouette(image, 1.4f, currentColorSilhouette, observer)
       g.drawImage(image, observer)
 
     override def onHover(mousePoint: Point): Unit =
@@ -52,6 +54,7 @@ object MapItem:
       if hasCollided(mousePoint) then
         isSilhouetteShown = true
         currentColorSilhouette = Theme.light.forwardClick
+        itemObservable.notifyOnClick(mousePoint)
 
     override def onRelease(mousePoint: Point): Unit =
       if hasCollided(mousePoint) then isSilhouetteShown = false

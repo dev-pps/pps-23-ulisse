@@ -2,7 +2,6 @@ package ulisse.infrastructures.view.map
 
 import ulisse.entities.Coordinates
 import ulisse.entities.Coordinates.UIPoint
-import ulisse.infrastructures.view.map.ViewObservers.ViewObserver
 
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
@@ -16,31 +15,31 @@ object MapPanel:
   case class MapPanel() extends Panel:
     opaque = false
 
-    private val items         = MapItemsCollection()
-    private val mapObservable = ViewObservers.createObservable[Point]
+    private val itemCollection = MapItemsCollection()
+    private val mapObservable  = ViewObservers.createObservable[Point]
 
-    export mapObservable._
+    export mapObservable._, itemCollection.{attach as attachItem, detach as detachItem}
 
     listenTo(mouse.clicks, mouse.moves)
     reactions += {
       case event.MouseMoved(_, point, _) =>
         mapObservable.notifyOnHover(point)
-        items.onHover(point)
+        itemCollection.onHover(point)
         repaint()
       case event.MousePressed(_, point, _, _, _) =>
         mapObservable.notifyOnClick(point)
-        items.onClick(point)
+        itemCollection.onClick(point)
         repaint()
       case event.MouseReleased(_, point, _, _, _) =>
         mapObservable.notifyOnRelease(point)
-        items.onRelease(point);
+        itemCollection.onRelease(point);
         repaint()
     }
 
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-      items.draw(g, peer)
+      itemCollection.draw(g, peer)
 
 //      points.foreach((p1, p2) =>
 //        g.setColor(java.awt.Color.BLACK)

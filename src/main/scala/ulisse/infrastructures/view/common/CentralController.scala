@@ -6,6 +6,8 @@ import scala.swing.Component
 
 trait CentralController:
   def stationForm: Form
+  def routeForm: Form
+  def scheduleForm: Form
   def component[T >: Component]: T
 
 object CentralController:
@@ -30,4 +32,6 @@ object CentralController:
 
     export menu._
 
-    override def stationForm: Form = menu.pageOf(station)
+    override def stationForm: Form  = menu.pageOf(station)
+    override def routeForm: Form    = menu.pageOf(route)
+    override def scheduleForm: Form = menu.pageOf(schedule)

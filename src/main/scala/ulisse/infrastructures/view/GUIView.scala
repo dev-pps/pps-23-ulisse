@@ -29,6 +29,7 @@ object GUIView:
     private val mapPanel      = MapPanel.empty()
 
     mapPanel.attach(mapController.stationForm.mapObserver)
+    mapPanel.attachItem(mapController.routeForm.mapObserver)
 
     glassPane.opaque = false
     glassPane.visible = true
