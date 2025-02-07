@@ -38,12 +38,12 @@ object SideMenu:
     private val header = buildHeader()
 
     private val menuCards: List[SelectableJImageCard] = List(
-      buildMenuCard("icon/simulation.svg", "Simulation").genericClickReaction(() =>
+      buildMenuCard("icons/simulation.svg", "Simulation").genericClickReaction(() =>
         uc.update(StationSettings().stationEditorView)
       ),
-      buildMenuCard("icon/map.svg", "Editors").genericClickReaction(() => uc.update(EditorsView())),
-      buildMenuCard("icon/train.svg", "Trains").genericClickReaction(() => uc.update(Menu(uc))),
-      buildMenuCard("icon/settings.svg", "Settings")
+      buildMenuCard("icons/map.svg", "Editors").genericClickReaction(() => uc.update(EditorsView())),
+      buildMenuCard("icons/train.svg", "Trains").genericClickReaction(() => uc.update(Menu(uc))),
+      buildMenuCard("icons/settings.svg", "Settings")
     )
 
     private val buttonGroup: SelectableGroup = SelectableGroup(menuCards*)
@@ -74,12 +74,12 @@ object SideMenu:
 
     private def buildHeader(): JImageCard =
       val headerLeftContent = JImageCard.horizontal(
-        ImagePanel.createImagePanel("icon/logo_circular.png").fixedSize(logo_size, logo_size),
+        ImagePanel.createImagePanel("icons/logo_circular.png").fixedSize(logo_size, logo_size),
         Label("Ulisse").alignLeft(),
         JStyler.transparent.copy(rect = JStyler.defaultRect.copy(padding = JStyler.createPadding(10, 10)))
       )
       val headerRightContent =
-        ImagePanel.createSVGPanel("icon/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(
+        ImagePanel.createSVGPanel("icons/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(
           openCloseButtonSize,
           openCloseButtonSize
         ).styler(menuCardStyle).genericClickReaction(menuCallback)
