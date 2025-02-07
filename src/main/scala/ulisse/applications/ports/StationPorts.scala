@@ -24,31 +24,31 @@ object StationPorts:
     */
   trait Input[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
 
-    private type SM = CheckedStationManager[N, C, S]
-    private type E  = NonEmptyChain[CheckedStationManager.Error]
+    type SM = CheckedStationManager[N, C, S]
+    type E  = NonEmptyChain[CheckedStationManager.Error]
 
-    /** Retrieves the current station map.
+    /** Retrieves the current station manager.
       *
       * @return
       *   The `StationMap` containing the stations.
       */
-    def stationMap: Future[SM]
+    def stationManager: Future[SM]
 
-    /** Adds a station to the station map.
+    /** Adds a station to the station manager.
       *
       * @param station
       *   The station to be added.
       * @return
-      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
+      *   Either the updated `StationManager` or a `NonEmptyChain` of `Errors` indicating the issues.
       */
     def addStation(station: S): Future[Either[E, SM]]
 
-    /** Removes a station from the station map.
+    /** Removes a station from the station manager.
       *
       * @param station
       *   The station to be removed.
       * @return
-      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
+      *   Either the updated `StationManager` or a `NonEmptyChain` of `Errors` indicating the issues.
       */
     def removeStation(station: S): Future[Either[E, SM]]
 

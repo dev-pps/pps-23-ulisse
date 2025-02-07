@@ -25,8 +25,8 @@ object Coordinates:
   /** A generic trait representing a 2D coordinate point in space.
     *
     * @tparam T
-    *   A numeric type that represents the coordinate values (e.g., `Int`, `Double`, etc.). Must have a `Numeric` type
-    *   class instance available.
+    *   A numeric type that represents the coordinate values (e.g., `Int`, `Double`). Must have a `Numeric` type class
+    *   instance available.
     * @constructor
     *   Creates a new coordinate with the specified x and y values.
     * @param x
@@ -88,7 +88,6 @@ object Coordinates:
   final case class Geo private[Coordinates] (latitude: Double, longitude: Double)
       extends Coordinate[Double](latitude, longitude)
 
-  /** Factory for [Coordinate] instances. */
   /** A 2D grid coordinate point.
     *
     * Represents a grid location defined by row and column values.

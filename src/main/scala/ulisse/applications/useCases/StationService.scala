@@ -1,6 +1,5 @@
 package ulisse.applications.useCases
 
-import cats.data.NonEmptyChain
 import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.applications.ports.StationPorts
@@ -14,10 +13,8 @@ final case class StationService[N: Numeric, C <: Coordinate[N], S <: Station[N, 
     eventQueue: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]],
     outputPort: StationPorts.Output
 ) extends StationPorts.Input[N, C, S]:
-  type SM = CheckedStationManager[N, C, S]
-  type E  = NonEmptyChain[CheckedStationManager.Error]
 
-  override def stationMap: Future[SM] =
+  override def stationManager: Future[SM] =
     val p = Promise[SM]()
     eventQueue.add((state: AppState[N, C, S]) => { p.success(state.stationMap); state })
     p.future
@@ -37,6 +34,7 @@ final case class StationService[N: Numeric, C <: Coordinate[N], S <: Station[N, 
       updateState(p, state, updatedMap)
     })
     p.future
+
   override def findStationAt(coordinate: C): Future[Option[S]] =
     val p = Promise[Option[S]]()
     eventQueue.add((state: AppState[N, C, S]) => {

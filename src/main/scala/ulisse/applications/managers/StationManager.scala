@@ -8,9 +8,9 @@ import ulisse.entities.station.Station
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.validateUniqueItems
 
-/** Defines a map of stations.
+/** Defines a manager for stations.
   *
-  * A `StationMap` is a collection of `Station` instances.
+  * A `StationManager` is a collection of `Station` instances.
   *
   * @tparam N
   *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
@@ -25,7 +25,7 @@ trait StationManager[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
   /** The return type of the methods for adding or removing stations. */
   type R
 
-  /** The collection of stations in the map. */
+  /** The collection of stations in the manager. */
   val stations: StationMapType
 
   /** Transforms the stations using a function `f`.
@@ -50,21 +50,21 @@ trait StationManager[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
     case that: StationManager[_, _, _] => that.stations == stations
     case _                             => false
 
-  /** Adds a station to the map.
+  /** Adds a station to the manager.
     *
     * @param station
     *   The station to add.
     * @return
-    *   Either a new `StationMap` with the added station or an `Error` indicating the issue.
+    *   R type
     */
   def addStation(station: S): R
 
-  /** Removes a station from the map.
+  /** Removes a station from the manager.
     *
     * @param station
     *   The station to remove.
     * @return
-    *   Either a new `StationMap` without the removed station or an `Error` indicating the issue.
+    *   R type
     */
   def removeStation(station: S): R
 
@@ -79,39 +79,41 @@ trait StationManager[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
 
 /** Factory for [[StationManager]] instances. */
 object StationManager:
-  /** Creates a `StationMap` instance.
+  /** Creates a `StationManager` instance.
     *
     * @tparam N
     *   The numeric type representing the coordinates of the stations (e.g., `Int`, `Double`).
     * @tparam C
     *   A type that extends `Coordinate[N]`, representing the station's location.
     * @return
-    *   A `StationMap` instance.
+    *   A `StationManager` instance.
     */
   def apply[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](stations: S*): StationManager[N, C, S] =
     BaseStationManager(stations.toList)
 
-  /** Creates a `CheckedStationMap` instance, which is a `StationMap` with validation for unique names and locations.
+  /** Creates a `CheckedStationManager` instance, which is a `StationManager` with validation for unique names and
+    * locations.
     *
     * @tparam N
     *   The numeric type representing the coordinates of the stations (e.g., `Int`, `Double`).
     * @tparam C
     *   A type that extends `Coordinate[N]`, representing the station's location.
     * @return
-    *   An empty `CheckedStationMap` instance.
+    *   An empty `CheckedStationManager` instance.
     */
-  def createCheckedStationMap[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](): CheckedStationManager[N, C, S] =
+  def createCheckedStationManager[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]()
+      : CheckedStationManager[N, C, S] =
     CheckedStationManager(List.empty)
 
-  /** A case class that implements the `StationMap` trait with validation for unique station names and locations.
+  /** A case class that implements the `StationManager` trait with validation for unique station names and locations.
     *
     * @tparam N
     *   The numeric type representing the coordinates of the stations (e.g., `Int`, `Double`).
     * @tparam C
     *   A type that extends `Coordinate[N]`, representing the station's location.
     * @param stations
-    *   The list of stations in the map. **Note**: Instances of `Grid` can only be created through the
-    *   `Coordinates.createGrid` method to ensure validation.
+    *   The list of stations in the map. **Note**: Instances of `CheckedStationManager` can only be created through the
+    *   `StationManager.createCheckedStationManager` method to ensure validation.
     */
   final case class CheckedStationManager[N: Numeric, C <: Coordinate[N], S <: Station[N, C]] private[StationManager] (
       stations: List[S]

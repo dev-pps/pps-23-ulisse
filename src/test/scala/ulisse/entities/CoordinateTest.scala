@@ -7,7 +7,7 @@ import ulisse.entities.Coordinates.*
 
 class CoordinateTest extends AnyWordSpec with Matchers:
 
-  "A Location" when:
+  "A Coordinate" when:
     "is a Geo" should:
       "be created if latitude is between -90 and 90 and longitude between -180 and 180" in:
         Coordinate.createGeo(0.0, 0.0).map(location =>

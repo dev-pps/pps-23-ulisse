@@ -14,20 +14,20 @@ import scala.concurrent.{ExecutionContext, Future}
 object StationEditorAdapter:
 
   enum Error extends BaseError:
-    case InvalidRowFormat, InvalidColumnFormat, InvalidNumberOfTrackFormat
+    case InvalidFirstCoordinateComponentFormat, InvalidSecondCoordinateComponentFormat, InvalidNumberOfTrackFormat
 
-/** Controller for StationEditorView.
+/** Controller for the `StationEditorView`, managing interactions between the view and the application.
   *
-  * @constructor
-  *   create a new StationEditorController with a view and model.
-  * @param appPort
-  *   the 'StationInputPort' to interact with the application
   * @tparam N
-  *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
-  *   - An instance of `Numeric` must be available for the `N` type.
+  *   The numeric type representing the station's coordinates (e.g., `Int`, `Double`).
+  *   - An instance of `Numeric` must be available for `N`.
   * @tparam C
-  *   A type that extends `Coordinate[N]`, which represents the station's location.
-  *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
+  *   A subtype of `Coordinate[N]` representing the station's location.
+  *   - `C` must support coordinate comparison and uniqueness.
+  * @tparam S
+  *   A subtype of `Station[N, C]`, representing the station model.
+  * @param appPort
+  *   The `StationInputPort` to interact with the application.
   */
 final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
     appPort: StationPorts.Input[N, C, S]
@@ -35,35 +35,42 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
 
   /** Handles the click event when the "OK" button is pressed.
     *
-    * This method is responsible for creating a new station with the provided information. If an `oldStation` is
-    * provided, it removes the old station before adding the newly created station to the model. If the information
-    * provided is invalid, IllegalArgumentException is thrown.
+    * This method attempts to create a new station using the provided information. If an `oldStation` is given, it is
+    * removed before adding the newly created station. If the input data is invalid, a `NonEmptyChain` of `BaseError` is
+    * returned.
     *
     * @param stationName
     *   The name of the new station.
-    * @param latitude
-    *   The latitude of the new station's location.
-    * @param longitude
-    *   The longitude of the new station's location.
+    * @param x
+    *   The first coordinate component of the station's location (as a `String`).
+    * @param y
+    *   The second coordinate component of the station's location (as a `String`).
     * @param numberOfTrack
-    *   The number of tracks at the new station.
+    *   The number of tracks at the new station (as a `String`).
     * @param oldStation
-    *   An optional existing station that may be removed before adding the new station. If no station is provided, no
-    *   removal occurs.
-    * @throws IllegalArgumentException
-    *   If the information provided is invalid.
+    *   An optional existing station to be removed before adding the new one. If `None`, no removal occurs.
+    * @param coordinateGenerator
+    *   A function that converts coordinate values (`N`, `N`) into a valid `C` coordinate, returning either a
+    *   `NonEmptyChain` of errors or a valid coordinate.
+    * @param stationGenerator
+    *   A function that creates a `Station` instance from its name, coordinates, and track count, returning either a
+    *   `NonEmptyChain` of errors or a valid station.
+    * @return
+    *   A `Future` containing either:
+    *   - `Left(NonEmptyChain[BaseError])` if validation fails.
+    *   - `Right(StationManager[N, C, S])` if the station is successfully created and added.
     */
   def onOkClick(
       stationName: String,
-      latitude: String,
-      longitude: String,
+      x: String,
+      y: String,
       numberOfTrack: String,
       oldStation: Option[S]
   )(using
       coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
   ): Future[Either[NonEmptyChain[BaseError], StationManager[N, C, S]]] =
-    createStation(stationName, latitude, longitude, numberOfTrack, coordinateGenerator, stationGenerator) match
+    createStation(stationName, x, y, numberOfTrack, coordinateGenerator, stationGenerator) match
       case Left(value) => Future.successful(Left(value))
       case Right(value) =>
         for old <- oldStation do removeStation(old)
@@ -71,19 +78,19 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
 
   private def createStation(
       name: String,
-      latitude: String,
-      longitude: String,
+      x: String,
+      y: String,
       numberOfTrack: String,
       coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
   )(using numeric: Numeric[N]): Either[NonEmptyChain[BaseError], S] =
-    val validatedLocation = (
-      numeric.parseString(latitude).toValidNec(StationEditorAdapter.Error.InvalidRowFormat),
-      numeric.parseString(longitude).toValidNec(StationEditorAdapter.Error.InvalidColumnFormat)
-    ).mapN((_, _)).toEither.flatMap { case (x, y) => coordinateGenerator(x, y) }
+    val validatedCoordinate = (
+      numeric.parseString(x).toValidNec(StationEditorAdapter.Error.InvalidFirstCoordinateComponentFormat),
+      numeric.parseString(y).toValidNec(StationEditorAdapter.Error.InvalidSecondCoordinateComponentFormat)
+    ).mapN((_, _)).toEither.flatMap(coordinateGenerator(_, _))
     val validatedNumberOfTrack =
       numberOfTrack.toIntOption.toValidNec(StationEditorAdapter.Error.InvalidNumberOfTrackFormat).toEither
-    (validatedLocation.toValidated, validatedNumberOfTrack.toValidated)
-      .mapN((_, _)).toEither.flatMap((location, numberOfTrack) => stationGenerator(name, location, numberOfTrack))
+    (validatedCoordinate.toValidated, validatedNumberOfTrack.toValidated)
+      .mapN((_, _)).toEither.flatMap(stationGenerator(name, _, _))
 
   export appPort.{findStationAt, removeStation}

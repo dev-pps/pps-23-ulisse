@@ -25,25 +25,25 @@ class StationServiceTest extends AnyWordSpec with Matchers:
   private type S = Station[N, C]
   private val outputPort   = mock[StationPorts.Output]
   private val station      = Station("StationA", Coordinate(0, 0), 1)
-  private val initialState = AppState[N, C, S](StationManager.createCheckedStationMap())
+  private val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
   private val eventStream  = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   private val inputPort =
     StationService[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream, outputPort)
   private def updateState() = runAll(initialState, eventStream)
 
-  "StationPortInputAdapter" should:
-    "add a valid station to the station map" in:
+  "StationService" should:
+    "add a valid station to the station manager" in:
       val addStationResult = inputPort.addStation(station)
-      val stationMapResult = inputPort.stationMap
+      val stationMapResult = inputPort.stationManager
 
       updateState()
       Await.result(addStationResult, Duration.Inf) shouldBe Right(StationManager(station))
       Await.result(stationMapResult, Duration.Inf) shouldBe StationManager(station)
 
-    "add invalid station to the station map" in:
+    "not add invalid station to the station manager" in:
       val addStationResult     = inputPort.addStation(station)
       val addSameStationResult = inputPort.addStation(station)
-      val stationMapResult     = inputPort.stationMap
+      val stationMapResult     = inputPort.stationManager
 
       updateState()
       Await.result(addStationResult, Duration.Inf) shouldBe Right(StationManager(station))
@@ -53,19 +53,19 @@ class StationServiceTest extends AnyWordSpec with Matchers:
       ))
       Await.result(stationMapResult, Duration.Inf) shouldBe StationManager(station)
 
-    "remove a present station from the station map" in:
+    "remove a present station from the station manager" in:
       val addStationResult    = inputPort.addStation(station)
       val removeStationResult = inputPort.removeStation(station)
-      val stationMapResult    = inputPort.stationMap
+      val stationMapResult    = inputPort.stationManager
 
       updateState()
       Await.result(addStationResult, Duration.Inf) shouldBe Right(StationManager(station))
       Await.result(removeStationResult, Duration.Inf) shouldBe Right(StationManager[N, C, S]())
       Await.result(stationMapResult, Duration.Inf) shouldBe StationManager[N, C, S]()
 
-    "not remove an absent station from the station map" in:
+    "return error when is removed an absent station from the station manager" in:
       val removeStationResult = inputPort.removeStation(station)
-      val stationMapResult    = inputPort.stationMap
+      val stationMapResult    = inputPort.stationManager
       updateState()
 
       Await.result(removeStationResult, Duration.Inf) shouldBe Left(Chain(CheckedStationManager.Error.StationNotFound))

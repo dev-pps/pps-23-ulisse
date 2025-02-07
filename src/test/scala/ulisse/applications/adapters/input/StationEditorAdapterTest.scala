@@ -34,7 +34,7 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
   ): (StationEditorAdapter[N, C, S], () => List[AppState[N, C, S]]) =
     val station      = Station(stationName, Coordinate(x, y), numberOfTrack)
-    val initialState = AppState[N, C, S](StationManager.createCheckedStationMap())
+    val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
     val eventStream  = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
     val inputPort =
       StationService[N, C, S](eventStream, outputPort)
@@ -116,8 +116,8 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
 
         Await.result(addStationWithAllWrongInputsResult, Duration.Inf) shouldBe Left(
           Chain(
-            StationEditorAdapter.Error.InvalidRowFormat,
-            StationEditorAdapter.Error.InvalidColumnFormat,
+            StationEditorAdapter.Error.InvalidFirstCoordinateComponentFormat,
+            StationEditorAdapter.Error.InvalidSecondCoordinateComponentFormat,
             StationEditorAdapter.Error.InvalidNumberOfTrackFormat
           )
         )
@@ -139,7 +139,7 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
           )
         )
 
-      "chain error when latitude and longitude are valid and name and numberOfTracks are not" in:
+      "chain error when x and y are valid and name and numberOfTracks are not" in:
         val addStationWithWrongNameAndNumberOfTrackResult =
           checkedController.onOkClick(
             " ",
