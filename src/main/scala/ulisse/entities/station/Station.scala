@@ -1,5 +1,7 @@
 package ulisse.entities.station
 
+import cats.data.NonEmptyChain
+import cats.syntax.all.*
 import cats.implicits.catsSyntaxEq
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.utils.Errors.BaseError
@@ -54,7 +56,7 @@ object Station:
   ): Station[N, C] =
     StationImpl(name, coordinate, numberOfTrack)
 
-  given [N: Numeric, C <: Coordinate[N]]: ((String, C, Int) => Either[BaseError, CheckedStation[N, C]]) =
+  given [N: Numeric, C <: Coordinate[N]]: ((String, C, Int) => Either[NonEmptyChain[BaseError], CheckedStation[N, C]]) =
     Station.createCheckedStation
 
   /** Creates a `Station` instance with validation.
@@ -78,11 +80,11 @@ object Station:
       name: String,
       coordinate: C,
       numberOfTrack: Int
-  ): Either[CheckedStation.Error, CheckedStation[N, C]] =
-    for
-      validName          <- validateNonBlankString(name, CheckedStation.Error.InvalidName)
-      validNumberOfTrack <- validatePositive(numberOfTrack, CheckedStation.Error.InvalidNumberOfTrack)
-    yield CheckedStation(validName, coordinate, validNumberOfTrack)
+  ): Either[NonEmptyChain[CheckedStation.Error], CheckedStation[N, C]] =
+    (
+      validateNonBlankString(name, CheckedStation.Error.InvalidName).toValidatedNec,
+      validatePositive(numberOfTrack, CheckedStation.Error.InvalidNumberOfTrack).toValidatedNec
+    ).mapN(CheckedStation(_, coordinate, _)).toEither
 
   /** Defines a `CheckedStation`.
     *

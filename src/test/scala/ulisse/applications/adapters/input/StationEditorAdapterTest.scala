@@ -1,5 +1,6 @@
 package ulisse.applications.adapters.input
 
+import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -120,11 +121,11 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
 
         updateState()
         Await.result(addStationWithWrongRowResult, Duration.Inf) shouldBe Left(
-          StationEditorAdapter.Error.InvalidRowFormat
+          Chain(StationEditorAdapter.Error.InvalidRowFormat)
         )
         Await.result(addStationWithWrongColumnResult, Duration.Inf) shouldBe Left(
-          StationEditorAdapter.Error.InvalidColumnFormat
+          Chain(StationEditorAdapter.Error.InvalidColumnFormat)
         )
         Await.result(addStationWithWrongNumberOfTrackResult, Duration.Inf) shouldBe Left(
-          StationEditorAdapter.Error.InvalidNumberOfTrackFormat
+          Chain(StationEditorAdapter.Error.InvalidNumberOfTrackFormat)
         )

@@ -8,10 +8,16 @@ import scala.math.{atan2, pow, sqrt}
 
 object Coordinates:
   given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
+  
+  given ((Int, Int) => Either[NonEmptyChan[BaseError], Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
 
   given ((Int, Int) => Either[BaseError, Grid]) = Coordinate.createGrid
 
+  given ((Int, Int) => Either[NonEmptyChan[BaseError], Grid]) = Coordinate.createValidatedGrid
+
   given ((Double, Double) => Either[BaseError, Geo]) = Coordinate.createGeo
+
+  given ((Int, Int) => Either[NonEmptyChan[BaseError], Geo]) = Coordinate.createValidatedGrid
 
   /** A generic trait representing a 2D coordinate point in space.
     *
