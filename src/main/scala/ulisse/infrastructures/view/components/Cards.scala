@@ -11,7 +11,7 @@ import ulisse.infrastructures.view.components.Selectables.Selectable
 import scala.swing.{BoxPanel, Component, Label, Orientation, SequentialContainer}
 
 object Cards:
-  trait JImageCard extends JItem with SequentialContainer.Wrapper with Selectable:
+  trait JImageCard extends JItem with SequentialContainer.Wrapper:
     val image: ImagePanel
     val content: Component
     def reverse(): JImageCard =
@@ -20,6 +20,8 @@ object Cards:
       this.contents.clear()
       this.contents ++= reversedContent
       this
+
+  trait SelectableJImageCard extends JImageCard with Selectable
 
   object JImageCard:
     def horizontal(image: ImagePanel, component: Component, styler: JStyler.JStyler): JImageCard =
@@ -54,6 +56,39 @@ object Cards:
         styler
       )
 
+  object SelectableJImageCard:
+    def horizontal(image: ImagePanel, component: Component, styler: JStyler.JStyler): SelectableJImageCard =
+      SelectableJImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Horizontal, styler)
+
+    def vertical(image: ImagePanel, component: Component, styler: JStyler.JStyler): SelectableJImageCard =
+      SelectableJImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Vertical, styler)
+
+    def horizontalWithConfiguration(
+        imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
+        component: Component,
+        styler: JStyler.JStyler
+    ): SelectableJImageCard =
+      SelectableJImageCardImpl(
+        imageWithConfiguration.component,
+        imageWithConfiguration.configuration,
+        component,
+        Orientation.Horizontal,
+        styler
+      )
+
+    def verticalWithConfiguration(
+        imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
+        component: Component,
+        styler: JStyler.JStyler
+    ): SelectableJImageCard =
+      SelectableJImageCardImpl(
+        imageWithConfiguration.component,
+        imageWithConfiguration.configuration,
+        component,
+        Orientation.Vertical,
+        styler
+      )
+
   private final case class JImageCardImpl(
       image: ImagePanel,
       imageConfiguration: ComponentConfiguration,
@@ -63,9 +98,21 @@ object Cards:
   ) extends BoxPanel(orientation) with JImageCard with JItem(styler):
     listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
     contents += image.align(imageConfiguration.alignment); contents += content
+
+  private final case class SelectableJImageCardImpl(
+      image: ImagePanel,
+      imageConfiguration: ComponentConfiguration,
+      content: Component,
+      orientation: Orientation.Value,
+      styler: JStyler.JStyler
+  ) extends BoxPanel(orientation) with SelectableJImageCard with JItem(styler):
+    listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
+    contents += image.align(imageConfiguration.alignment);
+    contents += content
     private val selectedStyler = styler.copy(palette =
       styler.palette.copy(background = styler.palette.clickColor.getOrElse(JStyler.transparentColor))
     )
+
     override def selected_=(newSelected: Boolean): Unit =
       if newSelected then setStyler(selectedStyler)
       else setStyler(styler)
