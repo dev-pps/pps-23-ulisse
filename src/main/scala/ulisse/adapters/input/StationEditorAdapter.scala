@@ -1,5 +1,7 @@
 package ulisse.adapters.input
 
+import cats.data.NonEmptyChain
+import cats.syntax.all.*
 import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinates.{Coordinate, Geo, Grid}
@@ -7,7 +9,9 @@ import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.utils.Errors.BaseError
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+
+given ExecutionContext = ExecutionContext.global
 
 object StationEditorAdapter:
 
@@ -58,13 +62,13 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
       numberOfTrack: String,
       oldStation: Option[S]
   )(using coordinateGenerator: (N, N) => Either[BaseError, C])(using
-      stationGenerator: (String, C, Int) => Either[BaseError, S]
-  ): Future[Either[BaseError, StationManager[N, C, S]]] =
+      stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
+  ): Future[Either[NonEmptyChain[BaseError], StationManager[N, C, S]]] =
     createStation(stationName, latitude, longitude, numberOfTrack, coordinateGenerator, stationGenerator) match
       case Left(value) => Future.successful(Left(value))
       case Right(value) =>
         for old <- oldStation do removeStation(old)
-        appPort.addStation(value)
+        appPort.addStation(value).map(_.leftMap(NonEmptyChain.one))
 
   private def createStation(
       name: String,
@@ -72,14 +76,18 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
       longitude: String,
       numberOfTrack: String,
       coordinateGenerator: (N, N) => Either[BaseError, C],
-      stationGenerator: (String, C, Int) => Either[BaseError, S]
-  )(using numeric: Numeric[N]): Either[BaseError, S] =
+      stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
+  )(using numeric: Numeric[N]): Either[NonEmptyChain[BaseError], S] =
+    val locationE = (
+      numeric.parseString(latitude).toValidNec(StationEditorAdapter.Error.InvalidRowFormat),
+      numeric.parseString(longitude).toValidNec(StationEditorAdapter.Error.InvalidColumnFormat)
+    ).mapN((_, _)).toEither
     for
-      latitude      <- numeric.parseString(latitude).toRight(StationEditorAdapter.Error.InvalidRowFormat)
-      longitude     <- numeric.parseString(longitude).toRight(StationEditorAdapter.Error.InvalidColumnFormat)
-      coordinate    <- coordinateGenerator(latitude, longitude)
-      numberOfTrack <- numberOfTrack.toIntOption.toRight(StationEditorAdapter.Error.InvalidNumberOfTrackFormat)
-      station       <- stationGenerator(name, coordinate, numberOfTrack)
+      location   <- locationE
+      coordinate <- coordinateGenerator(location._1, location._2).toValidatedNec.toEither
+      numberOfTrack <-
+        numberOfTrack.toIntOption.toValidNec(StationEditorAdapter.Error.InvalidNumberOfTrackFormat).toEither
+      station <- stationGenerator(name, coordinate, numberOfTrack)
     yield station
 
   export appPort.{findStationAt, removeStation}

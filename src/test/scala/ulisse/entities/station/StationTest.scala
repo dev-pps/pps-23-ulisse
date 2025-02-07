@@ -1,5 +1,6 @@
 package ulisse.entities.station
 
+import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinates.Coordinate
@@ -14,7 +15,7 @@ class StationTest extends AnyWordSpec with Matchers:
     "not be created if the name is blank" in:
       List("", "  ").foreach(invalidName =>
         Station.createCheckedStation(invalidName, Coordinate(0, 0), 1) shouldBe Left(
-          Station.CheckedStation.Error.InvalidName
+          Chain(Station.CheckedStation.Error.InvalidName)
         )
       )
 
@@ -24,5 +25,5 @@ class StationTest extends AnyWordSpec with Matchers:
           "name",
           Coordinate(0, 0),
           invalidNumberOfTrack
-        ) shouldBe Left(Station.CheckedStation.Error.InvalidNumberOfTrack)
+        ) shouldBe Left(Chain(Station.CheckedStation.Error.InvalidNumberOfTrack))
       )
