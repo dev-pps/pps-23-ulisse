@@ -28,6 +28,8 @@ object GUIView:
     private val mapController = CentralController.createMap()
     private val mapPanel      = MapPanel.empty()
 
+    mapPanel.attach(mapController.stationForm.mapObserver)
+
     glassPane.opaque = false
     glassPane.visible = true
 

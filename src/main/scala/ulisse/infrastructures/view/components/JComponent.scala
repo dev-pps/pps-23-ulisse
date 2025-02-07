@@ -24,7 +24,7 @@ object JComponent:
   private val elementStyler =
     JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.overlayElement))
 
-  case class JInfoTextField(text: String) extends JComponent:
+  case class JInfoTextField(title: String) extends JComponent:
     private val colum = 15
 
     private val textFieldStyler =
@@ -36,13 +36,14 @@ object JComponent:
     private val mainPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
     private val labelPanel = JItem.createFlowPanel(JStyler.transparent)
 
-    private val label     = JItem.label(text, JStyler.transparent)
+    private val label     = JItem.label(title, JStyler.transparent)
     private val textField = JItem.textField(colum, textFieldStyler)
 
     labelPanel.contents += label
     mainPanel.contents += labelPanel
     mainPanel.contents += textField
 
+    export textField.text_=
     override def component[T >: Component]: T = mainPanel
 
   case class JIconLabel(iconPath: String, text: String) extends JComponent:
