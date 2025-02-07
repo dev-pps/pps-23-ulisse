@@ -10,7 +10,8 @@ import scala.annotation.targetName
 import scala.math.{atan2, pow, sqrt}
 
 object Coordinates:
-  given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
+  
+  given [N: Numeric]: ((N, N) => Either[BaseError, Coordinate[N]]) = Right(Coordinate(_,_))
 
   given ((Int, Int) => Either[NonEmptyChain[BaseError], Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
 

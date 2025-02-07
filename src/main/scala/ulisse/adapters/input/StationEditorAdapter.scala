@@ -11,8 +11,6 @@ import ulisse.utils.Errors.BaseError
 
 import scala.concurrent.{ExecutionContext, Future}
 
-given ExecutionContext = ExecutionContext.global
-
 object StationEditorAdapter:
 
   enum Error extends BaseError:
@@ -68,7 +66,7 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
       case Left(value) => Future.successful(Left(value))
       case Right(value) =>
         for old <- oldStation do removeStation(old)
-        appPort.addStation(value).map(_.leftMap(NonEmptyChain.one))
+        appPort.addStation(value)
 
   private def createStation(
       name: String,

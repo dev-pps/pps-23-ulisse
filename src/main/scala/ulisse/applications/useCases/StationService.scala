@@ -1,5 +1,6 @@
 package ulisse.applications.useCases
 
+import cats.data.NonEmptyChain
 import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.applications.ports.StationPorts
@@ -14,7 +15,7 @@ final case class StationService[N: Numeric, C <: Coordinate[N], S <: Station[N, 
     outputPort: StationPorts.Output
 ) extends StationPorts.Input[N, C, S]:
   type SM = CheckedStationManager[N, C, S]
-  type E  = CheckedStationManager.Error
+  type E  = NonEmptyChain[CheckedStationManager.Error]
 
   override def stationMap: Future[SM] =
     val p = Promise[SM]()
