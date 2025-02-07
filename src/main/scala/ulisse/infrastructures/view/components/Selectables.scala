@@ -8,7 +8,7 @@ import scala.swing.Component
 object Selectables:
 
   trait Selectable extends Component:
-    private var _selected: Boolean = true
+    private var _selected: Boolean = false
     def selected: Boolean          = _selected
     def selected_=(newSelected: Boolean): Unit =
       _selected = newSelected

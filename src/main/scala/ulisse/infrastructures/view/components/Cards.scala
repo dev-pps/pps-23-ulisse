@@ -63,9 +63,12 @@ object Cards:
   ) extends BoxPanel(orientation) with JImageCard with JItem(styler):
     listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
     contents += image.align(imageConfiguration.alignment); contents += content
+    private val selectedStyler = styler.copy(palette =
+      styler.palette.copy(background = styler.palette.clickColor.getOrElse(JStyler.transparentColor))
+    )
     override def selected_=(newSelected: Boolean): Unit =
-      if newSelected then setStyler(styler)
-      else setStyler(styler.copy(palette = styler.palette.copy(background = JStyler.transparentColor)))
+      if newSelected then setStyler(selectedStyler)
+      else setStyler(styler)
       super.selected_=(newSelected)
 
   object Example:
