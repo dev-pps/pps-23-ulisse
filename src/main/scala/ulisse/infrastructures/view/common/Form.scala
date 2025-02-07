@@ -70,7 +70,12 @@ object Form:
     export form._
     override def mapObserver: ViewObserver[Point] = this
 
-    override def onClick(data: Point): Unit   = ()
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
+    private var lastClick = false
+    override def onClick(data: Point): Unit =
+      lastClick match
+        case false => departureStation.text_=(s"position: ${data.x} - ${data.y}"); lastClick = true
+        case true  => arrivalStation.text_=(s"position: ${data.x} - ${data.y}"); lastClick = false
     override def onHover(data: Point): Unit   = ()
     override def onRelease(data: Point): Unit = ()
 
