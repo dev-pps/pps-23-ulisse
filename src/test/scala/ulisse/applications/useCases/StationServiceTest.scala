@@ -1,5 +1,6 @@
 package ulisse.applications.useCases
 
+import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -46,7 +47,10 @@ class StationServiceTest extends AnyWordSpec with Matchers:
 
       updateState()
       Await.result(addStationResult, Duration.Inf) shouldBe Right(StationManager(station))
-      Await.result(addSameStationResult, Duration.Inf) shouldBe Left(CheckedStationManager.Error.DuplicateStationName)
+      Await.result(addSameStationResult, Duration.Inf) shouldBe Left(Chain(
+        CheckedStationManager.Error.DuplicateStationName,
+        CheckedStationManager.Error.DuplicateStationLocation
+      ))
       Await.result(stationMapResult, Duration.Inf) shouldBe StationManager(station)
 
     "remove a present station from the station map" in:
@@ -64,5 +68,5 @@ class StationServiceTest extends AnyWordSpec with Matchers:
       val stationMapResult    = inputPort.stationMap
       updateState()
 
-      Await.result(removeStationResult, Duration.Inf) shouldBe Left(CheckedStationManager.Error.StationNotFound)
+      Await.result(removeStationResult, Duration.Inf) shouldBe Left(Chain(CheckedStationManager.Error.StationNotFound))
       Await.result(stationMapResult, Duration.Inf) shouldBe StationManager[N, C, S]()

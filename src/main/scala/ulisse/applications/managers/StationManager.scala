@@ -1,5 +1,8 @@
 package ulisse.applications.managers
 
+import cats.data.NonEmptyChain
+
+import cats.syntax.all.*
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.BaseError
@@ -114,21 +117,27 @@ object StationManager:
       stations: List[S]
   ) extends StationManager[N, C, S]:
     type StationMapType = List[S]
-    type R              = Either[CheckedStationManager.Error, CheckedStationManager[N, C, S]]
+    type R              = Either[NonEmptyChain[CheckedStationManager.Error], CheckedStationManager[N, C, S]]
 
     def addStation(station: S): R =
       val updatedStations = station :: stations
-      for
-        _ <- validateUniqueItems(updatedStations.map(_.name), CheckedStationManager.Error.DuplicateStationName)
-        _ <-
-          validateUniqueItems(updatedStations.map(_.coordinate), CheckedStationManager.Error.DuplicateStationLocation)
-      yield CheckedStationManager(updatedStations)
+      (
+        validateUniqueItems(
+          updatedStations.map(_.name),
+          CheckedStationManager.Error.DuplicateStationName
+        ).toValidatedNec,
+        validateUniqueItems(
+          updatedStations.map(_.coordinate),
+          CheckedStationManager.Error.DuplicateStationLocation
+        ).toValidatedNec
+      )
+        .mapN((_, _) => CheckedStationManager(updatedStations)).toEither
 
     def removeStation(station: S): R =
       if stations.exists(_.coordinate === station.coordinate) then
         Right(CheckedStationManager(stations.filterNot(_.coordinate === station.coordinate)))
       else
-        Left(CheckedStationManager.Error.StationNotFound)
+        Left(NonEmptyChain(CheckedStationManager.Error.StationNotFound))
 
     def findStationAt(coordinate: C): Option[S] =
       stations.find(_.coordinate === coordinate)

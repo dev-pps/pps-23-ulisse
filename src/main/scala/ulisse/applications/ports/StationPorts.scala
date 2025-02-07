@@ -2,6 +2,7 @@ package ulisse.applications.ports
 
 import ulisse.applications.managers.StationManager
 import StationManager.CheckedStationManager
+import cats.data.NonEmptyChain
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
@@ -24,7 +25,7 @@ object StationPorts:
   trait Input[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
 
     private type SM = CheckedStationManager[N, C, S]
-    private type E  = CheckedStationManager.Error
+    private type E  = NonEmptyChain[CheckedStationManager.Error]
 
     /** Retrieves the current station map.
       *
@@ -38,7 +39,7 @@ object StationPorts:
       * @param station
       *   The station to be added.
       * @return
-      *   Either the updated `StationMap` or an `Error` indicating the issue.
+      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
       */
     def addStation(station: S): Future[Either[E, SM]]
 
@@ -47,7 +48,7 @@ object StationPorts:
       * @param station
       *   The station to be removed.
       * @return
-      *   Either the updated `StationMap` or an `Error` indicating the issue.
+      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
       */
     def removeStation(station: S): Future[Either[E, SM]]
 

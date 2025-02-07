@@ -1,5 +1,6 @@
 package ulisse.applications.managers
 
+import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.applications.managers.StationManager
@@ -32,14 +33,25 @@ class StationManagerTest extends AnyWordSpec with Matchers:
         val otherStation = Station("StationA", Coordinate(1, 1), 1)
         StationManager.createCheckedStationMap().addStation(station).flatMap(
           _.addStation(otherStation)
-        ) shouldBe Left(CheckedStationManager.Error.DuplicateStationName)
+        ) shouldBe Left(Chain(CheckedStationManager.Error.DuplicateStationName))
 
     "another station with same location is added" should:
       "not be added and returns error" in:
         val otherStation = Station("StationB", Coordinate(0, 0), 1)
         StationManager.createCheckedStationMap().addStation(station).flatMap(
           _.addStation(otherStation)
-        ) shouldBe Left(CheckedStationManager.Error.DuplicateStationLocation)
+        ) shouldBe Left(Chain(CheckedStationManager.Error.DuplicateStationLocation))
+
+    "the same station is added" should:
+      "not be addend and return the chain of errors" in:
+        StationManager.createCheckedStationMap().addStation(station).flatMap(
+          _.addStation(station)
+        ) shouldBe Left(
+          Chain(
+            CheckedStationManager.Error.DuplicateStationName,
+            CheckedStationManager.Error.DuplicateStationLocation
+          )
+        )
 
     "existing station is removed" should:
       "no longer be present" in:
@@ -52,5 +64,5 @@ class StationManagerTest extends AnyWordSpec with Matchers:
     "non-existing station is removed" should:
       "return error" in:
         StationManager.createCheckedStationMap().removeStation(station) shouldBe Left(
-          CheckedStationManager.Error.StationNotFound
+          Chain(CheckedStationManager.Error.StationNotFound)
         )
