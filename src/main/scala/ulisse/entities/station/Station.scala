@@ -74,7 +74,7 @@ object Station:
     * @param numberOfTrack
     *   The number of tracks. Must be greater than 0.
     * @return
-    *   Either a `Station` instance or an `Errors` indicating the issue.
+    *   Either a `Station` instance or a `NonEmptyChain` of `Errors` indicating the issues.
     */
   def createCheckedStation[N: Numeric, C <: Coordinate[N]](
       name: String,
