@@ -1,4 +1,4 @@
-package ulisse.infrastructures.view.form
+package ulisse.infrastructures.view.common
 
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.{JComponent, JItem, JStyler}
