@@ -7,7 +7,7 @@ import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import scala.math.BigDecimal.double2bigDecimal
 import scala.math.{abs, sqrt}
-import scala.swing.{event, Graphics2D, Image, Panel}
+import scala.swing.*
 
 trait MapPanel extends Panel
 
@@ -15,9 +15,10 @@ object MapPanel:
   def empty(): MapPanel = MapPanelImpl()
 
   private case class MapPanelImpl() extends MapPanel:
-
-    private val items = MapItemsCollection()
     opaque = false
+
+    private val items         = MapItemsCollection()
+    private val mapObservable = GraphicObservers.createObservable[Point]
 
     listenTo(mouse.clicks, mouse.moves)
     reactions += {
