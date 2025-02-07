@@ -2,6 +2,7 @@ package ulisse.infrastructures.view.map
 
 import ulisse.entities.Coordinates
 import ulisse.entities.Coordinates.UIPoint
+import ulisse.infrastructures.view.map.ViewObservers.ViewObserver
 
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
@@ -9,22 +10,31 @@ import scala.math.BigDecimal.double2bigDecimal
 import scala.math.{abs, sqrt}
 import scala.swing.*
 
-trait MapPanel extends Panel
-
 object MapPanel:
-  def empty(): MapPanel = MapPanelImpl()
+  def empty(): MapPanel = MapPanel()
 
-  private case class MapPanelImpl() extends MapPanel:
+  case class MapPanel() extends Panel:
     opaque = false
 
     private val items         = MapItemsCollection()
-    private val mapObservable = GraphicObservers.createObservable[Point]
+    private val mapObservable = ViewObservers.createObservable[Point]
+
+    export mapObservable._
 
     listenTo(mouse.clicks, mouse.moves)
     reactions += {
-      case event.MouseMoved(_, point, _)          => items.onHover(point); repaint()
-      case event.MousePressed(_, point, _, _, _)  => items.onClick(point); repaint()
-      case event.MouseReleased(_, point, _, _, _) => items.onRelease(point); repaint()
+      case event.MouseMoved(_, point, _) =>
+        mapObservable.notifyOnHover(point)
+        items.onHover(point)
+        repaint()
+      case event.MousePressed(_, point, _, _, _) =>
+        mapObservable.notifyOnClick(point)
+        items.onClick(point)
+        repaint()
+      case event.MouseReleased(_, point, _, _, _) =>
+        mapObservable.notifyOnRelease(point)
+        items.onRelease(point);
+        repaint()
     }
 
     override def paintComponent(g: Graphics2D): Unit =
