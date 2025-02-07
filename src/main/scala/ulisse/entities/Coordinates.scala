@@ -1,5 +1,8 @@
 package ulisse.entities
 
+import cats.data.NonEmptyChain
+
+import cats.syntax.all.*
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonNegative, validateRange}
 
@@ -8,16 +11,16 @@ import scala.math.{atan2, pow, sqrt}
 
 object Coordinates:
   given ((Int, Int) => Either[BaseError, Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
-  
-  given ((Int, Int) => Either[NonEmptyChan[BaseError], Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
+
+  given ((Int, Int) => Either[NonEmptyChain[BaseError], Coordinate[Int]]) = (x, y) => Right(Coordinate(x, y))
 
   given ((Int, Int) => Either[BaseError, Grid]) = Coordinate.createGrid
 
-  given ((Int, Int) => Either[NonEmptyChan[BaseError], Grid]) = Coordinate.createValidatedGrid
+  given ((Int, Int) => Either[NonEmptyChain[BaseError], Grid]) = Coordinate.createValidatedGrid
 
   given ((Double, Double) => Either[BaseError, Geo]) = Coordinate.createGeo
 
-  given ((Int, Int) => Either[NonEmptyChan[BaseError], Geo]) = Coordinate.createValidatedGrid
+  given ((Int, Int) => Either[NonEmptyChain[BaseError], Geo]) = Coordinate.createValidatedGeo
 
   /** A generic trait representing a 2D coordinate point in space.
     *
@@ -136,6 +139,22 @@ object Coordinates:
         validLon <- validateRange(longitude, -180.0, 180.0, Geo.Error.InvalidLongitude)
       yield Geo(validLat, validLon)
 
+    /** Creates a `Geo` instance with validation.
+      *
+      * @param latitude
+      *   The latitude of the location. Must be between -90 and 90.
+      * @param longitude
+      *   The longitude of the location. Must be between -180 and 180.
+      * @return
+      *   Either a `Geo` instance or a `NonEmptyChain` of `Errors` indicating the issues.
+      */
+    def createValidatedGeo(latitude: Double, longitude: Double): Either[NonEmptyChain[Geo.Error], Geo] =
+      (
+        validateRange(latitude, -90.0, 90.0, Geo.Error.InvalidLatitude).toValidatedNec,
+        validateRange(longitude, -180.0, 180.0, Geo.Error.InvalidLongitude).toValidatedNec
+      )
+        .mapN(Geo(_, _)).toEither
+
     /** Creates a `Grid` instance with validation.
       *
       * @param row
@@ -150,6 +169,22 @@ object Coordinates:
         validRow <- validateNonNegative(row, Grid.Error.InvalidRow)
         validCol <- validateNonNegative(column, Grid.Error.InvalidColumn)
       yield Grid(validRow, validCol)
+
+    /** Creates a `Grid` instance with validation.
+      *
+      * @param row
+      *   The row of the grid. Must be non-negative.
+      * @param column
+      *   The column of the grid. Must be non-negative.
+      * @return
+      *   Either a `Grid` instance or a `NonEmptyChain` of `Errors` indicating the issues.
+      */
+    def createValidatedGrid(row: Int, column: Int): Either[NonEmptyChain[Grid.Error], Grid] =
+      (
+        validateNonNegative(row, Grid.Error.InvalidRow).toValidatedNec,
+        validateNonNegative(column, Grid.Error.InvalidColumn).toValidatedNec
+      )
+        .mapN(Grid(_, _)).toEither
 
     private final case class CoordinateImpl[T: Numeric](x: T, y: T) extends Coordinate[T](x, y)
 
