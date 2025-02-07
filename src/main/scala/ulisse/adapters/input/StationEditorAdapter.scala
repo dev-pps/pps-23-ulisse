@@ -59,7 +59,8 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
       longitude: String,
       numberOfTrack: String,
       oldStation: Option[S]
-  )(using coordinateGenerator: (N, N) => Either[BaseError, C])(using
+  )(using
+      coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
   ): Future[Either[NonEmptyChain[BaseError], StationManager[N, C, S]]] =
     createStation(stationName, latitude, longitude, numberOfTrack, coordinateGenerator, stationGenerator) match
@@ -73,19 +74,16 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
       latitude: String,
       longitude: String,
       numberOfTrack: String,
-      coordinateGenerator: (N, N) => Either[BaseError, C],
+      coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
   )(using numeric: Numeric[N]): Either[NonEmptyChain[BaseError], S] =
-    val locationE = (
+    val validatedLocation = (
       numeric.parseString(latitude).toValidNec(StationEditorAdapter.Error.InvalidRowFormat),
       numeric.parseString(longitude).toValidNec(StationEditorAdapter.Error.InvalidColumnFormat)
-    ).mapN((_, _)).toEither
-    for
-      location   <- locationE
-      coordinate <- coordinateGenerator(location._1, location._2).toValidatedNec.toEither
-      numberOfTrack <-
-        numberOfTrack.toIntOption.toValidNec(StationEditorAdapter.Error.InvalidNumberOfTrackFormat).toEither
-      station <- stationGenerator(name, coordinate, numberOfTrack)
-    yield station
+    ).mapN((_, _)).toEither.flatMap { case (x, y) => coordinateGenerator(x, y) }
+    val validatedNumberOfTrack =
+      numberOfTrack.toIntOption.toValidNec(StationEditorAdapter.Error.InvalidNumberOfTrackFormat).toEither
+    (validatedLocation.toValidated, validatedNumberOfTrack.toValidated)
+      .mapN((_, _)).toEither.flatMap((location, numberOfTrack) => stationGenerator(name, location, numberOfTrack))
 
   export appPort.{findStationAt, removeStation}
