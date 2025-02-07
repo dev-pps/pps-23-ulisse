@@ -1,8 +1,9 @@
-package ulisse.infrastructures.view.map
+package ulisse.infrastructures.view
 
 import ulisse.applications.ports.RoutePorts.UIInputPort
 import ulisse.infrastructures.view.common.CentralController
 import ulisse.infrastructures.view.components.JStyler.*
+import ulisse.infrastructures.view.map.MapPanel
 
 import scala.concurrent.ExecutionContext
 import scala.swing.*
@@ -24,13 +25,13 @@ object GUIView:
     private val mainPane  = BorderPanel()
     private val glassPane = BorderPanel()
 
-    private val mapPark       = MapPanel.empty()
     private val mapController = CentralController.createMap()
+    private val mapPanel      = MapPanel.empty()
 
     glassPane.opaque = false
     glassPane.visible = true
 
-    mainPane.layout(mapPark) = Center
+    mainPane.layout(mapPanel) = Center
     glassPane.layout(mapController.component) = East
 
     contents = mainPane
