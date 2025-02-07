@@ -27,3 +27,8 @@ class StationTest extends AnyWordSpec with Matchers:
           invalidNumberOfTrack
         ) shouldBe Left(Chain(Station.CheckedStation.Error.InvalidNumberOfTrack))
       )
+
+    "return the chain of error" in:
+      Station.createCheckedStation("", Coordinate(0, 0), 0) shouldBe Left(
+        Chain(Station.CheckedStation.Error.InvalidName, Station.CheckedStation.Error.InvalidNumberOfTrack)
+      )
