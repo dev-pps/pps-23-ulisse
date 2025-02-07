@@ -1,8 +1,8 @@
 package ulisse.infrastructures.view.map
 
 import ulisse.applications.ports.RoutePorts.UIInputPort
+import ulisse.infrastructures.view.common.CentralController
 import ulisse.infrastructures.view.components.JStyler.*
-import ulisse.infrastructures.view.form.CentralController
 
 import scala.concurrent.ExecutionContext
 import scala.swing.*
