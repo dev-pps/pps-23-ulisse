@@ -15,25 +15,21 @@ object MapPanel:
   def empty(): MapPanel = MapPanelImpl()
 
   private case class MapPanelImpl() extends MapPanel:
-    @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var items: List[MapItem] = List.empty
+
+    private val items = MapItemsCollection()
     opaque = false
 
     listenTo(mouse.clicks, mouse.moves)
     reactions += {
-      case event.MousePressed(_, point, _, _, _) =>
-        items = items.appended(MapItem.createSingleItem("station.png", point.x, point.y))
-        items.foreach(_.onClick(point))
-        repaint()
-      case event.MouseMoved(_, point, _) =>
-        items.foreach(_.onHover(point))
-        repaint()
+      case event.MouseMoved(_, point, _)          => items.onHover(point); repaint()
+      case event.MousePressed(_, point, _, _, _)  => items.onClick(point); repaint()
+      case event.MouseReleased(_, point, _, _, _) => items.onRelease(point); repaint()
     }
 
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-      items.foreach(_.drawItem(g, peer))
+      items.draw(g, peer)
 
 //      points.foreach((p1, p2) =>
 //        g.setColor(java.awt.Color.BLACK)
