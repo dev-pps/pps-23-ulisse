@@ -32,7 +32,7 @@ object SideMenu:
     private val openCloseButtonSize = 25
     private val menuCardStyle = JStyler.rectPaletteStyler(
       JStyler.rect(JStyler.defaultSizeRect, JStyler.Dimension2D(5, 5), 25),
-      JStyler.palette(Theme.light.forwardClick.withAlpha(150), Theme.light.overlayElement, Theme.light.forwardClick)
+      JStyler.palette(JStyler.transparentColor, Theme.light.forwardClick.withAlpha(150), Theme.light.forwardClick)
     )
 
     private val header = buildHeader()
