@@ -63,6 +63,6 @@ object ImagePanels:
       g.fillRect(center._1 - length / 2, center._2 - thickness / 2, length, thickness)
       g.setColor(oldColor)
 
-    val imagePanelExample: ImagePanel = ImagePanel.createImagePanel("icon/logo.jpg")
-    val svgPanelExample: ImagePanel   = ImagePanel.createSVGPanel("icon/map.svg", Color.RED)
+    val imagePanelExample: ImagePanel = ImagePanel.createImagePanel("icons/logo.jpg")
+    val svgPanelExample: ImagePanel   = ImagePanel.createSVGPanel("icons/map.svg", Color.RED)
     val drawnPanelExample: ImagePanel = ImagePanel.createDrawnPanel(drawCross(20, 2, Color.BLUE))

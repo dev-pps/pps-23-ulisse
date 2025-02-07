@@ -16,7 +16,7 @@ final case class Menu(root: UpdatableContainer) extends BorderPanel:
   preferredSize = new Dimension(600, 400)
   private val card =
     JImageCard.vertical(
-      ImagePanel.createSVGPanel("icon/add.svg", Color.BLACK),
+      ImagePanel.createSVGPanel("icons/add.svg", Color.BLACK),
       Label("new").centerHorizontally(),
       JStyler.default
     )
