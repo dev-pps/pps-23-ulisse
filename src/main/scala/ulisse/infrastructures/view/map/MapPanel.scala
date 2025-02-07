@@ -1,58 +1,56 @@
 package ulisse.infrastructures.view.map
 
 import ulisse.entities.Coordinates
-import ulisse.entities.Coordinates.{Coordinate, UIPoint}
-import ulisse.entities.Route.Station
+import ulisse.entities.Coordinates.UIPoint
 
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
-import javax.imageio.ImageIO
 import scala.math.BigDecimal.double2bigDecimal
 import scala.math.{abs, sqrt}
-import scala.swing.{Graphics2D, Image, Panel}
+import scala.swing.{event, Graphics2D, Image, Panel}
 
-trait MapPanel extends Panel:
-  def setPoints(points: List[(Station, Station)]): Unit
+trait MapPanel extends Panel
 
 object MapPanel:
-  def apply(points: List[((Int, Int), (Int, Int))]): MapPanel = MapPanelImpl(points)
-  def empty(): MapPanel                                       = MapPanelImpl(List.empty)
+  def empty(): MapPanel = MapPanelImpl()
 
-  @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  private case class MapPanelImpl(var points: List[((Int, Int), (Int, Int))]) extends Panel with MapPanel:
-    private val stationUrl   = ClassLoader.getSystemResource("icons/station.svg")
-    private val stationImage = ImageIO.read(stationUrl)
-
-    private val routeUrl   = getClass.getResource("/route.png")
-    private val routeImage = ImageIO.read(routeUrl)
-
+  private case class MapPanelImpl() extends MapPanel:
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
+    private var items: List[MapItem] = List.empty
     opaque = false
 
-    override def setPoints(points: List[((String, Coordinates.Geo), (String, Coordinates.Geo))]): Unit =
-      this.points = points.map((p1, p2) =>
-        ((p1._2.latitude.toInt, p1._2.longitude.toInt), (p2._2.latitude.toInt, p2._2.longitude.toInt))
-      )
+    listenTo(mouse.clicks, mouse.moves)
+    reactions += {
+      case event.MousePressed(_, point, _, _, _) =>
+        items = items.appended(MapItem.createSingleItem("station.png", point.x, point.y))
+        items.foreach(_.onClick(point))
+        repaint()
+      case event.MouseMoved(_, point, _) =>
+        items.foreach(_.onHover(point))
+        repaint()
+    }
 
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+      items.foreach(_.drawItem(g, peer))
 
-      points.foreach((p1, p2) =>
-        g.setColor(java.awt.Color.BLACK)
-        val stationSize = 30
-        val half        = stationSize / 2
-        val scale       = 0.05
-
-        val ss: UIPoint =
-          Coordinate.uiPoint(p1._1.toDouble + (stationSize * scale), p1._2.toDouble + (stationSize * scale))
-        val es: UIPoint = Coordinate.uiPoint(p2._1.toDouble + (half * scale), p2._2.toDouble + (half * scale))
-        val start: (Double, Double) = (p1._1 - half, p1._2 - half)
-        val end: (Double, Double)   = (p2._1 - half, p2._2 - half)
-
-        drawTiledImage(g, routeImage, scale, ss, es)
-        g.drawImage(stationImage, start._1.toInt, start._2.toInt, 30, 30, peer)
-        g.drawImage(stationImage, end._1.toInt, end._2.toInt, 30, 30, peer)
-      )
+//      points.foreach((p1, p2) =>
+//        g.setColor(java.awt.Color.BLACK)
+//        val stationSize = 30
+//        val half        = stationSize / 2
+//        val scale       = 0.05
+//
+//        val ss: UIPoint =
+//          Coordinate.uiPoint(p1._1.toDouble + (stationSize * scale), p1._2.toDouble + (stationSize * scale))
+//        val es: UIPoint = Coordinate.uiPoint(p2._1.toDouble + (half * scale), p2._2.toDouble + (half * scale))
+//        val start: (Double, Double) = (p1._1 - half, p1._2 - half)
+//        val end: (Double, Double)   = (p2._1 - half, p2._2 - half)
+//
+//        drawTiledImage(g, routeImage, scale, ss, es)
+//        g.drawImage(stationImage, start._1.toInt, start._2.toInt, 30, 30, peer)
+//        g.drawImage(stationImage, end._1.toInt, end._2.toInt, 30, 30, peer)
+//      )
 
     private def drawTiledImage(g: Graphics2D, img: Image, scale: Double, start: UIPoint, end: UIPoint): Unit =
       val scaleDim = (img.getWidth(peer) * scale, img.getHeight(peer) * scale)

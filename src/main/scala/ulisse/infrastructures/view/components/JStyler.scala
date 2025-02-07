@@ -1,8 +1,8 @@
 package ulisse.infrastructures.view.components
 
 import java.awt.Color
-import scala.swing.Font.Style.Value as StyleFont
 import scala.swing.Font as SwingFont
+import scala.swing.Font.Style.Value as StyleFont
 
 object JStyler:
   export JStyles._
@@ -69,6 +69,15 @@ object JStyler:
     val transparentPalette: Palette = Palette(transparentColor, withOutColor, withOutColor)
 
     case class Dimension2D[T](width: T, height: T)
+
+    extension [T: Numeric](dimension: Dimension2D[T])
+      def minus(other: Dimension2D[T])(using numeric: Numeric[T]): Dimension2D[T] =
+        Dimension2D(numeric.minus(dimension.width, other.width), numeric.minus(dimension.height, other.height))
+      def plus(other: Dimension2D[T])(using numeric: Numeric[T]): Dimension2D[T] =
+        Dimension2D(numeric.plus(dimension.width, other.width), numeric.plus(dimension.height, other.height))
+      def times(other: Dimension2D[T])(using numeric: Numeric[T]): Dimension2D[T] =
+        Dimension2D(numeric.times(dimension.width, other.width), numeric.times(dimension.height, other.height))
+
     type Size    = Dimension2D[Option[Int]]
     type Padding = Dimension2D[Int]
 
