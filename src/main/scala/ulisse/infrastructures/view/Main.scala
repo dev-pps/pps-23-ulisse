@@ -4,13 +4,12 @@ import ulisse.adapters.input.StationEditorAdapter
 import ulisse.adapters.output.StationPortOutputAdapter
 import ulisse.applications.AppState
 import ulisse.applications.managers.{RouteManager, StationManager}
-import ulisse.applications.useCases.RouteUIInputService.RouteUIInputService
+import ulisse.applications.useCases.RouteUIService.RouteUIInputService
 import ulisse.applications.useCases.StationService
 import ulisse.entities.Coordinates.Grid
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.StationTypes.*
-import ulisse.infrastructures.view.map.GUIView
 import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.station.StationEditorView
 

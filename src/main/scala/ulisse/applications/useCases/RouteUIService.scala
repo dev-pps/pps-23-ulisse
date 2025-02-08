@@ -9,7 +9,7 @@ import ulisse.entities.Routes.Route
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
-object RouteUIInputService:
+object RouteUIService:
 
   object RouteUIInputService:
     def apply(queue: LinkedBlockingQueue[RouteManager => RouteManager]): RoutePorts.UIInputPort =
