@@ -1,4 +1,4 @@
-# [Regole d'esame](https://virtuale.unibo.it/mod/page/view.php?id=1295910)
+# [Regole d'esame](https://virtuale.unibo.it/mod/page/view.php?route=1295910)
 # Note aggiuntive su come preparare la relazione
 1. Non si faccia mancare all'inizio una descrizione anche sommaria di cosa il sistema implementato realizza, con alcuni indicazioni  su quali caratteristiche potranno decretare se il progetto ha prodotto un buon risultato.
 2. Vista la mole di lavoro dietro al progetto, difficile pensare che i requirement occupino meno di 5-6 facciate: 
