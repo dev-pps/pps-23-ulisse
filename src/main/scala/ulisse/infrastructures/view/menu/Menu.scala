@@ -7,6 +7,7 @@ import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.Images.ImagePanel
 import ulisse.infrastructures.view.components.{ComposedSwing, Styles}
 import ulisse.infrastructures.view.dashboard.Dashboard
+import ulisse.infrastructures.view.simulation.SimulationPage.SimulationPageControlPanel
 
 import java.awt.Color
 import scala.swing.*
