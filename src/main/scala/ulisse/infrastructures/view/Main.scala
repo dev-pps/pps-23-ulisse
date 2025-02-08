@@ -1,16 +1,17 @@
 package ulisse.infrastructures.view
 
-import ulisse.adapters.input.StationEditorAdapter
+import ulisse.adapters.input.{SimulationPageAdapter, StationEditorAdapter}
 import ulisse.applications.AppState
 import ulisse.applications.managers.{RouteManager, StationManager}
 import ulisse.applications.useCases.RouteUIInputService.RouteUIInputService
-import ulisse.applications.useCases.StationService
+import ulisse.applications.useCases.{SimulationService, StationService}
 import ulisse.entities.Coordinates.Grid
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.StationTypes.*
 import ulisse.infrastructures.view.map.GUIView
 import ulisse.infrastructures.view.menu.Menu
+import ulisse.infrastructures.view.simulation.SimulationPage
 import ulisse.infrastructures.view.station.StationEditorView
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -37,6 +38,11 @@ val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
+
+final case class SimulationSettings():
+  val inputAdapter: SimulationService                 = SimulationService()
+  val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
+  val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
 
 final case class StationSettings():
   val inputAdapter: StationService[N, C, S]                  = StationService(eventStream)

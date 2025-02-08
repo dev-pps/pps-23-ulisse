@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.dashboard
 
-import ulisse.infrastructures.view.StationSettings
+import ulisse.infrastructures.view.{SimulationSettings, StationSettings}
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentConfigurations.{
@@ -36,7 +36,7 @@ object SideMenu:
     )
 
     private val header      = buildHeader()
-    private val defaultPage = SimulationPage()
+    private val defaultPage = SimulationSettings().simulationPage
     private val menuCards: List[SelectableJImageCard] = List(
       buildMenuCard("icons/simulation.svg", "Simulation").genericClickReaction(() =>
         uc.update(defaultPage)
