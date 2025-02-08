@@ -4,16 +4,19 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.applications.managers.RouteManager
 import ulisse.entities.Coordinates.Coordinate
-import ulisse.entities.Route.{Path, Station, TypeRoute}
-import ulisse.entities.Route
+import ulisse.entities.Routes.Route
+import ulisse.entities.Routes.Route.TypeRoute
+import ulisse.entities.station.Station
 
 class RouteManagerTest extends AnyFlatSpec with Matchers:
-  val riminiStation: Station = ("Rimini", Coordinate.geo(20d, 20d))
-  val cesenaStation: Station = ("Cesena", Coordinate.geo(10d, 10d))
-  val path: Path             = (riminiStation, cesenaStation)
-  val pathLength: Double     = 200.0d
-  val railsCount             = 1
-  val route: Route           = Route(TypeRoute.Normal, path, pathLength, railsCount)
+
+  val departureStation: Station[Double, Coordinate[Double]] = Station("Rimini", Coordinate.geo(20d, 20d), 2)
+  val arrivalStation: Station[Double, Coordinate[Double]]   = Station("Cesena", Coordinate.geo(10d, 10d), 2)
+  val typeRoute: TypeRoute                                  = TypeRoute.Normal
+  val railsCount                                            = 1
+  val pathLength: Double                                    = 200.0d
+
+  val route: Route = Route(departureStation, arrivalStation, typeRoute, railsCount, pathLength)
 
   val emptyRouteManager: RouteManager         = RouteManager.empty()
   val singleElementRouteManager: RouteManager = RouteManager.createOf(List(route))
@@ -24,36 +27,35 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
 
   "save new routes" should "be contains in routeManager" in:
     val newRouteManager = emptyRouteManager.save(route)
-
     newRouteManager match
       case Left(error) => fail(error.productPrefix)
       case Right(manager) =>
         manager.size must be(1)
         manager.contains(route) must be(true)
 
-  "read routes" should "from id" in:
-    val optRoute = singleElementRouteManager.route(route.id)
+  "read routes" should "from route" in:
+    val optRoute = singleElementRouteManager.find(route.id)
     optRoute match
       case Some(newRoute) => newRoute must be(route)
       case _              => fail("Route not found")
 
-  "save routes with same id" should "change routes railsCount" in:
-    val differentRailsCountRoute = Route(TypeRoute.Normal, path, pathLength, 3)
+  "save routes with same route" should "change routes railsCount" in:
+    val differentRailsCountRoute = Route(departureStation, arrivalStation, typeRoute, railsCount + 1, pathLength)
     val newRouteManager          = singleElementRouteManager.save(differentRailsCountRoute)
-    val optOldRoute              = singleElementRouteManager.route(route.id)
+    val optOldRoute              = singleElementRouteManager.find(route.id)
 
     newRouteManager match
       case Left(error) => fail(error.productPrefix)
       case Right(manager) => for {
           oldRoute <- optOldRoute
-          newRoute <- manager.route(route.id)
+          newRoute <- manager.find(route.id)
         } yield {
           oldRoute must be(newRoute)
           oldRoute.railsCount must not be newRoute.railsCount
         }
 
   "save two different routes" should "have two element" in:
-    val differentRoute  = Route(TypeRoute.AV, path, pathLength, railsCount)
+    val differentRoute  = Route(departureStation, arrivalStation, TypeRoute.AV, railsCount, pathLength)
     val newRouteManager = singleElementRouteManager.save(differentRoute)
 
     newRouteManager match
