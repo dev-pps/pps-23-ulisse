@@ -10,7 +10,9 @@ import ulisse.infrastructures.view.components.JStyler
 
 import java.awt.{BorderLayout, Color}
 
-trait SimulationPage extends Component
+trait SimulationPage extends Component:
+  def updateData(): Unit = println("received simulation data update")
+
 object SimulationPage:
   def apply(): SimulationPage = SimulationPageImpl()
 
