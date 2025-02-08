@@ -13,11 +13,11 @@ import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 import ulisse.infrastructures.view.components.JStyler
 import ulisse.infrastructures.view.components.Selectables.SelectableGroup
-import ulisse.infrastructures.view.map.{EditorsView, MapPanel}
-import ulisse.infrastructures.view.menu.Menu
+import ulisse.infrastructures.view.map.EditorsView
+import ulisse.infrastructures.view.simulation.SimulationPage
 
 import java.awt.{Color, Insets}
-import scala.swing.{BoxPanel, Component, Dimension, Label, Orientation, Reactor, Swing}
+import scala.swing.*
 
 trait SideMenu extends Component
 object SideMenu:
@@ -35,14 +35,16 @@ object SideMenu:
       JStyler.palette(JStyler.transparentColor, Theme.light.forwardClick.withAlpha(150), Theme.light.forwardClick)
     )
 
-    private val header = buildHeader()
-
+    private val header      = buildHeader()
+    private val defaultPage = SimulationPage()
     private val menuCards: List[SelectableJImageCard] = List(
       buildMenuCard("icons/simulation.svg", "Simulation").genericClickReaction(() =>
-        uc.update(StationSettings().stationEditorView)
+        uc.update(defaultPage)
       ),
       buildMenuCard("icons/map.svg", "Editors").genericClickReaction(() => uc.update(EditorsView())),
-      buildMenuCard("icons/train.svg", "Trains").genericClickReaction(() => uc.update(Menu(uc))),
+      buildMenuCard("icons/train.svg", "Trains").genericClickReaction(() =>
+        uc.update(StationSettings().stationEditorView)
+      ),
       buildMenuCard("icons/settings.svg", "Settings")
     )
 
@@ -69,8 +71,8 @@ object SideMenu:
       bottomMenu.foreach(position)
       lastItem.foreach(position)
       contents += Swing.VStrut(layout_bounds.bottom)
-      uc.update(StationSettings().stationEditorView)
       updateSize()
+      uc.update(defaultPage)
 
     private def buildHeader(): JImageCard =
       val headerLeftContent = JImageCard.horizontal(
@@ -105,6 +107,8 @@ object SideMenu:
       this.peer.setBounds(0, 0, preferredSize.width, preferredSize.height)
       revalidate()
       repaint()
+
+    background = Theme.light.element
     build_layout()
 
     extension (imageCard: JImageCard)
