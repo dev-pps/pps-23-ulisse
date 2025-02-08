@@ -8,6 +8,7 @@ import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 import ulisse.infrastructures.view.components.JComponent
 import ulisse.infrastructures.view.components.JStyler
 import ulisse.infrastructures.view.dashboard.Dashboard
+import ulisse.infrastructures.view.simulation.SimulationPage.SimulationPageControlPanel
 
 import java.awt.Color
 import scala.swing.{BorderPanel, BoxPanel, Dimension, Label, Orientation, Swing}
