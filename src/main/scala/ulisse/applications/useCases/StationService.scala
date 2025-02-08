@@ -14,15 +14,15 @@ final case class StationService[N: Numeric, C <: Coordinate[N], S <: Station[N, 
     outputPort: StationPorts.Output
 ) extends StationPorts.Input[N, C, S]:
 
-  override def stationManager: Future[SM] =
+  override def stationMap: Future[SM] =
     val p = Promise[SM]()
-    eventQueue.add((state: AppState[N, C, S]) => { p.success(state.stationMap); state })
+    eventQueue.add((state: AppState[N, C, S]) => { p.success(state.stationManager.stations); state })
     p.future
 
   override def addStation(station: S): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[N, C, S]) => {
-      val updatedMap = state.stationMap.addStation(station)
+      val updatedMap = state.stationManager.addStation(station)
       updateState(p, state, updatedMap)
     })
     p.future
@@ -30,7 +30,7 @@ final case class StationService[N: Numeric, C <: Coordinate[N], S <: Station[N, 
   override def removeStation(station: S): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[N, C, S]) => {
-      val updatedMap = state.stationMap.removeStation(station)
+      val updatedMap = state.stationManager.removeStation(station)
       updateState(p, state, updatedMap)
     })
     p.future
@@ -38,15 +38,15 @@ final case class StationService[N: Numeric, C <: Coordinate[N], S <: Station[N, 
   override def findStationAt(coordinate: C): Future[Option[S]] =
     val p = Promise[Option[S]]()
     eventQueue.add((state: AppState[N, C, S]) => {
-      val station = state.stationMap.findStationAt(coordinate)
+      val station = state.stationManager.findStationAt(coordinate)
       p.success(station)
       state
     })
     p.future
 
-  private def updateState(p: Promise[Either[E, SM]], state: AppState[N, C, S], updatedMap: state.stationMap.R) = {
-    p.success(updatedMap)
+  private def updateState(p: Promise[Either[E, SM]], state: AppState[N, C, S], updatedMap: state.stationManager.R) = {
     updatedMap match
-      case Left(value)  => state
-      case Right(value) => state.copy(stationMap = value)
+      case Left(value) => p.success(Left(value)); state
+      case Right(value: CheckedStationManager[N, C, S]) =>
+        p.success(Right(value.stations)); state.copy(stationManager = value)
   }

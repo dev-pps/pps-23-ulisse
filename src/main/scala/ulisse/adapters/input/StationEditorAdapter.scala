@@ -58,7 +58,7 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
     * @return
     *   A `Future` containing either:
     *   - `Left(NonEmptyChain[BaseError])` if validation fails.
-    *   - `Right(StationManager[N, C, S])` if the station is successfully created and added.
+    *   - `Right(StationMap[S])` if the station is successfully created and added.
     */
   def onOkClick(
       stationName: String,
@@ -69,7 +69,7 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
   )(using
       coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
-  ): Future[Either[NonEmptyChain[BaseError], StationManager[N, C, S]]] =
+  ): Future[Either[NonEmptyChain[BaseError], StationManager[N, C, S]#StationMapType]] =
     createStation(stationName, x, y, numberOfTrack, coordinateGenerator, stationGenerator) match
       case Left(value) => Future.successful(Left(value))
       case Right(value) =>

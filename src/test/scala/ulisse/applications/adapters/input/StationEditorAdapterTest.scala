@@ -46,7 +46,10 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
   private val (checkedController, _)    = configureTest[Int, Grid, CheckedStation[Int, Grid]]()
 
   private type addStationFuture =
-    Future[Either[NonEmptyChain[BaseError], StationManager[Int, Coordinate[Int], Station[Int, Coordinate[Int]]]]]
+    Future[Either[
+      NonEmptyChain[BaseError],
+      StationManager[Int, Coordinate[Int], Station[Int, Coordinate[Int]]]#StationMapType
+    ]]
   private type findStationFuture = Future[Option[Station[Int, Coordinate[Int]]]]
   private def addStation(): (addStationFuture, findStationFuture) =
     val addStationResult =
@@ -65,7 +68,7 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
       "add a new station when inputs are valid and oldStation is None" in:
         val (addStationResult, findStationResult) = addStation()
         updateState()
-        Await.result(addStationResult, Duration.Inf) shouldBe Right(StationManager(station))
+        Await.result(addStationResult, Duration.Inf) shouldBe Right(List(station))
         Await.result(findStationResult, Duration.Inf) shouldBe Some(station)
 
       "replace the station when inputs are valid and oldStation is Some(station)" in:
@@ -85,9 +88,9 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
         val findStationAfterAddNewStationResult = controller.findStationAt(Coordinate(x, y))
 
         updateState()
-        Await.result(addStationResult, Duration.Inf) shouldBe Right(StationManager(station))
+        Await.result(addStationResult, Duration.Inf) shouldBe Right(List(station))
         Await.result(findStationResult, Duration.Inf) shouldBe Some(station)
-        Await.result(addNewStationResult, Duration.Inf) shouldBe Right(StationManager(newStation))
+        Await.result(addNewStationResult, Duration.Inf) shouldBe Right(List(newStation))
         Await.result(findNewStationResult, Duration.Inf) shouldBe Some(newStation)
         Await.result(findStationAfterAddNewStationResult, Duration.Inf) shouldBe None
 
@@ -96,7 +99,7 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
         val (addSameStationResult, findSameStationResult) = addStation()
 
         updateState()
-        Await.result(addStationResult, Duration.Inf) shouldBe Right(StationManager(station))
+        Await.result(addStationResult, Duration.Inf) shouldBe Right(List(station))
         Await.result(findStationResult, Duration.Inf) shouldBe Some(station)
         Await.result(addSameStationResult, Duration.Inf) shouldBe Left(Chain(
           CheckedStationManager.Error.DuplicateStationName,
