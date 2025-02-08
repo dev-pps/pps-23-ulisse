@@ -10,8 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 final case class StationService[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
-    eventQueue: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]],
-    outputPort: StationPorts.Output
+    eventQueue: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]
 ) extends StationPorts.Input[N, C, S]:
 
   override def stationMap: Future[SM] =

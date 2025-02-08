@@ -23,12 +23,11 @@ class StationServiceTest extends AnyWordSpec with Matchers:
   private type N = Int
   private type C = Coordinate[N]
   private type S = Station[N, C]
-  private val outputPort   = mock[StationPorts.Output]
-  private val station      = Station("StationA", Coordinate(0, 0), 1)
-  private val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
-  private val eventStream  = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
-  private val inputPort =
-    StationService[Int, Coordinate[Int], Station[Int, Coordinate[Int]]](eventStream, outputPort)
+  private val outputPort    = mock[StationPorts.Output]
+  private val station       = Station("StationA", Coordinate(0, 0), 1)
+  private val initialState  = AppState[N, C, S](StationManager.createCheckedStationManager())
+  private val eventStream   = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+  private val inputPort     = StationService(eventStream)
   private def updateState() = runAll(initialState, eventStream)
 
   "StationService" should:

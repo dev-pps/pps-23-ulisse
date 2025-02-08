@@ -22,7 +22,6 @@ import scala.concurrent.duration.Duration
 
 class StationEditorAdapterTest extends AnyWordSpec with Matchers:
 
-  private val outputPort    = mock[StationPorts.Output]
   private val stationName   = "New Station"
   private val x             = 1
   private val y             = 1
@@ -37,7 +36,7 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
     val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
     val eventStream  = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
     val inputPort =
-      StationService[N, C, S](eventStream, outputPort)
+      StationService[N, C, S](eventStream)
     val controller = StationEditorAdapter[N, C, S](inputPort)
     (controller, () => runAll(initialState, eventStream))
 
