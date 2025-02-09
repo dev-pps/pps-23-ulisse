@@ -1,3 +1,35 @@
+## [1.7.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.6.0...v1.7.0) (2025-02-09)
+
+### Features
+
+* add basic menu bar ([3b18566](https://github.com/dev-pps/pps-23-ulisse/commit/3b18566b31cbe08bde19f0ce1f6e11694de1b662))
+* **Card:** add ImageCard ([edb96dc](https://github.com/dev-pps/pps-23-ulisse/commit/edb96dc48fccb06d7894ec040c37a417dcf85e9d))
+* **Card:** can draw icon at center of dedicated panel or the entire card ([a63717d](https://github.com/dev-pps/pps-23-ulisse/commit/a63717dc4f0fd16c9ced13c51c968ba091fb143e))
+* **Cards:** split normal and selectable cards ([e87a3b2](https://github.com/dev-pps/pps-23-ulisse/commit/e87a3b249fa15d346de9196b2c1af670704ae72a))
+* **ComponentUtils:** single button selection works but there are rendering problems ([de94f94](https://github.com/dev-pps/pps-23-ulisse/commit/de94f94e5cad865652c92e39264bcd4a347cf182))
+* **Dashboard:** integration demo ([69cad7b](https://github.com/dev-pps/pps-23-ulisse/commit/69cad7bd2e1ab2cf8a3094135df84816c47363f1))
+* **Dashboard:** move menus from menu page to dashboar page ([8ab14f8](https://github.com/dev-pps/pps-23-ulisse/commit/8ab14f8df8c399a568296e5c38d0e1ae83120dfe))
+* **Dashboard:** put side menu in PALETTE_LAYER ([c8c8e49](https://github.com/dev-pps/pps-23-ulisse/commit/c8c8e49ad349e02b919593165fd5dbc4a890d1e7))
+* **ImageCard:** enanche component building and setup selectableGroup ([60d6277](https://github.com/dev-pps/pps-23-ulisse/commit/60d62777d695fe81eb993ccb9a9a6ae9b3006be0))
+* **ImagePanels:** improve implementation ([b7e1d2d](https://github.com/dev-pps/pps-23-ulisse/commit/b7e1d2d89b8cfbcd32675cd2d076b56f1a91ebc4))
+* **MenuCard:** align content to the left ([61f9f3a](https://github.com/dev-pps/pps-23-ulisse/commit/61f9f3a002b09dcb7fd31e76a336d1fd43fc55c4))
+* **MenuCard:** menu item ([990467f](https://github.com/dev-pps/pps-23-ulisse/commit/990467f094756147ea9550d90bdd48eb80425226))
+* **Menu:** configure Card click reaction ([ab8ea0c](https://github.com/dev-pps/pps-23-ulisse/commit/ab8ea0cc3443160888fb5fa8bce49f8b857a9abe))
+* **Menu:** make a centerd new project icon ([0993cab](https://github.com/dev-pps/pps-23-ulisse/commit/0993cab9ba2fe004aa302f8a6dbcbd342b35a3fa))
+* **Menu:** update style ([0c1605c](https://github.com/dev-pps/pps-23-ulisse/commit/0c1605c9187f2e9a001905e64cec0d49a5df10a6))
+* **SideMenu:** reasonable layout ([86a1d98](https://github.com/dev-pps/pps-23-ulisse/commit/86a1d98c07067ddc3d650c692d1db4881735beec))
+* **SideMenu:** setup ([1ca219d](https://github.com/dev-pps/pps-23-ulisse/commit/1ca219d7b3b316570f3d380e45490d32a18578b5))
+* **SideMenu:** working layout ([4656eb2](https://github.com/dev-pps/pps-23-ulisse/commit/4656eb295eaa9755cd97bcb8453b60af0b30badd))
+* **SideMenu:** working open/close ([b6c9348](https://github.com/dev-pps/pps-23-ulisse/commit/b6c9348471c95d6e6777722cea098a2ee99ab8db))
+* **SideMenu:** working radio selection ([e56b5eb](https://github.com/dev-pps/pps-23-ulisse/commit/e56b5eb80f7f2a2d4dd9e2fe62281ae48e1b9027))
+* **SVGCard:** add svg support for card image to allow icon to match app theme ([f3e4182](https://github.com/dev-pps/pps-23-ulisse/commit/f3e4182e224f4c738323c977ecd9596fbd56756a))
+
+### Bug Fixes
+
+* **ComponentUtils:** click event propagation to radiobutton ([a15a445](https://github.com/dev-pps/pps-23-ulisse/commit/a15a4450221ecfd2023f0685c3eaa5fb0ab9ef4e))
+* **ComponentUtils:** rendering problem for custom radio button ([5e5a4ea](https://github.com/dev-pps/pps-23-ulisse/commit/5e5a4eae4e3d1fa9db2ff389bb539a2fae3f1435))
+* **HexagonalTest:** move main into infrastructure ([b7caad2](https://github.com/dev-pps/pps-23-ulisse/commit/b7caad2250aa4ceeb94689f30967769c3d89f3ec))
+
 ## [1.6.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.5.1...v1.6.0) (2025-02-06)
 
 ### Features
