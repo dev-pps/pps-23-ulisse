@@ -29,5 +29,6 @@ object SimulationManager:
     override def stop(): SimulationManager  = copy(running = false)
     override def reset(): SimulationManager = copy(running = false, step = 0)
     override def doStep(): SimulationManager =
-      notificationService.stepNotification()
-      copy(step = step + 1)
+      val updatedStep = step + 1
+      notificationService.stepNotification(updatedStep)
+      copy(step = updatedStep)
