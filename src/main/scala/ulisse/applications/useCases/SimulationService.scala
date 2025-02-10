@@ -17,6 +17,7 @@ final case class SimulationService[N: Numeric, C <: Coordinate[N], S <: Station[
     val p = Promise[Unit]()
     simulationEvents.add((state: SimulationState) => {
       p.success(println("[SimulationService]: Simulation Started"));
+      doStep()
       state.copy(simulationManager = state.simulationManager.start())
     })
     p.future
@@ -37,15 +38,19 @@ final case class SimulationService[N: Numeric, C <: Coordinate[N], S <: Station[
     })
     p.future
 
+  @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   private def doStep(): Unit =
-    simulationEvents.add((state: SimulationState) => {
-      doStep()
-      state.copy(simulationManager = state.simulationManager.doStep())
+    simulationEvents.offer((state: SimulationState) => {
+      if state.simulationManager.running then
+        doStep()
+        println("[SimulationService]: Simulation Step")
+        state.copy(simulationManager = state.simulationManager.doStep())
+      else
+        state
     })
 
   Executors.newSingleThreadExecutor().execute(() =>
-    LazyList.continually(simulationEvents.take()).foldLeft(SimulationState(SimulationManager(simulationEvents)))(
-      (state, event) =>
-        event(state)
+    LazyList.continually(simulationEvents.take()).foldLeft(SimulationState(SimulationManager()))((state, event) =>
+      event(state)
     )
   )
