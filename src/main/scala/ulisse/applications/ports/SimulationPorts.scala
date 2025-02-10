@@ -1,10 +1,12 @@
 package ulisse.applications.ports
 
+import scala.concurrent.Future
+
 object SimulationPorts:
   trait Output:
     def stepNotification(): Unit
 
   trait Input:
-    def start(): Unit
-    def stop(): Unit
-    def reset(): Unit
+    def start(): Future[Unit]
+    def stop(): Future[Unit]
+    def reset(): Future[Unit]
