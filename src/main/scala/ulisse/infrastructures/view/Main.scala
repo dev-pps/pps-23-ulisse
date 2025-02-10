@@ -3,7 +3,8 @@ package ulisse.infrastructures.view
 import ulisse.adapters.input.StationEditorAdapter
 import ulisse.adapters.output.StationPortOutputAdapter
 import ulisse.applications.AppState
-import ulisse.applications.managers.{RouteManager, StationManager}
+import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.applications.managers.StationManager
 import ulisse.applications.useCases.RouteUIService.RouteUIInputService
 import ulisse.applications.useCases.StationService
 import ulisse.entities.Coordinates.{Coordinate, Grid}
