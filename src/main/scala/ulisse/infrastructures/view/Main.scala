@@ -6,7 +6,7 @@ import ulisse.applications.AppState
 import ulisse.applications.managers.{RouteManager, StationManager}
 import ulisse.applications.useCases.RouteUIService.RouteUIInputService
 import ulisse.applications.useCases.StationService
-import ulisse.entities.Coordinates.Grid
+import ulisse.entities.Coordinates.{Coordinate, Grid}
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.StationTypes.*
@@ -80,6 +80,6 @@ object StationTypes:
   )
 
 @main def testNewGraphicComponents(): Unit =
-  val list = LinkedBlockingQueue[RouteManager => RouteManager]
+  val list = LinkedBlockingQueue[RouteManager[Double, Coordinate[Double]] => RouteManager[Double, Coordinate[Double]]]()
   val port = RouteUIInputService(list)
   val map  = GUIView(port)
