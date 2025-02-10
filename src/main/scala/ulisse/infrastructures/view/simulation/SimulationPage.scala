@@ -10,6 +10,10 @@ import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 import ulisse.infrastructures.view.components.JStyler
 
 import java.awt.{BorderLayout, Color}
+import scala.concurrent.ExecutionContext
+
+given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
+  Swing.onEDT(runnable.run())
 
 trait SimulationPage extends Component:
   def updateData(): Unit = println("received simulation data update")
@@ -35,20 +39,20 @@ object SimulationPage:
       ImagePanel.createSVGPanel("icons/play.svg", Color.ORANGE).fixedSize(50, 50).genericClickReaction(() =>
         startImage.visible = false
         pauseImage.visible = true
-        controller.start()
+        controller.start().onComplete(_ => println("[View]Simulation started"))
       ).styler(pageControlImageButtonStyle)
     private val pauseImage: ImagePanel =
       ImagePanel.createSVGPanel("icons/pause.svg", Color.ORANGE).fixedSize(50, 50).visible(false).genericClickReaction(
         () =>
           pauseImage.visible = false
           startImage.visible = true
-          controller.stop()
+          controller.stop().onComplete(_ => println("[View]Simulation stopped"))
       ).styler(pageControlImageButtonStyle)
     private val resetImage =
       ImagePanel.createSVGPanel("icons/reset.svg", Color.ORANGE).fixedSize(50, 50).genericClickReaction(() =>
         startImage.visible = true
         pauseImage.visible = false
-        controller.reset()
+        controller.reset().onComplete(_ => println("[View]Simulation reset"))
       ).styler(pageControlImageButtonStyle)
     background = Theme.light.element
     contents += Swing.HStrut(10)
