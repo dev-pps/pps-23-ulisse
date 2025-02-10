@@ -2,7 +2,7 @@ package ulisse.infrastructures.view
 
 import ulisse.adapters.input.{SimulationPageAdapter, StationEditorAdapter}
 import ulisse.applications.AppState
-import ulisse.applications.managers.{RouteManager, StationManager}
+import ulisse.applications.managers.{RouteManager, SimulationManager, StationManager}
 import ulisse.applications.useCases.RouteUIInputService.RouteUIInputService
 import ulisse.applications.useCases.{SimulationService, StationService}
 import ulisse.entities.Coordinates.Grid
@@ -23,7 +23,7 @@ val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   app.contents = Menu(app)
   app.open()
 
-  val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
+  val initialState = AppState[N, C, S](StationManager.createCheckedStationManager(), SimulationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
@@ -34,13 +34,13 @@ val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   app.contents = settings.stationEditorView
   app.open()
 
-  val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
+  val initialState = AppState[N, C, S](StationManager.createCheckedStationManager(), SimulationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
 
 final case class SimulationSettings():
-  val inputAdapter: SimulationService                 = SimulationService()
+  val inputAdapter: SimulationService[N, C, S]        = SimulationService(eventStream)
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
 
