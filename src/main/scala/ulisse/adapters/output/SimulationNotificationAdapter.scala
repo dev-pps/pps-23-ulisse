@@ -5,7 +5,7 @@ import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.simulation.SimulationPage
 
-final case class SimulationNotificationAdapter[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
-    simulationPage: SimulationPage
-) extends SimulationPorts.Output:
-  override def stepNotification(): Unit = simulationPage.updateData()
+final case class SimulationNotificationAdapter() extends SimulationPorts.Output:
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
+  var simulationPage: Option[SimulationPage] = None
+  override def stepNotification(): Unit      = for sp <- simulationPage do sp.updateData()
