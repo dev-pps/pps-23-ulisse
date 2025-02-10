@@ -3,21 +3,21 @@ package ulisse.applications.useCases
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.{AppState, SimulationState}
 import ulisse.applications.ports.SimulationPorts
-import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.Coordinate
 import ulisse.entities.simulation.Environments.SimulationEnvironment
 import ulisse.entities.station.Station
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
-final case class SimulationService[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
-    eventQueue: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]],
+final case class SimulationService(
+    eventQueue: LinkedBlockingQueue[AppState => AppState],
     notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
   private val simulationEvents = LinkedBlockingQueue[SimulationState => SimulationState]()
   def start(): Future[Unit] =
     val p = Promise[Unit]()
-    eventQueue.add((appState: AppState[N, C, S]) => {
+    eventQueue.add((appState: AppState) => {
       simulationEvents.add((state: SimulationState) => {
         p.success(println("[SimulationService]: Simulation Started"));
         doStep()

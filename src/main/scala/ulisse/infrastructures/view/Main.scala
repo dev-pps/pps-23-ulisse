@@ -3,10 +3,8 @@ package ulisse.infrastructures.view
 import ulisse.adapters.input.{SimulationPageAdapter, StationEditorAdapter}
 import ulisse.adapters.output.{SimulationNotificationAdapter, SimulationNotificationAdapterRequirements}
 import ulisse.applications.AppState
-import ulisse.applications.managers.{CheckedStationManager, RouteManager, StationManager}
-import ulisse.applications.useCases.RouteUIInputService.RouteUIInputService
+import ulisse.applications.managers.StationManager
 import ulisse.applications.useCases.{SimulationService, StationService}
-import ulisse.entities.Coordinates.Grid
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
 import ulisse.applications.useCases.{RouteService, StationService}
@@ -46,7 +44,7 @@ final case class SimulationSettings():
     SimulationNotificationAdapter(new SimulationNotificationAdapterRequirements {
       override def simulationPageComponent: SimulationPage = simulationPage
     })
-  val inputAdapter: SimulationService        = SimulationService(eventStream, simulationNotificationAdapter)
+  val inputAdapter: SimulationService              = SimulationService(eventStream, simulationNotificationAdapter)
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
 //  simulationNotificationAdapter.simulationPage = Some(simulationPage)
