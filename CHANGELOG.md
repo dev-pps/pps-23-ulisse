@@ -1,3 +1,13 @@
+## [1.8.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.7.0...v1.8.0) (2025-02-10)
+
+### Features
+
+* **LayeredContainers:** add layered container with content and glass layers ([0e8c3ae](https://github.com/dev-pps/pps-23-ulisse/commit/0e8c3ae5a01d5ab22e13ae97114507dbe4c36716))
+
+### Bug Fixes
+
+* **StationPort:** don't expose the station manager but only the station map ([ca9ae06](https://github.com/dev-pps/pps-23-ulisse/commit/ca9ae0641459a07d6ebae25a4d372b57d5dcc0d7))
+
 ## [1.7.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.6.0...v1.7.0) (2025-02-09)
 
 ### Features
