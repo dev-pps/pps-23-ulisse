@@ -49,7 +49,7 @@ final case class SimulationSettings():
     SimulationNotificationAdapter(new SimulationNotificationAdapterRequirements {
       override def simulationPageComponent: SimulationPage = simulationPage
     })
-  val inputAdapter: SimulationService        = SimulationService(eventStream, simulationNotificationAdapter)
+  val inputAdapter: SimulationService[S]              = SimulationService(eventStream, simulationNotificationAdapter)
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
 //  simulationNotificationAdapter.simulationPage = Some(simulationPage)

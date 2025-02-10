@@ -10,14 +10,14 @@ import ulisse.entities.station.Station
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
-final case class SimulationService[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
-    eventQueue: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]],
+final case class SimulationService[S <: Station[?]](
+    eventQueue: LinkedBlockingQueue[AppState[S] => AppState[S]],
     notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
   private val simulationEvents = LinkedBlockingQueue[SimulationState => SimulationState]()
   def start(): Future[Unit] =
     val p = Promise[Unit]()
-    eventQueue.add((appState: AppState[N, C, S]) => {
+    eventQueue.add((appState: AppState[S]) => {
       simulationEvents.add((state: SimulationState) => {
         p.success(println("[SimulationService]: Simulation Started"));
         doStep()

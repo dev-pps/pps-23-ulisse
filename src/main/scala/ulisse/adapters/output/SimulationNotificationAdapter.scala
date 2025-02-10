@@ -11,4 +11,4 @@ trait SimulationNotificationAdapterRequirements:
 final case class SimulationNotificationAdapter(requirements: SimulationNotificationAdapterRequirements)
     extends SimulationPorts.Output with SimulationNotificationAdapterRequirements:
   override def simulationPageComponent: SimulationPage = requirements.simulationPageComponent
-  override def stepNotification(): Unit                = simulationPageComponent.updateData()
+  override def stepNotification(step: Int): Unit       = simulationPageComponent.updateData(step)

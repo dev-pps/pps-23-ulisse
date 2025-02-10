@@ -1,6 +1,6 @@
 package ulisse.applications
 
-import ulisse.applications.managers.CheckedStationManager
+import ulisse.applications.managers.{CheckedStationManager, SimulationManager}
 import ulisse.entities.station.Station
 
 final case class AppState[S <: Station[?]](

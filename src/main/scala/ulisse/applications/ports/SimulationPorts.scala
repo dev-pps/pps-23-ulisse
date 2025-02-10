@@ -5,7 +5,7 @@ import scala.concurrent.Future
 object SimulationPorts:
 
   trait Output:
-    def stepNotification(): Unit
+    def stepNotification(step: Int): Unit
 
   trait Input:
     def start(): Future[Unit]
