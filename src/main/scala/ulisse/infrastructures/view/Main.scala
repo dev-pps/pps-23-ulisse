@@ -23,7 +23,7 @@ val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   app.contents = Menu(app)
   app.open()
 
-  val initialState = AppState[N, C, S](StationManager.createCheckedStationManager(), SimulationManager())
+  val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
@@ -34,7 +34,7 @@ val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   app.contents = settings.stationEditorView
   app.open()
 
-  val initialState = AppState[N, C, S](StationManager.createCheckedStationManager(), SimulationManager())
+  val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
