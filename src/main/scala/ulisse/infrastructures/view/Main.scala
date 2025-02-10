@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view
 
 import ulisse.adapters.input.{SimulationPageAdapter, StationEditorAdapter}
+import ulisse.adapters.output.SimulationNotificationAdapter
 import ulisse.applications.AppState
 import ulisse.applications.managers.{CheckedStationManager, RouteManager, StationManager}
 import ulisse.applications.useCases.RouteUIInputService.RouteUIInputService
@@ -41,6 +42,7 @@ val eventStream = LinkedBlockingQueue[AppState => AppState]()
   )
 
 final case class SimulationSettings():
+  val simulationNotificationAdapter: SimulationNotificationAdapter = SimulationNotificationAdapter()
   val inputAdapter: SimulationService        = SimulationService(eventStream)
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
