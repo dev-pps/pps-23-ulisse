@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view
 
 import ulisse.adapters.input.{SimulationPageAdapter, StationEditorAdapter}
-import ulisse.adapters.output.SimulationNotificationAdapter
+import ulisse.adapters.output.{SimulationNotificationAdapter, SimulationNotificationAdapterRequirements}
 import ulisse.applications.AppState
 import ulisse.applications.managers.{RouteManager, SimulationManager, StationManager}
 import ulisse.applications.useCases.RouteUIInputService.RouteUIInputService
@@ -41,11 +41,14 @@ val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   )
 
 final case class SimulationSettings():
-  val simulationNotificationAdapter: SimulationNotificationAdapter = SimulationNotificationAdapter()
+  val simulationNotificationAdapter: SimulationNotificationAdapter =
+    SimulationNotificationAdapter(new SimulationNotificationAdapterRequirements {
+      override def simulationPageComponent: SimulationPage = simulationPage
+    })
   val inputAdapter: SimulationService[N, C, S]        = SimulationService(eventStream, simulationNotificationAdapter)
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
-  simulationNotificationAdapter.simulationPage = Some(simulationPage)
+//  simulationNotificationAdapter.simulationPage = Some(simulationPage)
 
 final case class StationSettings():
   val inputAdapter: StationService[N, C, S]                  = StationService(eventStream)
