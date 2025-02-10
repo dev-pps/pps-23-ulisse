@@ -37,8 +37,15 @@ final case class SimulationService[N: Numeric, C <: Coordinate[N], S <: Station[
     })
     p.future
 
+  private def doStep(): Unit =
+    simulationEvents.add((state: SimulationState) => {
+      doStep()
+      state.copy(simulationManager = state.simulationManager.doStep())
+    })
+
   Executors.newSingleThreadExecutor().execute(() =>
-    LazyList.continually(simulationEvents.take()).foldLeft(SimulationState(SimulationManager()))((state, event) =>
-      event(state)
+    LazyList.continually(simulationEvents.take()).foldLeft(SimulationState(SimulationManager(simulationEvents)))(
+      (state, event) =>
+        event(state)
     )
   )
