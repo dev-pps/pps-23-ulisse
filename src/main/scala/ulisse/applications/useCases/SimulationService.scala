@@ -1,9 +1,10 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.managers.{SimulationEnvironment, SimulationManager}
+import ulisse.applications.managers.SimulationManager
 import ulisse.applications.{AppState, SimulationState}
 import ulisse.applications.ports.SimulationPorts
 import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.simulation.Environments.SimulationEnvironment
 import ulisse.entities.station.Station
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
