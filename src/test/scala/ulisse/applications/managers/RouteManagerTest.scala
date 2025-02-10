@@ -1,4 +1,4 @@
-package ulisse.applications
+package ulisse.applications.managers
 
 import cats.syntax.either.*
 import org.scalatest.flatspec.AnyFlatSpec
@@ -41,8 +41,8 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
   "find route from manager that" should "contains" in:
     val optRoute = singleElementRouteManager.find(route.id)
     optRoute match
-      case Some(newRoute) => newRoute must be(route)
-      case _              => fail("Route not found")
+      case Right(newRoute) => newRoute must be(route)
+      case _               => fail("Route not found")
 
   "save route with same id" should "launch already exist error" in:
     val differentRailsCountRoute = Route(departureStation, arrivalStation, typeRoute, railsCount, pathLength)
@@ -63,20 +63,33 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
         newRouteManager.size must be(singleElementRouteManager.size + 1)
         newRouteManager.contains(differentRoute) must be(true)
 
-  "modify route that non exist" should "launch not found error" in:
-    val newRouteManager                         = emptyRouteManager.modify(route)
+  "modify route that not found" should "launch not found error" in:
+    val newRoute        = Route(departureStation, arrivalStation, TypeRoute.AV, railsCount, pathLength)
+    val newRouteManager = emptyRouteManager.modify(route, newRoute)
     val error: Either[Errors, RouteManagerTest] = Errors.NotFound.asLeft
 
+    newRoute must not be route
     newRouteManager must be(error)
 
-  "modify route that exist" should "have new route" in:
+  "modify route in same of other route" should "launch already exit error" in:
     val newRoute        = Route(departureStation, arrivalStation, typeRoute, railsCount + 1, pathLength)
-    val newRouteManager = singleElementRouteManager.modify(route)
+    val newRouteManager = singleElementRouteManager.modify(route, newRoute)
+    val error: Either[Errors, RouteManagerTest] = Errors.AlreadyExist.asLeft
 
     route must be(newRoute)
+    newRouteManager must be(error)
+
+  "modify route in a route that not exist" should "apply modify" in:
+    val newRoute        = Route(departureStation, arrivalStation, TypeRoute.AV, railsCount, pathLength)
+    val newRouteManager = singleElementRouteManager.modify(route, newRoute)
+
+    route must not be newRoute
     newRouteManager match
-      case Left(error)            => fail(error.productPrefix)
-      case Right(newRouteManager) => newRouteManager.find(newRoute.id) must be(Some(newRoute))
+      case Left(error) => fail(error.productPrefix)
+      case Right(newRouteManager) =>
+        newRouteManager.size must be(singleElementRouteManager.size)
+        newRouteManager.contains(route) must be(false)
+        newRouteManager.contains(newRoute) must be(true)
 
   "delete route that non exist" should "launch not exist error" in:
     val newRouteManager                         = emptyRouteManager.delete(route.id)
@@ -91,5 +104,5 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
       case Left(error) => fail(error.productPrefix)
       case Right(newRouteManager) =>
         newRouteManager.contains(route) must be(false)
-        newRouteManager.find(route.id).isEmpty must be(true)
+        newRouteManager.find(route.id).isLeft must be(true)
         newRouteManager.size must be(singleElementRouteManager.size - 1)

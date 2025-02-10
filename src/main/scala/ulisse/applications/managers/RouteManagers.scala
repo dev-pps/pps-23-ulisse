@@ -18,10 +18,10 @@ object RouteManagers:
     def size: Int
     def routes: List[Route[N, C]]
     def contains(route: Route[N, C]): Boolean
-    def find(id: IdRoute): Option[Route[N, C]]
+    def find(id: IdRoute): Either[Errors, Route[N, C]]
 
     def save(route: Route[N, C]): Either[Errors, RouteManager[N, C]]
-    def modify(route: Route[N, C]): Either[Errors, RouteManager[N, C]]
+    def modify(oldRoute: Route[N, C], newRoute: Route[N, C]): Either[Errors, RouteManager[N, C]]
     def delete(id: IdRoute): Either[Errors, RouteManager[N, C]]
 
   object RouteManager:
@@ -34,15 +34,18 @@ object RouteManagers:
     private case class RouteManagerImpl[N: Numeric, C <: Coordinate[N]](manager: Map[IdRoute, Route[N, C]])
         extends RouteManager[N, C]:
       export manager.size
-      override def routes: List[Route[N, C]]              = manager.values.toList
-      override def contains(route: Route[N, C]): Boolean  = manager.contains(route.id)
-      override def find(id: IdRoute): Option[Route[N, C]] = manager.get(id)
+      override def routes: List[Route[N, C]]                      = manager.values.toList
+      override def contains(route: Route[N, C]): Boolean          = manager.contains(route.id)
+      override def find(id: IdRoute): Either[Errors, Route[N, C]] = manager.get(id).toRight(Errors.NotFound)
 
       override def save(route: Route[N, C]): Either[Errors, RouteManager[N, C]] =
-        find(route.id).fold(copy(manager + (route.id -> route)).asRight)(_ => Errors.AlreadyExist.asLeft)
+        find(route.id).map(_ => Errors.AlreadyExist.asLeft).getOrElse(copy(manager + (route.id -> route)).asRight)
 
-      override def modify(route: Route[N, C]): Either[Errors, RouteManager[N, C]] =
-        find(route.id).fold(Errors.NotFound.asLeft)(oldRoute => copy(manager + (route.id -> route)).asRight)
+      override def modify(oldRoute: Route[N, C], newRoute: Route[N, C]): Either[Errors, RouteManager[N, C]] =
+        (find(oldRoute.id), find(newRoute.id)) match
+          case (Left(error), _) => error.asLeft
+          case (_, Right(_))    => Errors.AlreadyExist.asLeft
+          case (_, _)           => copy(manager.removed(oldRoute.id) + (newRoute.id -> newRoute)).asRight
 
       override def delete(id: IdRoute): Either[Errors, RouteManager[N, C]] =
         find(id).map(_ => copy(manager - id).asRight).getOrElse(Errors.NotExist.asLeft)
