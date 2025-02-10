@@ -29,8 +29,8 @@ object StationEditorAdapter:
   * @param appPort
   *   The `StationInputPort` to interact with the application.
   */
-final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
-    appPort: StationPorts.Input[N, C, S]
+final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Station[C]](
+    appPort: StationPorts.Input[S]
 ):
 
   /** Handles the click event when the "OK" button is pressed.
@@ -69,7 +69,7 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
   )(using
       coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
-  ): Future[Either[NonEmptyChain[BaseError], StationManager[N, C, S]#StationMapType]] =
+  ): Future[Either[NonEmptyChain[BaseError], StationManager[S]#StationMapType]] =
     createStation(stationName, x, y, numberOfTrack, coordinateGenerator, stationGenerator) match
       case Left(value) => Future.successful(Left(value))
       case Right(value) =>

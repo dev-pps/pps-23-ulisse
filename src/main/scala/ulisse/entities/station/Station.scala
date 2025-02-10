@@ -19,12 +19,12 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
   *   A type that extends `Coordinate[N]`, which represents the station's location.
   *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
   */
-trait Station[N: Numeric, C <: Coordinate[N]]:
+trait Station[C <: Coordinate[?]]:
   val name: String
   val coordinate: C
   val numberOfTracks: Int
   override def equals(other: Any): Boolean = other match
-    case s: Station[_, _] =>
+    case s: Station[_] =>
       name === s.name &&
       coordinate == s.coordinate &&
       numberOfTracks === s.numberOfTracks
@@ -49,14 +49,14 @@ object Station:
     * @return
     *   A `Station` instance.
     */
-  def apply[N: Numeric, C <: Coordinate[N]](
+  def apply[C <: Coordinate[?]](
       name: String,
       coordinate: C,
       numberOfTrack: Int
-  ): Station[N, C] =
+  ): Station[C] =
     StationImpl(name, coordinate, numberOfTrack)
 
-  given [N: Numeric, C <: Coordinate[N]]: ((String, C, Int) => Either[NonEmptyChain[BaseError], CheckedStation[N, C]]) =
+  given [C <: Coordinate[?]]: ((String, C, Int) => Either[NonEmptyChain[BaseError], CheckedStation[C]]) =
     Station.createCheckedStation
 
   /** Creates a `Station` instance with validation.
@@ -76,11 +76,11 @@ object Station:
     * @return
     *   Either a `Station` instance or a `NonEmptyChain` of `Errors` indicating the issues.
     */
-  def createCheckedStation[N: Numeric, C <: Coordinate[N]](
+  def createCheckedStation[C <: Coordinate[?]](
       name: String,
       coordinate: C,
       numberOfTrack: Int
-  ): Either[NonEmptyChain[CheckedStation.Error], CheckedStation[N, C]] =
+  ): Either[NonEmptyChain[CheckedStation.Error], CheckedStation[C]] =
     (
       validateNonBlankString(name, CheckedStation.Error.InvalidName).toValidatedNec,
       validatePositive(numberOfTrack, CheckedStation.Error.InvalidNumberOfTrack).toValidatedNec
@@ -106,11 +106,11 @@ object Station:
     * **Note**: Instances of `CheckedStation` can only be created through the `Station.createCheckedStation` method to
     * ensure validation.
     */
-  case class CheckedStation[N: Numeric, C <: Coordinate[N]] private[Station] (
+  case class CheckedStation[C <: Coordinate[?]] private[Station] (
       name: String,
       coordinate: C,
       numberOfTracks: Int
-  ) extends Station[N, C]
+  ) extends Station[C]
 
   /** Represents a selectable station.
     *
@@ -126,17 +126,17 @@ object Station:
     * @param selected
     *   A boolean flag indicating whether the station is selected. `true` if selected, `false` otherwise.
     */
-  final case class SelectableStation[N: Numeric, C <: Coordinate[N]](
-      station: Station[N, C],
+  final case class SelectableStation[C <: Coordinate[?]](
+      station: Station[C],
       selected: Boolean
-  ) extends Station[N, C] with Selectable:
+  ) extends Station[C] with Selectable:
     export station.*
 
-  private final case class StationImpl[N: Numeric, C <: Coordinate[N]](
+  private final case class StationImpl[C <: Coordinate[?]](
       name: String,
       coordinate: C,
       numberOfTracks: Int
-  ) extends Station[N, C]
+  ) extends Station[C]
 
   object CheckedStation:
     /** Represents errors that can occur during station creation. */
