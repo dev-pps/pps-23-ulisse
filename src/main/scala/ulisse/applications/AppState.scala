@@ -1,6 +1,6 @@
 package ulisse.applications
 
-import ulisse.applications.managers.StationManager
+import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.entities.station.Station
 
 final case class AppState(
