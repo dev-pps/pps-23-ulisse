@@ -41,7 +41,7 @@ val eventStream = LinkedBlockingQueue[AppState => AppState]()
   )
 
 final case class SimulationSettings():
-  val inputAdapter: SimulationService                 = SimulationService()
+  val inputAdapter: SimulationService        = SimulationService(eventStream)
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
 
