@@ -1,13 +1,13 @@
 package ulisse.entities
 
 import cats.data.NonEmptyChain
-
 import cats.syntax.all.*
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonNegative, validateRange}
 
 import scala.annotation.targetName
 import scala.math.{atan2, pow, sqrt}
+import scala.util.Random
 
 object Coordinates:
   given [N: Numeric]: ((N, N) => Either[BaseError, Coordinate[N]]) = (x, y) => Right(Coordinate(x, y))
@@ -21,6 +21,10 @@ object Coordinates:
   given ((Double, Double) => Either[BaseError, Geo]) = Coordinate.createGeo
 
   given ((Int, Int) => Either[NonEmptyChain[BaseError], Geo]) = Coordinate.createValidatedGeo
+
+  opaque type GeoRange = (Double, Double)
+  val latitudeRange: GeoRange  = (-90.0d, 90.0d)
+  val longitudeRange: GeoRange = (-180.0d, 180.0d)
 
   /** A generic trait representing a 2D coordinate point in space.
     *
@@ -118,8 +122,9 @@ object Coordinates:
       */
     def apply[T: Numeric](x: T, y: T): Coordinate[T] = CoordinateImpl(x, y)
 
-    @Deprecated("Use createGeo method that is the safe constructor for type Geo")
-    def geo(latitude: Double, longitude: Double): Geo = Geo(latitude, longitude)
+    // TODO: to comment
+    def createValidRandomGeo(): Geo =
+      Geo(Random.between(latitudeRange._1, latitudeRange._2), Random.between(longitudeRange._1, longitudeRange._2))
 
     def uiPoint(x: Double, y: Double): UIPoint = UIPoint(x, y)
 
@@ -134,8 +139,8 @@ object Coordinates:
       */
     def createGeo(latitude: Double, longitude: Double): Either[Geo.Error, Geo] =
       for
-        validLat <- validateRange(latitude, -90.0, 90.0, Geo.Error.InvalidLatitude)
-        validLon <- validateRange(longitude, -180.0, 180.0, Geo.Error.InvalidLongitude)
+        validLat <- validateRange(latitude, latitudeRange._1, latitudeRange._2, Geo.Error.InvalidLatitude)
+        validLon <- validateRange(longitude, longitudeRange._1, longitudeRange._2, Geo.Error.InvalidLongitude)
       yield Geo(validLat, validLon)
 
     /** Creates a `Geo` instance with validation.
@@ -149,8 +154,8 @@ object Coordinates:
       */
     def createValidatedGeo(latitude: Double, longitude: Double): Either[NonEmptyChain[Geo.Error], Geo] =
       (
-        validateRange(latitude, -90.0, 90.0, Geo.Error.InvalidLatitude).toValidatedNec,
-        validateRange(longitude, -180.0, 180.0, Geo.Error.InvalidLongitude).toValidatedNec
+        validateRange(latitude, latitudeRange._1, latitudeRange._2, Geo.Error.InvalidLatitude).toValidatedNec,
+        validateRange(longitude, longitudeRange._1, longitudeRange._2, Geo.Error.InvalidLongitude).toValidatedNec
       )
         .mapN(Geo(_, _)).toEither
 
