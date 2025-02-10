@@ -2,13 +2,10 @@ package ulisse.applications.managers
 
 import ulisse.applications.SimulationState
 import ulisse.applications.ports.SimulationPorts
+import ulisse.entities.simulation.Environments.SimulationEnvironment
 import ulisse.entities.station.Station
 
 import java.util.concurrent.LinkedBlockingQueue
-
-final case class SimulationEnvironment(
-    stationMap: Seq[Station[?, ?]]
-)
 
 trait SimulationManager:
   val running: Boolean

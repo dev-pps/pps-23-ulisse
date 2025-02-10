@@ -46,7 +46,8 @@ class PackagesTest extends AnyFlatSpec:
     rule.check(IMPORT_ONLY_CLASSES_CREATED)
 
   "classes of adapters package" should "have Adapter as the ending in the name" in:
-    val adapterEndingName = "Adapter"
-    val rule              = simpleEndingNameRule(Packages.ADAPTERS, adapterEndingName)
+    val adapterEndingName      = "Adapter"
+    val requirementsEndingName = "Requirements"
+    val rule = doubleEndingNameRulePossible(Packages.ADAPTERS, adapterEndingName, requirementsEndingName)
 
     rule.check(IMPORT_ONLY_CLASSES_CREATED)
