@@ -1,36 +1,39 @@
 package ulisse.applications.managers
 
 import cats.syntax.either.*
-import RouteManager.ErrorSaving
+import ulisse.applications.managers.RouteManager.ErrorSaving
+import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.Routes.{IdRoute, Route}
 
 import scala.collection.immutable.Map
 
-trait RouteManager:
+trait RouteManager[N: Numeric, C <: Coordinate[N]]:
+  opaque type Bank = Map[IdRoute, Route[N, C]]
   def size: Int
-  def routes: List[Route]
-  def contains(route: Route): Boolean
+  def routes: List[Route[N, C]]
+  def contains(route: Route[N, C]): Boolean
 
-  def find(id: IdRoute): Option[Route]
-  def save(route: Route): Either[ErrorSaving, RouteManager]
+  def find(id: IdRoute): Option[Route[N, C]]
+  def save(route: Route[N, C]): Either[ErrorSaving, RouteManager[N, C]]
 
 object RouteManager:
-  def apply(bank: Bank): RouteManager             = RouteManagerImpl(bank)
-  def empty(): RouteManager                       = RouteManager(Map.empty)
-  def createOf(routes: List[Route]): RouteManager = RouteManager(routes.map(route => (route.id, route)).toMap)
+  def apply[N: Numeric, C <: Coordinate[N]](bank: Map[IdRoute, Route[N, C]]): RouteManager[N, C] =
+    RouteManagerImpl(bank)
+  def empty[N: Numeric, C <: Coordinate[N]](): RouteManager[N, C] = RouteManager(Map.empty)
+  def createOf[N: Numeric, C <: Coordinate[N]](routes: List[Route[N, C]]): RouteManager[N, C] =
+    RouteManager(routes.map(route => (route.id, route)).toMap)
 
   enum ErrorSaving:
     case notExist
     case creation
 
-  opaque type Bank = Map[IdRoute, Route]
+  private case class RouteManagerImpl[N: Numeric, C <: Coordinate[N]](manager: Map[IdRoute, Route[N, C]])
+      extends RouteManager[N, C]:
+    override def size: Int                             = manager.size
+    override def routes: List[Route[N, C]]             = manager.values.toList
+    override def contains(route: Route[N, C]): Boolean = manager.contains(route.id)
 
-  private case class RouteManagerImpl(manager: Bank) extends RouteManager:
-    override def size: Int                       = manager.size
-    override def routes: List[Route]             = manager.values.toList
-    override def contains(route: Route): Boolean = manager.contains(route.id)
+    override def find(id: IdRoute): Option[Route[N, C]] = manager.get(id)
 
-    override def find(id: IdRoute): Option[Route] = manager.get(id)
-
-    override def save(route: Route): Either[ErrorSaving, RouteManager] =
+    override def save(route: Route[N, C]): Either[ErrorSaving, RouteManager[N, C]] =
       this.copy(manager + (route.id -> route)).asRight
