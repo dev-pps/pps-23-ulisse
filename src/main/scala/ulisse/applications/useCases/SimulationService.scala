@@ -1,25 +1,44 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.AppState
+import ulisse.applications.managers.SimulationManager
+import ulisse.applications.{AppState, SimulationState}
 import ulisse.applications.ports.SimulationPorts
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
-import java.util.concurrent.LinkedBlockingQueue
-import scala.concurrent.{Future, Promise}
+import java.util.concurrent.{Executors, LinkedBlockingQueue}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 final case class SimulationService[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
     eventQueue: LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]
 ) extends SimulationPorts.Input:
-  override def start(): Future[Unit] =
+  private val simulationEvents = LinkedBlockingQueue[SimulationState => SimulationState]()
+  def start(): Future[Unit] =
     val p = Promise[Unit]()
-    p.success(println("Simulation started"))
+    simulationEvents.add((state: SimulationState) => {
+      p.success(println("[SimulationService]: Simulation Started"));
+      state.copy(simulationManager = state.simulationManager.start())
+    })
     p.future
-  override def stop(): Future[Unit] =
+
+  def stop(): Future[Unit] =
     val p = Promise[Unit]()
-    p.success(println("Simulation stopped"))
+    simulationEvents.add((state: SimulationState) => {
+      p.success(println("[SimulationService]: Simulation Stopped"));
+      state.copy(simulationManager = state.simulationManager.stop())
+    })
     p.future
-  override def reset(): Future[Unit] =
+
+  def reset(): Future[Unit] =
     val p = Promise[Unit]()
-    p.success(println("Simulation reset"))
+    simulationEvents.add((state: SimulationState) => {
+      p.success(println("[SimulationService]: Simulation Reset"));
+      state.copy(simulationManager = state.simulationManager.reset())
+    })
     p.future
+
+  Executors.newSingleThreadExecutor().execute(() =>
+    LazyList.continually(simulationEvents.take()).foldLeft(SimulationState(SimulationManager()))((state, event) =>
+      event(state)
+    )
+  )
