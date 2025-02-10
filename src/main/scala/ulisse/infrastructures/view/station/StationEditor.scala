@@ -18,7 +18,7 @@ given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
 
 type N = Int
 type C = Grid
-type S = CheckedStation[N, C]
+type S = CheckedStation[C]
 
 /** A Card displaying station information.
   *

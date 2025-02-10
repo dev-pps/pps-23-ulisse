@@ -22,9 +22,9 @@ object StationPorts:
     *   A type that extends `Coordinate[N]`, which represents the station's location.
     *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
     */
-  trait Input[N: Numeric, C <: Coordinate[N], S <: Station[N, C]]:
+  trait Input[S <: Station[?]]:
 
-    type SM = CheckedStationManager[N, C, S]#StationMapType
+    type SM = CheckedStationManager[S]#StationMapType
     type E  = NonEmptyChain[CheckedStationManager.Error]
 
     /** Retrieves the current station map.
@@ -59,4 +59,4 @@ object StationPorts:
       * @return
       *   An `Option` containing the station at the specified location, if it exists.
       */
-    def findStationAt(coordinate: C): Future[Option[S]]
+    def findStationAt(coordinate: Coordinate[?]): Future[Option[S]]

@@ -17,14 +17,14 @@ import ulisse.infrastructures.view.station.StationEditorView
 
 import java.util.concurrent.LinkedBlockingQueue
 
-val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+val eventStream = LinkedBlockingQueue[AppState[S] => AppState[S]]()
 
 @main def launchApp(): Unit =
   val app = AppFrame()
   app.contents = Menu(app)
   app.open()
 
-  val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
+  val initialState = AppState[S](StationManager.createCheckedStationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
@@ -35,7 +35,7 @@ val eventStream = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
   app.contents = settings.stationEditorView
   app.open()
 
-  val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
+  val initialState = AppState[S](StationManager.createCheckedStationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
@@ -51,14 +51,15 @@ final case class SimulationSettings():
 //  simulationNotificationAdapter.simulationPage = Some(simulationPage)
 
 final case class StationSettings():
-  val inputAdapter: StationService[N, C, S]                  = StationService(eventStream)
+  lazy val outputAdapter: StationPortOutputAdapter[N, C, S]  = StationPortOutputAdapter(stationEditorController)
+  lazy val inputAdapter: StationService[S]                   = StationService(eventStream, outputAdapter)
   val stationEditorController: StationEditorAdapter[N, C, S] = StationEditorAdapter(inputAdapter)
   val stationEditorView: StationEditorView                   = StationEditorView(stationEditorController)
 
 object StationTypes:
   type N = Int
   type C = Grid
-  type S = CheckedStation[N, C]
+  type S = CheckedStation[C]
 
 @main def trainDemoMain(): Unit =
   import ulisse.applications.managers.TechnologyManagers.TechnologyManager

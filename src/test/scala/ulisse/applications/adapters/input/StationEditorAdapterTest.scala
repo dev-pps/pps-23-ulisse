@@ -27,29 +27,29 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
   private val y             = 1
   private val numberOfTrack = 1
 
-  private def configureTest[N: Numeric, C <: Coordinate[N], S <: Station[N, C]](
+  private def configureTest[N: Numeric, C <: Coordinate[N], S <: Station[C]](
       using
       coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
-  ): (StationEditorAdapter[N, C, S], () => List[AppState[N, C, S]]) =
+  ): (StationEditorAdapter[N, C, S], () => List[AppState[S]]) =
     val station      = Station(stationName, Coordinate(x, y), numberOfTrack)
-    val initialState = AppState[N, C, S](StationManager.createCheckedStationManager())
-    val eventStream  = LinkedBlockingQueue[AppState[N, C, S] => AppState[N, C, S]]()
+    val initialState = AppState[S](StationManager.createCheckedStationManager())
+    val eventStream  = LinkedBlockingQueue[AppState[S] => AppState[S]]()
     val inputPort =
-      StationService[N, C, S](eventStream)
+      StationService[S](eventStream)
     val controller = StationEditorAdapter[N, C, S](inputPort)
     (controller, () => runAll(initialState, eventStream))
 
   private val station                   = Station(stationName, Coordinate(x, y), numberOfTrack)
-  private val (controller, updateState) = configureTest[Int, Coordinate[Int], Station[Int, Coordinate[Int]]]()
-  private val (checkedController, _)    = configureTest[Int, Grid, CheckedStation[Int, Grid]]()
+  private val (controller, updateState) = configureTest[Int, Coordinate[Int], Station[Coordinate[Int]]]()
+  private val (checkedController, _)    = configureTest[Int, Grid, CheckedStation[Grid]]()
 
   private type addStationFuture =
     Future[Either[
       NonEmptyChain[BaseError],
-      StationManager[Int, Coordinate[Int], Station[Int, Coordinate[Int]]]#StationMapType
+      StationManager[Station[Coordinate[Int]]]#StationMapType
     ]]
-  private type findStationFuture = Future[Option[Station[Int, Coordinate[Int]]]]
+  private type findStationFuture = Future[Option[Station[Coordinate[Int]]]]
   private def addStation(): (addStationFuture, findStationFuture) =
     val addStationResult =
       controller.onOkClick(
