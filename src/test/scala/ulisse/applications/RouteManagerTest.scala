@@ -9,18 +9,21 @@ import ulisse.entities.Routes.Route.TypeRoute
 import ulisse.entities.station.Station
 
 class RouteManagerTest extends AnyFlatSpec with Matchers:
-  opaque type ValueType = Double
+  opaque type ValueType        = Double
+  opaque type StationTest      = Station[ValueType, Coordinate[ValueType]]
+  opaque type RouteTest        = Route[ValueType, Coordinate[ValueType]]
+  opaque type RouteManagerTest = RouteManager[ValueType, Coordinate[ValueType]]
 
-  val departureStation: Station[ValueType, Coordinate[ValueType]] = Station("Rimini", Coordinate.geo(20d, 20d), 2)
-  val arrivalStation: Station[ValueType, Coordinate[ValueType]]   = Station("Cesena", Coordinate.geo(10d, 10d), 2)
-  val typeRoute: TypeRoute                                        = TypeRoute.Normal
-  val railsCount                                                  = 1
-  val pathLength: Double                                          = 200.0d
+  val departureStation: StationTest = Station("Rimini", Coordinate.createValidRandomGeo(), 2)
+  val arrivalStation: StationTest   = Station("Cesena", Coordinate.createValidRandomGeo(), 2)
+  val typeRoute: TypeRoute          = TypeRoute.Normal
+  val railsCount: Int               = 1
+  val pathLength: Double            = 200.0d
 
-  val route = Route(departureStation, arrivalStation, typeRoute, railsCount, pathLength)
+  val route: RouteTest = Route(departureStation, arrivalStation, typeRoute, railsCount, pathLength)
 
-  val emptyRouteManager         = RouteManager.empty[ValueType, Coordinate[ValueType]]()
-  val singleElementRouteManager = RouteManager.createOf[ValueType, Coordinate[ValueType]](List(route))
+  val emptyRouteManager: RouteManagerTest         = RouteManager.empty[ValueType, Coordinate[ValueType]]()
+  val singleElementRouteManager: RouteManagerTest = RouteManager.createOf[ValueType, Coordinate[ValueType]](List(route))
 
   "create empty routeManager" should "have size 0" in:
     val zeroSize = 0

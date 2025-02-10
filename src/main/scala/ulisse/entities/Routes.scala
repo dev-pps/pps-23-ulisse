@@ -14,10 +14,14 @@ object Routes:
     val departure: Station[N, C]
     val arrival: Station[N, C]
     val typology: TypeRoute
+    val technology: Technology
     val railsCount: Int
     val length: Double
 
-    def withTechnology(typeRoute: TypeRoute): Route[N, C]
+    def withDeparture(departure: Station[N, C]): Route[N, C]
+    def withArrival(arrival: Station[N, C]): Route[N, C]
+    def withTypology(typeRoute: TypeRoute): Route[N, C]
+    def withRailsCount(railsCount: Int): Route[N, C]
     def withLength(length: Double): Route[N, C]
 
     @targetName("Equals")
@@ -44,16 +48,22 @@ object Routes:
         railsCount: Int,
         length: Double
     ) extends Route[N, C]:
-      override val id: IdRoute                                       = hashCode()
-      override def withTechnology(typeRoute: TypeRoute): Route[N, C] = copy(typology = typeRoute)
-      override def withLength(length: Double): Route[N, C]           = copy(length = length)
+      export typology._
+      override val id: IdRoute = hashCode()
+
+      override def withDeparture(departure: Station[N, C]): Route[N, C] = copy(departure = departure)
+      override def withArrival(arrival: Station[N, C]): Route[N, C]     = copy(arrival = arrival)
+      override def withTypology(typeRoute: TypeRoute): Route[N, C]      = copy(typology = typeRoute)
+      override def withRailsCount(railsCount: Int): Route[N, C]         = copy(railsCount = railsCount)
+      override def withLength(length: Double): Route[N, C]              = copy(length = length)
 
       @targetName("Equals")
       override def ===(other: Route[N, C]): Boolean =
         departure.equals(other.departure) && arrival.equals(other.arrival) && typology == other.typology
 
-      override def equals(obj: Any): Boolean = obj match
-        case that: Route[N, C] => this === that
-        case _                 => false
+      override def equals(obj: Any): Boolean =
+        obj match
+          case other: Route[N, C] => this === other
+          case _                  => false
 
       override def hashCode(): Int = departure.hashCode() + arrival.hashCode() + typology.hashCode()
