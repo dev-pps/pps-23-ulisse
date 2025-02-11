@@ -66,7 +66,7 @@ trait StationManager[S <: Station[?]]:
     * @return
     *   R type
     */
-  def removeStation(station: S): R
+  def removeStation(station: Station[?]): R
 
   /** Finds a station at the given location.
     *
@@ -134,9 +134,9 @@ object StationManager:
       )
         .mapN((_, _) => CheckedStationManager(updatedStations)).toEither
 
-    def removeStation(station: S): R =
-      if stations.exists(_.coordinate == station.coordinate) then
-        Right(CheckedStationManager(stations.filterNot(_.coordinate == station.coordinate)))
+    def removeStation(station: Station[?]): R =
+      if stations.contains(station) then
+        Right(CheckedStationManager(stations.filterNot(_ == station)))
       else
         Left(NonEmptyChain(CheckedStationManager.Error.StationNotFound))
 
@@ -154,8 +154,8 @@ object StationManager:
     def addStation(station: S): R =
       BaseStationManager(station :: stations)
 
-    def removeStation(station: S): R =
-      BaseStationManager(stations.filterNot(_.coordinate == station.coordinate))
+    def removeStation(station: Station[?]): R =
+      BaseStationManager(stations.filterNot(_ == station))
 
     def findStationAt(coordinate: Coordinate[?]): Option[S] =
       stations.find(_.coordinate == coordinate)
