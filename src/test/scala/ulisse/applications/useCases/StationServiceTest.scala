@@ -20,15 +20,11 @@ import scala.util.Right
 
 class StationServiceTest extends AnyWordSpec with Matchers:
 
-  private type N = Int
-  private type C = Coordinate[N]
-  private type S = Station[C]
-  private val outputPort   = mock[StationPorts.Output]
-  private val station      = Station("StationA", Coordinate(0, 0), 1)
-  private val initialState = AppState[S](StationManager.createCheckedStationManager())
-  private val eventStream  = LinkedBlockingQueue[AppState[S] => AppState[S]]()
-  private val inputPort =
-    StationService[Station[Coordinate[Int]]](eventStream, outputPort)
+  private type S = Station[Coordinate[Int]]
+  private val station       = Station("StationA", Coordinate(0, 0), 1)
+  private val initialState  = AppState[S](StationManager.createCheckedStationManager())
+  private val eventStream   = LinkedBlockingQueue[AppState[S] => AppState[S]]()
+  private val inputPort     = StationService[S](eventStream)
   private def updateState() = runAll(initialState, eventStream)
 
   "StationService" should:
