@@ -11,8 +11,10 @@ object Environments:
     def agents_=(newAgents: Seq[SimulationAgent]): SimulationEnvironment
 
   object SimulationEnvironment:
-    def apply(): SimulationEnvironment =
-      SimulationEnvironmentImpl(Seq[Station](), Seq[SimulationAgent]())
+    def apply(stations: Seq[Station], agents: Seq[SimulationAgent]): SimulationEnvironment =
+      SimulationEnvironmentImpl(stations, agents)
+    def empty(): SimulationEnvironment =
+      apply(Seq[Station](), Seq[SimulationAgent]())
 
     private final case class SimulationEnvironmentImpl(
         stations: Seq[Station],
