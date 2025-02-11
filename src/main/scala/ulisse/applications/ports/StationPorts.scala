@@ -1,6 +1,6 @@
 package ulisse.applications.ports
 
-import ulisse.applications.managers.StationManager
+import ulisse.applications.managers.{CheckedStationManager, StationManager}
 import StationManager.CheckedStationManager
 import cats.data.NonEmptyChain
 import ulisse.entities.Coordinates.Coordinate
@@ -22,10 +22,10 @@ object StationPorts:
     *   A type that extends `Coordinate[N]`, which represents the station's location.
     *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
     */
-  trait Input[S <: Station[?]]:
+  trait Input[SCSM <: CheckedStationManager[?]]:
 
-    type SM = CheckedStationManager[S]#StationMapType
-    type E  = NonEmptyChain[CheckedStationManager.Error]
+//    type SM = CheckedStationManager[S]#StationMapType
+//    type E  = NonEmptyChain[CheckedStationManager.Error]
 
     /** Retrieves the current station map.
       *
