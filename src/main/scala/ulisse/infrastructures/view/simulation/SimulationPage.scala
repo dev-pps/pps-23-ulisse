@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.simulation
 
 import ulisse.adapters.input.SimulationPageAdapter
-import ulisse.applications.useCases.SimulationData
+import ulisse.entities.simulation.Simulations.SimulationData
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.LayeredContainers.JLayeredPane
 
@@ -28,7 +28,9 @@ object SimulationPage:
     private val mapControlPane = SimulationPageControlPanel(controller)
 
     def updateData(data: SimulationData): Unit = mapControlPane.notificationLabel.text =
-      s"Step: ${data.step}, Time: ${data.secondElapsed}, Agent: ${data.simulationAgent}"
+      s"Step: ${data.step}, Time: ${data.secondElapsed}, Agent: ${data.simulationEnvironment.agents.foldLeft("")(
+          (acc, agent) => s"$acc $agent"
+        )}"
 
     mainPane.peer.add(map.center().peer)
     glassPane.peer.add(mapControlPane.center().peer, BorderLayout.EAST)
