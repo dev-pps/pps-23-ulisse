@@ -3,13 +3,10 @@ package ulisse.applications.useCases
 import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
 import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.StationManager.CheckedStationManager
-import ulisse.applications.ports.StationPorts
-import ulisse.applications.useCases.StationService
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
 

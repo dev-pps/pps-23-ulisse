@@ -3,7 +3,6 @@ package ulisse.applications.managers
 import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station

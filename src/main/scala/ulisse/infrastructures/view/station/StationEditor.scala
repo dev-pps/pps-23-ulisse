@@ -2,25 +2,23 @@ package ulisse.infrastructures.view.station
 
 import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.managers.CheckedStationManager
-import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 
 import java.awt.Color
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.swing.*
 import scala.swing.Swing.LineBorder
 import scala.swing.event.*
-import scala.util.{Failure, Success}
+import scala.util.Success
 
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
   Swing.onEDT(runnable.run())
 
-type N   = Int
-type C   = Grid
-type S   = CheckedStation[C]
-type CSM = CheckedStationManager[S]
+type N = Int
+type C = Grid
+type S = CheckedStation[C]
 
 /** A Card displaying station information.
   *

@@ -1,19 +1,14 @@
 package ulisse.adapters.input
 
-import cats.data.{Chain, NonEmptyChain}
+import cats.data.NonEmptyChain
 import cats.syntax.all.*
-import ulisse.applications.managers.StationManager.CheckedStationManager
-import ulisse.applications.managers.{CheckedStationManager, StationManager}
 import ulisse.applications.ports.StationPorts
 import ulisse.applications.ports.StationPorts.Input
-import ulisse.entities.Coordinates.{Coordinate, Geo, Grid}
+import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
-import ulisse.entities.station.Station.CheckedStation
 import ulisse.utils.Errors.BaseError
 
-import java.util.concurrent.Executors
-import scala.concurrent.impl.Promise
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 object StationEditorAdapter:
 
