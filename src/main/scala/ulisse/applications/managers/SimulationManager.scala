@@ -2,15 +2,15 @@ package ulisse.applications.managers
 
 import ulisse.applications.SimulationState
 import ulisse.applications.ports.SimulationPorts
-import ulisse.applications.useCases.{SimulationAgent, SimulationData}
+import ulisse.entities.simulation.Agents.SimulationAgent
 import ulisse.entities.simulation.Environments.SimulationEnvironment
+import ulisse.entities.simulation.Simulations.SimulationData
 import ulisse.entities.station.Station
 
 import java.util.concurrent.LinkedBlockingQueue
 
 trait SimulationManager:
-  val running: Boolean
-  val step: Int
+  def running: Boolean
   def start(environment: SimulationEnvironment): SimulationManager
   def stop(): SimulationManager
   def reset(): SimulationManager
@@ -18,16 +18,7 @@ trait SimulationManager:
 
 object SimulationManager:
   def apply(notificationService: SimulationPorts.Output): SimulationManager =
-    SimulationManagerImpl(false, 0, SimulationEnvironment(Seq[Station]()), notificationService)
-    SimulationManagerImpl(
-      false,
-      0,
-      SimulationEnvironment(Seq[Station]()),
-      notificationService,
-      0.0,
-      0,
-      SimulationAgent(1, 0, 5)
-    )
+    SimulationManagerImpl(false, 0, SimulationEnvironment(), notificationService, 0.0, 0, SimulationAgent(1, 0, 5))
   private case class SimulationManagerImpl(
       running: Boolean,
       step: Int,
@@ -49,5 +40,5 @@ object SimulationManager:
       val updatedAgent         = simulationAgent.update(deltaElapsed / 1000.0)
       val updatedSecondElapsed = secondElapsed + deltaElapsed / 1000.0
       println(s"[SimulationManager]: Step $lastUpdate, $deltaElapsed")
-      notificationService.stepNotification(SimulationData(updatedStep, updatedSecondElapsed, updatedAgent))
+      notificationService.stepNotification(SimulationData(updatedStep, updatedSecondElapsed, environment))
       copy(step = updatedStep, secondElapsed = updatedSecondElapsed, lastUpdate = lu, simulationAgent = updatedAgent)
