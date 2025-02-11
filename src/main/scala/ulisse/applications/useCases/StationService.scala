@@ -10,8 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 final case class StationService[S <: Station[?]](
-    eventQueue: LinkedBlockingQueue[AppState[S] => AppState[S]],
-    outputPort: StationPorts.Output
+    eventQueue: LinkedBlockingQueue[AppState[S] => AppState[S]]
 ) extends StationPorts.Input[S]:
 
   override def stationMap: Future[SM] =
@@ -27,7 +26,7 @@ final case class StationService[S <: Station[?]](
     })
     p.future
 
-  override def removeStation(station: S): Future[Either[E, SM]] =
+  override def removeStation(station: Station[?]): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[S]) => {
       val updatedMap = state.stationManager.removeStation(station)

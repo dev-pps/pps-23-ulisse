@@ -1,7 +1,6 @@
 package ulisse.infrastructures.view
 
 import ulisse.adapters.input.StationEditorAdapter
-import ulisse.adapters.output.StationPortOutputAdapter
 import ulisse.applications.AppState
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
@@ -40,8 +39,7 @@ val eventStream = LinkedBlockingQueue[AppState[S] => AppState[S]]()
   )
 
 final case class StationSettings():
-  lazy val outputAdapter: StationPortOutputAdapter[N, C, S]  = StationPortOutputAdapter(stationEditorController)
-  lazy val inputAdapter: StationService[S]                   = StationService(eventStream, outputAdapter)
+  val inputAdapter: StationService[S]                        = StationService(eventStream)
   val stationEditorController: StationEditorAdapter[N, C, S] = StationEditorAdapter(inputAdapter)
   val stationEditorView: StationEditorView                   = StationEditorView(stationEditorController)
 

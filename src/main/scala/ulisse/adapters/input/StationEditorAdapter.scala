@@ -65,7 +65,7 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
       x: String,
       y: String,
       numberOfTrack: String,
-      oldStation: Option[S]
+      oldStation: Option[Station[?]]
   )(using
       coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]

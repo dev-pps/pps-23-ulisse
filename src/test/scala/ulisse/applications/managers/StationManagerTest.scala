@@ -28,7 +28,7 @@ class StationManagerTest extends AnyWordSpec with Matchers:
 
     "another station with same name is added" should:
       "not be added and returns error" in:
-        val otherStation = Station("StationA", Coordinate(1.2, 1), 1)
+        val otherStation = Station("StationA", Coordinate(1, 1), 1)
         StationManager.createCheckedStationManager().addStation(station).flatMap(
           _.addStation(otherStation)
         ) shouldBe Left(Chain(CheckedStationManager.Error.DuplicateStationName))

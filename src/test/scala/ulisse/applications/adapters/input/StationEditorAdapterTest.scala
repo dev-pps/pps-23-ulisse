@@ -22,35 +22,25 @@ import scala.concurrent.duration.Duration
 
 class StationEditorAdapterTest extends AnyWordSpec with Matchers:
 
-  private val outputPort    = mock[StationPorts.Output]
   private val stationName   = "New Station"
   private val x             = 1
   private val y             = 1
   private val numberOfTrack = 1
+  private val station       = Station(stationName, Coordinate(x, y), numberOfTrack)
 
-  private def configureTest[N: Numeric, C <: Coordinate[N], S <: Station[C]](
-      using
-      coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
-      stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
-  ): (StationEditorAdapter[N, C, S], () => List[AppState[S]]) =
-    val station      = Station(stationName, Coordinate(x, y), numberOfTrack)
-    val initialState = AppState[S](StationManager.createCheckedStationManager())
-    val eventStream  = LinkedBlockingQueue[AppState[S] => AppState[S]]()
-    val inputPort =
-      StationService[S](eventStream, outputPort)
-    val controller = StationEditorAdapter[N, C, S](inputPort)
-    (controller, () => runAll(initialState, eventStream))
-
-  private val station                   = Station(stationName, Coordinate(x, y), numberOfTrack)
-  private val (controller, updateState) = configureTest[Int, Coordinate[Int], Station[Coordinate[Int]]]()
-  private val (checkedController, _)    = configureTest[Int, Grid, CheckedStation[Grid]]()
+  private type StationType = CheckedStation[Grid]
+  private val initialState = AppState[StationType](StationManager.createCheckedStationManager())
+  private val eventStream  = LinkedBlockingQueue[AppState[StationType] => AppState[StationType]]()
+  private val inputPort    = StationService(eventStream)
+  private val controller   = StationEditorAdapter(inputPort)
+  private val updateState  = () => runAll(initialState, eventStream)
 
   private type addStationFuture =
     Future[Either[
       NonEmptyChain[BaseError],
-      StationManager[Station[Coordinate[Int]]]#StationMapType
+      StationManager[StationType]#StationMapType
     ]]
-  private type findStationFuture = Future[Option[Station[Coordinate[Int]]]]
+  private type findStationFuture = Future[Option[StationType]]
   private def addStation(): (addStationFuture, findStationFuture) =
     val addStationResult =
       controller.onOkClick(
@@ -109,7 +99,7 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
 
       "chain error when all inputs format are not valid" in:
         val addStationWithAllWrongInputsResult =
-          checkedController.onOkClick(
+          controller.onOkClick(
             stationName,
             "a",
             "a",
@@ -127,7 +117,7 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
 
       "chain error when all inputs are not valid" in:
         val addStationWithAllWrongInputsResult =
-          checkedController.onOkClick(
+          controller.onOkClick(
             " ",
             "-1",
             "-1",
@@ -144,7 +134,7 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
 
       "chain error when x and y are valid and name and numberOfTracks are not" in:
         val addStationWithWrongNameAndNumberOfTrackResult =
-          checkedController.onOkClick(
+          controller.onOkClick(
             " ",
             x.toString,
             y.toString,

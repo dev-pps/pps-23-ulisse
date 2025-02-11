@@ -50,7 +50,7 @@ object StationPorts:
       * @return
       *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
       */
-    def removeStation(station: S): Future[Either[E, SM]]
+    def removeStation(station: Station[?]): Future[Either[E, SM]]
 
     /** Finds a station at a specified location.
       *
