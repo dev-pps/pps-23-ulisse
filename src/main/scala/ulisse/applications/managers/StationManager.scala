@@ -77,6 +77,13 @@ trait StationManager[S <: Station[?]]:
     */
   def findStationAt(coordinate: Coordinate[?]): Option[S]
 
+trait UncheckedStationManager[S <: Station[?]] extends StationManager[S]:
+  type R = UncheckedStationManager[S]
+
+trait CheckedStationManager[S <: Station[?]] extends StationManager[S]:
+  type R = Either[NonEmptyChain[E], CheckedStationManager[S]]
+  type E <: BaseError
+
 /** Factory for [[StationManager]] instances. */
 object StationManager:
   /** Creates a `StationManager` instance.
@@ -88,8 +95,8 @@ object StationManager:
     * @return
     *   A `StationManager` instance.
     */
-  def apply[S <: Station[?]](stations: S*): StationManager[S] =
-    BaseStationManager(stations.toList)
+  def apply[S <: Station[?]](stations: S*): UncheckedStationManager[S] =
+    UncheckedStationManagerImpl(stations.toList)
 
   /** Creates a `CheckedStationManager` instance, which is a `StationManager` with validation for unique names and
     * locations.
@@ -102,7 +109,7 @@ object StationManager:
     *   An empty `CheckedStationManager` instance.
     */
   def createCheckedStationManager[S <: Station[?]](): CheckedStationManager[S] =
-    CheckedStationManager(List.empty)
+    CheckedStationManagerImpl(List.empty)
 
   /** A case class that implements the `StationManager` trait with validation for unique station names and locations.
     *
@@ -114,11 +121,11 @@ object StationManager:
     *   The list of stations in the map. **Note**: Instances of `CheckedStationManager` can only be created through the
     *   `StationManager.createCheckedStationManager` method to ensure validation.
     */
-  final case class CheckedStationManager[S <: Station[?]] private[StationManager] (
+  final case class CheckedStationManagerImpl[S <: Station[?]] private[StationManager] (
       stations: List[S]
-  ) extends StationManager[S]:
+  ) extends CheckedStationManager[S]:
     type StationMapType = List[S]
-    type R              = Either[NonEmptyChain[CheckedStationManager.Error], CheckedStationManager[S]]
+    type E              = CheckedStationManager.Error
 
     def addStation(station: S): R =
       val updatedStations = station :: stations
@@ -132,11 +139,11 @@ object StationManager:
           CheckedStationManager.Error.DuplicateStationLocation
         ).toValidatedNec
       )
-        .mapN((_, _) => CheckedStationManager(updatedStations)).toEither
+        .mapN((_, _) => CheckedStationManagerImpl(updatedStations)).toEither
 
     def removeStation(station: Station[?]): R =
       if stations.contains(station) then
-        Right(CheckedStationManager(stations.filterNot(_ == station)))
+        Right(CheckedStationManagerImpl(stations.filterNot(_ == station)))
       else
         Left(NonEmptyChain(CheckedStationManager.Error.StationNotFound))
 
@@ -145,17 +152,16 @@ object StationManager:
 
     export stations.map
 
-  private final case class BaseStationManager[S <: Station[?]](
+  private final case class UncheckedStationManagerImpl[S <: Station[?]](
       stations: List[S]
-  ) extends StationManager[S]:
+  ) extends UncheckedStationManager[S]:
     type StationMapType = List[S]
-    type R              = BaseStationManager[S]
 
     def addStation(station: S): R =
-      BaseStationManager(station :: stations)
+      UncheckedStationManagerImpl(station :: stations)
 
     def removeStation(station: Station[?]): R =
-      BaseStationManager(stations.filterNot(_ == station))
+      UncheckedStationManagerImpl(stations.filterNot(_ == station))
 
     def findStationAt(coordinate: Coordinate[?]): Option[S] =
       stations.find(_.coordinate == coordinate)
