@@ -47,7 +47,7 @@ object SimulationPage:
     private val startImage: ImagePanel =
       ImagePanel.createSVGPanel("icons/play.svg", Color.ORANGE).fixedSize(50, 50).genericClickReaction(() =>
         controller.start().onComplete(_ =>
-          timing = System.currentTimeMillis()
+          if timing == 0 then timing = System.currentTimeMillis()
           startImage.visible = false
           pauseImage.visible = true
           println("[View]Simulation started")
