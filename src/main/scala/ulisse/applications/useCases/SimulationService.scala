@@ -10,21 +10,6 @@ import ulisse.entities.station.Station
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
-final case class SimulationAgent(timeUpdatePerSecond: Double, spaceTravelled: Double, velocity: Double):
-  /* dt is time elapsed between each frame so
-       dt * timeUpdatePerSecond is the fraction of
-       the movement that has to be done
-       if dt > 1 then the simulation could break
-   */
-  def update(dt: Double): SimulationAgent =
-    val maxDelta = math.min(dt, 1.0)
-    println(
-      s"[SimulationAgent]: Update $dt, $dt, $velocity, ${dt * velocity}, ${timeUpdatePerSecond * dt * velocity} ${spaceTravelled + timeUpdatePerSecond * dt * velocity}"
-    )
-    copy(spaceTravelled = spaceTravelled + velocity * dt * timeUpdatePerSecond)
-
-final case class SimulationData(step: Int, secondElapsed: Double, simulationAgent: SimulationAgent)
-
 final case class SimulationService(
     eventQueue: LinkedBlockingQueue[AppState => AppState],
     notificationService: SimulationPorts.Output
@@ -37,7 +22,7 @@ final case class SimulationService(
         p.success(println("[SimulationService]: Simulation Started"));
         doStep()
         state.copy(simulationManager =
-          state.simulationManager.start(SimulationEnvironment(appState.stationManager.stations))
+          state.simulationManager.start(SimulationEnvironment().stations = appState.stationManager.stations)
         )
       })
       appState
@@ -65,7 +50,6 @@ final case class SimulationService(
     simulationEvents.offer((state: SimulationState) => {
       if state.simulationManager.running then
         doStep()
-        println("[SimulationService]: Simulation Step")
         state.copy(simulationManager = state.simulationManager.doStep())
       else
         state
