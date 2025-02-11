@@ -4,6 +4,7 @@ import ulisse.applications.managers.SimulationManager
 import ulisse.applications.{AppState, SimulationState}
 import ulisse.applications.ports.SimulationPorts
 import ulisse.entities.Coordinate
+import ulisse.entities.simulation.Agents.SimulationAgent
 import ulisse.entities.simulation.Environments.SimulationEnvironment
 import ulisse.entities.station.Station
 
@@ -22,7 +23,7 @@ final case class SimulationService(
         p.success(println("[SimulationService]: Simulation Started"));
         doStep()
         state.copy(simulationManager =
-          state.simulationManager.start(SimulationEnvironment().stations = appState.stationManager.stations)
+          state.simulationManager.start(SimulationEnvironment(appState.stationManager.stations, Seq[SimulationAgent]()))
         )
       })
       appState
