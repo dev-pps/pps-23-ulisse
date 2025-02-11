@@ -17,7 +17,7 @@ trait SimulationManager:
 
 object SimulationManager:
   def apply(notificationService: SimulationPorts.Output): SimulationManager =
-    SimulationManagerImpl(false, 0, SimulationEnvironment(Seq[Station[?, ?]]()), notificationService)
+    SimulationManagerImpl(false, 0, SimulationEnvironment(Seq[Station[?]]()), notificationService)
   private case class SimulationManagerImpl(
       running: Boolean,
       step: Int,

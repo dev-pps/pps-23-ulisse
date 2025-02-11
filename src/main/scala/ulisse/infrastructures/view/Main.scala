@@ -3,6 +3,7 @@ package ulisse.infrastructures.view
 import ulisse.adapters.input.{SimulationPageAdapter, StationEditorAdapter}
 import ulisse.adapters.output.{SimulationNotificationAdapter, SimulationNotificationAdapterRequirements}
 import ulisse.applications.AppState
+import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.applications.managers.{RouteManager, SimulationManager, StationManager}
 import ulisse.applications.useCases.RouteUIInputService.RouteUIInputService
 import ulisse.applications.useCases.{SimulationService, StationService}
@@ -18,7 +19,9 @@ import ulisse.infrastructures.view.station.StationEditorView
 import java.util.concurrent.LinkedBlockingQueue
 
 val eventStream = LinkedBlockingQueue[AppState[S] => AppState[S]]()
-
+val updateManager = (stationManagerUpdater: CheckedStationManager[S] => CheckedStationManager[S]) =>
+  eventStream.offer((state: AppState[S]) => state.copy(stationManager = stationManagerUpdater(state.stationManager)));
+  ()
 @main def launchApp(): Unit =
   val app = AppFrame()
   app.contents = Menu(app)
@@ -45,14 +48,13 @@ final case class SimulationSettings():
     SimulationNotificationAdapter(new SimulationNotificationAdapterRequirements {
       override def simulationPageComponent: SimulationPage = simulationPage
     })
-  val inputAdapter: SimulationService[N, C, S]        = SimulationService(eventStream, simulationNotificationAdapter)
+  val inputAdapter: SimulationService[S]              = SimulationService(updateManager, simulationNotificationAdapter)
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
 //  simulationNotificationAdapter.simulationPage = Some(simulationPage)
 
 final case class StationSettings():
-  lazy val outputAdapter: StationPortOutputAdapter[N, C, S]  = StationPortOutputAdapter(stationEditorController)
-  lazy val inputAdapter: StationService[S]                   = StationService(eventStream, outputAdapter)
+  lazy val inputAdapter: StationService[S]                   = StationService(eventStream)
   val stationEditorController: StationEditorAdapter[N, C, S] = StationEditorAdapter(inputAdapter)
   val stationEditorView: StationEditorView                   = StationEditorView(stationEditorController)
 
