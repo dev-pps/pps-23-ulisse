@@ -66,3 +66,23 @@ class StationServiceTest extends AnyWordSpec with Matchers:
 
       Await.result(removeStationResult, Duration.Inf) shouldBe Left(Chain(CheckedStationManager.Error.StationNotFound))
       Await.result(stationMapResult, Duration.Inf) shouldBe List()
+
+    "update a present station in the station manager" in:
+      val addStationResult    = inputPort.addStation(station)
+      val newStation          = Station("StationB", Coordinate(1, 1), 1)
+      val updateStationResult = inputPort.updateStation(station, newStation)
+      val stationMapResult    = inputPort.stationMap
+
+      updateState()
+      Await.result(addStationResult, Duration.Inf) shouldBe Right(List(station))
+      Await.result(updateStationResult, Duration.Inf) shouldBe Right(List(newStation))
+      Await.result(stationMapResult, Duration.Inf) shouldBe List(newStation)
+
+    "return error when is updated an absent station in the station manager" in:
+      val newStation          = Station("StationB", Coordinate(1, 1), 1)
+      val updateStationResult = inputPort.updateStation(station, newStation)
+      val stationMapResult    = inputPort.stationMap
+
+      updateState()
+      Await.result(updateStationResult, Duration.Inf) shouldBe Left(Chain(CheckedStationManager.Error.StationNotFound))
+      Await.result(stationMapResult, Duration.Inf) shouldBe List()
