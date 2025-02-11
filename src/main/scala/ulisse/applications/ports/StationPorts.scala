@@ -53,6 +53,17 @@ object StationPorts:
       */
     def removeStation(station: Station[?]): Future[Either[E, SM]]
 
+    /** Updates a station from the station manager.
+      *
+      * @param oldStation
+      *   The station to update.
+      * @param newStation
+      *   The new station that replaces the old station.
+      * @return
+      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
+      */
+    def updateStation(oldStation: Station[?], newStation: S): Future[Either[E, SM]]
+
     /** Finds a station at a specified location.
       *
       * @param coordinate

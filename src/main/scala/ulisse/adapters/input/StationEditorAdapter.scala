@@ -11,6 +11,8 @@ import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.utils.Errors.BaseError
 
+import java.util.concurrent.Executors
+import scala.concurrent.impl.Promise
 import scala.concurrent.{ExecutionContext, Future}
 
 object StationEditorAdapter:
@@ -73,10 +75,10 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
   ): Future[Either[NonEmptyChain[BaseError], StationPorts.Input[S]#SM]] =
     createStation(stationName, x, y, numberOfTrack, coordinateGenerator, stationGenerator) match
-      case Left(value) => Future.successful(Left(value))
-      case Right(value) =>
-        for old <- oldStation do removeStation(old)
-        appPort.addStation(value)
+      case Left(error) => Future.successful(Left(error))
+      case Right(station) => oldStation match
+          case Some(oldStation) => appPort.updateStation(oldStation, station)
+          case None             => appPort.addStation(station)
 
   private def createStation(
       name: String,
