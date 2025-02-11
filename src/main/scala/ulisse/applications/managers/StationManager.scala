@@ -12,10 +12,8 @@ import ulisse.utils.ValidationUtils.validateUniqueItems
   *
   * A `StationManager` is a collection of `Station` instances.
   *
-  * @tparam N
-  *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
-  * @tparam C
-  *   A type that extends `Coordinate[N]`, which represents the station's location.
+  * @tparam S
+  *   The station type that the manager will handle.
   */
 trait StationManager[S <: Station[?]]:
 
@@ -77,21 +75,33 @@ trait StationManager[S <: Station[?]]:
     */
   def findStationAt(coordinate: Coordinate[?]): Option[S]
 
+/** Defines a manager for stations.
+  *
+  * A `UncheckedStationManager` is a `StationManager` that doesn't make checks when stations are added or removed.
+  *
+  * @tparam S
+  *   The station type that the manager will handle.
+  */
 trait UncheckedStationManager[S <: Station[?]] extends StationManager[S]:
-  final type R = UncheckedStationManager[S]
+  type R = UncheckedStationManager[S]
 
+/** Defines a manager for stations.
+  *
+  * A `CheckedStationManager` is a `StationManager` that make checks when stations are added or removed.
+  *
+  * @tparam S
+  *   The station type that the manager will handle.
+  */
 trait CheckedStationManager[S <: Station[?]] extends StationManager[S]:
-  final type R = Either[NonEmptyChain[E], CheckedStationManager[S]]
-  type E       = CheckedStationManager.Error
+  type R = Either[NonEmptyChain[E], CheckedStationManager[S]]
+  type E = CheckedStationManager.Error
 
 /** Factory for [[StationManager]] instances. */
 object StationManager:
   /** Creates a `StationManager` instance.
     *
-    * @tparam N
-    *   The numeric type representing the coordinates of the stations (e.g., `Int`, `Double`).
-    * @tparam C
-    *   A type that extends `Coordinate[N]`, representing the station's location.
+    * @tparam S
+    *   The station type that the manager will handle.
     * @return
     *   A `StationManager` instance.
     */
@@ -101,27 +111,15 @@ object StationManager:
   /** Creates a `CheckedStationManager` instance, which is a `StationManager` with validation for unique names and
     * locations.
     *
-    * @tparam N
-    *   The numeric type representing the coordinates of the stations (e.g., `Int`, `Double`).
-    * @tparam C
-    *   A type that extends `Coordinate[N]`, representing the station's location.
+    * @tparam S
+    *   The station type that the manager will handle.
     * @return
     *   An empty `CheckedStationManager` instance.
     */
   def createCheckedStationManager[S <: Station[?]](): CheckedStationManager[S] =
     CheckedStationManagerImpl(List.empty)
 
-  /** A case class that implements the `StationManager` trait with validation for unique station names and locations.
-    *
-    * @tparam N
-    *   The numeric type representing the coordinates of the stations (e.g., `Int`, `Double`).
-    * @tparam C
-    *   A type that extends `Coordinate[N]`, representing the station's location.
-    * @param stations
-    *   The list of stations in the map. **Note**: Instances of `CheckedStationManager` can only be created through the
-    *   `StationManager.createCheckedStationManager` method to ensure validation.
-    */
-  final case class CheckedStationManagerImpl[S <: Station[?]] private[StationManager] (
+  private final case class CheckedStationManagerImpl[S <: Station[?]](
       stations: List[S]
   ) extends CheckedStationManager[S]:
     type StationMapType = List[S]

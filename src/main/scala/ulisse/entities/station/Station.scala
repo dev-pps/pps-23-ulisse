@@ -12,12 +12,8 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
   * A `Station` represents a location where trains can stop. Each station has a name, a location, and a number of
   * tracks.
   *
-  * @tparam N
-  *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
-  *   - An instance of `Numeric` must be available for the `N` type.
   * @tparam C
-  *   A type that extends `Coordinate[N]`, which represents the station's location.
-  *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
+  *   A type that extends `Coordinate[?]`, which represents the station's location.
   */
 trait Station[C <: Coordinate[?]]:
   val name: String
@@ -34,12 +30,8 @@ trait Station[C <: Coordinate[?]]:
 object Station:
   /** Creates a `Station` instance.
     *
-    * @tparam N
-    *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
-    *   - An instance of `Numeric` must be available for the `N` type.
     * @tparam C
-    *   A type that extends `Coordinate[N]`, which represents the station's location.
-    *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
+    *   A type that extends `Coordinate[?]`, which represents the station's location.
     * @param name
     *   The name of the station.
     * @param coordinate
@@ -61,12 +53,8 @@ object Station:
 
   /** Creates a `Station` instance with validation.
     *
-    * @tparam N
-    *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
-    *   - An instance of `Numeric` must be available for the `N` type.
     * @tparam C
-    *   A type that extends `Coordinate[N]`, which represents the station's location.
-    *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
+    *   A type that extends `Coordinate[?]`, which represents the station's location.
     * @param name
     *   The name of the station. Must not be empty or blank.
     * @param coordinate
@@ -90,12 +78,8 @@ object Station:
     *
     * A `CheckedStation` represents a validated station.
     *
-    * @tparam N
-    *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
-    *   - An instance of `Numeric` must be available for the `N` type.
     * @tparam C
-    *   A type that extends `Coordinate[N]`, which represents the station's location.
-    *   - The `C` type must ensure uniqueness and comparability of coordinates.
+    *   A type that extends `Coordinate[?]`, which represents the station's location.
     * @param name
     *   The name of the station. Must be non-blank.
     * @param coordinate
@@ -117,12 +101,10 @@ object Station:
     * A `SelectableStation` wraps a `Station` instance and provides a boolean flag to indicate whether the station is
     * selected.
     *
-    * @tparam N
-    *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
     * @tparam C
-    *   A type that extends `Coordinate[N]`, representing the station's location.
+    *   A type that extends `Coordinate[?]`, representing the station's location.
     * @param station
-    *   The station instance of type `Station[N, C]` to be wrapped.
+    *   The station instance of type `Station[C]` to be wrapped.
     * @param selected
     *   A boolean flag indicating whether the station is selected. `true` if selected, `false` otherwise.
     */
