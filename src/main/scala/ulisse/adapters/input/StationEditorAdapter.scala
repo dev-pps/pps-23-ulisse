@@ -1,9 +1,11 @@
 package ulisse.adapters.input
 
-import cats.data.NonEmptyChain
+import cats.data.{Chain, NonEmptyChain}
 import cats.syntax.all.*
-import ulisse.applications.managers.StationManager
+import ulisse.applications.managers.StationManager.CheckedStationManager
+import ulisse.applications.managers.{CheckedStationManager, StationManager}
 import ulisse.applications.ports.StationPorts
+import ulisse.applications.ports.StationPorts.Input
 import ulisse.entities.Coordinates.{Coordinate, Geo, Grid}
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
@@ -69,7 +71,7 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
   )(using
       coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
       stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
-  ): Future[Either[NonEmptyChain[BaseError], StationManager[S]#StationMapType]] =
+  ): Future[Either[NonEmptyChain[BaseError], StationPorts.Input[S]#SM]] =
     createStation(stationName, x, y, numberOfTrack, coordinateGenerator, stationGenerator) match
       case Left(value) => Future.successful(Left(value))
       case Right(value) =>

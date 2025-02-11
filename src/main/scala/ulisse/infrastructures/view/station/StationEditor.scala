@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.station
 
 import ulisse.adapters.input.StationEditorAdapter
+import ulisse.applications.managers.CheckedStationManager
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinates.*
 import ulisse.entities.station.Station
@@ -16,9 +17,10 @@ import scala.util.{Failure, Success}
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
   Swing.onEDT(runnable.run())
 
-type N = Int
-type C = Grid
-type S = CheckedStation[C]
+type N   = Int
+type C   = Grid
+type S   = CheckedStation[C]
+type CSM = CheckedStationManager[S]
 
 /** A Card displaying station information.
   *
