@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.simulation
 
 import ulisse.adapters.input.SimulationPageAdapter
+import ulisse.applications.useCases.SimulationData
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.LayeredContainers.JLayeredPane
 
@@ -16,7 +17,7 @@ given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
   Swing.onEDT(runnable.run())
 
 trait SimulationPage extends Component:
-  def updateData(step: Int): Unit
+  def updateData(data: SimulationData): Unit
 
 object SimulationPage:
   def apply(controller: SimulationPageAdapter): SimulationPage = SimulationPageImpl(controller)
@@ -26,21 +27,25 @@ object SimulationPage:
     private val map: Component = Label("Simulation Map")
     private val mapControlPane = SimulationPageControlPanel(controller)
 
-    def updateData(step: Int): Unit = mapControlPane.notificationLabel.text = s"Step: $step"
+    def updateData(data: SimulationData): Unit = mapControlPane.notificationLabel.text =
+      s"Step: ${data.step}, Time: ${data.secondElapsed}, Agent: ${data.simulationAgent}"
 
     mainPane.peer.add(map.center().peer)
     glassPane.peer.add(mapControlPane.center().peer, BorderLayout.EAST)
 
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
   final case class SimulationPageControlPanel(controller: SimulationPageAdapter)
       extends BoxPanel(Orientation.Vertical):
     private val pageControlImageButtonStyle = JStyler.rectPaletteStyler(
       JStyler.rect(JStyler.defaultSizeRect, JStyler.Dimension2D(5, 5), 25),
       JStyler.palette(JStyler.transparentColor, Theme.light.forwardClick.withAlpha(150), Theme.light.forwardClick)
     )
+    var timing                   = 0L
     val notificationLabel: Label = Label("Step: 0")
     private val startImage: ImagePanel =
       ImagePanel.createSVGPanel("icons/play.svg", Color.ORANGE).fixedSize(50, 50).genericClickReaction(() =>
         controller.start().onComplete(_ =>
+          timing = System.currentTimeMillis()
           startImage.visible = false
           pauseImage.visible = true
           println("[View]Simulation started")
@@ -52,7 +57,7 @@ object SimulationPage:
           controller.stop().onComplete(_ =>
             pauseImage.visible = false
             startImage.visible = true
-            println("[View]Simulation stopped")
+            println(s"[View]Simulation stopped${(System.currentTimeMillis() - timing) / 1000.0}")
           )
       ).styler(pageControlImageButtonStyle)
     private val resetImage =
@@ -61,7 +66,7 @@ object SimulationPage:
           startImage.visible = true
           pauseImage.visible = false
           notificationLabel.text = "Step: 0"
-          println("[View]Simulation reset")
+          println(s"[View]Simulation reset${(System.currentTimeMillis() - timing) / 1000}")
         )
       ).styler(pageControlImageButtonStyle)
     background = Theme.light.element
