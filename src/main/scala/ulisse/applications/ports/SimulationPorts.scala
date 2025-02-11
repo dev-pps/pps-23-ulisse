@@ -1,6 +1,6 @@
 package ulisse.applications.ports
 
-import ulisse.applications.useCases.SimulationData
+import ulisse.entities.simulation.Simulations.SimulationData
 
 import scala.concurrent.Future
 

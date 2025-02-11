@@ -2,7 +2,7 @@ package ulisse.adapters.output
 
 import ulisse.applications.ports.SimulationPorts
 import ulisse.entities.Coordinate
-import ulisse.applications.useCases.SimulationData
+import ulisse.entities.simulation.Simulations.SimulationData
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.simulation.SimulationPage
 
