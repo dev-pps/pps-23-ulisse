@@ -4,7 +4,7 @@ import ulisse.applications.SimulationState
 import ulisse.applications.ports.SimulationPorts
 import ulisse.entities.simulation.Agents.SimulationAgent
 import ulisse.entities.simulation.Environments.SimulationEnvironment
-import ulisse.entities.simulation.Simulations.SimulationData
+import ulisse.entities.simulation.Simulations.{EngineData, SimulationData}
 import ulisse.entities.station.Station
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -18,27 +18,49 @@ trait SimulationManager:
 
 object SimulationManager:
   def apply(notificationService: SimulationPorts.Output): SimulationManager =
-    SimulationManagerImpl(false, 0, SimulationEnvironment(), notificationService, 0.0, 0, SimulationAgent(1, 0, 5))
+    SimulationManagerImpl(
+      EngineData(false, None, None, 0, 0),
+      SimulationData(0, 0, SimulationEnvironment.empty()),
+      notificationService
+    )
   private case class SimulationManagerImpl(
-      running: Boolean,
-      step: Int,
-      environment: SimulationEnvironment,
-      notificationService: SimulationPorts.Output,
-      secondElapsed: Double,
-      lastUpdate: Long,
-      simulationAgent: SimulationAgent
+      engineData: EngineData,
+      simulationData: SimulationData,
+      notificationService: SimulationPorts.Output
   ) extends SimulationManager:
     override def start(environment: SimulationEnvironment): SimulationManager =
-      copy(running = true, environment = environment, lastUpdate = System.currentTimeMillis())
-    override def stop(): SimulationManager = copy(running = false)
-    override def reset(): SimulationManager =
-      copy(running = false, step = 0, secondElapsed = 0, lastUpdate = 0, simulationAgent = SimulationAgent(1, 0, 5))
+      copy(engineData.copy(true), simulationData.copy(simulationEnvironment = environment))
+    override def stop(): SimulationManager  = copy(engineData.copy(false))
+    override def reset(): SimulationManager = copy(engineData.copy(false), simulationData.clear())
     override def doStep(): SimulationManager =
-      val updatedStep          = step + 1
-      val lu                   = System.currentTimeMillis()
-      val deltaElapsed         = lu - lastUpdate
-      val updatedAgent         = simulationAgent.update(deltaElapsed / 1000.0)
-      val updatedSecondElapsed = secondElapsed + deltaElapsed / 1000.0
-      println(s"[SimulationManager]: Step $lastUpdate, $deltaElapsed")
-      notificationService.stepNotification(SimulationData(updatedStep, updatedSecondElapsed, environment))
-      copy(step = updatedStep, secondElapsed = updatedSecondElapsed, lastUpdate = lu, simulationAgent = updatedAgent)
+      def _updateSimulationData(engineData: EngineData, simulationData: SimulationData): SimulationData =
+        val newSimulationData = simulationData.copy(
+          step = simulationData.step + 1,
+          secondElapsed = simulationData.secondElapsed + engineData.lastDelta
+        )
+        notificationService.stepNotification(newSimulationData)
+        newSimulationData
+      val updatedEngineData = engineData.update(System.currentTimeMillis().toDouble)
+      updatedEngineData.cyclesPerSecond match
+        case Some(cps) =>
+          val cycleTimeStep = 1.0 / cps
+          println(
+            s"Cycle Time Step: ${updatedEngineData.elapsedCycleTime}, ${simulationData.secondElapsed}, ${updatedEngineData.lastDelta}"
+          )
+          if updatedEngineData.elapsedCycleTime >= cycleTimeStep then
+            val newSimData = _updateSimulationData(updatedEngineData, simulationData)
+            copy(
+              engineData =
+                updatedEngineData.copy(elapsedCycleTime = updatedEngineData.elapsedCycleTime - cycleTimeStep),
+              simulationData = newSimData
+            )
+          else
+            copy(
+              engineData = updatedEngineData,
+              simulationData = simulationData.copy(secondElapsed = simulationData.secondElapsed + engineData.lastDelta)
+            )
+        case None =>
+          val newSimData = _updateSimulationData(updatedEngineData, simulationData)
+          copy(engineData = updatedEngineData, simulationData = newSimData)
+
+    export engineData.running
