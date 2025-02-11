@@ -45,10 +45,9 @@ final case class StationSettings():
   val stationEditorView: StationEditorView                   = StationEditorView(stationEditorController)
 
 object StationTypes:
-  type N   = Int
-  type C   = Grid
-  type S   = CheckedStation[C]
-  type CSM = CheckedStationManager[S]
+  type N = Int
+  type C = Grid
+  type S = CheckedStation[C]
 
 @main def trainDemoMain(): Unit =
   import ulisse.applications.managers.TechnologyManagers.TechnologyManager

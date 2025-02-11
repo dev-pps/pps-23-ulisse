@@ -3,7 +3,6 @@ package ulisse.applications.useCases
 import cats.data.NonEmptyChain
 import ulisse.applications.AppState
 import ulisse.applications.managers.CheckedStationManager
-import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station

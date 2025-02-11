@@ -3,13 +3,11 @@ package ulisse.applications.adapters.input
 import cats.data.{Chain, NonEmptyChain}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
 import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.StationManager.CheckedStationManager
-import ulisse.applications.ports.StationPorts
 import ulisse.applications.useCases.StationService
 import ulisse.entities.Coordinates.{Coordinate, Grid}
 import ulisse.entities.station.Station
@@ -17,8 +15,8 @@ import ulisse.entities.station.Station.CheckedStation
 import ulisse.utils.Errors.BaseError
 
 import java.util.concurrent.LinkedBlockingQueue
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 class StationEditorAdapterTest extends AnyWordSpec with Matchers:
 
