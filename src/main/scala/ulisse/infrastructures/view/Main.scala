@@ -2,6 +2,7 @@ package ulisse.infrastructures.view
 
 import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.AppState
+import ulisse.applications.managers.{CheckedStationManager, StationManager}
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
 import ulisse.applications.useCases.RouteService
@@ -44,9 +45,10 @@ final case class StationSettings():
   val stationEditorView: StationEditorView                   = StationEditorView(stationEditorController)
 
 object StationTypes:
-  type N = Int
-  type C = Grid
-  type S = CheckedStation[C]
+  type N   = Int
+  type C   = Grid
+  type S   = CheckedStation[C]
+  type CSM = CheckedStationManager[S]
 
 @main def trainDemoMain(): Unit =
   import ulisse.applications.managers.TechnologyManagers.TechnologyManager

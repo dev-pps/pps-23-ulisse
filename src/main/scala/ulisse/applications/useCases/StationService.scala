@@ -1,6 +1,7 @@
 package ulisse.applications.useCases
 
 import ulisse.applications.AppState
+import ulisse.applications.managers.CheckedStationManager
 import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinates.Coordinate
@@ -22,7 +23,10 @@ final case class StationService[S <: Station[?]](
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[S]) => {
       val updatedMap = state.stationManager.addStation(station)
-      updateState(p, state, updatedMap)
+      updatedMap match
+        case Left(value: E) => p.success(Left(value)); state
+        case Right(value) =>
+          p.success(Right(value.stations)); state.copy(stationManager = value)
     })
     p.future
 
@@ -30,7 +34,10 @@ final case class StationService[S <: Station[?]](
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[S]) => {
       val updatedMap = state.stationManager.removeStation(station)
-      updateState(p, state, updatedMap)
+      updatedMap match
+        case Left(value: E) => p.success(Left(value)); state
+        case Right(value) =>
+          p.success(Right(value.stations)); state.copy(stationManager = value)
     })
     p.future
 
@@ -43,9 +50,6 @@ final case class StationService[S <: Station[?]](
     })
     p.future
 
-  private def updateState(p: Promise[Either[E, SM]], state: AppState[S], updatedMap: state.stationManager.R) = {
-    updatedMap match
-      case Left(value) => p.success(Left(value)); state
-      case Right(value: CheckedStationManager[S]) =>
-        p.success(Right(value.stations)); state.copy(stationManager = value)
-  }
+//  private def updateState(state: AppState[S], p: Promise[Either[E, SM]], updatedMap: CheckedStationManager#R) = {
+//
+//  }

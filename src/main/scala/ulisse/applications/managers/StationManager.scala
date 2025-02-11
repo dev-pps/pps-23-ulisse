@@ -1,8 +1,8 @@
 package ulisse.applications.managers
 
 import cats.data.NonEmptyChain
-
 import cats.syntax.all.*
+import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.BaseError
@@ -78,11 +78,11 @@ trait StationManager[S <: Station[?]]:
   def findStationAt(coordinate: Coordinate[?]): Option[S]
 
 trait UncheckedStationManager[S <: Station[?]] extends StationManager[S]:
-  type R = UncheckedStationManager[S]
+  final type R = UncheckedStationManager[S]
 
 trait CheckedStationManager[S <: Station[?]] extends StationManager[S]:
-  type R = Either[NonEmptyChain[E], CheckedStationManager[S]]
-  type E <: BaseError
+  final type R = Either[NonEmptyChain[E], CheckedStationManager[S]]
+  type E       = CheckedStationManager.Error
 
 /** Factory for [[StationManager]] instances. */
 object StationManager:

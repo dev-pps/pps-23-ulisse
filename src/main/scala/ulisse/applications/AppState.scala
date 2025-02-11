@@ -1,6 +1,6 @@
 package ulisse.applications
 
-import ulisse.applications.managers.StationManager
+import ulisse.applications.managers.{CheckedStationManager, StationManager}
 import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.entities.Coordinates
 import ulisse.entities.station.Station
