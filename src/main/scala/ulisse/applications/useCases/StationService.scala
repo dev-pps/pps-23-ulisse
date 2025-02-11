@@ -41,6 +41,17 @@ final case class StationService[S <: Station[?]](
     })
     p.future
 
+  override def updateStation(oldStation: Station[?], newStation: S): Future[Either[E, SM]] =
+    val p = Promise[Either[E, SM]]()
+    eventQueue.add((state: AppState[S]) => {
+      val updatedMap = state.stationManager.removeStation(oldStation).flatMap(_.addStation(newStation))
+      updatedMap match
+        case Left(value: E) => p.success(Left(value)); state
+        case Right(value) =>
+          p.success(Right(value.stations)); state.copy(stationManager = value)
+    })
+    p.future
+
   override def findStationAt(coordinate: Coordinate[?]): Future[Option[S]] =
     val p = Promise[Option[S]]()
     eventQueue.add((state: AppState[S]) => {

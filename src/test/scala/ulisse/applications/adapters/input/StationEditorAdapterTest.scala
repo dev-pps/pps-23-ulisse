@@ -83,12 +83,26 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
         Await.result(addNewStationResult, Duration.Inf) shouldBe Right(List(newStation))
         Await.result(findNewStationResult, Duration.Inf) shouldBe Some(newStation)
         Await.result(findStationAfterAddNewStationResult, Duration.Inf) shouldBe None
-      
+
       "chain error when inputs are valid and oldStation is not" in:
-        val (addStationResult, findStationResult) = addStation()
-        val oldStation                            = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
-        
-      
+        val oldStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
+        val updateStationResult =
+          controller.onOkClick(
+            stationName,
+            x.toString,
+            y.toString,
+            numberOfTrack.toString,
+            Some(oldStation)
+          )
+
+        val findStationResult = controller.findStationAt(Coordinate(x, y))
+
+        updateState()
+        Await.result(updateStationResult, Duration.Inf) shouldBe Left(
+          Chain(CheckedStationManager.Error.StationNotFound)
+        )
+        Await.result(findStationResult, Duration.Inf) shouldBe None
+
       "chain error when same station is added" in:
         val (addStationResult, findStationResult)         = addStation()
         val (addSameStationResult, findSameStationResult) = addStation()
