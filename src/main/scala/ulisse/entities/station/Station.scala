@@ -1,8 +1,8 @@
 package ulisse.entities.station
 
 import cats.data.NonEmptyChain
-import cats.syntax.all.*
 import cats.implicits.catsSyntaxEq
+import cats.syntax.all.*
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}

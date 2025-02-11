@@ -1,9 +1,7 @@
 package ulisse.applications.ports
 
-import ulisse.applications.managers.{CheckedStationManager, StationManager}
-import StationManager.CheckedStationManager
 import cats.data.NonEmptyChain
-import ulisse.applications.AppState
+import ulisse.applications.managers.{CheckedStationManager, StationManager}
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 
