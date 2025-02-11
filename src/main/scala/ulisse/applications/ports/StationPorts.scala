@@ -10,18 +10,10 @@ import ulisse.entities.station.Station
 import scala.concurrent.Future
 
 object StationPorts:
-  /** Trait representing output operations that a `StationManager` uses.
-    */
-  trait Output
-
   /** Trait representing input operations for interacting with a `StationManager`.
     *
-    * @tparam N
-    *   The numeric type representing the coordinates of the station (e.g., `Int`, `Double`).
-    *   - An instance of `Numeric` must be available for the `N` type.
-    * @tparam C
-    *   A type that extends `Coordinate[N]`, which represents the station's location.
-    *   - The `C` type must provide a way to compare coordinates and ensure uniqueness.
+    * @tparam S
+    *   The type of the station that the underlying manager will handle.
     */
   trait Input[S <: Station[?]]:
 

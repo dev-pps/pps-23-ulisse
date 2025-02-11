@@ -1,5 +1,6 @@
 package ulisse.applications.useCases
 
+import cats.data.NonEmptyChain
 import ulisse.applications.AppState
 import ulisse.applications.managers.CheckedStationManager
 import ulisse.applications.managers.StationManager.CheckedStationManager
@@ -23,10 +24,7 @@ final case class StationService[S <: Station[?]](
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[S]) => {
       val updatedMap = state.stationManager.addStation(station)
-      updatedMap match
-        case Left(value: E) => p.success(Left(value)); state
-        case Right(value) =>
-          p.success(Right(value.stations)); state.copy(stationManager = value)
+      updateState(p, state, updatedMap)
     })
     p.future
 
@@ -34,10 +32,7 @@ final case class StationService[S <: Station[?]](
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[S]) => {
       val updatedMap = state.stationManager.removeStation(station)
-      updatedMap match
-        case Left(value: E) => p.success(Left(value)); state
-        case Right(value) =>
-          p.success(Right(value.stations)); state.copy(stationManager = value)
+      updateState(p, state, updatedMap)
     })
     p.future
 
@@ -45,10 +40,7 @@ final case class StationService[S <: Station[?]](
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState[S]) => {
       val updatedMap = state.stationManager.removeStation(oldStation).flatMap(_.addStation(newStation))
-      updatedMap match
-        case Left(value: E) => p.success(Left(value)); state
-        case Right(value) =>
-          p.success(Right(value.stations)); state.copy(stationManager = value)
+      updateState(p, state, updatedMap)
     })
     p.future
 
@@ -61,6 +53,12 @@ final case class StationService[S <: Station[?]](
     })
     p.future
 
-//  private def updateState(state: AppState[S], p: Promise[Either[E, SM]], updatedMap: CheckedStationManager#R) = {
-//
-//  }
+  private def updateState(
+      p: Promise[Either[E, SM]],
+      state: AppState[S],
+      updatedMap: Either[NonEmptyChain[state.stationManager.E], CheckedStationManager[S]]
+  ) =
+    updatedMap match
+      case Left(value: E) => p.success(Left(value)); state
+      case Right(value) =>
+        p.success(Right(value.stations)); state.copy(stationManager = value)
