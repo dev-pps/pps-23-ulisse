@@ -52,7 +52,6 @@ final case class SimulationSettings():
   val inputAdapter: SimulationService[S]              = SimulationService(eventStream, simulationNotificationAdapter)
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
-//  simulationNotificationAdapter.simulationPage = Some(simulationPage)
 
 final case class StationSettings():
   val inputAdapter: StationService[S]                        = StationService(eventStream)
