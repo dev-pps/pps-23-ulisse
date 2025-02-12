@@ -4,8 +4,7 @@ import cats.data.NonEmptyChain
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.entities.Coordinates.Coordinate
-import ulisse.entities.Routes.Route
-import ulisse.entities.Routes.TypeRoute
+import ulisse.entities.Routes.{Route, TypeRoute}
 import ulisse.entities.station.Station
 import ulisse.utils.ValidationUtils.mkStringErrors
 
@@ -14,16 +13,16 @@ class RouteTest extends AnyFlatSpec with Matchers:
   opaque type StationTest = Station[ValueType, Coordinate[ValueType]]
   opaque type RouteTest   = Either[NonEmptyChain[Routes.Errors], Route[ValueType, Coordinate[ValueType]]]
 
-  val departure: StationTest = Station("Rimini", Coordinate.createValidRandomGeo(), 2)
-  val arrival: StationTest   = Station("Cesena", Coordinate.createValidRandomGeo(), 2)
+  val railsCount: Int        = 2
+  val departure: StationTest = Station("Rimini", Coordinate.createValidRandomGeo(), railsCount)
+  val arrival: StationTest   = Station("Cesena", Coordinate.createValidRandomGeo(), railsCount)
   val typeRoute: TypeRoute   = TypeRoute.Normal
-  val railsCount: Int        = 1
   val pathLength: Double     = departure.coordinate.distance(arrival.coordinate)
 
-  val creationRoute: RouteTest = Route(departure, arrival, typeRoute, railsCount, pathLength)
+  val validateRoute: RouteTest = Route(departure, arrival, typeRoute, railsCount, pathLength)
 
   "create routes" should "set core parameters: typology, railsCount, path" in:
-    creationRoute match
+    validateRoute match
       case Left(errors) => fail(s"${errors.mkStringErrors}")
       case Right(route) =>
         route.departure must be(departure)
@@ -33,66 +32,90 @@ class RouteTest extends AnyFlatSpec with Matchers:
         route.railsCount must be(railsCount)
         route.length must be(pathLength)
 
-  "check same routes" should "be same typology and path and the others parameters different" in:
-    val sameRoute: RouteTest = Route(departure, arrival, typeRoute, railsCount + 1, pathLength + 1)
-    creationRoute must be(sameRoute)
+  "check equals routes" should "be same typology and path and the others parameters different" in:
+    val equalRoute: RouteTest = Route(departure, arrival, typeRoute, railsCount - 1, pathLength + 1)
+    validateRoute must be(equalRoute)
 
   "check different routes" should "have different departure or arrival station or typology " in:
-    val newDeparture: StationTest        = Station("Firenze", Coordinate.createValidRandomGeo(), 2)
-    val newArrival: StationTest          = Station("Bologna", Coordinate.createValidRandomGeo(), 2)
+    val stationTracks: Int               = 2
+    val newDeparture: StationTest        = Station("Firenze", Coordinate.createValidRandomGeo(), stationTracks)
+    val newArrival: StationTest          = Station("Bologna", Coordinate.createValidRandomGeo(), stationTracks)
     val routeWithNewDeparture: RouteTest = Route(newDeparture, arrival, typeRoute, railsCount, pathLength)
     val routeWithNewArrival: RouteTest   = Route(departure, newArrival, typeRoute, railsCount, pathLength)
 
-    creationRoute must not be routeWithNewDeparture
-    creationRoute must not be routeWithNewArrival
+    validateRoute must not be routeWithNewDeparture
+    validateRoute must not be routeWithNewArrival
     TypeRoute.values.filter(!_.canEqual(typeRoute))
-      .foreach(creationRoute must not be Route(departure, arrival, _, railsCount, pathLength))
+      .foreach(validateRoute must not be Route(departure, arrival, _, railsCount, pathLength))
+
+  "check all fields from equal route" should "be equals" in:
+    for
+      route <- validateRoute
+    yield route.checkAllField(route) must be(true)
+
+  "check all fields from different route" should "be different" in:
+    for
+      route          <- validateRoute
+      differentRoute <- Route(departure, arrival, TypeRoute.AV, railsCount, pathLength + 100)
+    yield route.checkAllField(differentRoute) must be(false)
 
   "route with departure" should "change routes departure" in:
-    val newDeparture: StationTest = Station("Firenze", departure.coordinate, 2)
-    creationRoute.foreach(route =>
+    for
+      route <- validateRoute
+    yield
+      val newDeparture: StationTest       = Station("Firenze", departure.coordinate, 2)
       val changeRouteDeparture: RouteTest = route.withDeparture(newDeparture)
+
       changeRouteDeparture match
         case Left(errors) => fail(s"${errors.mkStringErrors}")
         case Right(newRoute) =>
           route.departure must not be newDeparture
           newRoute.departure must be(newDeparture)
-    )
 
   "route with arrival" should "change routes arrival" in:
-    val newArrival: StationTest = Station("Bologna", arrival.coordinate, 2)
-    creationRoute.foreach(route =>
+    for
+      route <- validateRoute
+    yield
+      val newArrival: StationTest       = Station("Bologna", arrival.coordinate, 2)
       val changeRouteArrival: RouteTest = route.withArrival(newArrival)
+
       changeRouteArrival match
         case Left(errors) => fail(s"${errors.mkStringErrors}")
         case Right(newRoute) =>
           route.arrival must not be newArrival
           newRoute.arrival must be(newArrival)
-    )
 
   "route with typology" should "change routes typology" in:
-    creationRoute.foreach(route =>
+    for
+      route <- validateRoute
+    yield
       val changeRouteTypology = route.withTypology(TypeRoute.AV)
+
       route.typology must not be TypeRoute.AV
       changeRouteTypology.typology must be(TypeRoute.AV)
-    )
 
   "route with rails count" should "change routes rails count" in:
-    creationRoute.foreach(route =>
-      val changeRouteRailsCount: RouteTest = route.withRailsCount(railsCount + 1)
+    for
+      route <- validateRoute
+    yield
+      val newRailsCount: Int               = railsCount - 1
+      val changeRouteRailsCount: RouteTest = route.withRailsCount(newRailsCount)
+
       changeRouteRailsCount match
         case Left(errors) => fail(s"${errors.mkStringErrors}")
         case Right(newRoute) =>
-          route.railsCount must not be (railsCount + 1)
-          newRoute.railsCount must be(railsCount + 1)
-    )
+          route.railsCount must not be newRailsCount
+          newRoute.railsCount must be(newRailsCount)
 
   "route with length" should "change routes length" in:
-    creationRoute.foreach(route =>
-      val changeRouteLength: RouteTest = route.withLength(pathLength + 50.0d)
+    for
+      route <- validateRoute
+    yield
+      val newLength: Double            = pathLength + 50.0d
+      val changeRouteLength: RouteTest = route.withLength(newLength)
+
       changeRouteLength match
         case Left(errors) => fail(s"${errors.mkStringErrors}")
         case Right(newRoute) =>
-          route.length must not be (pathLength + 50.0d)
-          newRoute.length must be(pathLength + 50.0d)
-    )
+          route.length must not be newLength
+          newRoute.length must be(newLength)

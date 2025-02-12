@@ -112,5 +112,11 @@ object ValidationUtils:
   def validateUniqueItems[A, E <: BaseError](items: Seq[A], error: E): Either[E, Seq[A]] =
     Either.cond(items.distinct.size === items.size, items, error)
 
+  extension [A, E](value: A)
+    def cond(f: A => Boolean, error: E): Either[E, A] = Either.cond(f(value), value, error)
+
+    def validateChain(f: (A => Boolean, E)*): Either[NonEmptyChain[E], A] =
+      f.map(value.cond).traverse(_.toValidatedNec).map(_ => value).toEither
+
   extension [A <: ErrorMessage](chainErrors: NonEmptyChain[A])
     def mkStringErrors: String = chainErrors.toList.map(_.msg).mkString(", ")

@@ -19,10 +19,13 @@ object RouteManagers:
     def routes: List[Route[N, C]]
     def contains(route: Route[N, C]): Boolean
     def find(id: IdRoute): Either[Errors, Route[N, C]]
+    def findFrom(route: Route[N, C]): Either[Errors, Route[N, C]] = find(route.id)
 
     def save(route: Route[N, C]): Either[Errors, RouteManager[N, C]]
     def modify(oldRoute: Route[N, C], newRoute: Route[N, C]): Either[Errors, RouteManager[N, C]]
+
     def delete(id: IdRoute): Either[Errors, RouteManager[N, C]]
+    def deleteForm(route: Route[N, C]): Either[Errors, RouteManager[N, C]] = delete(route.id)
 
   object RouteManager:
     def apply[N: Numeric, C <: Coordinate[N]](bank: Map[IdRoute, Route[N, C]]): RouteManager[N, C] =
