@@ -3,12 +3,11 @@ package ulisse.infrastructures.view.train
 import SwingUtils.onLeftOf
 import ulisse.applications.ports.TrainPorts
 import ulisse.infrastructures.view.train.model.TrainViewModel.{emptyTrainData, TechType, TrainData, WagonName}
-import ulisse.infrastructures.view.train.model.{TrainViewModel, TrainViewModelAdapter}
+import ulisse.infrastructures.view.train.model.{TrainViewAdapter, TrainViewModel}
 
 import scala.swing.event.*
 import scala.swing.*
 import scala.swing.Dialog.Message
-import scala.util.Try
 
 trait TrainEditorView:
   def updateTrainList(trains: List[TrainData]): Unit
@@ -18,17 +17,17 @@ trait TrainEditorView:
 
 object TrainEditorView:
 
-  def apply(inServicePort: TrainPorts.Input): Window =
+  def apply(inServicePort: TrainPorts.Input): Panel =
     TrainEditImpl(inServicePort)
 
   private class TrainEditImpl(val port: TrainPorts.Input)
-      extends Frame, TrainEditorView:
-    private val modelAdapter = TrainViewModelAdapter(port, this)
+      extends FlowPanel, TrainEditorView:
+    private val modelAdapter = TrainViewAdapter(port, this)
     modelAdapter.requestTechnologies()
     modelAdapter.requestWagonTypes()
     modelAdapter.requestTrains()
 
-    private val trainListView                       = TrainListView(List.empty)
+    private val trainListView                       = TrainsViews.trainsView(List.empty)
     private val trainsFleetPanel                    = new ScrollPane(trainListView)
     private val nameField: TextField                = new TextField(10)
     private val trainTechCombo: ComboBox[TechType]  = new ComboBox(List.empty)
@@ -79,13 +78,10 @@ object TrainEditorView:
       contents += deleteButton.onLeftOf(clearButton).onLeftOf(updateButton).onLeftOf(saveButton)
     }
 
-    private val mainFrame = new Frame {
-      title = "Train Fleet Editor"
-      contents = new BorderPanel {
-        preferredSize = new Dimension(800, 400)
-        layout(trainsFleetPanel) = BorderPanel.Position.Center
-        layout(editPane) = BorderPanel.Position.East
-      }
+    private val mainPanel = new BorderPanel {
+      preferredSize = new Dimension(800, 400)
+      layout(trainsFleetPanel) = BorderPanel.Position.Center
+      layout(editPane) = BorderPanel.Position.East
       listenTo(trainListView.selection)
 
       reactions += {
@@ -93,11 +89,8 @@ object TrainEditorView:
           val selectedTrain = trainListView.selection.items.headOption
           selectedTrain.map(loadFormFields)
       }
-
-      pack()
-      centerOnScreen()
-      open()
     }
+    contents += mainPanel
 
     private def clearFields(): Unit =
       loadFormFields(emptyTrainData)
@@ -144,7 +137,7 @@ object TrainEditorView:
 
     override def updateTrainList(trains: List[TrainData]): Unit =
       Swing.onEDT({
-        import ulisse.infrastructures.view.train.TrainListView.updateDataModel
+        import ulisse.infrastructures.view.train.TrainsViews.updateDataModel
         trainListView.updateDataModel(trains)
       })
 
@@ -157,7 +150,7 @@ object TrainEditorView:
     override def showError(errorMessage: String): Unit =
       Swing.onEDT(
         Dialog.showMessage(
-          mainFrame,
+          mainPanel,
           errorMessage,
           "Something goes wrong !",
           Message.Warning

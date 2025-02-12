@@ -1,8 +1,6 @@
 package ulisse.infrastructures.view.train.model
 
-import ulisse.entities.train.Wagons.UseType
-import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons
+import ulisse.entities.train.Trains.Train
 import TrainViewModel.*
 import ulisse.applications.ports.TrainPorts
 import ulisse.infrastructures.view.train.TrainEditorView
@@ -11,7 +9,7 @@ import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-trait TrainViewModelAdapter:
+trait TrainViewAdapter:
   def requestTrains(): Unit
   def requestTechnologies(): Unit
   def requestWagonTypes(): Unit
@@ -19,12 +17,12 @@ trait TrainViewModelAdapter:
   def deleteTrain(name: String): Unit
   def updateTrain(trainData: TrainData): Unit
 
-object TrainViewModelAdapter:
-  def apply(trainService: TrainPorts.Input, view: TrainEditorView): TrainViewModelAdapter =
+object TrainViewAdapter:
+  def apply(trainService: TrainPorts.Input, view: TrainEditorView): TrainViewAdapter =
     BaseAdapter(trainService, view)
 
   private final case class BaseAdapter(trainService: TrainPorts.Input, view: TrainEditorView)
-      extends TrainViewModelAdapter:
+      extends TrainViewAdapter:
     given executionContext: ExecutionContext = ExecutionContext.fromExecutorService(
       Executors.newFixedThreadPool(1)
     )
