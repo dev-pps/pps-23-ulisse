@@ -26,13 +26,27 @@ object SimulationManager:
     SimulationManagerImpl(
       EngineState(false, None, None, 0, 0),
       SimulationData(0, 0, SimulationEnvironment.empty()),
-      notificationService,
+      Some(notificationService),
       timeProvider
     )
+  def empty(timeProvider: UtilityPorts.Output.TimeProviderPort): SimulationManager =
+    SimulationManagerImpl(
+      EngineState(false, None, None, 0, 0),
+      SimulationData(0, 0, SimulationEnvironment.empty()),
+      None,
+      timeProvider
+    )
+
+  extension (simulationManager: SimulationManager)
+    def withNotificationService(notificationService: SimulationPorts.Output): SimulationManager =
+      simulationManager match
+        case SimulationManagerImpl(engineState, simulationData, _, timeProvider) =>
+          SimulationManagerImpl(engineState, simulationData, Some(notificationService), timeProvider)
+
   private case class SimulationManagerImpl(
       engineState: EngineState,
       simulationData: SimulationData,
-      notificationService: SimulationPorts.Output,
+      notificationService: Option[SimulationPorts.Output],
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ) extends SimulationManager:
     override def start(environment: SimulationEnvironment): SimulationManager =
@@ -45,7 +59,7 @@ object SimulationManager:
           step = simulationData.step + 1,
           secondElapsed = simulationData.secondElapsed + engineData.lastDelta
         )
-        notificationService.stepNotification(newSimulationData)
+        for ns <- notificationService do ns.stepNotification(newSimulationData)
         newSimulationData
       val updatedEngineData = engineState.update(timeProvider.currentTimeMillis.toDouble)
       updatedEngineData.cyclesPerSecond match
