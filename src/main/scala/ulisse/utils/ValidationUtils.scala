@@ -1,7 +1,8 @@
 package ulisse.utils
 
-import cats.implicits.catsSyntaxEq
-import ulisse.utils.Errors.BaseError
+import cats.data.NonEmptyChain
+import cats.syntax.all.*
+import ulisse.utils.Errors.{BaseError, ErrorMessage}
 
 /** Utility object containing various validation functions.
   *
@@ -110,3 +111,6 @@ object ValidationUtils:
     */
   def validateUniqueItems[A, E <: BaseError](items: Seq[A], error: E): Either[E, Seq[A]] =
     Either.cond(items.distinct.size === items.size, items, error)
+
+  extension [A <: ErrorMessage](chainErrors: NonEmptyChain[A])
+    def mkStringErrors: String = chainErrors.toList.map(_.msg).mkString(", ")

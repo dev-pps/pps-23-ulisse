@@ -42,10 +42,11 @@ object RouteManagers:
         find(route.id).map(_ => Errors.AlreadyExist.asLeft).getOrElse(copy(manager + (route.id -> route)).asRight)
 
       override def modify(oldRoute: Route[N, C], newRoute: Route[N, C]): Either[Errors, RouteManager[N, C]] =
-        (find(oldRoute.id), find(newRoute.id)) match
+        val managerWithoutOldRoute = copy(manager - oldRoute.id)
+        (find(oldRoute.id), managerWithoutOldRoute.find(newRoute.id)) match
           case (Left(error), _) => error.asLeft
           case (_, Right(_))    => Errors.AlreadyExist.asLeft
-          case (_, _)           => copy(manager.removed(oldRoute.id) + (newRoute.id -> newRoute)).asRight
+          case (_, _)           => copy(manager - oldRoute.id + (newRoute.id -> newRoute)).asRight
 
       override def delete(id: IdRoute): Either[Errors, RouteManager[N, C]] =
         find(id).map(_ => copy(manager - id).asRight).getOrElse(Errors.NotExist.asLeft)
