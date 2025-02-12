@@ -1,3 +1,21 @@
+## [1.9.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.8.0...v1.9.0) (2025-02-12)
+
+### Features
+
+* add hover icon color ([0192e1e](https://github.com/dev-pps/pps-23-ulisse/commit/0192e1e4a267aac40dad4758f7ef174985404373))
+* connect map observe to station ([5346140](https://github.com/dev-pps/pps-23-ulisse/commit/53461408a51b6186157e015ce01bdd6f006b805d))
+* connect station observer to route ([f5919f6](https://github.com/dev-pps/pps-23-ulisse/commit/f5919f62e83f9c897c81baee11da8f143e8e3d69))
+* create all function to modify route fields ([742c9f3](https://github.com/dev-pps/pps-23-ulisse/commit/742c9f3d6176ee1641e701a9ee4483b17300df23))
+* create base functions to use routeManager ([052d943](https://github.com/dev-pps/pps-23-ulisse/commit/052d94309c654b8f4e8f95218d7c729b306a770a))
+* create map items colletion to mapPanel ([38e568a](https://github.com/dev-pps/pps-23-ulisse/commit/38e568a5dd56b1b69aa06cdbde7de93b1654e648))
+* create obeserver-observable system ([d116706](https://github.com/dev-pps/pps-23-ulisse/commit/d116706591c9a96ee886e78bc3f2c5a584f7c58b))
+* create silhouette ([da632e8](https://github.com/dev-pps/pps-23-ulisse/commit/da632e8365e91d72fd41c8eb807d5187bcfe1989))
+* improve form spaces ([c2d5ebb](https://github.com/dev-pps/pps-23-ulisse/commit/c2d5ebb770793565d32d1ac00f48403c7433a04a))
+* init map service ([724e71b](https://github.com/dev-pps/pps-23-ulisse/commit/724e71b5608b10da94b674320c3e46d99cbd1f00))
+* merge route with station and technology ([97ea5e6](https://github.com/dev-pps/pps-23-ulisse/commit/97ea5e681781be6e37ab5c785b4b91e3e725b138))
+* system to modify route in RouteManager ([32aa624](https://github.com/dev-pps/pps-23-ulisse/commit/32aa624cb77921ed5a4e7f3bc275f2331c0d4f3e))
+* the generic propagation of station in route, manager, service and test ([ff4ec90](https://github.com/dev-pps/pps-23-ulisse/commit/ff4ec903be512c885b671f80089a7fd0297a11b2))
+
 ## [1.8.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.7.0...v1.8.0) (2025-02-10)
 
 ### Features
