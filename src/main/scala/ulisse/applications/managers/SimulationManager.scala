@@ -1,11 +1,12 @@
 package ulisse.applications.managers
 
 import ulisse.applications.SimulationState
-import ulisse.applications.ports.SimulationPorts
+import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
 import ulisse.entities.simulation.Agents.SimulationAgent
 import ulisse.entities.simulation.Environments.SimulationEnvironment
 import ulisse.entities.simulation.Simulations.{EngineData, SimulationData}
 import ulisse.entities.station.Station
+import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -17,16 +18,21 @@ trait SimulationManager:
   def doStep(): SimulationManager
 
 object SimulationManager:
-  def apply(notificationService: SimulationPorts.Output): SimulationManager =
+  def apply(
+      notificationService: SimulationPorts.Output,
+      timeProvider: UtilityPorts.Output.TimeProviderPort
+  ): SimulationManager =
     SimulationManagerImpl(
       EngineData(false, None, None, 0, 0),
       SimulationData(0, 0, SimulationEnvironment.empty()),
-      notificationService
+      notificationService,
+      timeProvider
     )
   private case class SimulationManagerImpl(
       engineData: EngineData,
       simulationData: SimulationData,
-      notificationService: SimulationPorts.Output
+      notificationService: SimulationPorts.Output,
+      timeProvider: UtilityPorts.Output.TimeProviderPort
   ) extends SimulationManager:
     override def start(environment: SimulationEnvironment): SimulationManager =
       copy(engineData.copy(true), simulationData.copy(simulationEnvironment = environment))
@@ -40,7 +46,7 @@ object SimulationManager:
         )
         notificationService.stepNotification(newSimulationData)
         newSimulationData
-      val updatedEngineData = engineData.update(System.currentTimeMillis().toDouble)
+      val updatedEngineData = engineData.update(timeProvider.currentTimeMillis.toDouble)
       updatedEngineData.cyclesPerSecond match
         case Some(cps) =>
           val cycleTimeStep = 1.0 / cps
