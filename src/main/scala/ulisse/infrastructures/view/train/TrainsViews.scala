@@ -1,18 +1,16 @@
 package ulisse.infrastructures.view.train
 
 import ulisse.infrastructures.view.train.model.TrainViewModel
-
+import ulisse.infrastructures.view.train.SwingUtils.{defaultString, headerLabel, nameFont, valueLabel}
 import java.awt.Color
-import scala.swing.*
+import scala.swing.Swing.{EmptyBorder, HGlue, HStrut}
+import scala.swing.{BoxPanel, Component, Label, ListView, Orientation, Swing}
 
-object TrainListView:
+object TrainsViews:
 
   private val selectedColor = Color.decode("#fff3d0")
-  private val nameFont      = new Font("Arial", java.awt.Font.BOLD, 18)
-  private val labelFont     = new Font("Arial", java.awt.Font.BOLD, 14)
-  private val valueFont     = new Font("Arial", java.awt.Font.PLAIN, 14)
 
-  def apply(trains: List[TrainViewModel.TrainData]): ListView[TrainViewModel.TrainData] =
+  def trainsView(trains: List[TrainViewModel.TrainData]): ListView[TrainViewModel.TrainData] =
     new ListView(trains) {
       import scala.swing.ListView.IntervalMode
       selection.intervalMode = IntervalMode.Single
@@ -32,34 +30,38 @@ object TrainListView:
         item: TrainViewModel.TrainData,
         index: Int
     ): Component = {
-      new TrainListItem(item, isSelected) {
+      new TrainInfoCard(item, isSelected) {
         background = if isSelected then selectedColor else Color.WHITE
       }
     }
   }
 
-  private class TrainListItem(trainData: TrainViewModel.TrainData, isSelected: Boolean)
+  private class TrainInfoCard(trainData: TrainViewModel.TrainData, isSelected: Boolean)
       extends BoxPanel(Orientation.Vertical) {
-
+    border = EmptyBorder(10, 20, 10, 20)
     private def createRow(labelText: String, value: Option[String]): BoxPanel = {
       new BoxPanel(Orientation.Horizontal) {
-        contents += new Label(labelText + ":") {
-          font = labelFont
-        }
-        contents += Swing.HStrut(10)
-        contents += new Label(value.getOrElse("N/A")) {
-          font = valueFont
-        }
+        contents += s"$labelText:".headerLabel
+        contents += HGlue
+        contents += value.valueLabel
         background = if isSelected then selectedColor else Color.WHITE
       }
     }
-    contents += new Label(trainData.name.getOrElse("N/A")) {
+    private val trainIcon = Label("icon train") // ImagePanel.createImagePanel("train-icon.png")
+    private val titleLabel = new Label(trainData.name.getOrElse("N/A")) {
       font = nameFont
     }
+    private val titlePane = new BoxPanel(Orientation.Horizontal) {
+      contents += HStrut(20)
+      contents += titleLabel
+      contents += HGlue
+      contents += trainIcon
+      contents += HGlue
+    }
+    contents += titlePane
     contents += createRow("Technology Name", trainData.technologyName)
     contents += createRow("Wagon Name Type", trainData.wagonNameType)
     contents += createRow("Wagon Count", trainData.wagonCount.map(_.toString))
     contents += createRow("Technology Max Speed", trainData.technologyMaxSpeed.map(_.toString))
     contents += createRow("Wagon Capacity", trainData.wagonCapacity.map(_.toString))
-    border = Swing.EmptyBorder(10, 10, 10, 10) // Padding
   }
