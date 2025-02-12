@@ -19,13 +19,15 @@ final case class SimulationService(
     notificationService: SimulationPorts.Output,
     timeProviderService: UtilityPorts.Output.TimeProviderPort
 ) extends SimulationPorts.Input:
-  private val simulationEvents = LinkedBlockingQueue[SimulationState => SimulationState]()
   def start(): Future[EngineState] =
     val p = Promise[EngineState]()
     eventQueue.add((appState: AppState) => {
       simulationEvents.add((state: SimulationState) => {
         val newSimulationManager =
-          state.simulationManager.start(SimulationEnvironment(appState.stationManager.stations, Seq[SimulationAgent]()))
+          state.simulationManager.withNotificationService(notificationService).start(SimulationEnvironment(
+            appState.stationManager.stations,
+            Seq[SimulationAgent]()
+          ))
         p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engineState })
         doStep()
         state.copy(simulationManager = newSimulationManager)
@@ -61,12 +63,3 @@ final case class SimulationService(
       else
         state
     })
-
-  Executors.newSingleThreadExecutor().execute(() =>
-    LazyList.continually(simulationEvents.take()).foldLeft(SimulationState(SimulationManager(
-      notificationService,
-      timeProviderService
-    )))((state, event) =>
-      event(state)
-    )
-  )
