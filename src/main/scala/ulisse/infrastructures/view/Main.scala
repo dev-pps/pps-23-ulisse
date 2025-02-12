@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view
 
 import ulisse.adapters.input.{SimulationPageAdapter, StationEditorAdapter}
+import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.adapters.output.{SimulationNotificationAdapter, SimulationNotificationAdapterRequirements}
 import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager
@@ -10,6 +11,9 @@ import ulisse.applications.managers.StationManager
 import ulisse.applications.useCases.{RouteService, StationService}
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
+import ulisse.entities.station.Station.CheckedStation
+import ulisse.infrastructures.commons.TimeProviders.TimeProvider
+import ulisse.infrastructures.view.StationTypes.*
 import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.simulation.SimulationPage
 import ulisse.infrastructures.view.station.StationEditorView
@@ -44,7 +48,11 @@ final case class SimulationSettings():
     SimulationNotificationAdapter(new SimulationNotificationAdapterRequirements {
       override def simulationPageComponent: SimulationPage = simulationPage
     })
-  val inputAdapter: SimulationService              = SimulationService(eventStream, simulationNotificationAdapter)
+  val inputAdapter: SimulationService = SimulationService(
+    eventStream,
+    simulationNotificationAdapter,
+    TimeProviderAdapter(TimeProvider.systemTimeProvider())
+  )
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
 

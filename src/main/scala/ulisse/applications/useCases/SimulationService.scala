@@ -1,19 +1,22 @@
 package ulisse.applications.useCases
 
+import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.{AppState, SimulationState}
-import ulisse.applications.ports.SimulationPorts
+import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
 import ulisse.entities.Coordinate
 import ulisse.entities.simulation.Agents.SimulationAgent
 import ulisse.entities.simulation.Environments.SimulationEnvironment
 import ulisse.entities.station.Station
+import ulisse.infrastructures.commons.TimeProviders.*
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 final case class SimulationService(
     eventQueue: LinkedBlockingQueue[AppState => AppState],
-    notificationService: SimulationPorts.Output
+    notificationService: SimulationPorts.Output,
+    timeProviderService: UtilityPorts.Output.TimeProviderPort
 ) extends SimulationPorts.Input:
   private val simulationEvents = LinkedBlockingQueue[SimulationState => SimulationState]()
   def start(): Future[Unit] =
@@ -57,8 +60,10 @@ final case class SimulationService(
     })
 
   Executors.newSingleThreadExecutor().execute(() =>
-    LazyList.continually(simulationEvents.take()).foldLeft(SimulationState(SimulationManager(notificationService)))(
-      (state, event) =>
-        event(state)
+    LazyList.continually(simulationEvents.take()).foldLeft(SimulationState(SimulationManager(
+      notificationService,
+      timeProviderService
+    )))((state, event) =>
+      event(state)
     )
   )
