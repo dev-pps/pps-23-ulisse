@@ -4,14 +4,14 @@ import cats.{Functor, Monad}
 import ulisse.entities.simulation.Environments.SimulationEnvironment
 
 object Simulations:
-  final case class EngineData(
+  final case class EngineState(
       running: Boolean,
       cyclesPerSecond: Option[Double],
       lastUpdate: Option[Double],
       lastDelta: Double,
       elapsedCycleTime: Double
   ):
-    def update(currentUpdate: Double): EngineData =
+    def update(currentUpdate: Double): EngineState =
       lastUpdate match
         case Some(lastUpdate) =>
           val deltaElapsed = (currentUpdate - lastUpdate) / 1000.0

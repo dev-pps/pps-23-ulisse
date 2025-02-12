@@ -7,6 +7,7 @@ import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
 import ulisse.entities.Coordinate
 import ulisse.entities.simulation.Agents.SimulationAgent
 import ulisse.entities.simulation.Environments.SimulationEnvironment
+import ulisse.entities.simulation.Simulations.EngineState
 import ulisse.entities.station.Station
 import ulisse.infrastructures.commons.TimeProviders.*
 
@@ -19,40 +20,42 @@ final case class SimulationService(
     timeProviderService: UtilityPorts.Output.TimeProviderPort
 ) extends SimulationPorts.Input:
   private val simulationEvents = LinkedBlockingQueue[SimulationState => SimulationState]()
-  def start(): Future[Unit] =
-    val p = Promise[Unit]()
+  def start(): Future[EngineState] =
+    val p = Promise[EngineState]()
     eventQueue.add((appState: AppState) => {
       simulationEvents.add((state: SimulationState) => {
-        p.success(println("[SimulationService]: Simulation Started"));
-        doStep()
-        state.copy(simulationManager =
+        val newSimulationManager =
           state.simulationManager.start(SimulationEnvironment(appState.stationManager.stations, Seq[SimulationAgent]()))
-        )
+        p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engineState })
+        doStep()
+        state.copy(simulationManager = newSimulationManager)
       })
       appState
     })
     p.future
 
-  def stop(): Future[Unit] =
-    val p = Promise[Unit]()
+  def stop(): Future[EngineState] =
+    val p = Promise[EngineState]()
     simulationEvents.add((state: SimulationState) => {
-      p.success(println("[SimulationService]: Simulation Stopped"));
-      state.copy(simulationManager = state.simulationManager.stop())
+      val newSimulationManager = state.simulationManager.stop()
+      p.success({ println("[SimulationService]: Simulation Stopped"); newSimulationManager.engineState })
+      state.copy(simulationManager = newSimulationManager)
     })
     p.future
 
-  def reset(): Future[Unit] =
-    val p = Promise[Unit]()
+  def reset(): Future[EngineState] =
+    val p = Promise[EngineState]()
     simulationEvents.add((state: SimulationState) => {
-      p.success(println("[SimulationService]: Simulation Reset"));
-      state.copy(simulationManager = state.simulationManager.reset())
+      val newSimulationManager = state.simulationManager.reset()
+      p.success({ println("[SimulationService]: Simulation Reset"); newSimulationManager.engineState })
+      state.copy(simulationManager = newSimulationManager)
     })
     p.future
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   private def doStep(): Unit =
     simulationEvents.offer((state: SimulationState) => {
-      if state.simulationManager.running then
+      if state.simulationManager.engineState.running then
         doStep()
         state.copy(simulationManager = state.simulationManager.doStep())
       else
