@@ -5,6 +5,7 @@ import cats.syntax.all.*
 import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.ErrorMessage
+import ulisse.utils.ValidationUtils.*
 
 import scala.annotation.targetName
 import scala.math.*
@@ -20,31 +21,6 @@ object Routes:
   enum TypeRoute(val technology: Technology):
     case Normal extends TypeRoute(Technology("Normal", 100))
     case AV     extends TypeRoute(Technology("AV", 300))
-
-  private def validateRailsCount(
-      railsCount: Int,
-      departure: Station[_, _],
-      arrival: Station[_, _]
-  ): Either[NonEmptyChain[Errors], Int] =
-    List(
-      Either.cond(railsCount > 0, railsCount, Errors.FewRails),
-      Either.cond(
-        railsCount <= min(departure.numberOfTracks, arrival.numberOfTracks),
-        railsCount,
-        Errors.TooManyRails
-      )
-    ).traverse(_.toValidatedNec).map(_ => railsCount).toEither
-
-  private def validateLength[A: Numeric, B <: Coordinate[A]](
-      length: Double,
-      departure: Station[A, B],
-      arrival: Station[A, B]
-  ): Either[NonEmptyChain[Errors], Double] =
-    Either.cond(
-      length >= departure.coordinate.distance(arrival.coordinate),
-      length,
-      Errors.TooShort
-    ).toValidatedNec.toEither
 
   trait Route[N: Numeric, C <: Coordinate[N]]:
     val id: IdRoute
@@ -69,6 +45,23 @@ object Routes:
         technology == other.technology && railsCount == other.railsCount && length == other.length
 
   object Route:
+    private def validateRailsCount(
+        railsCount: Int,
+        departure: Station[_, _],
+        arrival: Station[_, _]
+    ): Either[NonEmptyChain[Errors], Int] =
+      railsCount.validateChain(
+        (_ > 0, Errors.FewRails),
+        (_ <= min(departure.numberOfTracks, arrival.numberOfTracks), Errors.TooManyRails)
+      )
+
+    private def validateLength[A: Numeric, B <: Coordinate[A]](
+        length: Double,
+        departure: Station[A, B],
+        arrival: Station[A, B]
+    ): Either[NonEmptyChain[Errors], Double] =
+      length.validateChain((_ >= departure.coordinate.distance(arrival.coordinate), Errors.TooShort))
+
     private def validateRoute[N: Numeric, C <: Coordinate[N]](
         departure: Station[N, C],
         arrival: Station[N, C],
