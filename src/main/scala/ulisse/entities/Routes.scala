@@ -24,15 +24,15 @@ object Routes:
 
   trait Route[N: Numeric, C <: Coordinate[N]]:
     val id: IdRoute
-    val departure: Station[N, C]
-    val arrival: Station[N, C]
+    val departure: Station[C]
+    val arrival: Station[C]
     val typology: TypeRoute
     val technology: Technology
     val railsCount: Int
     val length: Double
 
-    def withDeparture(departure: Station[N, C]): Either[NonEmptyChain[Errors], Route[N, C]]
-    def withArrival(arrival: Station[N, C]): Either[NonEmptyChain[Errors], Route[N, C]]
+    def withDeparture(departure: Station[C]): Either[NonEmptyChain[Errors], Route[N, C]]
+    def withArrival(arrival: Station[C]): Either[NonEmptyChain[Errors], Route[N, C]]
     def withTypology(typeRoute: TypeRoute): Route[N, C]
     def withRailsCount(railsCount: Int): Either[NonEmptyChain[Errors], Route[N, C]]
     def withLength(length: Double): Either[NonEmptyChain[Errors], Route[N, C]]
@@ -47,8 +47,8 @@ object Routes:
   object Route:
     private def validateRailsCount(
         railsCount: Int,
-        departure: Station[_, _],
-        arrival: Station[_, _]
+        departure: Station[_],
+        arrival: Station[_]
     ): Either[NonEmptyChain[Errors], Int] =
       railsCount.validateChain(
         (_ > 0, Errors.FewRails),
@@ -57,14 +57,14 @@ object Routes:
 
     private def validateLength[A: Numeric, B <: Coordinate[A]](
         length: Double,
-        departure: Station[A, B],
-        arrival: Station[A, B]
+        departure: Station[B],
+        arrival: Station[B]
     ): Either[NonEmptyChain[Errors], Double] =
       length.validateChain((_ >= departure.coordinate.distance(arrival.coordinate), Errors.TooShort))
 
     private def validateRoute[N: Numeric, C <: Coordinate[N]](
-        departure: Station[N, C],
-        arrival: Station[N, C],
+        departure: Station[C],
+        arrival: Station[C],
         typeRoute: TypeRoute,
         railsCount: Int,
         length: Double
@@ -75,8 +75,8 @@ object Routes:
       ).mapN(RouteImpl(departure, arrival, typeRoute, _, _))
 
     def apply[N: Numeric, C <: Coordinate[N]](
-        departure: Station[N, C],
-        arrival: Station[N, C],
+        departure: Station[C],
+        arrival: Station[C],
         typeRoute: TypeRoute,
         railsCount: Int,
         length: Double
@@ -84,8 +84,8 @@ object Routes:
       validateRoute(departure, arrival, typeRoute, railsCount, length)
 
     private case class RouteImpl[N: Numeric, C <: Coordinate[N]](
-        departure: Station[N, C],
-        arrival: Station[N, C],
+        departure: Station[C],
+        arrival: Station[C],
         typology: TypeRoute,
         railsCount: Int,
         length: Double
@@ -93,9 +93,9 @@ object Routes:
       export typology._
       override val id: IdRoute = hashCode()
 
-      override def withDeparture(departure: Station[N, C]): Either[NonEmptyChain[Errors], Route[N, C]] =
+      override def withDeparture(departure: Station[C]): Either[NonEmptyChain[Errors], Route[N, C]] =
         validateRoute(departure, arrival, typology, railsCount, length)
-      override def withArrival(arrival: Station[N, C]): Either[NonEmptyChain[Errors], Route[N, C]] =
+      override def withArrival(arrival: Station[C]): Either[NonEmptyChain[Errors], Route[N, C]] =
         validateRoute(departure, arrival, typology, railsCount, length)
 
       override def withTypology(typeRoute: TypeRoute): Route[N, C] = copy(typology = typeRoute)

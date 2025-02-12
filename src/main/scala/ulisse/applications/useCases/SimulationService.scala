@@ -16,16 +16,18 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 
 final case class SimulationService[S <: Station[?]](
     eventQueue: LinkedBlockingQueue[AppState[S] => AppState[S]],
-    notificationService: SimulationPorts.Output,
-    timeProviderService: UtilityPorts.Output.TimeProviderPort
+    simulationEvents: LinkedBlockingQueue[SimulationState => SimulationState],
+    notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
-  private val simulationEvents = LinkedBlockingQueue[SimulationState => SimulationState]()
   def start(): Future[EngineState] =
     val p = Promise[EngineState]()
     eventQueue.add((appState: AppState[S]) => {
       simulationEvents.add((state: SimulationState) => {
         val newSimulationManager =
-          state.simulationManager.start(SimulationEnvironment(appState.stationManager.stations, Seq[SimulationAgent]()))
+          state.simulationManager.withNotificationService(notificationService).start(SimulationEnvironment(
+            appState.stationManager.stations,
+            Seq[SimulationAgent]()
+          ))
         p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engineState })
         doStep()
         state.copy(simulationManager = newSimulationManager)
@@ -61,12 +63,3 @@ final case class SimulationService[S <: Station[?]](
       else
         state
     })
-
-  Executors.newSingleThreadExecutor().execute(() =>
-    LazyList.continually(simulationEvents.take()).foldLeft(SimulationState(SimulationManager(
-      notificationService,
-      timeProviderService
-    )))((state, event) =>
-      event(state)
-    )
-  )

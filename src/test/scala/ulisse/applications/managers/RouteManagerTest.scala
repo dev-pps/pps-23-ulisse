@@ -13,7 +13,7 @@ import ulisse.utils.ValidationUtils.mkStringErrors
 
 class RouteManagerTest extends AnyFlatSpec with Matchers:
   opaque type ValueType        = Double
-  opaque type StationTest      = Station[ValueType, Coordinate[ValueType]]
+  opaque type StationTest      = Station[Coordinate[ValueType]]
   opaque type RouteTest        = Either[NonEmptyChain[Routes.Errors], Route[ValueType, Coordinate[ValueType]]]
   opaque type RouteManagerTest = RouteManager[ValueType, Coordinate[ValueType]]
 
