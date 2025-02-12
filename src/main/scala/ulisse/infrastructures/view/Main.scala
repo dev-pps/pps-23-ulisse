@@ -10,6 +10,11 @@ import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
 import ulisse.applications.useCases.{RouteService, StationService}
 import ulisse.entities.Coordinate
+import ulisse.applications.managers.{SimulationManager, StationManager}
+import ulisse.applications.useCases.RouteUIService.RouteUIInputService
+import ulisse.applications.useCases.{SimulationService, StationService}
+import ulisse.applications.{AppState, SimulationState}
+import ulisse.entities.Coordinates.{Coordinate, Grid}
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
@@ -18,41 +23,50 @@ import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.simulation.SimulationPage
 import ulisse.infrastructures.view.station.StationEditorView
 
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.{Executors, LinkedBlockingQueue}
 
-val eventStream = LinkedBlockingQueue[AppState => AppState]()
+val eventStream           = LinkedBlockingQueue[AppState => AppState]()
+val simulationEventStream = LinkedBlockingQueue[SimulationState => SimulationState]()
+
+def runEngines(): Unit =
+  val simulationInitialState =
+    SimulationState(SimulationManager.empty(TimeProviderAdapter(TimeProvider.systemTimeProvider())))
+  Executors.newSingleThreadExecutor().execute(() =>
+    LazyList.continually(simulationEventStream.take()).foldLeft(simulationInitialState)((state, event) =>
+      event(state)
+    )
+  )
+  val initialState = AppState[S](StationManager.createCheckedStationManager())
+  LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
+    event(state)
+  )
 
 @main def launchApp(): Unit =
   val app = AppFrame()
   app.contents = Menu(app)
   app.open()
 
-  val initialState = AppState(StationManager())
-  LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
-    event(state)
-  )
+  runEngines()
 
 @main def stationEditor(): Unit =
   val app      = AppFrame()
   val settings = StationSettings()
   app.contents = settings.stationEditorView
   app.open()
-
-  val initialState = AppState(StationManager())
-  LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
-    event(state)
-  )
+  runEngines()
 
 final case class SimulationSettings():
   val simulationNotificationAdapter: SimulationNotificationAdapter =
     SimulationNotificationAdapter(new SimulationNotificationAdapterRequirements {
       override def simulationPageComponent: SimulationPage = simulationPage
     })
+
   val inputAdapter: SimulationService = SimulationService(
     eventStream,
-    simulationNotificationAdapter,
-    TimeProviderAdapter(TimeProvider.systemTimeProvider())
+    simulationEventStream,
+    simulationNotificationAdapter
   )
+
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
 
