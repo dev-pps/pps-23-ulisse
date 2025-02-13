@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.10.0...v1.10.1) (2025-02-13)
+
+### Bug Fixes
+
+* **StationEditorAdapter:** invalid update scenario ([e09211d](https://github.com/dev-pps/pps-23-ulisse/commit/e09211dc3c1ce51d499315e060a8fdb81fbbcae7))
+* **StationManager:** adapt new interface ([2b278c8](https://github.com/dev-pps/pps-23-ulisse/commit/2b278c83b9d7ef2f8d5bc63fed8aacf19211ee73))
+
 ## [1.10.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.9.0...v1.10.0) (2025-02-13)
 
 ### Features
