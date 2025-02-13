@@ -1,3 +1,9 @@
+## [1.10.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.9.0...v1.10.0) (2025-02-13)
+
+### Features
+
+* create base service ([f70f8d7](https://github.com/dev-pps/pps-23-ulisse/commit/f70f8d7f9700abcc27004110e6aa968d2b9744a5))
+
 ## [1.9.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.8.0...v1.9.0) (2025-02-12)
 
 ### Features
