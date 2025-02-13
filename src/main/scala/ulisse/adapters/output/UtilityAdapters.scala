@@ -5,4 +5,4 @@ import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 
 object UtilityAdapters:
   case class TimeProviderAdapter(timeProvider: TimeProvider) extends TimeProviderPort:
-    override def currentTimeMillis: Long = timeProvider.currentTimeMillis
+    override def currentTimeMillis(): Long = timeProvider.currentTimeMillis()

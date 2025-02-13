@@ -19,15 +19,23 @@ final case class SimulationService(
     notificationService: SimulationPorts.Output,
     timeProviderService: UtilityPorts.Output.TimeProviderPort
 ) extends SimulationPorts.Input:
+  eventQueue.add((appState: AppState[S]) => {
+    simulationEvents.add((state: SimulationState) => {
+      state.copy(simulationManager =
+        state.simulationManager.withNotificationService(notificationService).setup(SimulationEnvironment(
+          appState.stationManager.stations,
+          Seq[SimulationAgent]()
+        ))
+      )
+    })
+    appState
+  })
+
   def start(): Future[EngineState] =
     val p = Promise[EngineState]()
     eventQueue.add((appState: AppState) => {
       simulationEvents.add((state: SimulationState) => {
-        val newSimulationManager =
-          state.simulationManager.withNotificationService(notificationService).start(SimulationEnvironment(
-            appState.stationManager.stations,
-            Seq[SimulationAgent]()
-          ))
+        val newSimulationManager = state.simulationManager.start()
         p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engineState })
         doStep()
         state.copy(simulationManager = newSimulationManager)
