@@ -5,8 +5,7 @@ import ulisse.entities.train.Wagons.Wagon
 
 object Trains:
 
-  /** Technology used by train
-    */
+  /** Technology used by train */
   trait TrainTechnology extends Technology:
     /** @return
       *   value of acceleration in m/s
@@ -28,8 +27,7 @@ object Trains:
       def acceleration: Double   = acc
       def deceleration: Double   = dec
 
-  /** Train is characterized by [[Technology]], [[Wagons.Wagon]] types and total capacity and wagon amount.
-    */
+  /** Train is characterized by [[Technology]], [[Wagons.Wagon]] types and total capacity and wagon amount. */
   trait Train:
 
     /** Train name */

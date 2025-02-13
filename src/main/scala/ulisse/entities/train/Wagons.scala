@@ -9,8 +9,7 @@ object Wagons:
     case Passenger extends UseType("Passenger")
     case Other     extends UseType("Other")
 
-  /** A train wagon (a.k.a. train wagon, train car, railroad car) that is part of a train.
-    */
+  /** A train wagon (a.k.a. train wagon, train car, railroad car) that is part of a train. */
   trait Wagon:
     /** @return
       *   [[UseType]] that defines the type of transport of the wagon
@@ -22,8 +21,7 @@ object Wagons:
       */
     def capacity: Capacity
 
-  /** Factory for [[train.model.Trains.Wagons.Wagon]] instances.
-    */
+  /** Factory for [[train.model.Trains.Wagons.Wagon]] instances. */
   object Wagon:
     def apply(use: UseType, capacity: Capacity): Wagon =
       WagonImpl(use, capacity)

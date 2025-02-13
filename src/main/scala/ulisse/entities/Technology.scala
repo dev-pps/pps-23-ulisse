@@ -1,7 +1,6 @@
 package ulisse.entities
 
-/** The technology used by the train or by railway
-  */
+/** The technology used by the train or by railway */
 trait Technology:
   /** @return
     *   Name of technology
@@ -13,8 +12,7 @@ trait Technology:
     */
   def maxSpeed: Int
 
-/** Factory for [[Technology]] instances.
-  */
+/** Factory for [[Technology]] instances. */
 object Technology:
   /** Creates new technology type,
     *
