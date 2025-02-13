@@ -22,7 +22,7 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
   private val timeProviderService     = mock[UtilityPorts.Output.TimeProviderPort]
   private val initialState            = AppState[S](StationManager.createCheckedStationManager())
   private val eventQueue              = LinkedBlockingQueue[AppState[S] => AppState[S]]()
-  private val initialSimulationState  = SimulationState(SimulationManager.empty(timeProviderService))
+  private val initialSimulationState  = SimulationState(SimulationManager.emptyBatchManager(timeProviderService))
   private val simulationQueue         = LinkedBlockingQueue[SimulationState => SimulationState]()
   private val simulationService       = SimulationService(eventQueue, simulationQueue, notificationService)
   private def updateAppState()        = runAll(initialState, eventQueue)
@@ -39,6 +39,8 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
       case _                     => fail()
 
   "SimulationService" should:
+    // TODO add tests for setup (auto-setup on create)
+
     "start simulation" in:
       val startSimulationResult = simulationService.start()
       updateState()
