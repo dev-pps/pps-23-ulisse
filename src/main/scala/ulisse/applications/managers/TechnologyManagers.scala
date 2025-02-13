@@ -4,8 +4,7 @@ import ulisse.entities.Technology
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist, ErrorValidation}
 
 object TechnologyManagers:
-  /** Train TechnologyManager errors that can be returned after a request.
-    */
+  /** Train TechnologyManager errors that can be returned after a request. */
   sealed trait TechErrors extends BaseError
   object TechErrors:
     final case class InvalidSpeed(speed: Int) extends ErrorValidation(s"technology speed value $speed") with TechErrors

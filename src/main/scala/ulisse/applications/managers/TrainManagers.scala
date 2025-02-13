@@ -8,8 +8,7 @@ import scala.util.Either
 
 object TrainManagers:
 
-  /** Train Manager errors that can be returned after a request.
-    */
+  /** Train Manager errors that can be returned after a request. */
   sealed trait TrainErrors extends BaseError
   object TrainErrors:
     final case class TrainAlreadyExists(name: String) extends ErrorMessage(s"[DUPLICATE] train $name") with TrainErrors
