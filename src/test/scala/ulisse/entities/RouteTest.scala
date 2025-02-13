@@ -9,17 +9,17 @@ import ulisse.entities.station.Station
 import ulisse.utils.ValidationUtils.mkStringErrors
 
 object RouteTest extends AnyFlatSpec with Matchers:
-  opaque type ValueType   = Double
-  opaque type StationTest = Station[ValueType, Coordinate[ValueType]]
-  opaque type RouteTest   = Either[NonEmptyChain[Routes.Errors], Route[ValueType, Coordinate[ValueType]]]
+  type ValueType   = Double
+  type StationTest = Station[ValueType, Coordinate[ValueType]]
+  type RouteTest   = Either[NonEmptyChain[Routes.Errors], Route[ValueType, Coordinate[ValueType]]]
 
-  private val railsCount: Int        = 2
-  private val departure: StationTest = Station("Rimini", Coordinate.createValidRandomGeo(), railsCount)
-  private val arrival: StationTest   = Station("Cesena", Coordinate.createValidRandomGeo(), railsCount)
-  private val typeRoute: TypeRoute   = TypeRoute.Normal
-  private val pathLength: Double     = departure.coordinate.distance(arrival.coordinate)
+  val railsCount: Int        = 2
+  val departure: StationTest = Station("Rimini", Coordinate.createValidRandomGeo(), railsCount)
+  val arrival: StationTest   = Station("Cesena", Coordinate.createValidRandomGeo(), railsCount)
+  val typeRoute: TypeRoute   = TypeRoute.Normal
+  val pathLength: Double     = departure.coordinate.distance(arrival.coordinate)
 
-  private val validateRoute: RouteTest = Route(departure, arrival, typeRoute, railsCount, pathLength)
+  val validateRoute: RouteTest = Route(departure, arrival, typeRoute, railsCount, pathLength)
 
   "create routes" should "set core parameters: typology, railsCount, path" in:
     validateRoute match
