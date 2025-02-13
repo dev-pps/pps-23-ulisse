@@ -87,7 +87,7 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
   "TimedSimulationManager" should:
     "update state on multiple steps" in:
       setupTimeProvider()
-      val manager        = SimulationManager.emptyBatchManager(timeProvider).start()
+      val manager        = SimulationManager.emptyTimedManager(timeProvider, 10).start()
       val updatedManager = manager.doStep().doStep().doStep()
       updatedManager.engineState compareTo manager.engineState ignoring (Field.LastUpdate, Field.LastDelta, Field.ElapsedCycleTime) shouldBeBoolean true
       updatedManager.engineState compareTo manager.engineState considering Field.LastUpdate shouldBeBoolean false
