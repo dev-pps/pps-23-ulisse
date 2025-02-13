@@ -1,14 +1,8 @@
 package ulisse.applications.managers
 
-import ulisse.applications.SimulationState
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
-import ulisse.entities.simulation.Agents.SimulationAgent
 import ulisse.entities.simulation.Environments.SimulationEnvironment
 import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
-import ulisse.entities.station.Station
-import ulisse.infrastructures.commons.TimeProviders.TimeProvider
-
-import java.util.concurrent.LinkedBlockingQueue
 
 trait SimulationManager:
   def engineState: EngineState
@@ -84,11 +78,11 @@ object SimulationManager:
               "decrease cycle timeStep"
             )
             copy(
-              updatedEngineData.decreaseElapsedCycleTimeBy(cycleTimeStep),
+              updatedEngineData.decreaseElapsedCycleTimeBy(cycleTimeStep * 1000.0),
               _updateSimulationData(updatedEngineData, simulationData)
             )
           else
-            copy(updatedEngineData, simulationData.increaseSecondElapsedBy(engineState.lastDelta))
+            copy(updatedEngineData, simulationData.increaseSecondElapsedBy(updatedEngineData.lastDelta))
         case None =>
           println(
             s"newData $updatedEngineData"
