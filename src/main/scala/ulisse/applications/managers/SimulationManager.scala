@@ -26,6 +26,9 @@ object SimulationManager:
       timeProvider
     )
 
+  def calculateCycleTimeStep(cps: Int): Double =
+    1.0 / cps * 1000
+
   def timedManager(
       notificationService: SimulationPorts.Output,
       timeProvider: UtilityPorts.Output.TimeProviderPort,
@@ -55,6 +58,7 @@ object SimulationManager:
       notificationService: Option[SimulationPorts.Output],
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ) extends SimulationManager:
+
     override def setup(environment: SimulationEnvironment): SimulationManager =
       copy(simulationData = simulationData.copy(simulationEnvironment = environment))
     override def start(): SimulationManager =
@@ -69,16 +73,16 @@ object SimulationManager:
       val updatedEngineData = engineState.update(timeProvider.currentTimeMillis().toDouble)
       updatedEngineData.cyclesPerSecond match
         case Some(cps) =>
-          val cycleTimeStep = 1.0 / cps
+          val cycleTimeStep = calculateCycleTimeStep(cps)
           println(
             s"Cycle Time Step: ${updatedEngineData}${updatedEngineData.elapsedCycleTime}, ${simulationData.secondElapsed}, ${updatedEngineData.lastDelta}"
           )
-          if updatedEngineData.elapsedCycleTime / 1000.0 >= cycleTimeStep then
+          if updatedEngineData.elapsedCycleTime >= cycleTimeStep then
             println(
               "decrease cycle timeStep"
             )
             copy(
-              updatedEngineData.decreaseElapsedCycleTimeBy(cycleTimeStep * 1000.0),
+              updatedEngineData.decreaseElapsedCycleTimeBy(cycleTimeStep),
               _updateSimulationData(updatedEngineData, simulationData)
             )
           else

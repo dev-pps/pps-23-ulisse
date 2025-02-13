@@ -9,9 +9,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.applications.ports.UtilityPorts
 import ulisse.entities.simulation.Environments.SimulationEnvironment
-import ulisse.entities.simulation.Simulations.EngineState
-import ulisse.entities.simulation.Simulations.EngineState.{ComparisonBuilder, Field}
-import EngineState.*
+import ulisse.entities.simulation.Simulations.EngineState.*
 import ulisse.entities.simulation.Simulations.EngineState.Field.LastDelta
 
 class SimulationManagerTest extends AnyWordSpec with Matchers:
@@ -22,6 +20,9 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
   private def setupTimeProvider(): Unit =
     val timeIterator = LazyList.iterate(startTime)(_ + timeIncrement).iterator
     when(timeProvider.currentTimeMillis()).thenAnswer((_: InvocationOnMock) => timeIterator.next())
+
+  private def repeatDoStep(simulationManager: SimulationManager, times: Int): SimulationManager =
+    (1 to times).foldLeft(simulationManager)((manager, _) => manager.doStep())
 
   "Mocked TimeProvider" should:
     "return a sequence of increasing time values" in:
@@ -71,30 +72,37 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
 
   "BatchSimulationManager" should:
     "update state on multiple steps" in:
-      setupTimeProvider()
-      val manager        = SimulationManager.emptyBatchManager(timeProvider).start()
-      val updatedManager = manager.doStep().doStep().doStep()
-      updatedManager.engineState compareTo manager.engineState ignoring (Field.LastUpdate, Field.LastDelta, Field.ElapsedCycleTime) shouldBeBoolean true
-      updatedManager.engineState compareTo manager.engineState considering Field.LastUpdate shouldBeBoolean false
-      updatedManager.engineState compareTo manager.engineState considering Field.LastDelta shouldBeBoolean false
-      updatedManager.engineState compareTo manager.engineState considering Field.ElapsedCycleTime shouldBeBoolean false
-      updatedManager.engineState.lastUpdate shouldBe Some(startTime + 2 * timeIncrement)
-      updatedManager.engineState.lastDelta shouldBe timeIncrement
-      updatedManager.engineState.elapsedCycleTime shouldBe 2 * timeIncrement
-      updatedManager.simulationData.step shouldBe 3
-      updatedManager.simulationData.secondElapsed shouldBe 2 * timeIncrement
+      for step <- 2 to 100 do
+        setupTimeProvider()
+        val realUpdate     = step - 1
+        val manager        = SimulationManager.emptyBatchManager(timeProvider).start()
+        val updatedManager = repeatDoStep(manager, step)
+        updatedManager.engineState compareTo manager.engineState ignoring (Field.LastUpdate, Field.LastDelta, Field.ElapsedCycleTime) shouldBeBoolean true
+        updatedManager.engineState compareTo manager.engineState considering Field.LastUpdate shouldBeBoolean false
+        updatedManager.engineState compareTo manager.engineState considering Field.LastDelta shouldBeBoolean false
+        updatedManager.engineState compareTo manager.engineState considering Field.ElapsedCycleTime shouldBeBoolean false
+        updatedManager.engineState.lastUpdate shouldBe Some(startTime + realUpdate * timeIncrement)
+        updatedManager.engineState.lastDelta shouldBe timeIncrement
+        updatedManager.engineState.elapsedCycleTime shouldBe realUpdate * timeIncrement
+        updatedManager.simulationData.step shouldBe step
+        updatedManager.simulationData.secondElapsed shouldBe realUpdate * timeIncrement
 
   "TimedSimulationManager" should:
     "update state on multiple steps" in:
-      setupTimeProvider()
-      val manager        = SimulationManager.emptyTimedManager(timeProvider, 10).start()
-      val updatedManager = manager.doStep().doStep().doStep()
-      updatedManager.engineState compareTo manager.engineState ignoring (Field.LastUpdate, Field.LastDelta, Field.ElapsedCycleTime) shouldBeBoolean true
-      updatedManager.engineState compareTo manager.engineState considering Field.LastUpdate shouldBeBoolean false
-      updatedManager.engineState compareTo manager.engineState considering Field.LastDelta shouldBeBoolean false
-      updatedManager.engineState compareTo manager.engineState considering Field.ElapsedCycleTime shouldBeBoolean false
-      updatedManager.engineState.lastUpdate shouldBe Some(startTime + 2 * timeIncrement)
-      updatedManager.engineState.lastDelta shouldBe timeIncrement
-      updatedManager.engineState.elapsedCycleTime shouldBe 2 * timeIncrement
-      updatedManager.simulationData.step shouldBe 0
-      updatedManager.simulationData.secondElapsed shouldBe 2 * timeIncrement
+      val cps           = 10
+      val cycleTimeStep = SimulationManager.calculateCycleTimeStep(cps)
+      for step <- 2 to 100 do
+        setupTimeProvider()
+        val manager        = SimulationManager.emptyTimedManager(timeProvider, cps).start()
+        val updatedManager = repeatDoStep(manager, step)
+        val realUpdate     = step - 1
+        val expectedStep   = (updatedManager.simulationData.secondElapsed / cycleTimeStep).toInt
+        updatedManager.engineState compareTo manager.engineState ignoring (Field.LastUpdate, Field.LastDelta, Field.ElapsedCycleTime) shouldBeBoolean true
+        updatedManager.engineState compareTo manager.engineState considering Field.LastUpdate shouldBeBoolean false
+        updatedManager.engineState compareTo manager.engineState considering Field.LastDelta shouldBeBoolean false
+        updatedManager.engineState compareTo manager.engineState considering Field.ElapsedCycleTime shouldBeBoolean realUpdate % (cycleTimeStep / timeIncrement) == 0
+        updatedManager.engineState.lastUpdate shouldBe Some(startTime + realUpdate * timeIncrement)
+        updatedManager.engineState.lastDelta shouldBe timeIncrement
+        updatedManager.engineState.elapsedCycleTime shouldBe realUpdate * timeIncrement - expectedStep * cycleTimeStep
+        updatedManager.simulationData.step shouldBe expectedStep
+        updatedManager.simulationData.secondElapsed shouldBe realUpdate * timeIncrement
