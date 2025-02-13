@@ -28,9 +28,9 @@ object SimulationPage:
     private val mapControlPane = SimulationPageControlPanel(controller)
 
     def updateData(data: SimulationData): Unit = mapControlPane.notificationLabel.text =
-      s"Step: ${data.step}, Time: ${data.secondElapsed}, Agent: ${data.simulationEnvironment.agents.foldLeft("")(
-          (acc, agent) => s"$acc $agent"
-        )}"
+      s"Step: ${data.step}, Time: ${data.secondElapsed / 1000.0}, Agent: ${data.simulationEnvironment.agents.foldLeft(
+          ""
+        )((acc, agent) => s"$acc $agent")}"
 
     mainPane.peer.add(map.center().peer)
     glassPane.peer.add(mapControlPane.center().peer, BorderLayout.EAST)
@@ -65,6 +65,7 @@ object SimulationPage:
     private val resetImage =
       ImagePanel.createSVGPanel("icons/reset.svg", Color.ORANGE).fixedSize(50, 50).genericClickReaction(() =>
         controller.reset().onComplete(_ =>
+          timing = 0
           startImage.visible = true
           pauseImage.visible = false
           notificationLabel.text = "Step: 0"
