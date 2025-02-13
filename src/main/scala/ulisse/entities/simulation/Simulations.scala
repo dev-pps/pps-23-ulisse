@@ -18,6 +18,9 @@ object Simulations:
       def ignoring(fields: Field*): ComparisonBuilder =
         copy(ignoredFields = ignoredFields ++ fields)
 
+      def considering(fields: Field*): ComparisonBuilder =
+        copy(ignoredFields = Field.values.filterNot(fields.contains).toIndexedSeq)
+
       def andTo(nextEngine: EngineState): ComparisonBuilder =
         copy(engines = nextEngine +: engines)
 
@@ -52,13 +55,14 @@ object Simulations:
     def update(currentUpdate: Double): EngineState =
       lastUpdate match
         case Some(lastUpdate) =>
-          val deltaElapsed = (currentUpdate - lastUpdate) / 1000.0
+          val deltaElapsed = currentUpdate - lastUpdate
           copy(
             lastDelta = deltaElapsed,
             elapsedCycleTime = elapsedCycleTime + deltaElapsed,
             lastUpdate = Some(currentUpdate)
           )
         case None =>
+          println(s"First update: $currentUpdate")
           copy(lastUpdate = Some(currentUpdate))
 
   object SimulationData:
