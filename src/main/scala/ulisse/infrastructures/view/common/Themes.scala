@@ -22,12 +22,12 @@ object Themes:
     val light: Theme = Light()
 
     private case class Light() extends Theme(
-          Color.decode("#f7f8ff"),
-          Color.decode("#2C2C2C"),
-          Color.decode("#d6dbf5"),
-          Color.decode("#a2aace"),
-          Color.decode("#418dff"),
-          Color.decode("#c0c1c8"),
-          Color.decode("#59f759"),
-          Color.decode("#f75959")
+          background = Color.decode("#f7f8ff"),
+          text = Color.decode("#2C2C2C"),
+          element = Color.decode("#d6dbf5"),
+          overlayElement = Color.decode("#a2aace"),
+          forwardClick = Color.decode("#418dff"),
+          backwardClick = Color.decode("#c0c1c8"),
+          trueClick = Color.decode("#59f759"),
+          falseClick = Color.decode("#f75959")
         )
