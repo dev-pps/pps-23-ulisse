@@ -11,6 +11,7 @@ import ulisse.entities.simulation.Simulations.EngineState
 import ulisse.entities.station.Station
 
 import java.util.concurrent.LinkedBlockingQueue
+import scala.annotation.tailrec
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
@@ -30,24 +31,46 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
     updateAppState()
     updateSimulationState()
 
+  @tailrec
+  private def doSteps(n: Int, currentState: Option[SimulationState]): SimulationState =
+    (n, currentState) match
+      case (0, Some(finalState)) => finalState
+      case (_, Some(state))      => doSteps(n - 1, runAll(state, simulationQueue).lastOption)
+      case _                     => fail()
+
   "SimulationService" should:
     "start simulation" in:
       val startSimulationResult = simulationService.start()
       updateState()
       Await.result(startSimulationResult, Duration.Inf).running shouldBe true
+      eventQueue.clear()
+
+    "when started start to enqueue step handlers" in:
+      for i <- 0 until 10 do
+        simulationService.start()
+        simulationQueue.size() shouldBe 1
+        doSteps(i, updateState().lastOption).simulationManager.simulationData.step shouldBe i
+        simulationQueue.size() shouldBe 1
+        eventQueue.clear()
 
     "stop simulation" in:
-      val startSimulationResult = simulationService.start()
-      val stopSimulationResult  = simulationService.stop()
+      simulationService.start()
+      val stopSimulationResult = simulationService.stop()
       updateState()
-      Await.result(startSimulationResult, Duration.Inf).running shouldBe true
       Await.result(stopSimulationResult, Duration.Inf).running shouldBe false
+      eventQueue.clear()
+
+    "restart simulation" in:
+      simulationService.start()
+      simulationService.stop()
+      val restartSimulationResult = simulationService.start()
+      updateState()
+      Await.result(restartSimulationResult, Duration.Inf).running shouldBe true
+      eventQueue.clear()
 
     "reset simulation" in:
-      val startSimulationResult = simulationService.start()
-      val stopSimulationResult  = simulationService.stop()
+      simulationService.start()
       val resetSimulationResult = simulationService.reset()
       updateState()
-      Await.result(startSimulationResult, Duration.Inf).running shouldBe true
-      Await.result(stopSimulationResult, Duration.Inf).running shouldBe false
       Await.result(resetSimulationResult, Duration.Inf).running shouldBe false
+      eventQueue.clear()
