@@ -13,29 +13,41 @@ import java.util.concurrent.LinkedBlockingQueue
 trait SimulationManager:
   def engineState: EngineState
   def simulationData: SimulationData
-  def start(environment: SimulationEnvironment): SimulationManager
+  def setup(environment: SimulationEnvironment): SimulationManager
+  def start(): SimulationManager
   def stop(): SimulationManager
   def reset(): SimulationManager
   def doStep(): SimulationManager
 
 object SimulationManager:
   def apply(
-      notificationService: SimulationPorts.Output,
-      timeProvider: UtilityPorts.Output.TimeProviderPort
+      notificationService: Option[SimulationPorts.Output],
+      timeProvider: UtilityPorts.Output.TimeProviderPort,
+      cyclesPerSecond: Option[Int]
   ): SimulationManager =
     SimulationManagerImpl(
-      EngineState(false, None, None, 0, 0),
+      EngineState(false, cyclesPerSecond, None, 0, 0),
       SimulationData(0, 0, SimulationEnvironment.empty()),
-      Some(notificationService),
+      notificationService,
       timeProvider
     )
-  def empty(timeProvider: UtilityPorts.Output.TimeProviderPort): SimulationManager =
-    SimulationManagerImpl(
-      EngineState(false, None, None, 0, 0),
-      SimulationData(0, 0, SimulationEnvironment.empty()),
-      None,
-      timeProvider
-    )
+
+  def timedManager(
+      notificationService: SimulationPorts.Output,
+      timeProvider: UtilityPorts.Output.TimeProviderPort,
+      cyclesPerSecond: Int
+  ): SimulationManager = apply(Some(notificationService), timeProvider, Some(cyclesPerSecond))
+
+  def emptyTimedManager(timeProvider: UtilityPorts.Output.TimeProviderPort, cyclesPerSecond: Int): SimulationManager =
+    apply(None, timeProvider, Some(cyclesPerSecond))
+
+  def batchManager(
+      notificationService: SimulationPorts.Output,
+      timeProvider: UtilityPorts.Output.TimeProviderPort
+  ): SimulationManager = apply(Some(notificationService), timeProvider, None)
+
+  def emptyBatchManager(timeProvider: UtilityPorts.Output.TimeProviderPort): SimulationManager =
+    apply(None, timeProvider, None)
 
   extension (simulationManager: SimulationManager)
     def withNotificationService(notificationService: SimulationPorts.Output): SimulationManager =
@@ -49,19 +61,18 @@ object SimulationManager:
       notificationService: Option[SimulationPorts.Output],
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ) extends SimulationManager:
-    override def start(environment: SimulationEnvironment): SimulationManager =
-      copy(engineState.copy(true), simulationData.copy(simulationEnvironment = environment))
+    override def setup(environment: SimulationEnvironment): SimulationManager =
+      copy(simulationData = simulationData.copy(simulationEnvironment = environment))
+    override def start(): SimulationManager =
+      copy(engineState.copy(true))
     override def stop(): SimulationManager  = copy(engineState.copy(false))
     override def reset(): SimulationManager = copy(engineState.copy(false), simulationData.clear())
     override def doStep(): SimulationManager =
       def _updateSimulationData(engineData: EngineState, simulationData: SimulationData): SimulationData =
-        val newSimulationData = simulationData.copy(
-          step = simulationData.step + 1,
-          secondElapsed = simulationData.secondElapsed + engineData.lastDelta
-        )
+        val newSimulationData = simulationData.increaseStepByOne().increaseSecondElapsedBy(engineData.lastDelta)
         for ns <- notificationService do ns.stepNotification(newSimulationData)
         newSimulationData
-      val updatedEngineData = engineState.update(timeProvider.currentTimeMillis.toDouble)
+      val updatedEngineData = engineState.update(timeProvider.currentTimeMillis().toDouble)
       updatedEngineData.cyclesPerSecond match
         case Some(cps) =>
           val cycleTimeStep = 1.0 / cps
@@ -69,17 +80,12 @@ object SimulationManager:
             s"Cycle Time Step: ${updatedEngineData.elapsedCycleTime}, ${simulationData.secondElapsed}, ${updatedEngineData.lastDelta}"
           )
           if updatedEngineData.elapsedCycleTime >= cycleTimeStep then
-            val newSimData = _updateSimulationData(updatedEngineData, simulationData)
             copy(
-              engineState =
-                updatedEngineData.copy(elapsedCycleTime = updatedEngineData.elapsedCycleTime - cycleTimeStep),
-              simulationData = newSimData
+              updatedEngineData.decreaseElapsedCycleTimeBy(cycleTimeStep),
+              _updateSimulationData(updatedEngineData, simulationData)
             )
           else
-            copy(
-              engineState = updatedEngineData,
-              simulationData = simulationData.copy(secondElapsed = simulationData.secondElapsed + engineState.lastDelta)
-            )
+            copy(updatedEngineData, simulationData.increaseSecondElapsedBy(engineState.lastDelta))
         case None =>
           val newSimData = _updateSimulationData(updatedEngineData, simulationData)
           copy(engineState = updatedEngineData, simulationData = newSimData)

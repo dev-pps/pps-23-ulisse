@@ -30,7 +30,7 @@ val simulationEventStream = LinkedBlockingQueue[SimulationState => SimulationSta
 
 def runEngines(): Unit =
   val simulationInitialState =
-    SimulationState(SimulationManager.empty(TimeProviderAdapter(TimeProvider.systemTimeProvider())))
+    SimulationState(SimulationManager.emptyBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider())))
   Executors.newSingleThreadExecutor().execute(() =>
     LazyList.continually(simulationEventStream.take()).foldLeft(simulationInitialState)((state, event) =>
       event(state)
