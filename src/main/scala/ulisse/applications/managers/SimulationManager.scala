@@ -77,9 +77,12 @@ object SimulationManager:
         case Some(cps) =>
           val cycleTimeStep = 1.0 / cps
           println(
-            s"Cycle Time Step: ${updatedEngineData.elapsedCycleTime}, ${simulationData.secondElapsed}, ${updatedEngineData.lastDelta}"
+            s"Cycle Time Step: ${updatedEngineData}${updatedEngineData.elapsedCycleTime}, ${simulationData.secondElapsed}, ${updatedEngineData.lastDelta}"
           )
-          if updatedEngineData.elapsedCycleTime >= cycleTimeStep then
+          if updatedEngineData.elapsedCycleTime / 1000.0 >= cycleTimeStep then
+            println(
+              "decrease cycle timeStep"
+            )
             copy(
               updatedEngineData.decreaseElapsedCycleTimeBy(cycleTimeStep),
               _updateSimulationData(updatedEngineData, simulationData)
@@ -87,5 +90,8 @@ object SimulationManager:
           else
             copy(updatedEngineData, simulationData.increaseSecondElapsedBy(engineState.lastDelta))
         case None =>
+          println(
+            s"newData $updatedEngineData"
+          )
           val newSimData = _updateSimulationData(updatedEngineData, simulationData)
           copy(engineState = updatedEngineData, simulationData = newSimData)
