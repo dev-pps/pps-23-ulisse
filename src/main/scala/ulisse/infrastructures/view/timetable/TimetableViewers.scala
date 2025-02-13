@@ -1,31 +1,25 @@
 package ulisse.infrastructures.view.timetable
 
+import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.TimetableEntry
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel.createSVGPanel
 import ulisse.infrastructures.view.train.SwingUtils
 import ulisse.infrastructures.view.train.SwingUtils.headerLabel
 
 import java.awt.Color
 import scala.swing.Swing.{EmptyBorder, HGlue}
-import scala.swing.{BoxPanel, Component, GridPanel, Label, ListView, Orientation}
+import scala.swing.{BoxPanel, Component, GridPanel, Label, ListView, Orientation, ScrollPane}
 
-object TimetableView:
+object TimetableViewers:
 
-  trait TimetableEntry:
-    def name: String
-    def arrivingTime: String
-    def departureTime: String
-    def waitMinutes: Option[Int]
-
-  val mockedData: TableEntryData = TableEntryData("Station A", "9:00", "9:00", Some(3))
-  case class TableEntryData(name: String, arrivingTime: String, departureTime: String, waitMinutes: Option[Int])
-      extends TimetableEntry
-
-  def timetableViewer(timeEntries: List[TimetableEntry]): ListView[TimetableEntry] =
-    new ListView(timeEntries) {
+  def timetableViewer(timeEntries: List[TimetableEntry], visibleRows: Int): ListView[TimetableEntry] =
+    val listView = new ListView(timeEntries) {
       import scala.swing.ListView.IntervalMode
       selection.intervalMode = IntervalMode.Single
+      background = Color.white
       renderer = new ItemRenderer[TimetableEntry]
+      visibleRowCount = visibleRows
     }
+    listView
 
   private class ItemRenderer[T] extends ListView.Renderer[TimetableEntry] {
     override def componentFor(
@@ -35,15 +29,14 @@ object TimetableView:
         item: TimetableEntry,
         index: Int
     ): Component = {
-      new StationCard(item)
+      StationCard(item)
     }
   }
 
-  class StationCard(data: TimetableEntry) extends BoxPanel(Orientation.Vertical):
+  case class StationCard(data: TimetableEntry) extends BoxPanel(Orientation.Vertical):
     import java.awt.Dimension
     preferredSize = Dimension(180, 110)
     border = EmptyBorder(5, 5, 5, 5)
-
     private val heading = new BoxPanel(Orientation.Horizontal) {
       background = Color.WHITE
       border = EmptyBorder(5, 5, 0, 5)

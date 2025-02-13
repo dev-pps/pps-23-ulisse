@@ -1,7 +1,5 @@
 package ulisse.infrastructures.view.train
 
-import java.awt.{BasicStroke, Color, RenderingHints}
-import javax.swing.border.AbstractBorder
 import scala.swing.event.ValueChanged
 import scala.swing.{Component, FlowPanel, Font, Graphics2D, Label, Swing, TextField}
 

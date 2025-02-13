@@ -2,10 +2,9 @@ package ulisse.infrastructures.view.timetable
 
 import ulisse.infrastructures.view.components.JComponent
 import ulisse.infrastructures.view.components.JComponent.{JIconLabel, JTabbedPane}
-import ulisse.infrastructures.view.timetable.TimetableView.{mockedData, StationCard}
+import ulisse.infrastructures.view.timetable.TimetableEditorTabView.EditorTab
 
-import java.awt.Dimension
-import scala.swing.{BoxPanel, Component, FlowPanel, Label, MainFrame, Orientation, Panel, ScrollPane}
+import scala.swing.{Component, FlowPanel, Label, MainFrame, ScrollPane}
 
 object TimetableViews:
 
@@ -17,9 +16,9 @@ object TimetableViews:
 
   def timetableTabbedPane(): JTabbedPane =
     val formIcon: JIconLabel  = JComponent.createIconLabel("icons/calendar_add_on.svg", "Create")
-    val formPane              = FlowPanel(Label("Create timetable form"))
+    val formPane              = EditorTab(TimetableViewController())
     val savedIcon: JIconLabel = JComponent.createIconLabel("icons/calendar_clock.svg", "Saved")
-    val savedPane = FlowPanel(ScrollPane(TimetableView.timetableViewer(List(mockedData, mockedData, mockedData))))
+    val savedPane             = FlowPanel(Label("Create timetable form"))
 
     Map(
       formIcon  -> formPane,
@@ -29,7 +28,6 @@ object TimetableViews:
 @main def timetableDemoGUI(): Unit =
   new MainFrame() {
     title = "timetable preview"
-    preferredSize = Dimension(400, 400)
     val mainPanel = FlowPanel()
     import ulisse.infrastructures.view.timetable.TimetableViews.timetableTabbedPane
     mainPanel.contents += timetableTabbedPane().component
