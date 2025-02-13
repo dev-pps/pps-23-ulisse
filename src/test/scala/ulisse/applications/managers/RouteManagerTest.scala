@@ -6,22 +6,13 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.applications.managers.RouteManagers.{Errors, RouteManager}
 import ulisse.entities.Coordinates.Coordinate
-import ulisse.entities.Routes
-import ulisse.entities.Routes.{Route, TypeRoute}
+import ulisse.entities.RouteTest._
+import ulisse.entities.Routes.*
 import ulisse.entities.station.Station
 import ulisse.utils.ValidationUtils.mkStringErrors
 
 object RouteManagerTest extends AnyFlatSpec with Matchers:
-  type ValueType        = Double
-  type StationTest      = Station[ValueType, Coordinate[ValueType]]
-  type RouteTest        = Either[NonEmptyChain[Routes.Errors], Route[ValueType, Coordinate[ValueType]]]
   type RouteManagerTest = RouteManager[ValueType, Coordinate[ValueType]]
-
-  private val railsCount: Int        = 2
-  private val departure: StationTest = Station("Rimini", Coordinate.createValidRandomGeo(), railsCount)
-  private val arrival: StationTest   = Station("Cesena", Coordinate.createValidRandomGeo(), railsCount)
-  private val typeRoute: TypeRoute   = TypeRoute.Normal
-  private val pathLength: Double     = departure.coordinate.distance(arrival.coordinate)
 
   val validateRoute: RouteTest          = Route(departure, arrival, typeRoute, railsCount, pathLength)
   val validateEqualRoute: RouteTest     = Route(departure, arrival, typeRoute, railsCount, pathLength + 100d)

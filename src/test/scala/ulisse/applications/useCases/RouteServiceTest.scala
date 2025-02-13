@@ -3,8 +3,14 @@ package ulisse.applications.useCases
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.Runner.runAll
-import ulisse.applications.managers.RouteManagerTest.*
+import ulisse.applications.managers.RouteManagerTest.{
+  emptyManager,
+  validateDifferentRoute,
+  validateEqualRoute,
+  RouteManagerTest
+}
 import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.RouteTest.{validateRoute, RouteTest}
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Await
