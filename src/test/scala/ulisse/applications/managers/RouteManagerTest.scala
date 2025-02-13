@@ -11,17 +11,17 @@ import ulisse.entities.Routes.{Route, TypeRoute}
 import ulisse.entities.station.Station
 import ulisse.utils.ValidationUtils.mkStringErrors
 
-class RouteManagerTest extends AnyFlatSpec with Matchers:
-  opaque type ValueType        = Double
-  opaque type StationTest      = Station[ValueType, Coordinate[ValueType]]
-  opaque type RouteTest        = Either[NonEmptyChain[Routes.Errors], Route[ValueType, Coordinate[ValueType]]]
-  opaque type RouteManagerTest = RouteManager[ValueType, Coordinate[ValueType]]
+object RouteManagerTest extends AnyFlatSpec with Matchers:
+  type ValueType        = Double
+  type StationTest      = Station[ValueType, Coordinate[ValueType]]
+  type RouteTest        = Either[NonEmptyChain[Routes.Errors], Route[ValueType, Coordinate[ValueType]]]
+  type RouteManagerTest = RouteManager[ValueType, Coordinate[ValueType]]
 
-  val railsCount: Int        = 2
-  val departure: StationTest = Station("Rimini", Coordinate.createValidRandomGeo(), railsCount)
-  val arrival: StationTest   = Station("Cesena", Coordinate.createValidRandomGeo(), railsCount)
-  val typeRoute: TypeRoute   = TypeRoute.Normal
-  val pathLength: Double     = departure.coordinate.distance(arrival.coordinate)
+  private val railsCount: Int        = 2
+  private val departure: StationTest = Station("Rimini", Coordinate.createValidRandomGeo(), railsCount)
+  private val arrival: StationTest   = Station("Cesena", Coordinate.createValidRandomGeo(), railsCount)
+  private val typeRoute: TypeRoute   = TypeRoute.Normal
+  private val pathLength: Double     = departure.coordinate.distance(arrival.coordinate)
 
   val validateRoute: RouteTest          = Route(departure, arrival, typeRoute, railsCount, pathLength)
   val validateEqualRoute: RouteTest     = Route(departure, arrival, typeRoute, railsCount, pathLength + 100d)
@@ -63,8 +63,8 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
     for
       route <- validateRoute
     yield
-      singleElementManager.find(route.id) must be(singleElementManager.findFrom(route))
-      singleElementManager.find(route.id) match
+      singleElementManager.findBy(route.id) must be(singleElementManager.find(route))
+      singleElementManager.findBy(route.id) match
         case Right(newRoute) => newRoute must be(route)
         case _               => fail("Route not found")
 
@@ -98,7 +98,7 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
       case Left(error) => fail(s"${error.msg}")
       case Right(newManager) =>
         newManager.size must be(singleElementManager.size)
-        newManager.findFrom(equalRoute) match
+        newManager.find(equalRoute) match
           case Left(error)      => fail(s"${error.msg}")
           case Right(findRoute) => findRoute.checkAllField(equalRoute) must be(true)
 
@@ -115,17 +115,17 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
     for
       route <- validateRoute
     yield
-      emptyManager.delete(route.id) must be(emptyManager.deleteForm(route))
-      emptyManager.delete(route.id) must be(Errors.NotExist.asLeft[RouteManagerTest])
+      emptyManager.deleteBy(route.id) must be(emptyManager.delete(route))
+      emptyManager.deleteBy(route.id) must be(Errors.NotExist.asLeft[RouteManagerTest])
 
   "delete route that exist" should "have size 0" in:
     for
       route <- validateRoute
     yield
-      singleElementManager.delete(route.id) must be(singleElementManager.deleteForm(route))
-      singleElementManager.delete(route.id) match
+      singleElementManager.deleteBy(route.id) must be(singleElementManager.delete(route))
+      singleElementManager.deleteBy(route.id) match
         case Left(error) => fail(s"${error.msg}")
         case Right(newManager) =>
           newManager.contains(route) must be(false)
-          newManager.find(route.id).isLeft must be(true)
+          newManager.findBy(route.id).isLeft must be(true)
           newManager.size must be(singleElementManager.size - 1)
