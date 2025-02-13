@@ -66,7 +66,7 @@ object SimulationManager:
     override def start(): SimulationManager =
       copy(engineState.copy(true))
     override def stop(): SimulationManager  = copy(engineState.copy(false))
-    override def reset(): SimulationManager = copy(engineState.copy(false), simulationData.clear())
+    override def reset(): SimulationManager = copy(engineState.reset(), simulationData.reset())
     override def doStep(): SimulationManager =
       def _updateSimulationData(engineData: EngineState, simulationData: SimulationData): SimulationData =
         val newSimulationData = simulationData.increaseStepByOne().increaseSecondElapsedBy(engineData.lastDelta)
