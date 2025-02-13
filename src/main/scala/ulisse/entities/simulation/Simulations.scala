@@ -4,9 +4,15 @@ import cats.{Functor, Monad}
 import ulisse.entities.simulation.Environments.SimulationEnvironment
 
 object Simulations:
+  object EngineState:
+    def empty(): EngineState = EngineState(false, None, None, 0, 0)
+    extension (engineState: EngineState)
+      def decreaseElapsedCycleTimeBy(delta: Double): EngineState =
+        engineState.copy(elapsedCycleTime = engineState.elapsedCycleTime - delta)
+
   final case class EngineState(
       running: Boolean,
-      cyclesPerSecond: Option[Double],
+      cyclesPerSecond: Option[Int],
       lastUpdate: Option[Double],
       lastDelta: Double,
       elapsedCycleTime: Double
@@ -22,6 +28,13 @@ object Simulations:
           )
         case None =>
           copy(lastUpdate = Some(currentUpdate))
+
+  object SimulationData:
+    def empty(): SimulationData = SimulationData(0, 0, SimulationEnvironment.empty())
+    extension (simulationData: SimulationData)
+      def increaseStepByOne(): SimulationData = simulationData.copy(step = simulationData.step + 1)
+      def increaseSecondElapsedBy(delta: Double): SimulationData =
+        simulationData.copy(secondElapsed = simulationData.secondElapsed + delta)
 
   final case class SimulationData(
       step: Int,
