@@ -39,6 +39,9 @@ object Coordinates:
     *   The y-coordinate value.
     */
   trait Coordinate[T: Numeric](private val x: T, private val y: T):
+    /** Numeric instance to handle x, y operations */
+    protected val numeric: Numeric[T] = summon[Numeric[T]]
+
     /** Checks if this coordinate is equal to another coordinate.
       *
       * @param that
@@ -47,7 +50,7 @@ object Coordinates:
       *   `true` if both coordinates have the same x and y values, `false` otherwise.
       */
     @targetName("equals")
-    def ===(that: Coordinate[T])(using numeric: Numeric[T]): Boolean =
+    def ===(that: Coordinate[T]): Boolean =
       numeric.equiv(x, that.x) && numeric.equiv(y, that.y)
 
     /** Checks for equality with another object.
@@ -69,13 +72,13 @@ object Coordinates:
       * @return
       *   The Euclidean distance as a `Double`.
       */
-    def distance(coordinate: Coordinate[T])(using numeric: Numeric[T]): Double =
+    def distance(coordinate: Coordinate[T]): Double =
       sqrt(
         pow(numeric.toDouble(coordinate.x) - numeric.toDouble(x), 2) +
           pow(numeric.toDouble(coordinate.y) - numeric.toDouble(y), 2)
       )
 
-    def angle(coordinate: Coordinate[T])(using numeric: Numeric[T]): Double =
+    def angle(coordinate: Coordinate[T]): Double =
       atan2(numeric.toDouble(coordinate.y) - numeric.toDouble(y), numeric.toDouble(coordinate.x) - numeric.toDouble(x))
 
   /** A 2D geographic coordinate point.

@@ -10,7 +10,7 @@ import ulisse.utils.ValidationUtils.mkStringErrors
 
 object RouteTest extends AnyFlatSpec with Matchers:
   type ValueType   = Double
-  type StationTest = Station[ValueType, Coordinate[ValueType]]
+  type StationTest = Station[Coordinate[ValueType]]
   type RouteTest   = Either[NonEmptyChain[Routes.Errors], Route[ValueType, Coordinate[ValueType]]]
 
   val railsCount: Int        = 2
