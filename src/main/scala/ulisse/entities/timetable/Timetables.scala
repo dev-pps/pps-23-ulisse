@@ -17,8 +17,8 @@ object Timetables:
   private type WaitTime = Int
 
   private type N        = Int
-  private type C        = Coordinate[N]
-  private type StationT = Station[N, C]
+  private type C        = Coordinate[_]
+  private type StationT = Station[_, _]
 
   extension (i: Int)
     def toWaitTime: WaitTime = i
@@ -99,7 +99,8 @@ object Timetables:
     def ETA(trainTable: ListMap[StationT, Time], endStation: StationT, train: Train): Option[ClockTime] =
       for
         prevStation <- trainTable.lastOption
-        distance    <- Some(prevStation._1.coordinate.distance(endStation.coordinate))
+        // TODO: use distance value of route
+        distance <- Some(20.0 /*prevStation._1.coordinate.distance(endStation.coordinate)*/ )
         // TODO: here speed should be the min(train.maxSpeed, route.technology.speed)
         travelMinutes <- Some((distance / train.maxSpeed) * 60)
         prevDeparture <- prevStation._2.departure
