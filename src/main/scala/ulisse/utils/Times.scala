@@ -6,8 +6,7 @@ import scala.annotation.targetName
 
 object Times:
 
-  /** Errors that can be returned on ClockTime creation.
-    */
+  /** Errors that can be returned on ClockTime creation. */
   sealed trait ClockTimeErrors      extends BaseError
   final case class InvalidHours()   extends ClockTimeErrors with ErrorMessage("hours not in range [0,24]")
   final case class InvalidMinutes() extends ClockTimeErrors with ErrorMessage("minutes not in range [0,59]")

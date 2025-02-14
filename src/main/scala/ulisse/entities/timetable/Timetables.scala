@@ -9,16 +9,13 @@ import ulisse.utils.Times.FluentDeclaration.h
 
 import scala.collection.immutable.ListMap
 
-/** Object containing traits and utility method for creation and use of TrainTimetable
-  */
+/** Object containing traits and utility method for creation and use of TrainTimetable */
 object Timetables:
 
   private type Time     = ScheduleTime
   private type WaitTime = Int
 
-  private type N        = Int
-  private type C        = Coordinate[_]
-  private type StationT = Station[_, _]
+  private type StationT = Station[_]
 
   extension (i: Int)
     def toWaitTime: WaitTime = i
@@ -40,8 +37,7 @@ object Timetables:
       */
     def routes: List[(StationT, StationT)] = t.table.keys.toList.zip(t.table.keys.drop(1))
 
-  /** Basilar info of a timetable
-    */
+  /** Basilar info of a timetable */
   trait Timetable:
     /** @return
       *   Timetable's train
@@ -63,8 +59,7 @@ object Timetables:
       */
     def table: ListMap[StationT, Time]
 
-  /** Complete Train timetable
-    */
+  /** Complete Train timetable */
   trait TrainTimetable extends Timetable:
     /** @return
       *   Last station of train trip
@@ -76,8 +71,7 @@ object Timetables:
       */
     def arrivingTime: Option[ClockTime]
 
-  /** Context Travel time estimator strategy. It defines how to calculate travelling time between stations.
-    */
+  /** Context Travel time estimator strategy. It defines how to calculate travelling time between stations. */
   trait TimeEstimator:
     /** Calculates Estimated Time of Arrival (ETA) to reach `endStation`
       * @param trainTable
@@ -114,15 +108,13 @@ object Timetables:
     */
   given defaultTimeEstimator: TimeEstimator = UnrealTimeEstimator
 
-  /** Train timetable to be defined
-    */
+  /** Train timetable to be defined */
   trait PartialTimetable extends Timetable:
     def stopsIn(station: StationT, waitTime: WaitTime): PartialTimetable
     def transitIn(station: StationT): PartialTimetable
     def arrivesTo(station: StationT): TrainTimetable
 
-  /** Factory of PartialTimetable
-    */
+  /** Factory of PartialTimetable */
   object PartialTimetable:
     def apply(
         train: Train,
