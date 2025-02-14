@@ -22,13 +22,13 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 type Route    = MockRoutesService.Route
-type StationT = Station[_, _]
+type StationT = Station[_]
 
 trait AppStateTimetable:
   def trainManager: TrainManager
   def timetableManager: TimetableManager
   def timetableManagerUpdate(timetableManager: TimetableManager): AppStateTimetable
-  def stationManager: StationManager[_, _, _]
+  def stationManager: StationManager[StationT]
 
 object MockRoutesService: // after remove that
   case class Route(startStationName: String, endStationName: String, technology: Technology)
