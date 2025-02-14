@@ -3,21 +3,16 @@ package ulisse.applications.useCases
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.Runner.runAll
-import ulisse.applications.managers.RouteManagerTest.{
-  emptyManager,
-  validateDifferentRoute,
-  validateEqualRoute,
-  RouteManagerTest
-}
-import ulisse.entities.Coordinates.Coordinate
-import ulisse.entities.RouteTest.{validateRoute, RouteTest}
+import ulisse.applications.managers.RouteManagerTest.*
+import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.entities.RouteTest
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class RouteServiceTest extends AnyFlatSpec with Matchers:
-  private val events       = LinkedBlockingQueue[RouteManagerTest => RouteManagerTest]()
+  private val events       = LinkedBlockingQueue[RouteManager => RouteManager]()
   private val routeService = RouteService(events)
 
   private def updateState() = runAll(emptyManager, events)

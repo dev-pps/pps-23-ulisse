@@ -3,7 +3,7 @@ package ulisse.applications.managers
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
 import ulisse.applications.managers.StationManager.CheckedStationManager
-import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.validateUniqueItems
@@ -15,10 +15,10 @@ import ulisse.utils.ValidationUtils.validateUniqueItems
   * @tparam S
   *   The station type that the manager will handle.
   */
-trait StationManager[S <: Station[?]]:
+trait StationManager:
 
   /** The type representing the collection of stations. */
-  type StationMapType <: Seq[S]
+  type StationMapType <: Seq[Station]
 
   /** The return type of the methods for adding or removing stations. */
   type R
@@ -35,7 +35,7 @@ trait StationManager[S <: Station[?]]:
     * @return
     *   A list of results obtained by applying the function to each station.
     */
-  def map[B](f: S => B): List[B]
+  def map[B](f: Station => B): List[B]
 
   /** Compares two `StationMap` instances for equality.
     *
@@ -45,8 +45,8 @@ trait StationManager[S <: Station[?]]:
     *   `true` if both station maps have the same stations, `false` otherwise.
     */
   override def equals(other: Any): Boolean = other match
-    case that: StationManager[_] => that.stations == stations
-    case _                       => false
+    case that: StationManager => that.stations == stations
+    case _                    => false
 
   /** Adds a station to the manager.
     *
@@ -55,7 +55,7 @@ trait StationManager[S <: Station[?]]:
     * @return
     *   R type
     */
-  def addStation(station: S): R
+  def addStation(station: Station): R
 
   /** Removes a station from the manager.
     *
@@ -64,7 +64,7 @@ trait StationManager[S <: Station[?]]:
     * @return
     *   R type
     */
-  def removeStation(station: Station[?]): R
+  def removeStation(station: Station): R
 
   /** Finds a station at the given location.
     *
@@ -73,7 +73,7 @@ trait StationManager[S <: Station[?]]:
     * @return
     *   An `Option` containing the station at the given location, if found.
     */
-  def findStationAt(coordinate: Coordinate[?]): Option[S]
+  def findStationAt(coordinate: Coordinate): Option[Station]
 
 /** Defines a manager for stations.
   *
@@ -82,8 +82,8 @@ trait StationManager[S <: Station[?]]:
   * @tparam S
   *   The station type that the manager will handle.
   */
-trait UncheckedStationManager[S <: Station[?]] extends StationManager[S]:
-  type R = UncheckedStationManager[S]
+trait UncheckedStationManager extends StationManager:
+  type R = UncheckedStationManager
 
 /** Defines a manager for stations.
   *
@@ -92,8 +92,8 @@ trait UncheckedStationManager[S <: Station[?]] extends StationManager[S]:
   * @tparam S
   *   The station type that the manager will handle.
   */
-trait CheckedStationManager[S <: Station[?]] extends StationManager[S]:
-  type R = Either[NonEmptyChain[E], CheckedStationManager[S]]
+trait CheckedStationManager extends StationManager:
+  type R = Either[NonEmptyChain[E], CheckedStationManager]
   type E = CheckedStationManager.Error
 
 /** Factory for [[StationManager]] instances. */
@@ -105,8 +105,7 @@ object StationManager:
     * @return
     *   A `StationManager` instance.
     */
-  def apply[S <: Station[?]](stations: S*): UncheckedStationManager[S] =
-    UncheckedStationManagerImpl(stations.toList)
+  def apply(stations: Station*): UncheckedStationManager = UncheckedStationManagerImpl(stations.toList)
 
   /** Creates a `CheckedStationManager` instance, which is a `StationManager` with validation for unique names and
     * locations.
@@ -116,16 +115,14 @@ object StationManager:
     * @return
     *   An empty `CheckedStationManager` instance.
     */
-  def createCheckedStationManager[S <: Station[?]](): CheckedStationManager[S] =
+  def createCheckedStationManager(): CheckedStationManager =
     CheckedStationManagerImpl(List.empty)
 
-  private final case class CheckedStationManagerImpl[S <: Station[?]](
-      stations: List[S]
-  ) extends CheckedStationManager[S]:
-    type StationMapType = List[S]
+  private final case class CheckedStationManagerImpl(stations: List[Station]) extends CheckedStationManager:
+    type StationMapType = List[Station]
     type E              = CheckedStationManager.Error
 
-    def addStation(station: S): R =
+    def addStation(station: Station): R =
       val updatedStations = station :: stations
       (
         validateUniqueItems(
@@ -139,29 +136,29 @@ object StationManager:
       )
         .mapN((_, _) => CheckedStationManagerImpl(updatedStations)).toEither
 
-    def removeStation(station: Station[?]): R =
+    def removeStation(station: Station): R =
       if stations.contains(station) then
         Right(CheckedStationManagerImpl(stations.filterNot(_ == station)))
       else
         Left(NonEmptyChain(CheckedStationManager.Error.StationNotFound))
 
-    def findStationAt(coordinate: Coordinate[?]): Option[S] =
+    def findStationAt(coordinate: Coordinate): Option[Station] =
       stations.find(_.coordinate == coordinate)
 
     export stations.map
 
-  private final case class UncheckedStationManagerImpl[S <: Station[?]](
-      stations: List[S]
-  ) extends UncheckedStationManager[S]:
-    type StationMapType = List[S]
+  private final case class UncheckedStationManagerImpl(
+      stations: List[Station]
+  ) extends UncheckedStationManager:
+    type StationMapType = List[Station]
 
-    def addStation(station: S): R =
+    def addStation(station: Station): R =
       UncheckedStationManagerImpl(station :: stations)
 
-    def removeStation(station: Station[?]): R =
+    def removeStation(station: Station): R =
       UncheckedStationManagerImpl(stations.filterNot(_ == station))
 
-    def findStationAt(coordinate: Coordinate[?]): Option[S] =
+    def findStationAt(coordinate: Coordinate): Option[Station] =
       stations.find(_.coordinate == coordinate)
 
     export stations.map

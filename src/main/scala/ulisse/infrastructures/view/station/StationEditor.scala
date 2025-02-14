@@ -2,7 +2,8 @@ package ulisse.infrastructures.view.station
 
 import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.managers.CheckedStationManager
-import ulisse.entities.Coordinates.*
+import ulisse.entities.Coordinate
+import ulisse.entities.Coordinate.*
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
 
@@ -16,9 +17,8 @@ import scala.util.Success
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
   Swing.onEDT(runnable.run())
 
-type N = Int
-type C = Grid
-type S = CheckedStation[C]
+//type N = Int
+//type S = CheckedStation
 
 /** A Card displaying station information.
   *
@@ -30,8 +30,8 @@ type S = CheckedStation[C]
   *   A function that opens the station form to modify the station when the card is clicked.
   */
 final case class StationCard(
-    station: S,
-    openStationForm: Option[S] => Unit
+    station: Station,
+    openStationForm: Option[Station] => Unit
 ) extends GridPanel(3, 1):
   contents += new Label(s"Name: ${station.name}")
   contents += new Label(s"Location: ${station.coordinate}")
@@ -53,7 +53,7 @@ final case class StationCard(
   *   The form where the location will be set upon card click.
   */
 final case class EmptyMapCard(
-    mapLocation: C,
+    mapLocation: Coordinate,
     stationForm: Option[StationForm]
 ) extends Label:
   text = "Empty"
@@ -76,14 +76,14 @@ final case class EmptyMapCard(
   *   The form where location details are added when an EmptyMapCard is clicked.
   */
 final case class StationMapView(
-    controller: StationEditorAdapter[N, C, S],
-    openStationForm: Option[S] => Unit,
+    controller: StationEditorAdapter,
+    openStationForm: Option[Station] => Unit,
     stationForm: Option[StationForm]
 ) extends GridPanel(5, 5):
   private val labels = for {
     x          <- 0 until 5
     y          <- 0 until 5
-    coordinate <- Coordinate.createGrid(x, y).toOption
+    coordinate <- Some(Coordinate(x, y))
   } yield {
     controller.findStationAt(coordinate).onComplete {
       case Success(Some(station)) =>
@@ -149,9 +149,9 @@ final case class StationEditorMenu(onCreateClick: () => Unit)
   *   The station to be edited.
   */
 final case class StationForm(
-    controller: StationEditorAdapter[N, C, S],
+    controller: StationEditorAdapter,
     onBackClick: () => Unit,
-    station: Option[S]
+    station: Option[Station]
 ) extends GridBagPanel:
   private val stationName   = new TextField(5)
   private val latitude      = new TextField(5)
@@ -159,8 +159,8 @@ final case class StationForm(
   private val numberOfTrack = new TextField(5)
   for s <- station do
     stationName.text = s.name
-    latitude.text = s.coordinate.row.toString
-    longitude.text = s.coordinate.column.toString
+    latitude.text = s.coordinate.x.toString
+    longitude.text = s.coordinate.y.toString
     numberOfTrack.text = s.numberOfTracks.toString
   private val c = new Constraints
 
@@ -171,9 +171,9 @@ final case class StationForm(
     * @param location
     *   The location to set.
     */
-  def setLocation(location: C): Unit =
-    latitude.text = location.row.toString
-    longitude.text = location.column.toString
+  def setLocation(location: Coordinate): Unit =
+    latitude.text = location.x.toString
+    longitude.text = location.y.toString
   c.anchor = GridBagPanel.Anchor.Center
   c.gridx = 0
   c.weightx = 1
@@ -234,9 +234,8 @@ final case class StationForm(
       case ButtonClicked(_) =>
         controller.onOkClick(
           stationName.text,
-          latitude.text,
-          longitude.text,
-          numberOfTrack.text,
+          Coordinate(latitude.text.toInt, longitude.text.toInt),
+          numberOfTrack.text.toInt,
           station
         )
         onBackClick()
@@ -293,7 +292,7 @@ final case class StationEditorContent(
   * @param controller
   *   The associated StationEditorController.
   */
-final case class StationEditorView(controller: StationEditorAdapter[N, C, S])
+final case class StationEditorView(controller: StationEditorAdapter)
     extends BorderPanel:
 
   private val updateContentTemplate: Panel => Unit =
@@ -309,7 +308,7 @@ final case class StationEditorView(controller: StationEditorAdapter[N, C, S])
         )
       )
 
-  private val openStationForm: Option[S] => Unit =
+  private val openStationForm: Option[Station] => Unit =
     station => {
       updateContentTemplate(StationForm(controller, openStationMenu, station))
       updateContentTemplate(StationForm(controller, openStationMenu, station))

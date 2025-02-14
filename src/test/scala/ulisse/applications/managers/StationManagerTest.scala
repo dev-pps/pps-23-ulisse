@@ -4,7 +4,8 @@ import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.applications.managers.StationManager.CheckedStationManager
-import ulisse.entities.Coordinates.*
+import ulisse.entities.Coordinate
+import ulisse.entities.Coordinate.*
 import ulisse.entities.station.Station
 
 class StationManagerTest extends AnyWordSpec with Matchers:
@@ -14,9 +15,7 @@ class StationManagerTest extends AnyWordSpec with Matchers:
   "A StationManager" when:
     "created" should:
       "be empty" in:
-        StationManager.createCheckedStationManager[
-          Station[Coordinate[Int]]
-        ]().stations shouldBe empty
+        StationManager.createCheckedStationManager().stations shouldBe empty
 
     "a new station is added" should:
       "contain the new station" in:

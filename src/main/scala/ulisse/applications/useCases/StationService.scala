@@ -4,48 +4,48 @@ import cats.data.NonEmptyChain
 import ulisse.applications.AppState
 import ulisse.applications.managers.CheckedStationManager
 import ulisse.applications.ports.StationPorts
-import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
-final case class StationService[S <: Station[?]](
-    eventQueue: LinkedBlockingQueue[AppState[S] => AppState[S]]
-) extends StationPorts.Input[S]:
+final case class StationService(
+    eventQueue: LinkedBlockingQueue[AppState => AppState]
+) extends StationPorts.Input:
 
   override def stationMap: Future[SM] =
     val p = Promise[SM]()
-    eventQueue.add((state: AppState[S]) => { p.success(state.stationManager.stations); state })
+    eventQueue.add((state: AppState) => { p.success(state.stationManager.stations); state })
     p.future
 
-  override def addStation(station: S): Future[Either[E, SM]] =
+  override def addStation(station: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.add((state: AppState[S]) => {
+    eventQueue.add((state: AppState) => {
       val updatedMap = state.stationManager.addStation(station)
       updateState(p, state, updatedMap)
     })
     p.future
 
-  override def removeStation(station: Station[?]): Future[Either[E, SM]] =
+  override def removeStation(station: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.add((state: AppState[S]) => {
+    eventQueue.add((state: AppState) => {
       val updatedMap = state.stationManager.removeStation(station)
       updateState(p, state, updatedMap)
     })
     p.future
 
-  override def updateStation(oldStation: Station[?], newStation: S): Future[Either[E, SM]] =
+  override def updateStation(oldStation: Station, newStation: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.add((state: AppState[S]) => {
+    eventQueue.add((state: AppState) => {
       val updatedMap = state.stationManager.removeStation(oldStation).flatMap(_.addStation(newStation))
       updateState(p, state, updatedMap)
     })
     p.future
 
-  override def findStationAt(coordinate: Coordinate[?]): Future[Option[S]] =
-    val p = Promise[Option[S]]()
-    eventQueue.add((state: AppState[S]) => {
+  override def findStationAt(coordinate: Coordinate): Future[Option[Station]] =
+    val p = Promise[Option[Station]]()
+    eventQueue.add((state: AppState) => {
       val station = state.stationManager.findStationAt(coordinate)
       p.success(station)
       state
@@ -54,8 +54,8 @@ final case class StationService[S <: Station[?]](
 
   private def updateState(
       p: Promise[Either[E, SM]],
-      state: AppState[S],
-      updatedMap: Either[NonEmptyChain[state.stationManager.E], CheckedStationManager[S]]
+      state: AppState,
+      updatedMap: Either[NonEmptyChain[state.stationManager.E], CheckedStationManager]
   ) =
     updatedMap match
       case Left(value: E) => p.success(Left(value)); state

@@ -1,7 +1,6 @@
 package ulisse.infrastructures.view.map
 
-import ulisse.entities.Coordinates
-import ulisse.entities.Coordinates.UIPoint
+import ulisse.entities.Coordinate
 
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
@@ -58,7 +57,7 @@ object MapPanel:
 //        g.drawImage(stationImage, end._1.toInt, end._2.toInt, 30, 30, peer)
 //      )
 
-    private def drawTiledImage(g: Graphics2D, img: Image, scale: Double, start: UIPoint, end: UIPoint): Unit =
+    private def drawTiledImage(g: Graphics2D, img: Image, scale: Double, start: Coordinate, end: Coordinate): Unit =
       val scaleDim = (img.getWidth(peer) * scale, img.getHeight(peer) * scale)
       val rotate   = start.angle(end)
       val diagonal = sqrt(scaleDim._1 * scaleDim._1 + scaleDim._2 * scaleDim._2)
@@ -72,8 +71,8 @@ object MapPanel:
         val stepX         = (dx / distance) * correctedStep
         val stepY         = (dy / distance) * correctedStep
 
-        val x = start.x until end.x by stepX
-        val y = start.y until end.y by stepY
+        val x = start.x until end.x by stepX.toInt
+        val y = start.y until end.y by stepY.toInt
         (x zip y).map((x, y) => (x.toDouble, y.toDouble))
 
       positions.foreach((x, y) =>
