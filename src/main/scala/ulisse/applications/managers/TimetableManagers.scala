@@ -15,8 +15,7 @@ object TimetableManagers:
     final case class TimetableNotFound(trainName: String)
         extends ErrorNotExist(s"No timetables exist for train $trainName") with TimetableManagerErrors
 
-  /** A rules specification for accepting new `timetable`. Checks are done by method `accept`.
-    */
+  /** A rules specification for accepting new `timetable`. Checks are done by method `accept`. */
   trait AcceptanceTimetablePolicy:
     /** @param timetable
       *   [[TrainTimetable]] to check.
