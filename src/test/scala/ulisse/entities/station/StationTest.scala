@@ -3,7 +3,7 @@ package ulisse.entities.station
 import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.Coordinate
 
 class StationTest extends AnyWordSpec with Matchers:
 

@@ -2,7 +2,6 @@ package ulisse.entities
 
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
-import ulisse.entities.Coordinates.Coordinate
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.ErrorMessage
 import ulisse.utils.ValidationUtils.*
@@ -22,96 +21,96 @@ object Routes:
     case Normal extends TypeRoute(Technology("Normal", 100))
     case AV     extends TypeRoute(Technology("AV", 300))
 
-  trait Route[N: Numeric, C <: Coordinate[N]]:
+  trait Route:
     val id: IdRoute
-    val departure: Station[C]
-    val arrival: Station[C]
+    val departure: Station
+    val arrival: Station
     val typology: TypeRoute
     val technology: Technology
     val railsCount: Int
     val length: Double
 
-    def withDeparture(departure: Station[C]): Either[NonEmptyChain[Errors], Route[N, C]]
-    def withArrival(arrival: Station[C]): Either[NonEmptyChain[Errors], Route[N, C]]
-    def withTypology(typeRoute: TypeRoute): Route[N, C]
-    def withRailsCount(railsCount: Int): Either[NonEmptyChain[Errors], Route[N, C]]
-    def withLength(length: Double): Either[NonEmptyChain[Errors], Route[N, C]]
+    def withDeparture(departure: Station): Either[NonEmptyChain[Errors], Route]
+    def withArrival(arrival: Station): Either[NonEmptyChain[Errors], Route]
+    def withTypology(typeRoute: TypeRoute): Route
+    def withRailsCount(railsCount: Int): Either[NonEmptyChain[Errors], Route]
+    def withLength(length: Double): Either[NonEmptyChain[Errors], Route]
 
     @targetName("Equals")
-    def ===(other: Route[N, C]): Boolean
+    def ===(other: Route): Boolean
 
-    def checkAllField(other: Route[N, C]): Boolean =
+    def checkAllField(other: Route): Boolean =
       departure.equals(other.departure) && arrival.equals(other.arrival) && typology == other.typology &&
         technology == other.technology && railsCount == other.railsCount && length == other.length
 
   object Route:
     private def validateRailsCount(
         railsCount: Int,
-        departure: Station[_],
-        arrival: Station[_]
+        departure: Station,
+        arrival: Station
     ): Either[NonEmptyChain[Errors], Int] =
       railsCount.validateChain(
         (_ > 0, Errors.FewRails),
         (_ <= min(departure.numberOfTracks, arrival.numberOfTracks), Errors.TooManyRails)
       )
 
-    private def validateLength[A: Numeric, B <: Coordinate[A]](
+    private def validateLength(
         length: Double,
-        departure: Station[B],
-        arrival: Station[B]
+        departure: Station,
+        arrival: Station
     ): Either[NonEmptyChain[Errors], Double] =
       length.validateChain((_ >= departure.coordinate.distance(arrival.coordinate), Errors.TooShort))
 
-    private def validateRoute[N: Numeric, C <: Coordinate[N]](
-        departure: Station[C],
-        arrival: Station[C],
+    private def validateRoute(
+        departure: Station,
+        arrival: Station,
         typeRoute: TypeRoute,
         railsCount: Int,
         length: Double
-    ): Either[NonEmptyChain[Errors], Route[N, C]] =
+    ): Either[NonEmptyChain[Errors], Route] =
       (
         validateRailsCount(railsCount, departure, arrival),
         validateLength(length, departure, arrival)
       ).mapN(RouteImpl(departure, arrival, typeRoute, _, _))
 
-    def apply[N: Numeric, C <: Coordinate[N]](
-        departure: Station[C],
-        arrival: Station[C],
+    def apply(
+        departure: Station,
+        arrival: Station,
         typeRoute: TypeRoute,
         railsCount: Int,
         length: Double
-    ): Either[NonEmptyChain[Errors], Route[N, C]] =
+    ): Either[NonEmptyChain[Errors], Route] =
       validateRoute(departure, arrival, typeRoute, railsCount, length)
 
-    private case class RouteImpl[N: Numeric, C <: Coordinate[N]](
-        departure: Station[C],
-        arrival: Station[C],
+    private case class RouteImpl(
+        departure: Station,
+        arrival: Station,
         typology: TypeRoute,
         railsCount: Int,
         length: Double
-    ) extends Route[N, C]:
+    ) extends Route:
       export typology._
       override val id: IdRoute = hashCode()
 
-      override def withDeparture(departure: Station[C]): Either[NonEmptyChain[Errors], Route[N, C]] =
+      override def withDeparture(departure: Station): Either[NonEmptyChain[Errors], Route] =
         validateRoute(departure, arrival, typology, railsCount, length)
-      override def withArrival(arrival: Station[C]): Either[NonEmptyChain[Errors], Route[N, C]] =
+      override def withArrival(arrival: Station): Either[NonEmptyChain[Errors], Route] =
         validateRoute(departure, arrival, typology, railsCount, length)
 
-      override def withTypology(typeRoute: TypeRoute): Route[N, C] = copy(typology = typeRoute)
+      override def withTypology(typeRoute: TypeRoute): Route = copy(typology = typeRoute)
 
-      override def withRailsCount(railsCount: Int): Either[NonEmptyChain[Errors], Route[N, C]] =
+      override def withRailsCount(railsCount: Int): Either[NonEmptyChain[Errors], Route] =
         validateRailsCount(railsCount, departure, arrival).map(_ => copy(railsCount = railsCount))
-      override def withLength(length: Double): Either[NonEmptyChain[Errors], Route[N, C]] =
+      override def withLength(length: Double): Either[NonEmptyChain[Errors], Route] =
         validateLength(length, departure, arrival).map(_ => copy(length = length))
 
       @targetName("Equals")
-      override def ===(other: Route[N, C]): Boolean =
+      override def ===(other: Route): Boolean =
         departure.equals(other.departure) && arrival.equals(other.arrival) && typology == other.typology
 
       override def equals(obj: Any): Boolean =
         obj match
-          case other: Route[N, C] => this === other
-          case _                  => false
+          case other: Route => this === other
+          case _            => false
 
       override def hashCode(): Int = departure.hashCode() + arrival.hashCode() + typology.hashCode()

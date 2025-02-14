@@ -1,7 +1,6 @@
 package ulisse.infrastructures.view
 
 import ulisse.applications.ports.RoutePorts.Input
-import ulisse.entities.Coordinates.Coordinate
 import ulisse.infrastructures.view.common.CentralController
 import ulisse.infrastructures.view.components.JStyler.*
 import ulisse.infrastructures.view.map.MapPanel
@@ -16,9 +15,9 @@ given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
 trait GUIView
 
 object GUIView:
-  def apply[N: Numeric, C <: Coordinate[N]](uiPort: Input[N, C]): GUIView = GUIViewImpl(uiPort)
+  def apply(uiPort: Input): GUIView = GUIViewImpl(uiPort)
 
-  private case class GUIViewImpl[N: Numeric, C <: Coordinate[N]](uiPort: Input[N, C]) extends MainFrame, GUIView:
+  private case class GUIViewImpl(uiPort: Input) extends MainFrame, GUIView:
     title = "Map"
     visible = true
     preferredSize = new Dimension(800, 800)

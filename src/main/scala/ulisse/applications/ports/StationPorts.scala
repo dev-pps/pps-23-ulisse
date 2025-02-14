@@ -2,7 +2,7 @@ package ulisse.applications.ports
 
 import cats.data.NonEmptyChain
 import ulisse.applications.managers.{CheckedStationManager, StationManager}
-import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 
 import scala.concurrent.Future
@@ -13,10 +13,10 @@ object StationPorts:
     * @tparam S
     *   The type of the station that the underlying manager will handle.
     */
-  trait Input[S <: Station[?]]:
+  trait Input:
 
-    type SM = CheckedStationManager[S]#StationMapType
-    type E  = NonEmptyChain[CheckedStationManager[S]#E]
+    type SM = CheckedStationManager#StationMapType
+    type E  = NonEmptyChain[CheckedStationManager#E]
 
     /** Retrieves the current station map.
       *
@@ -32,7 +32,7 @@ object StationPorts:
       * @return
       *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
       */
-    def addStation(station: S): Future[Either[E, SM]]
+    def addStation(station: Station): Future[Either[E, SM]]
 
     /** Removes a station from the station manager.
       *
@@ -41,7 +41,7 @@ object StationPorts:
       * @return
       *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
       */
-    def removeStation(station: Station[?]): Future[Either[E, SM]]
+    def removeStation(station: Station): Future[Either[E, SM]]
 
     /** Updates a station from the station manager.
       *
@@ -52,7 +52,7 @@ object StationPorts:
       * @return
       *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
       */
-    def updateStation(oldStation: Station[?], newStation: S): Future[Either[E, SM]]
+    def updateStation(oldStation: Station, newStation: Station): Future[Either[E, SM]]
 
     /** Finds a station at a specified location.
       *
@@ -61,4 +61,4 @@ object StationPorts:
       * @return
       *   An `Option` containing the station at the specified location, if it exists.
       */
-    def findStationAt(coordinate: Coordinate[?]): Future[Option[S]]
+    def findStationAt(coordinate: Coordinate): Future[Option[Station]]

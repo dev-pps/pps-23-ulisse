@@ -1,45 +1,38 @@
 package ulisse.applications.managers
 
-import cats.data.NonEmptyChain
 import cats.syntax.either.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.applications.managers.RouteManagers.{Errors, RouteManager}
-import ulisse.entities.Coordinates.Coordinate
-import ulisse.entities.RouteTest._
+import ulisse.entities.RouteTest.*
 import ulisse.entities.Routes.*
-import ulisse.entities.station.Station
-import ulisse.utils.ValidationUtils.mkStringErrors
 
-object RouteManagerTest extends AnyFlatSpec with Matchers:
-  type RouteManagerTest = RouteManager[ValueType, Coordinate[ValueType]]
+object RouteManagerTest:
+  val validateRoute: RouteError          = Route(departure, arrival, typeRoute, railsCount, pathLength)
+  val validateEqualRoute: RouteError     = Route(departure, arrival, typeRoute, railsCount, pathLength + 100d)
+  val validateDifferentRoute: RouteError = Route(departure, arrival, TypeRoute.AV, railsCount, pathLength)
 
-  val validateRoute: RouteTest          = Route(departure, arrival, typeRoute, railsCount, pathLength)
-  val validateEqualRoute: RouteTest     = Route(departure, arrival, typeRoute, railsCount, pathLength + 100d)
-  val validateDifferentRoute: RouteTest = Route(departure, arrival, TypeRoute.AV, railsCount, pathLength)
-
-  val emptyManager: RouteManagerTest = RouteManager.empty()
-  val singleElementManager: RouteManagerTest =
+  val emptyManager: RouteManager = RouteManager.empty()
+  val singleElementManager: RouteManager =
     validateRoute.map(route => RouteManager.createOf(List(route))).getOrElse(emptyManager)
+
+class RouteManagerTest extends AnyFlatSpec with Matchers:
+  import RouteManagerTest.*
 
   "create empty routeManager" should "have size 0" in:
     val zeroSize = 0
     emptyManager.size must be(zeroSize)
 
   "check route to test manager" should "be empty" in:
-    validateRoute match
-      case Left(errors) => fail(s"${errors.mkStringErrors}")
-      case Right(route) =>
-        validateEqualRoute match
-          case Left(errors) => fail(s"${errors.mkStringErrors}")
-          case Right(equalRoute) =>
-            validateDifferentRoute match
-              case Left(errors) => fail(s"${errors.mkStringErrors}")
-              case Right(differentRoute) =>
-                route must be(equalRoute)
-                route must not be differentRoute
-                route.checkAllField(equalRoute) must be(false)
-                route.checkAllField(differentRoute) must be(false)
+    for
+      route          <- validateRoute
+      equalRoute     <- validateEqualRoute
+      differentRoute <- validateDifferentRoute
+    yield
+      route must be(equalRoute)
+      route must not be differentRoute
+      route.checkAllField(equalRoute) must be(false)
+      route.checkAllField(differentRoute) must be(false)
 
   "save new routes in empty route manager" should "be contains in routeManager" in:
     for
@@ -79,7 +72,7 @@ object RouteManagerTest extends AnyFlatSpec with Matchers:
     for
       route          <- validateRoute
       differentRoute <- validateDifferentRoute
-    yield emptyManager.modify(route, differentRoute) must be(Errors.NotFound.asLeft[RouteManagerTest])
+    yield emptyManager.modify(route, differentRoute) must be(Errors.NotFound.asLeft[RouteManager])
 
   "modify route in a route that not exist" should "apply modify" in:
     for
@@ -100,14 +93,14 @@ object RouteManagerTest extends AnyFlatSpec with Matchers:
     yield singleElementManager.save(differentRoute) match
       case Left(errors) => fail(s"${errors.msg}")
       case Right(newManager) =>
-        newManager.modify(differentRoute, route) must be(Errors.AlreadyExist.asLeft[RouteManagerTest])
+        newManager.modify(differentRoute, route) must be(Errors.AlreadyExist.asLeft[RouteManager])
 
   "delete route that non exist" should "launch not exist error" in:
     for
       route <- validateRoute
     yield
       emptyManager.deleteBy(route.id) must be(emptyManager.delete(route))
-      emptyManager.deleteBy(route.id) must be(Errors.NotExist.asLeft[RouteManagerTest])
+      emptyManager.deleteBy(route.id) must be(Errors.NotExist.asLeft[RouteManager])
 
   "delete route that exist" should "have size 0" in:
     for

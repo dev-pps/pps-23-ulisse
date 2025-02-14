@@ -2,28 +2,25 @@ package ulisse.infrastructures.view
 
 import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.AppState
-import ulisse.applications.managers.{CheckedStationManager, StationManager}
 import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.applications.managers.StationManager
-import ulisse.applications.useCases.RouteService
-import ulisse.applications.useCases.StationService
-import ulisse.entities.Coordinates.{Coordinate, Grid}
+import ulisse.applications.managers.{CheckedStationManager, StationManager}
+import ulisse.applications.useCases.{RouteService, StationService}
+import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 import ulisse.entities.station.Station.CheckedStation
-import ulisse.infrastructures.view.StationTypes.*
 import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.station.StationEditorView
 
 import java.util.concurrent.LinkedBlockingQueue
 
-val eventStream = LinkedBlockingQueue[AppState[S] => AppState[S]]()
+val eventStream = LinkedBlockingQueue[AppState => AppState]()
 
 @main def launchApp(): Unit =
   val app = AppFrame()
   app.contents = Menu(app)
   app.open()
 
-  val initialState = AppState[S](StationManager.createCheckedStationManager())
+  val initialState = AppState(StationManager.createCheckedStationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
@@ -34,20 +31,15 @@ val eventStream = LinkedBlockingQueue[AppState[S] => AppState[S]]()
   app.contents = settings.stationEditorView
   app.open()
 
-  val initialState = AppState[S](StationManager.createCheckedStationManager())
+  val initialState = AppState(StationManager.createCheckedStationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
 
 final case class StationSettings():
-  val inputAdapter: StationService[S]                        = StationService(eventStream)
-  val stationEditorController: StationEditorAdapter[N, C, S] = StationEditorAdapter(inputAdapter)
-  val stationEditorView: StationEditorView                   = StationEditorView(stationEditorController)
-
-object StationTypes:
-  type N = Int
-  type C = Grid
-  type S = CheckedStation[C]
+  val inputAdapter: StationService                  = StationService(eventStream)
+  val stationEditorController: StationEditorAdapter = StationEditorAdapter(inputAdapter)
+  val stationEditorView: StationEditorView          = StationEditorView(stationEditorController)
 
 @main def trainDemoMain(): Unit =
   import ulisse.applications.managers.TechnologyManagers.TechnologyManager
@@ -80,6 +72,6 @@ object StationTypes:
   )
 
 @main def testNewGraphicComponents(): Unit =
-  val list = LinkedBlockingQueue[RouteManager[Double, Coordinate[Double]] => RouteManager[Double, Coordinate[Double]]]()
+  val list = LinkedBlockingQueue[RouteManager => RouteManager]()
   val port = RouteService(list)
   val map  = GUIView(port)

@@ -4,7 +4,7 @@ import cats.data.NonEmptyChain
 import cats.syntax.all.*
 import ulisse.applications.ports.StationPorts
 import ulisse.applications.ports.StationPorts.Input
-import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.BaseError
 
@@ -28,8 +28,8 @@ object StationEditorAdapter:
   * @param appPort
   *   The `StationInputPort` to interact with the application.
   */
-final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Station[C]](
-    appPort: StationPorts.Input[S]
+final case class StationEditorAdapter(
+    appPort: StationPorts.Input
 ):
 
   /** Handles the click event when the "OK" button is pressed.
@@ -61,15 +61,11 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
     */
   def onOkClick(
       stationName: String,
-      x: String,
-      y: String,
-      numberOfTrack: String,
-      oldStation: Option[Station[?]]
-  )(using
-      coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
-      stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
-  ): Future[Either[NonEmptyChain[BaseError], StationPorts.Input[S]#SM]] =
-    createStation(stationName, x, y, numberOfTrack, coordinateGenerator, stationGenerator) match
+      coordinate: Coordinate,
+      numberOfTrack: Int,
+      oldStation: Option[Station]
+  ): Future[Either[NonEmptyChain[BaseError], StationPorts.Input#SM]] =
+    createStation(stationName, coordinate, numberOfTrack) match
       case Left(error) => Future.successful(Left(error))
       case Right(station) => oldStation match
           case Some(oldStation) => appPort.updateStation(oldStation, station)
@@ -77,19 +73,9 @@ final case class StationEditorAdapter[N: Numeric, C <: Coordinate[N], S <: Stati
 
   private def createStation(
       name: String,
-      x: String,
-      y: String,
-      numberOfTrack: String,
-      coordinateGenerator: (N, N) => Either[NonEmptyChain[BaseError], C],
-      stationGenerator: (String, C, Int) => Either[NonEmptyChain[BaseError], S]
-  )(using numeric: Numeric[N]): Either[NonEmptyChain[BaseError], S] =
-    val validatedCoordinate = (
-      numeric.parseString(x).toValidNec(StationEditorAdapter.Error.InvalidFirstCoordinateComponentFormat),
-      numeric.parseString(y).toValidNec(StationEditorAdapter.Error.InvalidSecondCoordinateComponentFormat)
-    ).mapN((_, _)).toEither.flatMap(coordinateGenerator(_, _))
-    val validatedNumberOfTrack =
-      numberOfTrack.toIntOption.toValidNec(StationEditorAdapter.Error.InvalidNumberOfTrackFormat).toEither
-    (validatedCoordinate.toValidated, validatedNumberOfTrack.toValidated)
-      .mapN((_, _)).toEither.flatMap(stationGenerator(name, _, _))
+      coordinate: Coordinate,
+      numberOfTrack: Int
+  ): Either[NonEmptyChain[BaseError], Station] =
+    Station(name, coordinate, numberOfTrack).asRight
 
   export appPort.{findStationAt, removeStation}

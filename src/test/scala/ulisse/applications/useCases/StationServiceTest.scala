@@ -7,7 +7,8 @@ import ulisse.Runner.runAll
 import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.StationManager.CheckedStationManager
-import ulisse.entities.Coordinates.*
+import ulisse.entities.Coordinate
+import ulisse.entities.Coordinate.*
 import ulisse.entities.station.Station
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -17,11 +18,10 @@ import scala.util.Right
 
 class StationServiceTest extends AnyWordSpec with Matchers:
 
-  private type S = Station[Coordinate[Int]]
   private val station       = Station("StationA", Coordinate(0, 0), 1)
-  private val initialState  = AppState[S](StationManager.createCheckedStationManager())
-  private val eventStream   = LinkedBlockingQueue[AppState[S] => AppState[S]]()
-  private val inputPort     = StationService[S](eventStream)
+  private val initialState  = AppState(StationManager.createCheckedStationManager())
+  private val eventStream   = LinkedBlockingQueue[AppState => AppState]()
+  private val inputPort     = StationService(eventStream)
   private def updateState() = runAll(initialState, eventStream)
 
   "StationService" should:
