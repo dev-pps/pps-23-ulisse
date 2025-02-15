@@ -14,95 +14,42 @@ object Timetables:
 
   private type Time     = ScheduleTime
   private type WaitTime = Int
-
-  private type StationT = Station[_]
+  import ulisse.entities.timetable.MockedEntities.*
 
   extension (i: Int)
     def toWaitTime: WaitTime = i
 
   extension (t: TrainTimetable)
-    /** @return
-      *   Stations where train stops
-      */
-    def stopStations: List[StationT] = t.table.filter(_._2.waitTime.nonEmpty).keys.toList
+    def stopStations: List[Route]    = t.table.filter(_._2.waitTime.nonEmpty).keys.toList
+    def transitStations: List[Route] = t.table.filter(_._2.waitTime.isEmpty).keys.toList
+    def routes: List[Route]          = t.table.keys.toList
 
-    /** @return
-      *   Stations where train transits and not stops
-      */
-    def transitStations: List[StationT] =
-      t.table.removedAll(List(t.arrivingStation, t.startStation)).filter(_._2.waitTime.isEmpty).keys.toList
-
-    /** @return
-      *   List of a couple of stations that compone train trip
-      */
-    def routes: List[(StationT, StationT)] = t.table.keys.toList.zip(t.table.keys.drop(1))
-
-  /** Basilar info of a timetable */
   trait Timetable:
-    /** @return
-      *   Timetable's train
-      */
     def train: Train
-
-    /** @return
-      *   Initial station of train trip
-      */
     def startStation: StationT
-
-    /** @return
-      *   Departure time
-      */
     def departureTime: ClockTime
+    def table: ListMap[Route, Time]
 
-    /** @return
-      *   Map of Train Timetable containing station and its arriving time.
-      */
-    def table: ListMap[StationT, Time]
-
-  /** Complete Train timetable */
   trait TrainTimetable extends Timetable:
-    /** @return
-      *   Last station of train trip
-      */
     def arrivingStation: StationT
-
-    /** @return
-      *   Time of arriving to last station
-      */
     def arrivingTime: Option[ClockTime]
 
-  /** Context Travel time estimator strategy. It defines how to calculate travelling time between stations. */
   trait TimeEstimator:
-    /** Calculates Estimated Time of Arrival (ETA) to reach `endStation`
-      * @param trainTable
-      *   Current timetable situation
-      * @param endStation
-      *   Station to reach
-      * @param train
-      *   Train used
-      * @return
-      *   ETA as Option of `ClockTime`
-      */
-    def ETA(trainTable: ListMap[StationT, Time], endStation: StationT, train: Train): Option[ClockTime]
+    def ETA(lastTime: Option[Time], route: Route, train: Train): Option[ClockTime]
 
-  /** Default context TimeEstimator strategy.
-    *
-    * ETA is calculated considering just speed of train and distance between last previous station and `endStation`.
-    */
   private object UnrealTimeEstimator extends TimeEstimator:
-    def ETA(trainTable: ListMap[StationT, Time], endStation: StationT, train: Train): Option[ClockTime] =
+    def ETA(lastTime: Option[Time], lastRoute: Route, train: Train): Option[ClockTime] =
       for
-        prevStation <- trainTable.lastOption
-        // TODO: use distance value of route
-        distance <- Some(20.0 /*prevStation._1.coordinate.distance(endStation.coordinate)*/ )
-        // TODO: here speed should be the min(train.maxSpeed, route.technology.speed)
-        travelMinutes <- Some((distance / train.maxSpeed) * 60)
-        prevDeparture <- prevStation._2.departure
-        arrivingTime  <- h(prevDeparture.h).m(prevDeparture.m + travelMinutes.toInt).toOption
+        distance        <- Some(lastRoute.length)
+        travelMinutes   <- Some((distance / Math.min(train.maxSpeed, lastRoute.technology.maxSpeed)) * 60)
+        offsetTime      <- lastTime
+        travelStartTime <- offsetTime.departure
+        arrivingTime    <- h(travelStartTime.h).m(travelStartTime.m + travelMinutes.toInt).toOption
       yield arrivingTime
 
   /** Default time estimator just considers distance between last station and the given one and train speed. No
     * acceleration and acceleration are considered.
+    *
     * @return
     *   TimeEstimator
     */
@@ -118,41 +65,42 @@ object Timetables:
   object PartialTimetable:
     def apply(
         train: Train,
-        startFrom: StationT,
+        travelsOn: Route,
         departureTime: Either[ClockTimeErrors, ClockTime]
     ): Either[ClockTimeErrors, PartialTimetable] =
       for
         depTime <- departureTime
       yield PartialTrainTimetable(
         train,
-        startFrom,
+        travelsOn,
         depTime,
-        ListMap((startFrom, StartScheduleTime(Some(depTime))))
+        ListMap((travelsOn, StartScheduleTime(Some(depTime))))
       )
 
     private case class PartialTrainTimetable(
         train: Train,
-        startStation: StationT,
+        travelsRoute: Route,
         departureTime: ClockTime,
-        table: ListMap[StationT, Time]
+        table: ListMap[Route, Time]
     )(using timeEstimationStrategy: TimeEstimator) extends PartialTimetable:
-      override def stopsIn(station: StationT, waitTime: WaitTime): PartialTimetable =
-        insertStation(
-          station,
-          AutoScheduleTime(timeEstimationStrategy.ETA(table, station, train), Some(waitTime))
+      private def lastDepartureTime: Option[Time] = table.lastOption.map(_._2)
+      override def stopsIn(route: Route, waitTime: WaitTime): PartialTimetable =
+        insertRoute(
+          route,
+          AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, route, train), Some(waitTime))
         )
 
-      override def transitIn(station: StationT): PartialTimetable =
-        insertStation(station, AutoScheduleTime(timeEstimationStrategy.ETA(table, station, train), None))
+      override def transitIn(route: Route): PartialTimetable =
+        insertRoute(route, AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, route, train), None))
 
-      override def arrivesTo(station: StationT): TrainTimetable =
+      override def arrivesTo(route: Route): TrainTimetable =
         TrainTimetableImpl(
-          insertStation(station, EndScheduleTime(timeEstimationStrategy.ETA(table, station, train))),
-          station
+          insertRoute(route, EndScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, route, train))),
+          route.arrival
         )
 
-      private def insertStation(station: StationT, time: Time): PartialTimetable =
-        this.copy(table = table.updated(station, time))
+      private def insertRoute(route: Route, time: Time): PartialTimetable =
+        this.copy(table = table.updated(route, time))
 
     private case class TrainTimetableImpl(
         private val partialTrainTimetable: PartialTimetable,
@@ -161,6 +109,6 @@ object Timetables:
       export partialTrainTimetable.{departureTime, startStation, table, train}
       override def arrivingTime: Option[ClockTime] =
         for
-          t  <- table.get(arrivingStation)
-          at <- t.arriving
+          t  <- table.lastOption
+          at <- t._2.arriving
         yield at
