@@ -1,6 +1,5 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.TimetableManagers.{TimetableManager, TimetableManagerErrors}
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.TimetablePorts
@@ -13,6 +12,7 @@ import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{
 import ulisse.applications.ports.TimetablePorts.{RequestResult, StationId, TimetableServiceErrors}
 import ulisse.entities.Technology
 import ulisse.entities.station.Station
+import ulisse.entities.timetable.MockedEntities.*
 import ulisse.entities.timetable.Timetables.{PartialTimetable, TrainTimetable}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.BaseError
@@ -20,26 +20,6 @@ import ulisse.utils.Times.ClockTime
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
-
-type Route    = MockRoutesService.Route
-type StationT = Station[_]
-
-trait AppStateTimetable:
-  def trainManager: TrainManager
-  def timetableManager: TimetableManager
-  def timetableManagerUpdate(timetableManager: TimetableManager): AppStateTimetable
-  def stationManager: StationManager[StationT]
-
-object MockRoutesService: // after remove that
-  case class Route(startStationName: String, endStationName: String, technology: Technology)
-  def routes: List[Route] = List(
-    Route("A", "B", Technology("AV", maxSpeed = 300)),
-    Route("A", "B1", Technology("AV", maxSpeed = 300)),
-    Route("A", "B2", Technology("NORMAL", maxSpeed = 300)),
-    Route("B", "C", Technology("AV", maxSpeed = 130)),
-    Route("C", "D", Technology("NORMAL", maxSpeed = 130)),
-    Route("C", "D1", Technology("magnetic", maxSpeed = 500))
-  )
 
 //----------------------------------------------------------------------
 /** Timetable service that jobs is like gatekeeper.
@@ -51,95 +31,67 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
 
   private case class ValidRoute(stations: (StationT, StationT), waitTime: Option[Int], speedLimit: Int)
 
-  extension (toCheck: List[((StationT, Option[Int]), (StationT, Option[Int]))])
+  extension (toCheck: List[(StationId, Option[Int])])
     /** @param existingRoutes
       *   Route and technology actually saved
       * @return
       *   Returns list of ValidRoute if sequence of Stations name is valid
       */
-    private def validateStations(existingRoutes: Map[(StationId, StationId), Technology]): Option[List[ValidRoute]] =
-      val routeStations = existingRoutes.keys.toList
-      val isValid = toCheck.corresponds(routeStations)((st, route) =>
-        val station1 = st._1._1
-        val station2 = st._2._1
-        (route._1 == station1.name && route._2 == station2.name) ||
-        (route._1 == station2.name && route._2 == station1.name)
+    private def validateStations(existingRoutes: List[Route]): Option[List[(Route, Option[Int])]] =
+      def routeExists(st1: String, st2: String)(route: Route): Boolean =
+        val arrivalName   = route.arrival.name
+        val departureName = route.departure.name
+        (departureName == st1 && arrivalName == st2) ||
+        (arrivalName == st2 && departureName == st1)
+
+      val isValid = toCheck.zip(toCheck.drop(1)).corresponds(existingRoutes)((s, route) =>
+        val startStationName = s._1._1
+        val finalStationName = s._2._1
+        routeExists(startStationName, finalStationName)(route)
       )
       Option.when(isValid):
-        toCheck.flatMap { (station1, station2) =>
+        toCheck.zip(toCheck.drop(1)).flatMap { (station1, station2) =>
           existingRoutes.collectFirst {
             case route
-                if route._1 == (station1._1.name, station2._1.name) || route._1 == (station2._1.name, station1._1.name) =>
-              ValidRoute((station1._1, station2._1), station2._2, route._2.maxSpeed)
+                if routeExists(station1._1, station2._1)(route) => (route, station2._2)
           }
         }
-
-  extension (routes: List[Route])
-    /** Extracts needed info from a List of Route
-      * @return
-      *   Map with tuple of name stations as key and Technology as value
-      */
-    private def extractRouteInfo: Map[(StationId, StationId), Technology] =
-      routes.map(r =>
-        val techType = r.technology
-        val st1      = r.startStationName
-        val st2      = r.endStationName
-        ((st1, st2), techType)
-      ).toMap
-
-  extension (stationsName: List[(StationId, Option[Int])])
-    private def namesToEntities(stationsMap: List[StationT]): Option[List[(StationT, Option[Int])]] =
-      stationsName.map {
-        case (name, waitTime) =>
-          stationsMap.find(_.name == name).map(station => (station, waitTime))
-      }.foldLeft[Option[List[(StationT, Option[Int])]]](Some(List.empty)) {
-        case (Some(acc), Some(item)) => Some(item :: acc)
-        case _                       => None
-      }.map(_.reverse)
 
   def createTimetable(
       trainName: String,
       departureTime: ClockTime,
       stations: List[(StationId, Option[Int])]
   ): Future[RequestResult] = stateEventQueue.updateWith: (state, promise) =>
-    // Maps routes (not mine) into a form that I need
-    val savedRoutes: Map[(StationId, StationId), Technology] =
-      MockRoutesService.routes.extractRouteInfo // here i must use then state.routeManager.routes
-    val savedStations = state.stationManager.stations
-    val savedTrains   = state.trainManager.trains
+    val savedRoutes: List[Route] = state.routeManager.routes
+    val savedTrains              = state.trainManager.trains
     for
-      timetable <-
-        // TODO: pass saved stations
-        buildTimetable(trainName, departureTime, stations)(savedTrains, List.empty /*savedStations*/, savedRoutes)
+      timetable     <- buildTimetable(trainName, departureTime, stations)(savedTrains, savedRoutes)
       newManager    <- state.timetableManager.save(timetable)
       updatedTables <- newManager.tablesOf(trainName)
     yield
       promise.success(Right(updatedTables))
       newManager
 
-  private def buildTimetable(
+  def buildTimetable(
       trainName: String,
       departureTime: ClockTime,
       usrStations: List[(StationId, Option[Int])]
   )(
       trains: List[Train],
-      stations: List[StationT],
-      routes: Map[(StationId, StationId), Technology]
+      routes: List[Route]
   ): Either[BaseError, TrainTimetable] =
+    // given train name, departureTime, and sequence of route an related wait time  ==> create timetable
     // TODO: use cats validated (chain of errors) to provide user all errors that occured during timetable creation
     for
-      train           <- trains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
-      stationEntities <- usrStations.namesToEntities(stations).toRight(GenericError(s"some station not found"))
-      _ <- stationEntities.zip(stationEntities.drop(1))
-        .validateStations(routes)
-        .toRight(InvalidStationSelection("some station not exists"))
-      startFrom        <- stationEntities.headOption.toRight(GenericError(s"some station not found"))
-      arriveTo         <- stationEntities.lastOption.toRight(GenericError(s"some station not found"))
+      train            <- trains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
+      stationEntities  <- usrStations.validateStations(routes).toRight(GenericError(s"some station not found"))
+      startFrom        <- stationEntities.headOption.toRight(GenericError(s"start station not found"))
+      arriveTo         <- stationEntities.lastOption.toRight(GenericError(s"arriving station not found"))
       partialTimetable <- PartialTimetable(train, startFrom._1, Right(departureTime))
     yield stationEntities.drop(1).foldLeft(partialTimetable) {
-      case (timetable, (station, Some(waitTime))) => timetable.stopsIn(station, waitTime)
-      case (timetable, (station, None))           => timetable.transitIn(station)
-    }.arrivesTo(arriveTo._1)
+      case (timetable, (route, Some(waitTime))) => timetable.stopsIn(route.arrival, waitTime)
+      case (timetable, (route, None))           => timetable.transitIn(route.arrival)
+    }.arrivesTo(arriveTo._1.arrival)
 
   def deleteTimetable(trainName: String, departureTime: ClockTime): Future[RequestResult] =
     stateEventQueue.updateWith: (state, promise) =>
