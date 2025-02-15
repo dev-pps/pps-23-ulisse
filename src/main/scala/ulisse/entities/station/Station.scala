@@ -11,9 +11,6 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
   *
   * A `Station` represents a location where trains can stop. Each station has a name, a location, and a number of
   * tracks.
-  *
-  * @tparam C
-  *   A type that extends `Coordinate[?]`, which represents the station's location.
   */
 trait Station:
   val name: String
@@ -30,8 +27,6 @@ trait Station:
 object Station:
   /** Creates a `Station` instance.
     *
-    * @tparam C
-    *   A type that extends `Coordinate[?]`, which represents the station's location.
     * @param name
     *   The name of the station.
     * @param coordinate
@@ -41,16 +36,12 @@ object Station:
     * @return
     *   A `Station` instance.
     */
+  // TODO evaluate default constructor
   def apply(name: String, coordinate: Coordinate, numberOfTrack: Int): Station =
     StationImpl(name, coordinate, numberOfTrack)
 
-//  given [C <: Coordinate[?]]: ((String, C, Int) => Either[NonEmptyChain[BaseError], CheckedStation[C]]) =
-//    Station.createCheckedStation
-
   /** Creates a `Station` instance with validation.
     *
-    * @tparam C
-    *   A type that extends `Coordinate[?]`, which represents the station's location.
     * @param name
     *   The name of the station. Must not be empty or blank.
     * @param coordinate
@@ -60,56 +51,18 @@ object Station:
     * @return
     *   Either a `Station` instance or a `NonEmptyChain` of `Errors` indicating the issues.
     */
-  def createCheckedStation(
+  def createNamedStation(
       name: String,
       coordinate: Coordinate,
       numberOfTrack: Int
-  ): Either[NonEmptyChain[CheckedStation.Error], CheckedStation] =
+  ): Either[NonEmptyChain[Station.Error], Station] =
     (
-      validateNonBlankString(name, CheckedStation.Error.InvalidName).toValidatedNec,
-      validatePositive(numberOfTrack, CheckedStation.Error.InvalidNumberOfTrack).toValidatedNec
-    ).mapN(CheckedStation(_, coordinate, _)).toEither
-
-  /** Defines a `CheckedStation`.
-    *
-    * A `CheckedStation` represents a validated station.
-    *
-    * @tparam C
-    *   A type that extends `Coordinate[?]`, which represents the station's location.
-    * @param name
-    *   The name of the station. Must be non-blank.
-    * @param coordinate
-    *   The location of the station, represented as a coordinate of type `C`.
-    * @param numberOfTracks
-    *   The number of tracks at the station. Must be a positive integer.
-    *
-    * **Note**: Instances of `CheckedStation` can only be created through the `Station.createCheckedStation` method to
-    * ensure validation.
-    */
-  case class CheckedStation private[Station] (name: String, coordinate: Coordinate, numberOfTracks: Int) extends Station
-
-  /** Represents a selectable station.
-    *
-    * A `SelectableStation` wraps a `Station` instance and provides a boolean flag to indicate whether the station is
-    * selected.
-    *
-    * @tparam C
-    *   A type that extends `Coordinate[?]`, representing the station's location.
-    * @param station
-    *   The station instance of type `Station[C]` to be wrapped.
-    * @param selected
-    *   A boolean flag indicating whether the station is selected. `true` if selected, `false` otherwise.
-    */
-  final case class SelectableStation(station: Station, selected: Boolean) extends Station with Selectable:
-    export station.*
+      validateNonBlankString(name, Station.Error.InvalidName).toValidatedNec,
+      validatePositive(numberOfTrack, Station.Error.InvalidNumberOfTrack).toValidatedNec
+    ).mapN(Station(_, coordinate, _)).toEither
 
   private final case class StationImpl(name: String, coordinate: Coordinate, numberOfTracks: Int) extends Station
 
-  object CheckedStation:
-    /** Represents errors that can occur during station creation. */
-    enum Error extends BaseError:
-      case InvalidName, InvalidNumberOfTrack
-
-/** Defines a Selectable Object. */
-trait Selectable:
-  val selected: Boolean
+  /** Represents errors that can occur during station creation. */
+  enum Error extends BaseError:
+    case InvalidName, InvalidNumberOfTrack
