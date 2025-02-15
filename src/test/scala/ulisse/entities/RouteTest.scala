@@ -8,7 +8,7 @@ import ulisse.entities.station.Station
 import ulisse.utils.ValidationUtils.mkStringErrors
 
 object RouteTest:
-  type RouteError = Either[NonEmptyChain[Routes.Errors], Route]
+  type ValidationRoute = Either[NonEmptyChain[Routes.Errors], Route]
 
   private val departureCoordinate = Coordinate(2, 0)
   private val arrivalCoordinate   = Coordinate(0, 2)
@@ -20,7 +20,7 @@ object RouteTest:
 
 class RouteTest extends AnyFlatSpec with Matchers:
   import RouteTest.*
-  val validateRoute: RouteError = Route(departure, arrival, typeRoute, railsCount, pathLength)
+  val validateRoute: ValidationRoute = Route(departure, arrival, typeRoute, railsCount, pathLength)
 
   "create routes" should "set core parameters: typology, railsCount, path" in:
     validateRoute match
@@ -34,15 +34,15 @@ class RouteTest extends AnyFlatSpec with Matchers:
         route.length must be(pathLength)
 
   "check equals routes" should "be same typology and path and the others parameters different" in:
-    val equalRoute: RouteError = Route(departure, arrival, typeRoute, railsCount - 1, pathLength + 1)
+    val equalRoute: ValidationRoute = Route(departure, arrival, typeRoute, railsCount - 1, pathLength + 1)
     validateRoute must be(equalRoute)
 
   "check different routes" should "have different departure or arrival station or typology " in:
-    val stationTracks: Int                = 2
-    val newDeparture: Station             = Station("Firenze", departureCoordinate, stationTracks)
-    val newArrival: Station               = Station("Bologna", arrivalCoordinate, stationTracks)
-    val routeWithNewDeparture: RouteError = Route(newDeparture, arrival, typeRoute, railsCount, pathLength)
-    val routeWithNewArrival: RouteError   = Route(departure, newArrival, typeRoute, railsCount, pathLength)
+    val stationTracks: Int                     = 2
+    val newDeparture: Station                  = Station("Firenze", departureCoordinate, stationTracks)
+    val newArrival: Station                    = Station("Bologna", arrivalCoordinate, stationTracks)
+    val routeWithNewDeparture: ValidationRoute = Route(newDeparture, arrival, typeRoute, railsCount, pathLength)
+    val routeWithNewArrival: ValidationRoute   = Route(departure, newArrival, typeRoute, railsCount, pathLength)
 
     validateRoute must not be routeWithNewDeparture
     validateRoute must not be routeWithNewArrival
@@ -64,8 +64,8 @@ class RouteTest extends AnyFlatSpec with Matchers:
     for
       route <- validateRoute
     yield
-      val newDeparture: Station            = Station("Firenze", departure.coordinate, 2)
-      val changeRouteDeparture: RouteError = route.withDeparture(newDeparture)
+      val newDeparture: Station                 = Station("Firenze", departure.coordinate, 2)
+      val changeRouteDeparture: ValidationRoute = route.withDeparture(newDeparture)
 
       changeRouteDeparture match
         case Left(errors) => fail(s"${errors.mkStringErrors}")
@@ -77,8 +77,8 @@ class RouteTest extends AnyFlatSpec with Matchers:
     for
       route <- validateRoute
     yield
-      val newArrival: Station            = Station("Bologna", arrival.coordinate, 2)
-      val changeRouteArrival: RouteError = route.withArrival(newArrival)
+      val newArrival: Station                 = Station("Bologna", arrival.coordinate, 2)
+      val changeRouteArrival: ValidationRoute = route.withArrival(newArrival)
 
       changeRouteArrival match
         case Left(errors) => fail(s"${errors.mkStringErrors}")
@@ -99,8 +99,8 @@ class RouteTest extends AnyFlatSpec with Matchers:
     for
       route <- validateRoute
     yield
-      val newRailsCount: Int                = railsCount - 1
-      val changeRouteRailsCount: RouteError = route.withRailsCount(newRailsCount)
+      val newRailsCount: Int                     = railsCount - 1
+      val changeRouteRailsCount: ValidationRoute = route.withRailsCount(newRailsCount)
 
       changeRouteRailsCount match
         case Left(errors) => fail(s"${errors.mkStringErrors}")
@@ -112,8 +112,8 @@ class RouteTest extends AnyFlatSpec with Matchers:
     for
       route <- validateRoute
     yield
-      val newLength: Double             = pathLength + 50.0d
-      val changeRouteLength: RouteError = route.withLength(newLength)
+      val newLength: Double                  = pathLength + 50.0d
+      val changeRouteLength: ValidationRoute = route.withLength(newLength)
 
       changeRouteLength match
         case Left(errors) => fail(s"${errors.mkStringErrors}")
