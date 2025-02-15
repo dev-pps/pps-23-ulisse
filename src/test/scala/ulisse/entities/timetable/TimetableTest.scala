@@ -4,6 +4,8 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
 import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.Routes
+import ulisse.entities.Routes.{Route, TypeRoute}
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.ScheduleTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
 import ulisse.entities.timetable.Timetables.{toWaitTime, PartialTimetable, TrainTimetable}
@@ -24,6 +26,25 @@ class TimetableTest extends AnyFlatSpec:
   private val stationC = Station("Station C", Coordinate(25, 0), 1) // 3 min from B
   private val stationD = Station("Station D", Coordinate(50, 0), 1) // 5 min from C
   private val stationF = Station("Station F", Coordinate(55, 0), 1) // 1 min from D
+  private val routeA_B = Routes.Route(
+    departure = stationA,
+    arrival = stationB,
+    typeRoute = TypeRoute.AV,
+    railsCount = 2,
+    length = 20
+  )
+
+  private val fixedDistanceRoutes =
+    val stations = List(stationA, stationB, stationC, stationD, stationF)
+    stations.zip(stations.drop(1)).map((s, s1) =>
+      Routes.Route(
+        departure = s,
+        arrival = s1,
+        typeRoute = TypeRoute.AV,
+        railsCount = 2,
+        length = 20
+      )
+    )
 
   val partialTimetable: Either[ClockTimeErrors, PartialTimetable] =
     PartialTimetable(train = AV1000Train, startFrom = stationA, departureTime = h(9).m(0))
@@ -42,7 +63,7 @@ class TimetableTest extends AnyFlatSpec:
   "When create new Timetable" should "be returned an error if departure time is not valid" in:
     val invalidDepartureTime = h(50).m(0)
     val invalidTimetable: Either[ClockTimeErrors, PartialTimetable] =
-      PartialTimetable(train = AV1000Train, startFrom = stationA, invalidDepartureTime)
+      PartialTimetable(train = AV1000Train, travelsOn = routeA_B, invalidDepartureTime)
     import ulisse.utils.Times.InvalidHours
     invalidTimetable should be(Left(InvalidHours()))
 
