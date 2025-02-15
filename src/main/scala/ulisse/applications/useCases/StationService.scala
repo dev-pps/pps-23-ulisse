@@ -2,7 +2,7 @@ package ulisse.applications.useCases
 
 import cats.data.NonEmptyChain
 import ulisse.applications.AppState
-import ulisse.applications.managers.CheckedStationManager
+import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
@@ -55,7 +55,7 @@ final case class StationService(
   private def updateState(
       p: Promise[Either[E, SM]],
       state: AppState,
-      updatedMap: Either[NonEmptyChain[state.stationManager.E], CheckedStationManager]
+      updatedMap: Either[NonEmptyChain[StationManager.Error], StationManager]
   ) =
     updatedMap match
       case Left(value: E) => p.success(Left(value)); state

@@ -1,7 +1,7 @@
 package ulisse.applications.ports
 
 import cats.data.NonEmptyChain
-import ulisse.applications.managers.{CheckedStationManager, StationManager}
+import ulisse.applications.managers.StationManager
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 
@@ -15,8 +15,8 @@ object StationPorts:
     */
   trait Input:
 
-    type SM = CheckedStationManager#StationMapType
-    type E  = NonEmptyChain[CheckedStationManager#E]
+    type SM = StationManager#StationMapType
+    type E  = NonEmptyChain[StationManager.Error]
 
     /** Retrieves the current station map.
       *

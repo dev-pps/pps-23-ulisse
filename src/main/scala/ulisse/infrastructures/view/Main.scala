@@ -3,11 +3,10 @@ package ulisse.infrastructures.view
 import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.AppState
 import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.applications.managers.{CheckedStationManager, StationManager}
+import ulisse.applications.managers.StationManager
 import ulisse.applications.useCases.{RouteService, StationService}
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
-import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.station.StationEditorView
 
@@ -20,7 +19,7 @@ val eventStream = LinkedBlockingQueue[AppState => AppState]()
   app.contents = Menu(app)
   app.open()
 
-  val initialState = AppState(StationManager.createCheckedStationManager())
+  val initialState = AppState(StationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
@@ -31,7 +30,7 @@ val eventStream = LinkedBlockingQueue[AppState => AppState]()
   app.contents = settings.stationEditorView
   app.open()
 
-  val initialState = AppState(StationManager.createCheckedStationManager())
+  val initialState = AppState(StationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )

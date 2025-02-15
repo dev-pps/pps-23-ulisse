@@ -61,11 +61,12 @@ final case class StationEditorAdapter(
     */
   def onOkClick(
       stationName: String,
-      coordinate: Coordinate,
-      numberOfTrack: Int,
+      x: String,
+      y: String,
+      numberOfTrack: String,
       oldStation: Option[Station]
   ): Future[Either[NonEmptyChain[BaseError], StationPorts.Input#SM]] =
-    createStation(stationName, coordinate, numberOfTrack) match
+    createStation(stationName, x, y, numberOfTrack) match
       case Left(error) => Future.successful(Left(error))
       case Right(station) => oldStation match
           case Some(oldStation) => appPort.updateStation(oldStation, station)
@@ -73,9 +74,17 @@ final case class StationEditorAdapter(
 
   private def createStation(
       name: String,
-      coordinate: Coordinate,
-      numberOfTrack: Int
+      x: String,
+      y: String,
+      numberOfTrack: String
   ): Either[NonEmptyChain[BaseError], Station] =
-    Station(name, coordinate, numberOfTrack).asRight
+    val validatedCoordinate = (
+      x.toIntOption.toValidNec(StationEditorAdapter.Error.InvalidFirstCoordinateComponentFormat),
+      y.toIntOption.toValidNec(StationEditorAdapter.Error.InvalidSecondCoordinateComponentFormat)
+    ).mapN((_, _)).toEither.map(Coordinate.apply)
+    val validatedNumberOfTrack =
+      numberOfTrack.toIntOption.toValidNec(StationEditorAdapter.Error.InvalidNumberOfTrackFormat).toEither
+    (validatedCoordinate.toValidated, validatedNumberOfTrack.toValidated)
+      .mapN((_, _)).toEither.flatMap(Station.createNamedStation(name, _, _))
 
   export appPort.{findStationAt, removeStation}
