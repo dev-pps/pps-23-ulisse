@@ -20,7 +20,7 @@ trait Station:
     case s: Station =>
       name === s.name &&
       coordinate == s.coordinate &&
-      numberOfTracks === s.numberOfTracks
+      numberOfTracks == s.numberOfTracks
     case _ => false
 
 /** Factory for [[Station]] instances. */
@@ -38,7 +38,7 @@ object Station:
     */
   // TODO evaluate default constructor
   def apply(name: String, coordinate: Coordinate, numberOfTrack: Int): Station =
-    StationImpl(name, coordinate, numberOfTrack)
+    StationImpl(name, coordinate, math.max(1, numberOfTrack))
 
   /** Creates a `Station` instance with validation.
     *
