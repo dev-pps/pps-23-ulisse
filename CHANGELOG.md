@@ -1,3 +1,9 @@
+## [1.10.2](https://github.com/dev-pps/pps-23-ulisse/compare/v1.10.1...v1.10.2) (2025-02-15)
+
+### Bug Fixes
+
+* **coordinate:** created new coordinate ([63bec9c](https://github.com/dev-pps/pps-23-ulisse/commit/63bec9c457e8ead5dfa3e58db8c704fb7b6375cc))
+
 ## [1.10.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.10.0...v1.10.1) (2025-02-13)
 
 ### Bug Fixes
