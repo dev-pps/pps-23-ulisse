@@ -13,13 +13,14 @@ class StationTest extends AnyWordSpec with Matchers:
 
   "A Station" when:
     "is created" should:
-      List(-1, 0, 1, 2).foreach(numberOfTrack =>
-        val station = Station(defaultName, defaultCoordinate, numberOfTrack)
-        station.id shouldBe station.hashCode()
-        station.name shouldBe defaultName
-        station.coordinate shouldBe defaultCoordinate
-        station.numberOfTracks shouldBe math.max(1, numberOfTrack)
-      )
+      "have at least 1 track" in:
+        List(-1, 0, 1, 2).foreach(numberOfTrack =>
+          val station = Station(defaultName, defaultCoordinate, numberOfTrack)
+          station.id shouldBe station.hashCode()
+          station.name shouldBe defaultName
+          station.coordinate shouldBe defaultCoordinate
+          station.numberOfTracks shouldBe math.max(1, numberOfTrack)
+        )
 
     "is checked" should:
       "be created if the name is not blank and numberOfTracks is greater than 0" in:
