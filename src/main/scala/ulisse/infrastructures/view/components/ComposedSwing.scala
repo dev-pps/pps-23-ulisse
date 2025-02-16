@@ -7,10 +7,10 @@ import java.awt
 import java.awt.Dimension
 import scala.swing.*
 
-trait JComponent:
+trait ComposedSwing:
   def component[T >: Component]: T
 
-object JComponent:
+object ComposedSwing:
   def createInfoTextField(text: String): JInfoTextField           = JInfoTextField(text)
   def createIconLabel(iconPath: String, text: String): JIconLabel = JIconLabel(iconPath, text)
   def createNavbar(JIconLabel: JIconLabel*): JNavBar              = JNavBar(JIconLabel: _*)
@@ -24,7 +24,7 @@ object JComponent:
   private val elementStyler =
     JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.overlayElement))
 
-  case class JInfoTextField(title: String) extends JComponent:
+  case class JInfoTextField(title: String) extends ComposedSwing:
     private val colum = 15
 
     private val textFieldStyler =
@@ -33,11 +33,11 @@ object JComponent:
         JStyler.backgroundPalette(Theme.light.background.withAlpha(50))
       )
 
-    private val mainPanel  = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
-    private val labelPanel = JItem.createFlowPanel(JStyler.transparent)
+    private val mainPanel  = ExtendedSwing.createBoxPanel(Orientation.Vertical, JStyler.transparent)
+    private val labelPanel = ExtendedSwing.createFlowPanel(JStyler.transparent)
 
-    private val label     = JItem.label(title, JStyler.transparent)
-    private val textField = JItem.textField(colum, textFieldStyler)
+    private val label     = ExtendedSwing.label(title, JStyler.transparent)
+    private val textField = ExtendedSwing.textField(colum, textFieldStyler)
 
     labelPanel.contents += label
     mainPanel.contents += labelPanel
@@ -46,7 +46,7 @@ object JComponent:
     export textField.text_=
     override def component[T >: Component]: T = mainPanel
 
-  case class JIconLabel(iconPath: String, text: String) extends JComponent:
+  case class JIconLabel(iconPath: String, text: String) extends ComposedSwing:
     private val width  = 100
     private val height = 40
 
@@ -59,9 +59,9 @@ object JComponent:
       JStyler.palette(Theme.light.overlayElement, Theme.light.forwardClick, Theme.light.forwardClick)
     )
 
-    private val mainPanel = JItem.createBoxPanel(Orientation.Horizontal, openStyler)
+    private val mainPanel = ExtendedSwing.createBoxPanel(Orientation.Horizontal, openStyler)
     private val icon      = createSVGPanel(iconPath, Theme.light.background)
-    private val label     = JItem.label(text, JStyler.transparent)
+    private val label     = ExtendedSwing.label(text, JStyler.transparent)
 
     icon.preferredSize = Dimension(height, height)
     label.preferredSize = Dimension(width, height)
@@ -98,11 +98,11 @@ object JComponent:
 
     override def component[T >: Component]: T = mainPanel
 
-  case class JNavBar(iconLabels: JIconLabel*) extends JComponent:
+  case class JNavBar(iconLabels: JIconLabel*) extends ComposedSwing:
     private val styler =
       JStyler.transparent.copy(rect = JStyler.defaultRect.copy(padding = JStyler.createPadding(40, 20)))
 
-    private val mainPanel = JItem.createFlowPanel(styler)
+    private val mainPanel = ExtendedSwing.createFlowPanel(styler)
     mainPanel.hGap = 5
 
     mainPanel.contents ++= iconLabels.map(_.component)
@@ -119,15 +119,16 @@ object JComponent:
 
     override def component[T >: Component]: T = mainPanel
 
-  case class JTabbedPane(iconLabels: JIconLabel*) extends JComponent:
+  case class JTabbedPane(iconLabels: JIconLabel*) extends ComposedSwing:
     private val styler =
       JStyler.rectPaletteStyler(JStyler.defaultRect.copy(arc = 10), JStyler.backgroundPalette(Theme.light.element))
 
-    private val mainPanel  = JItem.createBorderPanel(styler)
-    private val pagesPanel = JItem.createFlowPanel(JStyler.transparent)
+    private val mainPanel  = ExtendedSwing.createBorderPanel(styler)
+    private val pagesPanel = ExtendedSwing.createFlowPanel(JStyler.transparent)
 
     private val navBar = createNavbar(iconLabels: _*)
-    private val pages  = iconLabels.map(iconLabel => (iconLabel, JItem.createFlowPanel(JStyler.transparent))).toMap
+    private val pages =
+      iconLabels.map(iconLabel => (iconLabel, ExtendedSwing.createFlowPanel(JStyler.transparent))).toMap
 
     pages.values.foreach(_.visible = false)
     pagesPanel.contents ++= pages.values
@@ -144,13 +145,13 @@ object JComponent:
       }
     )
 
-    def paneOf(label: JIconLabel): JItem.JFlowPanelItem = pages(label)
-    override def component[T >: Component]: T           = mainPanel
+    def paneOf(label: JIconLabel): ExtendedSwing.JFlowPanelItem = pages(label)
+    override def component[T >: Component]: T                   = mainPanel
 
-  case class JInsertForm(title: String, infoTextField: JInfoTextField*) extends JComponent:
-    private val mainPanel = JItem.createBorderPanel(JStyler.transparent)
-    private val formPanel = JItem.createBoxPanel(Orientation.Vertical, JStyler.transparent)
-    val titleLabel        = JItem.label(title, JStyler.transparent)
+  case class JInsertForm(title: String, infoTextField: JInfoTextField*) extends ComposedSwing:
+    private val mainPanel = ExtendedSwing.createBorderPanel(JStyler.transparent)
+    private val formPanel = ExtendedSwing.createBoxPanel(Orientation.Vertical, JStyler.transparent)
+    val titleLabel        = ExtendedSwing.label(title, JStyler.transparent)
 
     private val titleSpace  = 5
     private val fieldsSpace = 15
@@ -167,8 +168,8 @@ object JComponent:
 
     override def component[T >: Component]: T = mainPanel
 
-  case class JToggleIconButton(onIconPath: String, offIconPath: String) extends JComponent:
-    private val mainPanel = JItem.createFlowPanel(JStyler.transparent)
+  case class JToggleIconButton(onIconPath: String, offIconPath: String) extends ComposedSwing:
+    private val mainPanel = ExtendedSwing.createFlowPanel(JStyler.transparent)
     private val onIcon    = createSVGPanel(onIconPath, Theme.light.background)
     private val offIcon   = createSVGPanel(offIconPath, Theme.light.background)
     private val size      = 40

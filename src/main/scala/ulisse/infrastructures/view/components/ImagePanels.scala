@@ -9,7 +9,7 @@ import javax.imageio.ImageIO
 import scala.swing.{Component, Graphics2D, Panel, UIElement}
 
 object ImagePanels:
-  trait ImagePanel          extends JItem with Rotatable
+  trait ImagePanel          extends ExtendedSwing with Rotatable
   trait ColorableImagePanel extends ImagePanel with Colorable
 
   object ImagePanel:
@@ -18,7 +18,7 @@ object ImagePanels:
     def createDrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit): ImagePanel = DrawnPanel(iconDrawer)
 
   private final case class ImagePanelImpl(imagePath: String)
-      extends ImagePanel with JItem(JStyler.transparent):
+      extends ImagePanel with ExtendedSwing(JStyler.transparent):
     private val image = ImageIO.read(ClassLoader.getSystemResource(imagePath))
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
@@ -27,7 +27,7 @@ object ImagePanels:
       g.drawImage(image, (peer.getWidth - size) / 2, (peer.getHeight - size) / 2, size, size, peer)
 
   private final case class SVGPanel(svgPath: String, _color: Color)
-      extends ColorableImagePanel with JItem(JStyler.transparent):
+      extends ColorableImagePanel with ExtendedSwing(JStyler.transparent):
     private val rawIcon = new FlatSVGIcon(svgPath)
     rawIcon.setColorFilter(ColorFilter(_ => color))
     opaque = false
@@ -44,7 +44,7 @@ object ImagePanels:
       icon.paintIcon(peer, g, (peer.getWidth - icon.getWidth) / 2, (peer.getHeight - icon.getHeight) / 2)
 
   private final case class DrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit)
-      extends ImagePanel with JItem(JStyler.transparent):
+      extends ImagePanel with ExtendedSwing(JStyler.transparent):
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
       iconDrawer(this, g)

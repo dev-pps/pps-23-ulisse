@@ -11,7 +11,7 @@ import ulisse.infrastructures.view.components.Selectables.Selectable
 import scala.swing.{BoxPanel, Component, Label, Orientation, SequentialContainer}
 
 object Cards:
-  trait JImageCard extends JItem with SequentialContainer.Wrapper:
+  trait JImageCard extends ExtendedSwing with SequentialContainer.Wrapper:
     val image: ImagePanel
     val content: Component
     def reverse(): JImageCard =
@@ -95,7 +95,7 @@ object Cards:
       content: Component,
       orientation: Orientation.Value,
       styler: JStyler.JStyler
-  ) extends BoxPanel(orientation) with JItem(styler):
+  ) extends BoxPanel(orientation) with ExtendedSwing(styler):
     listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
     contents += image.align(imageConfiguration.alignment); contents += content
 

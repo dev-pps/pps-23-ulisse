@@ -48,25 +48,25 @@ object ComponentUtils:
       case None => component
 
     def alignLeft(): Component =
-      val wrapper = JItem.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
+      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
       wrapper.contents += component
       wrapper.contents += Swing.HGlue
       wrapper
 
     def alignRight(): Component =
-      val wrapper = JItem.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
+      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
       wrapper.contents += Swing.HGlue
       wrapper.contents += component
       wrapper
 
     def alignTop(): Component =
-      val wrapper = JItem.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
+      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
       wrapper.contents += component
       wrapper.contents += Swing.VGlue
       wrapper
 
     def alignBottom(): Component =
-      val wrapper = JItem.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
+      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
       wrapper.contents += Swing.VGlue
       wrapper.contents += component
       wrapper
@@ -104,7 +104,7 @@ object ComponentUtils:
       component.listenTo(ps*)
       component
 
-  extension [J <: JItem](j: J)
+  extension [J <: ExtendedSwing](j: J)
     def styler(styler: JStyler.JStyler): J =
       j.setStyler(styler)
       j
