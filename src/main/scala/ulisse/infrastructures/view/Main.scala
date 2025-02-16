@@ -3,22 +3,13 @@ package ulisse.infrastructures.view
 import ulisse.adapters.input.{SimulationPageAdapter, StationEditorAdapter}
 import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.adapters.output.{SimulationNotificationAdapter, SimulationNotificationAdapterRequirements}
-import ulisse.applications.AppState
-import ulisse.applications.managers.StationManager
-import ulisse.applications.useCases.{SimulationService, StationService}
 import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.applications.managers.StationManager
-import ulisse.applications.useCases.{RouteService, StationService}
-import ulisse.entities.Coordinate
 import ulisse.applications.managers.{SimulationManager, StationManager}
-import ulisse.applications.useCases.RouteUIService.RouteUIInputService
-import ulisse.applications.useCases.{SimulationService, StationService}
+import ulisse.applications.useCases.{RouteService, SimulationService, StationService}
 import ulisse.applications.{AppState, SimulationState}
-import ulisse.entities.Coordinates.{Coordinate, Grid}
+import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
-import ulisse.entities.station.Station.CheckedStation
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
-import ulisse.infrastructures.view.StationTypes.*
 import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.simulation.SimulationPage
 import ulisse.infrastructures.view.station.StationEditorView
@@ -36,7 +27,7 @@ def runEngines(): Unit =
       event(state)
     )
   )
-  val initialState = AppState[S](StationManager.createCheckedStationManager())
+  val initialState = AppState(StationManager())
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )

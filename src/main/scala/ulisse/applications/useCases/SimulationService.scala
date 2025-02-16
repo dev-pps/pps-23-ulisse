@@ -16,10 +16,10 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 
 final case class SimulationService(
     eventQueue: LinkedBlockingQueue[AppState => AppState],
-    notificationService: SimulationPorts.Output,
-    timeProviderService: UtilityPorts.Output.TimeProviderPort
+    simulationEvents: LinkedBlockingQueue[SimulationState => SimulationState],
+    notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
-  eventQueue.add((appState: AppState[S]) => {
+  eventQueue.add((appState: AppState) => {
     simulationEvents.add((state: SimulationState) => {
       state.copy(simulationManager =
         state.simulationManager.withNotificationService(notificationService).setup(SimulationEnvironment(
