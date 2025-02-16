@@ -17,11 +17,10 @@ import scala.concurrent.duration.Duration
 
 class SimulationServiceTest extends AnyWordSpec with Matchers:
 
-  private type S = Station[?]
   private val notificationService     = mock[SimulationPorts.Output]
   private val timeProviderService     = mock[UtilityPorts.Output.TimeProviderPort]
-  private val initialState            = AppState[S](StationManager.createCheckedStationManager())
-  private val eventQueue              = LinkedBlockingQueue[AppState[S] => AppState[S]]()
+  private val initialState            = AppState(StationManager())
+  private val eventQueue              = LinkedBlockingQueue[AppState => AppState]()
   private val initialSimulationState  = SimulationState(SimulationManager.emptyBatchManager(timeProviderService))
   private val simulationQueue         = LinkedBlockingQueue[SimulationState => SimulationState]()
   private val simulationService       = SimulationService(eventQueue, simulationQueue, notificationService)
