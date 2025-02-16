@@ -26,11 +26,10 @@ object ScheduleTime:
   def EndScheduleTime(arriving: Option[ClockTime]): ScheduleTime =
     ScheduleTime(arriving = arriving, waitTime = None, departure = None)
 
-  def AutoScheduleTime(arriving: Option[ClockTime], waitTime: Option[WaitTime]): ScheduleTime =
+  def AutoScheduleTime(arriving: ClockTime, waitTime: Option[WaitTime]): ScheduleTime =
     import ulisse.utils.Times.FluentDeclaration
     val departure =
       for
-        a <- arriving
-        u <- (a ++ h(0).m(waitTime.getOrElse(0))).toOption
+        u <- (arriving ++ h(0).m(waitTime.getOrElse(0))).toOption
       yield u
-    ScheduleTime(arriving = arriving, waitTime = waitTime, departure = departure)
+    ScheduleTime(arriving = Some(arriving), waitTime = waitTime, departure = departure)

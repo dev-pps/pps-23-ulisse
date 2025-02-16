@@ -114,7 +114,7 @@ object TimetableManagers:
         for
           trainTimetables <- tablesOf(trainName)
           train           <- timetables.keys.find(_.name.contentEquals(trainName)).toRight(TimetableNotFound(trainName))
-          table <- trainTimetables.find(t => t.departureTime === departureTime).toRight(TimetableNotFound(
+          table <- trainTimetables.find(t => t.departureTime == departureTime).toRight(TimetableNotFound(
             s"not table found with $trainName and departure time $departureTime"
           ))
           updatedTimetables <- Right(timetables.updatedWith(train) {
