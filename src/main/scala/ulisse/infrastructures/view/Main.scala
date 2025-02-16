@@ -44,7 +44,7 @@ final case class StationSettings():
   import ulisse.applications.managers.TechnologyManagers.TechnologyManager
   import ulisse.applications.managers.TrainManagers.TrainManager
   import ulisse.applications.ports.TrainPorts
-  import ulisse.applications.useCases.TrainServiceManagerService
+  import ulisse.applications.useCases.TrainService
   import ulisse.entities.train.Trains.TrainTechnology
   import ulisse.infrastructures.view.train.TrainEditorView
 
@@ -52,7 +52,7 @@ final case class StationSettings():
   val stateEventQueue = LinkedBlockingQueue[AppState => AppState]
 
   // Train Fleet init
-  val trainPort: TrainPorts.Input = TrainServiceManagerService(stateEventQueue)
+  val trainPort: TrainPorts.Input = TrainService(stateEventQueue)
   val trainView                   = TrainEditorView(trainPort)
   // trainView.open()
 
