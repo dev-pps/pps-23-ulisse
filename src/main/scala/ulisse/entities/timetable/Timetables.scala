@@ -1,6 +1,6 @@
 package ulisse.entities.timetable
 
-import ulisse.entities.Coordinates.Coordinate
+import ulisse.entities.Routes.Route
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.ScheduleTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
 import ulisse.entities.train.Trains.Train
@@ -26,12 +26,12 @@ object Timetables:
 
   trait Timetable:
     def train: Train
-    def startStation: StationT
+    def startStation: Station
     def departureTime: ClockTime
     def table: ListMap[Route, Time]
 
   trait TrainTimetable extends Timetable:
-    def arrivingStation: StationT
+    def arrivingStation: Station
     def arrivingTime: Option[ClockTime]
 
   trait TimeEstimator:
@@ -57,9 +57,9 @@ object Timetables:
 
   /** Train timetable to be defined */
   trait PartialTimetable extends Timetable:
-    def stopsIn(station: StationT, waitTime: WaitTime): PartialTimetable
-    def transitIn(station: StationT): PartialTimetable
-    def arrivesTo(station: StationT): TrainTimetable
+    def stopsIn(station: Station, waitTime: WaitTime): PartialTimetable
+    def transitIn(station: Station): PartialTimetable
+    def arrivesTo(station: Station): TrainTimetable
 
   /** Factory of PartialTimetable */
   object PartialTimetable:
@@ -104,7 +104,7 @@ object Timetables:
 
     private case class TrainTimetableImpl(
         private val partialTrainTimetable: PartialTimetable,
-        arrivingStation: StationT
+        arrivingStation: Station
     ) extends TrainTimetable:
       export partialTrainTimetable.{departureTime, startStation, table, train}
       override def arrivingTime: Option[ClockTime] =

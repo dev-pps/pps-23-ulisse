@@ -1,5 +1,7 @@
 package ulisse.entities.timetable
 
+import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.entities.Routes.{IdRoute, TypeRoute}
@@ -8,22 +10,22 @@ import ulisse.entities.station.Station
 
 object MockedEntities:
 
-  type StationT = Station[_]
+//  type StationT = Station
 
-  trait StationManager:
-    def stations: List[StationT]
+//  trait StationManager:
+//    def stations: List[Station]
 
-  trait Route:
-    val id: IdRoute
-    val departure: StationT
-    val arrival: StationT
-    val typology: TypeRoute
-    val technology: Technology
-    val railsCount: Int
-    val length: Double
+//  trait Route:
+//    val id: IdRoute
+//    val departure: StationT
+//    val arrival: StationT
+//    val typology: TypeRoute
+//    val technology: Technology
+//    val railsCount: Int
+//    val length: Double
 
-  trait RouteManager:
-    def routes: List[Route]
+//  trait RouteManager:
+//    def routes: List[Route]
 
   trait AppStateTimetable:
     def trainManager: TrainManager
