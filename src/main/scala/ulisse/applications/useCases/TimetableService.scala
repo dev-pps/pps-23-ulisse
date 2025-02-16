@@ -10,9 +10,10 @@ import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{
   TrainTablesNotExist
 }
 import ulisse.applications.ports.TimetablePorts.{RequestResult, StationId, TimetableServiceErrors}
+import ulisse.entities.Routes.Route
 import ulisse.entities.Technology
 import ulisse.entities.station.Station
-import ulisse.entities.timetable.MockedEntities.*
+import ulisse.entities.timetable.MockedEntities.AppStateTimetable
 import ulisse.entities.timetable.Timetables.{PartialTimetable, TrainTimetable}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.BaseError
@@ -29,7 +30,7 @@ import scala.concurrent.{Future, Promise}
 final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateTimetable => AppStateTimetable])
     extends TimetablePorts.Input:
 
-  private case class ValidRoute(stations: (StationT, StationT), waitTime: Option[Int], speedLimit: Int)
+  private case class ValidRoute(stations: (Station, Station), waitTime: Option[Int], speedLimit: Int)
 
   extension (toCheck: List[(StationId, Option[Int])])
     /** @param existingRoutes
