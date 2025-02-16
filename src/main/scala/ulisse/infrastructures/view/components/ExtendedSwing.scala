@@ -7,7 +7,7 @@ import javax.swing.BorderFactory
 import scala.swing.{Font as SwingFont, *}
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
-trait JItem(private var styler: JStyler) extends Component:
+trait ExtendedSwing(private var styler: JStyler) extends Component:
   private var currentColor = styler.background
   listenTo(mouse.moves, mouse.clicks)
   opaque = false
@@ -42,7 +42,8 @@ trait JItem(private var styler: JStyler) extends Component:
     initStyler()
 
   reactions += {
-    case event.MouseEntered(_, _, _) => styler.hoverColor.map(color =>
+    case event.MouseEntered(_, _, _) =>
+      styler.hoverColor.map(color =>
         currentColor = color
         repaint()
       )
@@ -77,30 +78,27 @@ trait JItem(private var styler: JStyler) extends Component:
     g.fillRoundRect(0, 0, size.width, size.height, styler.arc, styler.arc)
     super.paintComponent(g)
 
-object JItem:
+object ExtendedSwing:
 
-  case class JBorderPanelItem()(jStyler: JStyler) extends BorderPanel with JItem(jStyler):
-    opaque = false
+  case class JBorderPanelItem()(jStyler: JStyler) extends BorderPanel with ExtendedSwing(jStyler)
+//    opaque = false
 
-  case class JFlowPanelItem()(jStyler: JStyler) extends FlowPanel with JItem(jStyler):
-    private val layout = new FlowLayout(FlowLayout.CENTER, 0, 0)
-    peer.setLayout(layout)
-    opaque = false
-    export layout._
+  case class JFlowPanelItem()(jStyler: JStyler) extends FlowPanel with ExtendedSwing(jStyler)
+  private val layout = new FlowLayout(FlowLayout.CENTER, 0, 0)
+  peer.setLayout(layout)
+//    opaque = false
+  export layout._
 
   case class JBoxPanelItem(orientation: Orientation.Value)(jStyler: JStyler) extends BoxPanel(orientation)
-      with JItem(jStyler):
-    opaque = false
+      with ExtendedSwing(jStyler)
+//    opaque = false
 
-  case class JPanelItem()(jStyler: JStyler) extends Panel with JItem(jStyler)
+  case class JPanelItem()(jStyler: JStyler) extends Panel with ExtendedSwing(jStyler)
 
-  case class JButtonItem(label: String)(jStyler: JStyler) extends Button(label) with JItem(jStyler):
-    focusPainted = false
-    borderPainted = false
-    contentAreaFilled = false
+  case class JButtonItem(label: String)(jStyler: JStyler) extends Button(label) with ExtendedSwing(jStyler)
 
-  case class JLabelItem(label: String)(jStyler: JStyler)  extends Label(label) with JItem(jStyler)
-  case class JTextFieldItem(colum: Int)(jStyler: JStyler) extends TextField(colum) with JItem(jStyler)
+  case class JLabelItem(label: String)(jStyler: JStyler)  extends Label(label) with ExtendedSwing(jStyler)
+  case class JTextFieldItem(colum: Int)(jStyler: JStyler) extends TextField(colum) with ExtendedSwing(jStyler)
 
   def createBorderPanel(styler: JStyler): JBorderPanelItem = JBorderPanelItem()(styler)
   def createFlowPanel(styler: JStyler): JFlowPanelItem     = JFlowPanelItem()(styler)

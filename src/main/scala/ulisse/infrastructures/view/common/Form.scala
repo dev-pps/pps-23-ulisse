@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.common
 
 import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.{JComponent, JItem, JStyler}
+import ulisse.infrastructures.view.components.{ComposedSwing, ExtendedSwing, JStyler}
 import ulisse.infrastructures.view.map.ViewObservers.ViewObserver
 
 import scala.swing.Font.Style
@@ -37,12 +37,12 @@ object Form:
   private val falseButtonStyler =
     buttonStyler.copy(palette = buttonStyler.palette.copy(clickColor = Some(Theme.light.falseClick)))
 
-  private case class BaseForm(title: String, fields: JComponent.JInfoTextField*):
-    private val mainPanel: JItem.JBoxPanelItem     = JItem.createBoxPanel(Orientation.Vertical, formStyler)
-    private val insertForm: JComponent.JInsertForm = JComponent.createInsertForm(title, fields: _*)
-    private val space                              = 10
+  private case class BaseForm(title: String, fields: ComposedSwing.JInfoTextField*):
+    private val mainPanel: ExtendedSwing.JBoxPanelItem = ExtendedSwing.createBoxPanel(Orientation.Vertical, formStyler)
+    private val insertForm: ComposedSwing.JInsertForm  = ComposedSwing.createInsertForm(title, fields: _*)
+    private val space                                  = 10
 
-    val buttonPanel: JItem.JFlowPanelItem = JItem.createFlowPanel(JStyler.transparent)
+    val buttonPanel: ExtendedSwing.JFlowPanelItem = ExtendedSwing.createFlowPanel(JStyler.transparent)
 
     insertForm.titleLabel.setStyler(insertForm.titleLabel.getStyler.copy(font = titleFont))
 
@@ -54,15 +54,15 @@ object Form:
     def component[T >: Component]: T = mainPanel
 
   case class RouteForm() extends Form with ViewObserver[Point]:
-    private val departureStation = JComponent.createInfoTextField("Departure Station")
-    private val arrivalStation   = JComponent.createInfoTextField("Arrival Station")
-    private val routeType        = JComponent.createInfoTextField("Type")
-    private val rails            = JComponent.createInfoTextField("Rails")
-    private val length           = JComponent.createInfoTextField("Length")
+    private val departureStation = ComposedSwing.createInfoTextField("Departure Station")
+    private val arrivalStation   = ComposedSwing.createInfoTextField("Arrival Station")
+    private val routeType        = ComposedSwing.createInfoTextField("Type")
+    private val rails            = ComposedSwing.createInfoTextField("Rails")
+    private val length           = ComposedSwing.createInfoTextField("Length")
 
     private val form         = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
-    private val saveButton   = JItem.button("Save", trueButtonStyler)
-    private val deleteButton = JItem.button("Delete", falseButtonStyler)
+    private val saveButton   = ExtendedSwing.button("Save", trueButtonStyler)
+    private val deleteButton = ExtendedSwing.button("Delete", falseButtonStyler)
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
@@ -80,15 +80,15 @@ object Form:
     override def onRelease(data: Point): Unit = ()
 
   case class StationForm() extends Form with ViewObserver[Point]:
-    private val name      = JComponent.createInfoTextField("Name")
-    private val latitude  = JComponent.createInfoTextField("Latitude")
-    private val longitude = JComponent.createInfoTextField("Longitude")
-    private val tracks    = JComponent.createInfoTextField("Tracks")
+    private val name      = ComposedSwing.createInfoTextField("Name")
+    private val latitude  = ComposedSwing.createInfoTextField("Latitude")
+    private val longitude = ComposedSwing.createInfoTextField("Longitude")
+    private val tracks    = ComposedSwing.createInfoTextField("Tracks")
 
     private val form = BaseForm("Station", name, latitude, longitude, tracks)
 
-    private val saveButton   = JItem.button("Save", trueButtonStyler)
-    private val deleteButton = JItem.button("Delete", falseButtonStyler)
+    private val saveButton   = ExtendedSwing.button("Save", trueButtonStyler)
+    private val deleteButton = ExtendedSwing.button("Delete", falseButtonStyler)
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
@@ -104,14 +104,14 @@ object Form:
     override def onRelease(data: Point): Unit = ()
 
   case class ScheduleForm() extends Form with ViewObserver[Point]:
-    private val field  = JComponent.createInfoTextField("Field")
-    private val field1 = JComponent.createInfoTextField("Field1")
-    private val field2 = JComponent.createInfoTextField("Field2")
+    private val field  = ComposedSwing.createInfoTextField("Field")
+    private val field1 = ComposedSwing.createInfoTextField("Field1")
+    private val field2 = ComposedSwing.createInfoTextField("Field2")
 
     private val form = BaseForm("Schedule", field, field1, field2)
 
-    private val saveButton   = JItem.button("Save", trueButtonStyler)
-    private val deleteButton = JItem.button("Delete", falseButtonStyler)
+    private val saveButton   = ExtendedSwing.button("Save", trueButtonStyler)
+    private val deleteButton = ExtendedSwing.button("Delete", falseButtonStyler)
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
