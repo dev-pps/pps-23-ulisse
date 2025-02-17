@@ -18,7 +18,7 @@ import scala.util.Right
 class StationServiceTest extends AnyWordSpec with Matchers:
 
   private val station       = Station("StationA", Coordinate(0, 0), 1)
-  private val initialState  = AppState(StationManager())
+  private val initialState  = AppState.default()
   private val eventStream   = LinkedBlockingQueue[AppState => AppState]()
   private val inputPort     = StationService(eventStream)
   private def updateState() = runAll(initialState, eventStream)

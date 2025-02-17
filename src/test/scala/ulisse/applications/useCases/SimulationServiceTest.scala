@@ -19,7 +19,7 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
 
   private val notificationService     = mock[SimulationPorts.Output]
   private val timeProviderService     = mock[UtilityPorts.Output.TimeProviderPort]
-  private val initialState            = AppState(StationManager())
+  private val initialState            = AppState.default()
   private val eventQueue              = LinkedBlockingQueue[AppState => AppState]()
   private val initialSimulationState  = SimulationState(SimulationManager.emptyBatchManager(timeProviderService))
   private val simulationQueue         = LinkedBlockingQueue[SimulationState => SimulationState]()
