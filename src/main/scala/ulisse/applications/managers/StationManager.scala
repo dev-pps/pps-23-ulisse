@@ -19,52 +19,23 @@ trait StationManager:
   /** The collection of stations in the manager. */
   val stations: StationMapType
 
-  /** Compares two `StationMap` instances for equality.
-    *
-    * @param other
-    *   The other object to compare with.
-    * @return
-    *   `true` if both station maps have the same stations, `false` otherwise.
-    */
+  /** Compares two `StationMap` instances for equality. */
   override def equals(other: Any): Boolean = other match
     case that: StationManager => that.stations == stations
     case _                    => false
 
-  /** Adds a station to the manager.
-    *
-    * @param station
-    *   The station to add.
-    * @return
-    *   R type
-    */
+  /** Adds a station to the manager. If the station is not accepted by the manager an error is returned */
   def addStation(station: Station): Either[NonEmptyChain[StationManager.Error], StationManager]
 
-  /** Removes a station from the manager.
-    *
-    * @param station
-    *   The station to remove.
-    * @return
-    *   R type
-    */
+  /** Remove a station from the manager. If the station is not recognized by the manager an error is returned */
   def removeStation(station: Station): Either[NonEmptyChain[StationManager.Error], StationManager]
 
-  /** Finds a station at the given location.
-    *
-    * @param coordinate
-    *   The location to search for.
-    * @return
-    *   An `Option` containing the station at the given location, if found.
-    */
+  /** Finds a station at the given location. */
   def findStationAt(coordinate: Coordinate): Option[Station]
 
 /** Factory for [[StationManager]] instances. */
 object StationManager:
-  /** Creates a `StationManager` instance, which is a `StationManager` with validation for unique names and
-    * locations.
-    *
-    * @return
-    *   An empty `CheckedStationManager` instance.
-    */
+  /** Creates a `StationManager` instance, which is a `StationManager` with validation for unique names and locations. */
   def apply(): StationManager = StationManagerImpl(List.empty)
 
   private final case class StationManagerImpl(stations: List[Station]) extends StationManager:
