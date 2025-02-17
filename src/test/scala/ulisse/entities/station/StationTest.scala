@@ -7,36 +7,40 @@ import ulisse.entities.Coordinate
 
 class StationTest extends AnyWordSpec with Matchers:
 
+  private val defaultName          = "name"
+  private val defaultCoordinate    = Coordinate(0, 0)
+  private val defaultNumberOfTrack = 1
+
   "A Station" when:
     "is created" should:
       List(-1, 0, 1, 2).foreach(numberOfTrack =>
-        val station = Station("name", Coordinate(0, 0), numberOfTrack)
-        station.name shouldBe "name"
-        station.coordinate shouldBe Coordinate(0, 0)
+        val station = Station(defaultName, defaultCoordinate, numberOfTrack)
+        station.name shouldBe defaultName
+        station.coordinate shouldBe defaultCoordinate
         station.numberOfTracks shouldBe math.max(1, numberOfTrack)
       )
 
     "is checked" should:
       "be created if the name is not blank and numberOfTracks is greater than 0" in:
-        Station.createNamedStation("name", Coordinate(0, 0), 1) shouldBe a[Right[_, _]]
+        Station.createCheckedStation(defaultName, defaultCoordinate, defaultNumberOfTrack) shouldBe a[Right[_, _]]
 
       "not be created if the name is blank" in:
         List("", "  ").foreach(invalidName =>
-          Station.createNamedStation(invalidName, Coordinate(0, 0), 1) shouldBe Left(
+          Station.createCheckedStation(invalidName, defaultCoordinate, defaultNumberOfTrack) shouldBe Left(
             Chain(Station.Error.InvalidName)
           )
         )
 
       "not be created if capacity is less than or equal to 0" in:
         List(-1, 0).foreach(invalidNumberOfTrack =>
-          Station.createNamedStation(
-            "name",
-            Coordinate(0, 0),
+          Station.createCheckedStation(
+            defaultName,
+            defaultCoordinate,
             invalidNumberOfTrack
           ) shouldBe Left(Chain(Station.Error.InvalidNumberOfTrack))
         )
 
       "return the chain of error" in:
-        Station.createNamedStation("", Coordinate(0, 0), 0) shouldBe Left(
+        Station.createCheckedStation("", defaultCoordinate, 0) shouldBe Left(
           Chain(Station.Error.InvalidName, Station.Error.InvalidNumberOfTrack)
         )
