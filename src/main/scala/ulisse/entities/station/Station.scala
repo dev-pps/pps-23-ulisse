@@ -39,6 +39,6 @@ object Station:
 
   private final case class StationImpl(name: String, coordinate: Coordinate, numberOfTracks: Int) extends Station
 
-  /** Represents errors that can occur during station creation. */
+  /** Represents errors that can occur during `Station` creation. */
   enum Error extends BaseError:
     case InvalidName, InvalidNumberOfTrack

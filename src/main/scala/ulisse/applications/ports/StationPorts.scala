@@ -8,38 +8,19 @@ import ulisse.entities.station.Station
 import scala.concurrent.Future
 
 object StationPorts:
-  /** Trait representing input operations for interacting with a `StationManager`.
-    *
-    * @tparam S
-    *   The type of the station that the underlying manager will handle.
-    */
+  /** Input operations for interacting with a `StationManager`. */
   trait Input:
 
     type SM = StationManager#StationMapType
     type E  = NonEmptyChain[StationManager.Error]
 
-    /** Retrieves the current station map.
-      *
-      * @return
-      *   The `StationMap` containing the stations.
-      */
+    /** Retrieves the current station map. */
     def stationMap: Future[SM]
 
-    /** Adds a station to the station manager.
-      *
-      * @param station
-      *   The station to be added.
-      * @return
-      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
-      */
+    /** Adds a station to the station manager. */
     def addStation(station: Station): Future[Either[E, SM]]
 
     /** Removes a station from the station manager.
-      *
-      * @param station
-      *   The station to be removed.
-      * @return
-      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
       */
     def removeStation(station: Station): Future[Either[E, SM]]
 
