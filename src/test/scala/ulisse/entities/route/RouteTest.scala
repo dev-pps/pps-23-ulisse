@@ -1,10 +1,12 @@
-package ulisse.entities
+package ulisse.entities.route
 
 import cats.data.NonEmptyChain
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.entities.Routes.{Route, TypeRoute}
+import ulisse.entities.route.Routes
+import ulisse.entities.route.Routes.{Route, TypeRoute}
 import ulisse.entities.station.Station
+import ulisse.entities.{Coordinate, RouteTest}
 import ulisse.utils.ValidationUtils.mkStringErrors
 
 object RouteTest:

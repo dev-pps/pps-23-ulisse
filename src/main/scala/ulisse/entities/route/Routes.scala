@@ -1,7 +1,8 @@
-package ulisse.entities
+package ulisse.entities.route
 
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
+import ulisse.entities.Technology
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.ErrorMessage
 import ulisse.utils.ValidationUtils.*

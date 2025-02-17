@@ -5,8 +5,9 @@ import ulisse.applications.managers.SimulationManager
 import ulisse.applications.{AppState, SimulationState}
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
 import ulisse.entities.Coordinate
+import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.Agents.SimulationAgent
-import ulisse.entities.simulation.Environments.{RouteEnvironmentElement, SimulationEnvironment}
+import ulisse.entities.simulation.Environments.SimulationEnvironment
 import ulisse.entities.simulation.Simulations.EngineState
 import ulisse.entities.station.Station
 import ulisse.infrastructures.commons.TimeProviders.*

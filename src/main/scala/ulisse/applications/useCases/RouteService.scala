@@ -3,7 +3,7 @@ package ulisse.applications.useCases
 import cats.syntax.either.*
 import ulisse.applications.managers.RouteManagers.{Errors, RouteManager}
 import ulisse.applications.ports.RoutePorts
-import ulisse.entities.Routes.Route
+import ulisse.entities.route.Routes.Route
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}

@@ -1,7 +1,7 @@
 package ulisse.applications.ports
 
 import ulisse.applications.managers.RouteManagers.Errors
-import ulisse.entities.Routes.Route
+import ulisse.entities.route.Routes.Route
 
 import scala.concurrent.Future
 
