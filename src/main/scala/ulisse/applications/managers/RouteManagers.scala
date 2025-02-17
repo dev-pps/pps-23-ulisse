@@ -1,7 +1,7 @@
 package ulisse.applications.managers
 
 import cats.syntax.either.*
-import ulisse.entities.Routes.{IdRoute, Route}
+import ulisse.entities.route.Routes.{IdRoute, Route}
 import ulisse.utils.Errors.ErrorMessage
 
 import scala.collection.immutable.Map
