@@ -9,6 +9,7 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
 
 /** Defines a `Station`, a place where trains can stop. */
 trait Station:
+  val id: Int
   val name: String
   val coordinate: Coordinate
   val numberOfTracks: Int
@@ -37,7 +38,8 @@ object Station:
       validatePositive(numberOfTrack, Station.Error.InvalidNumberOfTrack).toValidatedNec
     ).mapN(Station(_, coordinate, _)).toEither
 
-  private final case class StationImpl(name: String, coordinate: Coordinate, numberOfTracks: Int) extends Station
+  private final case class StationImpl(name: String, coordinate: Coordinate, numberOfTracks: Int) extends Station:
+    val id: Int = hashCode()
 
   /** Represents errors that can occur during `Station` creation. */
   enum Error extends BaseError:

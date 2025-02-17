@@ -1,4 +1,4 @@
-package ulisse.applications.adapters.input
+package ulisse.adapters.input
 
 import cats.data.{Chain, NonEmptyChain}
 import org.scalatest.matchers.should.Matchers
