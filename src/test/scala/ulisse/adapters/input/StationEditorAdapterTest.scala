@@ -25,7 +25,7 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
   private val numberOfTrack = 1
   private val station       = Station(stationName, Coordinate(x, y), numberOfTrack)
 
-  private val initialState = AppState(StationManager())
+  private val initialState = AppState.default()
   private val eventStream  = LinkedBlockingQueue[AppState => AppState]()
   private val inputPort    = StationService(eventStream)
   private val controller   = StationEditorAdapter(inputPort)
