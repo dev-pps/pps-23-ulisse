@@ -26,6 +26,9 @@ object Track:
     val step: Int => Int = _ + 1
     List.tabulate(numberOfTracks)(i => TrackImpl(step(i), None))
 
+  extension (track: Track)
+    def withTrain(train: Option[Train]): Track = TrackImpl(track.platform, train)
+
   /** Represents errors that can occur during `Track` creation. */
   enum Error extends BaseError:
     case InvalidPlatformNumber
