@@ -1,13 +1,13 @@
 package ulisse.entities.simulation
 
-import ulisse.entities.Routes.Route
-import ulisse.entities.simulation.Agents.{SimulationAgent, TrainAgent}
+import ulisse.entities.route.RouteEnvironmentElement
+import ulisse.entities.route.Routes.Route
+import ulisse.entities.simulation.Agents.SimulationAgent
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.StationEnvironmentElement
+import ulisse.entities.train.TrainAgent
 
 object Environments:
-  trait RouteEnvironmentElement extends Route:
-    val trains: Seq[Seq[TrainAgent]]
 
   trait SimulationEnvironment:
     def doStep(dt: Int): SimulationEnvironment
