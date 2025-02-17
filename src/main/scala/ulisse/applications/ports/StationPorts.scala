@@ -1,64 +1,30 @@
 package ulisse.applications.ports
 
 import cats.data.NonEmptyChain
-import ulisse.applications.managers.{CheckedStationManager, StationManager}
+import ulisse.applications.managers.StationManager
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 
 import scala.concurrent.Future
 
 object StationPorts:
-  /** Trait representing input operations for interacting with a `StationManager`.
-    *
-    * @tparam S
-    *   The type of the station that the underlying manager will handle.
-    */
+  /** Input operations for interacting with a `StationManager`. */
   trait Input:
 
-    type SM = CheckedStationManager#StationMapType
-    type E  = NonEmptyChain[CheckedStationManager#E]
+    type SM = StationManager#StationMapType
+    type E  = NonEmptyChain[StationManager.Error]
 
-    /** Retrieves the current station map.
-      *
-      * @return
-      *   The `StationMap` containing the stations.
-      */
+    /** Retrieves the current `Station` collection. */
     def stationMap: Future[SM]
 
-    /** Adds a station to the station manager.
-      *
-      * @param station
-      *   The station to be added.
-      * @return
-      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
-      */
+    /** Adds a `Station` to the station manager or return an error if it fails. */
     def addStation(station: Station): Future[Either[E, SM]]
 
-    /** Removes a station from the station manager.
-      *
-      * @param station
-      *   The station to be removed.
-      * @return
-      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
-      */
+    /** Removes a `Station` from the station manager or return an error if it fails. */
     def removeStation(station: Station): Future[Either[E, SM]]
 
-    /** Updates a station from the station manager.
-      *
-      * @param oldStation
-      *   The station to update.
-      * @param newStation
-      *   The new station that replaces the old station.
-      * @return
-      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
-      */
+    /** Updates a `Station` from the station manager or return an error if it fails. */
     def updateStation(oldStation: Station, newStation: Station): Future[Either[E, SM]]
 
-    /** Finds a station at a specified location.
-      *
-      * @param coordinate
-      *   The coordinate to search for a station.
-      * @return
-      *   An `Option` containing the station at the specified location, if it exists.
-      */
+    /** Finds a `Station` at a specified location. */
     def findStationAt(coordinate: Coordinate): Future[Option[Station]]

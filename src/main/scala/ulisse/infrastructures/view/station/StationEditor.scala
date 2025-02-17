@@ -1,11 +1,10 @@
 package ulisse.infrastructures.view.station
 
 import ulisse.adapters.input.StationEditorAdapter
-import ulisse.applications.managers.CheckedStationManager
+import ulisse.applications.managers.StationManager
 import ulisse.entities.Coordinate
 import ulisse.entities.Coordinate.*
 import ulisse.entities.station.Station
-import ulisse.entities.station.Station.CheckedStation
 
 import java.awt.Color
 import scala.concurrent.ExecutionContext
@@ -16,9 +15,6 @@ import scala.util.Success
 
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
   Swing.onEDT(runnable.run())
-
-//type N = Int
-//type S = CheckedStation
 
 /** A Card displaying station information.
   *
@@ -234,8 +230,9 @@ final case class StationForm(
       case ButtonClicked(_) =>
         controller.onOkClick(
           stationName.text,
-          Coordinate(latitude.text.toInt, longitude.text.toInt),
-          numberOfTrack.text.toInt,
+          latitude.text,
+          longitude.text,
+          numberOfTrack.text,
           station
         )
         onBackClick()

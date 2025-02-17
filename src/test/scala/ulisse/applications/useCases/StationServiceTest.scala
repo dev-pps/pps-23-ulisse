@@ -6,7 +6,6 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.Runner.runAll
 import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager
-import ulisse.applications.managers.StationManager.CheckedStationManager
 import ulisse.entities.Coordinate
 import ulisse.entities.Coordinate.*
 import ulisse.entities.station.Station
@@ -19,7 +18,7 @@ import scala.util.Right
 class StationServiceTest extends AnyWordSpec with Matchers:
 
   private val station       = Station("StationA", Coordinate(0, 0), 1)
-  private val initialState  = AppState(StationManager.createCheckedStationManager())
+  private val initialState  = AppState(StationManager())
   private val eventStream   = LinkedBlockingQueue[AppState => AppState]()
   private val inputPort     = StationService(eventStream)
   private def updateState() = runAll(initialState, eventStream)
@@ -41,8 +40,8 @@ class StationServiceTest extends AnyWordSpec with Matchers:
       updateState()
       Await.result(addStationResult, Duration.Inf) shouldBe Right(List(station))
       Await.result(addSameStationResult, Duration.Inf) shouldBe Left(Chain(
-        CheckedStationManager.Error.DuplicateStationName,
-        CheckedStationManager.Error.DuplicateStationLocation
+        StationManager.Error.DuplicateStationName,
+        StationManager.Error.DuplicateStationLocation
       ))
       Await.result(stationMapResult, Duration.Inf) shouldBe List(station)
 
@@ -61,7 +60,7 @@ class StationServiceTest extends AnyWordSpec with Matchers:
       val stationMapResult    = inputPort.stationMap
       updateState()
 
-      Await.result(removeStationResult, Duration.Inf) shouldBe Left(Chain(CheckedStationManager.Error.StationNotFound))
+      Await.result(removeStationResult, Duration.Inf) shouldBe Left(Chain(StationManager.Error.StationNotFound))
       Await.result(stationMapResult, Duration.Inf) shouldBe List()
 
     "update a present station in the station manager" in:
@@ -81,5 +80,5 @@ class StationServiceTest extends AnyWordSpec with Matchers:
       val stationMapResult    = inputPort.stationMap
 
       updateState()
-      Await.result(updateStationResult, Duration.Inf) shouldBe Left(Chain(CheckedStationManager.Error.StationNotFound))
+      Await.result(updateStationResult, Duration.Inf) shouldBe Left(Chain(StationManager.Error.StationNotFound))
       Await.result(stationMapResult, Duration.Inf) shouldBe List()
