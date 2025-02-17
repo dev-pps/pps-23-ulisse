@@ -4,8 +4,8 @@ import cats.syntax.either.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.applications.managers.RouteManagers.{Errors, RouteManager}
-import ulisse.entities.RouteTest.*
-import ulisse.entities.Routes.*
+import ulisse.entities.route.RouteTest.*
+import ulisse.entities.route.Routes.*
 
 object RouteManagerTest:
   val validateRoute: ValidationRoute          = Route(departure, arrival, typeRoute, railsCount, pathLength)
