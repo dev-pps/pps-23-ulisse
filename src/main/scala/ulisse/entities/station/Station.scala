@@ -21,7 +21,6 @@ trait Station:
     case _ => false
 
 trait StationEnvironmentElement extends Station:
-  export Station.*
   val tracks: List[Track]
 
 /** Factory for [[Station]] instances. */
