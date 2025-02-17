@@ -81,17 +81,14 @@ trait ExtendedSwing(private var styler: JStyler) extends Component:
 object ExtendedSwing:
 
   case class JBorderPanelItem()(jStyler: JStyler) extends BorderPanel with ExtendedSwing(jStyler)
-//    opaque = false
 
-  case class JFlowPanelItem()(jStyler: JStyler) extends FlowPanel with ExtendedSwing(jStyler)
-  private val layout = new FlowLayout(FlowLayout.CENTER, 0, 0)
-  peer.setLayout(layout)
-//    opaque = false
-  export layout._
+  case class JFlowPanelItem()(jStyler: JStyler) extends FlowPanel with ExtendedSwing(jStyler):
+    private val layout = new FlowLayout(FlowLayout.CENTER, 0, 0)
+    peer.setLayout(layout)
+    export layout._
 
   case class JBoxPanelItem(orientation: Orientation.Value)(jStyler: JStyler) extends BoxPanel(orientation)
       with ExtendedSwing(jStyler)
-//    opaque = false
 
   case class JPanelItem()(jStyler: JStyler) extends Panel with ExtendedSwing(jStyler)
 
