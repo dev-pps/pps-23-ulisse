@@ -4,6 +4,10 @@ import cats.{Functor, Monad}
 import ulisse.entities.simulation.Environments.SimulationEnvironment
 
 object Simulations:
+  object Actions:
+    sealed trait SimulationAction
+    final case class MoveBy(distance: Double) extends SimulationAction
+
   object EngineState:
     def empty(): EngineState = EngineState(false, None, None, 0, 0)
 
