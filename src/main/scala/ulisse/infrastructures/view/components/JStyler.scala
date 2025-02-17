@@ -42,7 +42,6 @@ object JStyler:
   case class JStyler(rect: Rect, palette: Palette, font: Font, border: Option[Border]):
     export rect._, palette._, font._
     val all: List[JStyle] = List(rect, palette, font) ++ border.toList
-    val swingFont         = new SwingFont(font.nameFont, font.styleFont.id, font.sizeFont)
 
   trait JStyle
   private object JStyles:
@@ -83,8 +82,9 @@ object JStyler:
 
     case class Rect(size: Size, padding: Padding, arc: Int)                                     extends JStyle
     case class Palette(background: Color, clickColor: Option[Color], hoverColor: Option[Color]) extends JStyle
-    case class Font(nameFont: String, styleFont: StyleFont, colorFont: Color, sizeFont: Int)    extends JStyle
-    case class Border(color: Color, stroke: Int)                                                extends JStyle
+    case class Font(nameFont: String, styleFont: StyleFont, colorFont: Color, sizeFont: Int) extends JStyle:
+      val swingFont: SwingFont = new SwingFont(nameFont, styleFont.id, sizeFont)
+    case class Border(color: Color, stroke: Int) extends JStyle
 
     def createSize(width: Int, height: Int): Size = Dimension2D(Some(width), Some(height))
     def createWidthSize(width: Int): Size         = Dimension2D(Some(width), defaultSizeRect.height)
