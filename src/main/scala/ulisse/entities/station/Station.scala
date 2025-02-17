@@ -19,6 +19,10 @@ trait Station:
       numberOfTracks == s.numberOfTracks
     case _ => false
 
+trait StationEnvironmentElement extends Station:
+  export Station.*
+  val tracks: List[Track]
+
 /** Factory for [[Station]] instances. */
 object Station:
   /** Creates a `Station` instance. The resulting station has at least 1 track. */
@@ -36,6 +40,13 @@ object Station:
       validateNonBlankString(name, Station.Error.InvalidName).toValidatedNec,
       validatePositive(numberOfTrack, Station.Error.InvalidNumberOfTrack).toValidatedNec
     ).mapN(Station(_, coordinate, _)).toEither
+
+  def createStationEnvironmentElement(station: Station): StationEnvironmentElement =
+    StationEnvironmentElementImpl(station)
+
+  private final case class StationEnvironmentElementImpl(station: Station) extends StationEnvironmentElement:
+    export station.*
+    val tracks: List[Track] = Track.generateSequentialTracks(numberOfTracks)
 
   private final case class StationImpl(name: String, coordinate: Coordinate, numberOfTracks: Int) extends Station
 
