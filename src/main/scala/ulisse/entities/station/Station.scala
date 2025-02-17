@@ -4,6 +4,7 @@ import cats.data.NonEmptyChain
 import cats.implicits.catsSyntaxEq
 import cats.syntax.all.*
 import ulisse.entities.Coordinate
+import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
 
@@ -22,6 +23,8 @@ trait Station:
 
 trait StationEnvironmentElement extends Station:
   val tracks: List[Track]
+  def firstAvailableTrack: Option[Track] = tracks.find(_.train.isEmpty)
+  def updateTrack(track: Track, train: Option[Train]): StationEnvironmentElement
 
 /** Factory for [[Station]] instances. */
 object Station:
@@ -45,11 +48,13 @@ object Station:
     val id: Int = hashCode()
 
   def createStationEnvironmentElement(station: Station): StationEnvironmentElement =
-    StationEnvironmentElementImpl(station)
+    StationEnvironmentElementImpl(station, Track.generateSequentialTracks(station.numberOfTracks))
 
-  private final case class StationEnvironmentElementImpl(station: Station) extends StationEnvironmentElement:
+  private final case class StationEnvironmentElementImpl(station: Station, tracks: List[Track])
+      extends StationEnvironmentElement:
     export station.*
-    val tracks: List[Track] = Track.generateSequentialTracks(numberOfTracks)
+    def updateTrack(track: Track, train: Option[Train]): StationEnvironmentElement =
+      copy(tracks = tracks.map(t => if t == track then t.withTrain(train) else t))
 
   /** Represents errors that can occur during `Station` creation. */
   enum Error extends BaseError:
