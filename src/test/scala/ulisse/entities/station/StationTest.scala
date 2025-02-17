@@ -15,6 +15,7 @@ class StationTest extends AnyWordSpec with Matchers:
     "is created" should:
       List(-1, 0, 1, 2).foreach(numberOfTrack =>
         val station = Station(defaultName, defaultCoordinate, numberOfTrack)
+        station.id shouldBe station.hashCode()
         station.name shouldBe defaultName
         station.coordinate shouldBe defaultCoordinate
         station.numberOfTracks shouldBe math.max(1, numberOfTrack)
@@ -22,7 +23,11 @@ class StationTest extends AnyWordSpec with Matchers:
 
     "is checked" should:
       "be created if the name is not blank and numberOfTracks is greater than 0" in:
-        Station.createCheckedStation(defaultName, defaultCoordinate, defaultNumberOfTrack) shouldBe a[Right[_, _]]
+        Station.createCheckedStation(defaultName, defaultCoordinate, defaultNumberOfTrack) shouldBe Right(Station(
+          defaultName,
+          defaultCoordinate,
+          defaultNumberOfTrack
+        ))
 
       "not be created if the name is blank" in:
         List("", "  ").foreach(invalidName =>
