@@ -1,9 +1,20 @@
 package ulisse.applications
 
+import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.entities.station.Station
+import ulisse.entities.train.Trains.TrainTechnology
+
+object AppState:
+  def default(): AppState =
+    AppState(StationManager(), RouteManager.empty(), TrainManager(List.empty), TechnologyManager(List.empty))
 
 final case class AppState(
-    stationManager: StationManager
+    stationManager: StationManager,
+    routeManager: RouteManager,
+    trainManager: TrainManager,
+    technologyManager: TechnologyManager[TrainTechnology]
 )
 final case class SimulationState(simulationManager: SimulationManager)
