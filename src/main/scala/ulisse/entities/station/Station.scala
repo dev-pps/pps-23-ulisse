@@ -7,11 +7,7 @@ import ulisse.entities.Coordinate
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
 
-/** Defines a Station.
-  *
-  * A `Station` is a location where trains can stop. Each station has a name, a location, and a number of
-  * tracks.
-  */
+/** Defines a `Station`, a place where trains can stop. */
 trait Station:
   val name: String
   val coordinate: Coordinate
@@ -25,32 +21,12 @@ trait Station:
 
 /** Factory for [[Station]] instances. */
 object Station:
-  /** Creates a `Station` instance.
-    *
-    * @param name
-    *   The name of the station.
-    * @param coordinate
-    *   The location of the station.
-    * @param numberOfTrack
-    *   The number of tracks.
-    * @return
-    *   A `Station` instance.
-    */
+  /** Creates a `Station` instance. The resulting station has at least 1 track. */
   def apply(name: String, coordinate: Coordinate, numberOfTrack: Int): Station =
     val minNumberOfTracks = 1
     StationImpl(name, coordinate, math.max(minNumberOfTracks, numberOfTrack))
 
-  /** Creates a `Station` instance with validation.
-    *
-    * @param name
-    *   The name of the station. Must not be empty or blank.
-    * @param coordinate
-    *   The location of the station.
-    * @param numberOfTrack
-    *   The number of tracks. Must be greater than 0.
-    * @return
-    *   Either a `Station` instance or a `NonEmptyChain` of `Errors` indicating the issues.
-    */
+  /** Creates a `Station` instance with validation. The resulting station must have non-blank name and positive numberOfTrack */
   def createCheckedStation(
       name: String,
       coordinate: Coordinate,

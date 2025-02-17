@@ -19,17 +19,6 @@ trait StationManager:
   /** The collection of stations in the manager. */
   val stations: StationMapType
 
-  /** Transforms the stations using a function `f`.
-    *
-    * @tparam B
-    *   The type of the result.
-    * @param f
-    *   The function to apply to each station.
-    * @return
-    *   A list of results obtained by applying the function to each station.
-    */
-  def map[B](f: Station => B): List[B]
-
   /** Compares two `StationMap` instances for equality.
     *
     * @param other
