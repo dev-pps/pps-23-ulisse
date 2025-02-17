@@ -5,7 +5,7 @@ import org.scalatest.matchers.must.Matchers
 import ulisse.Runner.runAll
 import ulisse.applications.managers.RouteManagerTest.*
 import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.entities.RouteTest
+import ulisse.entities.route.RouteTest
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Await
