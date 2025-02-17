@@ -3,9 +3,7 @@ package ulisse.applications.managers
 import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import ulisse.applications.managers.StationManager
 import ulisse.entities.Coordinate
-import ulisse.entities.Coordinate.*
 import ulisse.entities.station.Station
 
 class StationManagerTest extends AnyWordSpec with Matchers:

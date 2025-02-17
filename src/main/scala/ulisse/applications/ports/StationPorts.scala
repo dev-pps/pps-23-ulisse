@@ -14,32 +14,17 @@ object StationPorts:
     type SM = StationManager#StationMapType
     type E  = NonEmptyChain[StationManager.Error]
 
-    /** Retrieves the current station map. */
+    /** Retrieves the current `Station` collection. */
     def stationMap: Future[SM]
 
-    /** Adds a station to the station manager. */
+    /** Adds a `Station` to the station manager or return an error if it fails. */
     def addStation(station: Station): Future[Either[E, SM]]
 
-    /** Removes a station from the station manager.
-      */
+    /** Removes a `Station` from the station manager or return an error if it fails. */
     def removeStation(station: Station): Future[Either[E, SM]]
 
-    /** Updates a station from the station manager.
-      *
-      * @param oldStation
-      *   The station to update.
-      * @param newStation
-      *   The new station that replaces the old station.
-      * @return
-      *   Either the updated `StationMap` or a `NonEmptyChain` of `Errors` indicating the issues.
-      */
+    /** Updates a `Station` from the station manager or return an error if it fails. */
     def updateStation(oldStation: Station, newStation: Station): Future[Either[E, SM]]
 
-    /** Finds a station at a specified location.
-      *
-      * @param coordinate
-      *   The coordinate to search for a station.
-      * @return
-      *   An `Option` containing the station at the specified location, if it exists.
-      */
+    /** Finds a `Station` at a specified location. */
     def findStationAt(coordinate: Coordinate): Future[Option[Station]]
