@@ -1,26 +1,24 @@
 package ulisse.entities.simulation
 
-import ulisse.entities.simulation.Agents.{SimulationAgent, TrainAgent}
-import ulisse.entities.simulation.Simulations.Actions
-import ulisse.entities.station.Station
+import ulisse.entities.station.StationEnvironmentElement
 
 object Environments:
 
   trait SimulationEnvironment:
     def doStep(dt: Int): SimulationEnvironment
-    def stations: Seq[Station]
+    def stations: Seq[StationEnvironmentElement]
     def agents: Seq[SimulationAgent]
-    def stations_=(newStations: Seq[Station]): SimulationEnvironment
+    def stations_=(newStations: Seq[StationEnvironmentElement]): SimulationEnvironment
     def agents_=(newAgents: Seq[SimulationAgent]): SimulationEnvironment
 
   object SimulationEnvironment:
-    def apply(stations: Seq[Station], agents: Seq[SimulationAgent]): SimulationEnvironment =
+    def apply(stations: Seq[StationEnvironmentElement], agents: Seq[SimulationAgent]): SimulationEnvironment =
       SimulationEnvironmentImpl(stations, agents)
     def empty(): SimulationEnvironment =
-      apply(Seq[Station](), Seq[SimulationAgent]())
+      apply(Seq[StationEnvironmentElement](), Seq[SimulationAgent]())
 
     private final case class SimulationEnvironmentImpl(
-        stations: Seq[Station],
+        stations: Seq[StationEnvironmentElement],
         agents: Seq[SimulationAgent]
     ) extends SimulationEnvironment:
       def doStep(dt: Int): SimulationEnvironment =
@@ -30,7 +28,7 @@ object Environments:
             env.copy(agents = agents ++ Seq(agent.updateTravelDistance(d)))
           case (env, (agent, _)) => env.copy(agents = agents ++ Seq(agent))
         }
-      def stations_=(newStations: Seq[Station]): SimulationEnvironment =
+      def stations_=(newStations: Seq[StationEnvironmentElement]): SimulationEnvironment =
         copy(stations = newStations)
       def agents_=(newAgents: Seq[SimulationAgent]): SimulationEnvironment =
         copy(agents = newAgents)

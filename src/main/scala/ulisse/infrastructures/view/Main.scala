@@ -4,11 +4,14 @@ import ulisse.adapters.input.{SimulationPageAdapter, StationEditorAdapter}
 import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.adapters.output.{SimulationNotificationAdapter, SimulationNotificationAdapterRequirements}
 import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.useCases.{RouteService, SimulationService, StationService}
 import ulisse.applications.{AppState, SimulationState}
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
+import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.simulation.SimulationPage
@@ -27,7 +30,9 @@ def runEngines(): Unit =
       event(state)
     )
   )
-  val initialState = AppState(StationManager())
+  val technologies = List(TrainTechnology("AV", 300, 2.0, 1.0), TrainTechnology("Normal", 160, 1.0, 0.5))
+  val initialState =
+    AppState(StationManager(), RouteManager.empty(), TrainManager(List.empty), TechnologyManager(technologies))
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
