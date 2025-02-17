@@ -85,6 +85,6 @@ final case class StationEditorAdapter(
     val validatedNumberOfTrack =
       numberOfTrack.toIntOption.toValidNec(StationEditorAdapter.Error.InvalidNumberOfTrackFormat).toEither
     (validatedCoordinate.toValidated, validatedNumberOfTrack.toValidated)
-      .mapN((_, _)).toEither.flatMap(Station.createNamedStation(name, _, _))
+      .mapN((_, _)).toEither.flatMap(Station.createCheckedStation(name, _, _))
 
   export appPort.{findStationAt, removeStation}

@@ -16,7 +16,8 @@ object Track:
     validatePositive(platformNumber, Error.InvalidPlatformNumber).toValidatedNec.toEither.map(TrackImpl(_, None))
 
   def generateSequentialTracks(numberOfTracks: Int): List[Track] =
-    List.tabulate(numberOfTracks)(i => TrackImpl(i + 1, None))
+    val step: Int => Int = _ + 1
+    List.tabulate(numberOfTracks)(i => TrackImpl(step(i), None))
 
   enum Error extends BaseError:
     case InvalidPlatformNumber

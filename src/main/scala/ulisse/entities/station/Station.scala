@@ -9,7 +9,7 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
 
 /** Defines a Station.
   *
-  * A `Station` represents a location where trains can stop. Each station has a name, a location, and a number of
+  * A `Station` is a location where trains can stop. Each station has a name, a location, and a number of
   * tracks.
   */
 trait Station:
@@ -36,9 +36,9 @@ object Station:
     * @return
     *   A `Station` instance.
     */
-  // TODO evaluate default constructor
   def apply(name: String, coordinate: Coordinate, numberOfTrack: Int): Station =
-    StationImpl(name, coordinate, math.max(1, numberOfTrack))
+    val minNumberOfTracks = 1
+    StationImpl(name, coordinate, math.max(minNumberOfTracks, numberOfTrack))
 
   /** Creates a `Station` instance with validation.
     *
@@ -51,7 +51,7 @@ object Station:
     * @return
     *   Either a `Station` instance or a `NonEmptyChain` of `Errors` indicating the issues.
     */
-  def createNamedStation(
+  def createCheckedStation(
       name: String,
       coordinate: Coordinate,
       numberOfTrack: Int
