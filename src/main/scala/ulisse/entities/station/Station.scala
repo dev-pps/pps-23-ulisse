@@ -20,6 +20,10 @@ trait Station:
       numberOfTracks == s.numberOfTracks
     case _ => false
 
+trait StationEnvironmentElement extends Station:
+  export Station.*
+  val tracks: List[Track]
+
 /** Factory for [[Station]] instances. */
 object Station:
   /** Creates a `Station` instance. The resulting station has at least 1 track. */
@@ -40,6 +44,13 @@ object Station:
 
   private final case class StationImpl(name: String, coordinate: Coordinate, numberOfTracks: Int) extends Station:
     val id: Int = hashCode()
+
+  def createStationEnvironmentElement(station: Station): StationEnvironmentElement =
+    StationEnvironmentElementImpl(station)
+
+  private final case class StationEnvironmentElementImpl(station: Station) extends StationEnvironmentElement:
+    export station.*
+    val tracks: List[Track] = Track.generateSequentialTracks(numberOfTracks)
 
   /** Represents errors that can occur during `Station` creation. */
   enum Error extends BaseError:
