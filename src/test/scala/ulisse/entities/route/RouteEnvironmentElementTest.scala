@@ -29,23 +29,30 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
       case Left(errors) => fail()
       case Right(route) => RouteEnvironmentElement.createRouteEnvironmentElement(route)
 
+  "RouteEnvironmentElement" should:
+    "have two tracks" in:
+      route.tracks.size shouldBe 2
+
+    "have a length greater or equal than minPermittedDistanceBetweenTrains" in:
+      route.length shouldBe >=(route.minPermittedDistanceBetweenTrains)
+
   "A trainAgent" when:
     "take a route" should:
       "be place in a track if it empty" in:
         route.firstAvailableTrack shouldBe Some(Seq())
         train3905.take(route) match
           case Some(updatedRoute) =>
-            updatedRoute.trains.find(_.contains(train3905)) shouldBe Some(Seq(train3905))
+            updatedRoute.tracks.find(_.contains(train3905)) shouldBe Some(Seq(train3905))
             updatedRoute.firstAvailableTrack shouldBe Some(Seq())
-            updatedRoute.trains shouldBe Seq(Seq(train3905), Seq())
+            updatedRoute.tracks shouldBe Seq(Seq(train3905), Seq())
           case None => fail()
 
       "not be place in a track if not available" in:
         train3905.take(route).flatMap(train3906.take) match
           case Some(updatedRoute) =>
-            updatedRoute.trains.find(_.contains(train3906)) shouldBe Some(Seq(train3906))
+            updatedRoute.tracks.find(_.contains(train3906)) shouldBe Some(Seq(train3906))
             updatedRoute.firstAvailableTrack shouldBe None
-            updatedRoute.trains shouldBe Seq(Seq(train3905), Seq(train3906))
+            updatedRoute.tracks shouldBe Seq(Seq(train3905), Seq(train3906))
             train3907.take(updatedRoute) shouldBe None
           case None => fail()
 
@@ -59,6 +66,6 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
             updatedRoute.firstAvailableTrack shouldBe Some(Seq(train3905Updated))
             train3906.take(updatedRoute) match
               case Some(updatedRoute) =>
-                updatedRoute.trains.find(_.contains(train3906)) shouldBe Some(Seq(train3905Updated, train3906))
+                updatedRoute.tracks.find(_.contains(train3906)) shouldBe Some(Seq(train3905Updated, train3906))
               case None => fail()
           case None => fail()
