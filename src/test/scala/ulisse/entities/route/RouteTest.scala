@@ -6,7 +6,7 @@ import org.scalatest.matchers.must.Matchers
 import ulisse.entities.route.Routes
 import ulisse.entities.route.Routes.{Route, TypeRoute}
 import ulisse.entities.station.Station
-import ulisse.entities.{Coordinate, RouteTest}
+import ulisse.entities.Coordinate
 import ulisse.utils.ValidationUtils.mkStringErrors
 
 object RouteTest:
