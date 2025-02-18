@@ -61,11 +61,13 @@ object Environments:
         )
 
       private def leaveStation(station: StationEnvironmentElement, train: TrainAgent): SimulationEnvironmentImpl =
-        this.copy(stations = stations.updateWhen(_ == station)(train.leave))
+//        this.copy(stations = stations.updateWhen(_ == station)(train.leave))
+        this
       private def arriveToDestination(route: Route, train: TrainAgent): SimulationEnvironmentImpl =
-        //se arriva a destinazione, deve arrivare alla stazione di arrivo e togliersi dalla rotaia
+        // se arriva a destinazione, deve arrivare alla stazione di arrivo e togliersi dalla rotaia
 
-        this.copy(stations = stations.updateWhen(_.coordinate == route.arrival.coordinate)(train.arriveAt))
+//        this.copy(stations = stations.updateWhen(_.coordinate == route.arrival.coordinate)(train.arriveAt))
+        this
 
       def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment =
         copy(stations = newStations)
