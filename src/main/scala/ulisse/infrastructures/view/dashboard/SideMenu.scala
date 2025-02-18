@@ -111,7 +111,7 @@ object SideMenu:
       private def realPreferredSize(): Dimension =
         new Dimension(
           menu_item_height + (if imageCard.content.visible then imageCard.content.preferredSize.width
-                              else 0) + 2 * imageCard.getStyler.rect.padding.width,
-          menu_item_height + 2 * imageCard.getStyler.rect.padding.height
+                              else 0) + 2 * imageCard.rect.padding.width,
+          menu_item_height + 2 * imageCard.rect.padding.height
         )
       private def toggleLabel(): Unit = imageCard.content.visible = !imageCard.content.visible

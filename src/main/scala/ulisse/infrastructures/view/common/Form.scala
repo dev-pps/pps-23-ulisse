@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.common
 
 import ulisse.infrastructures.view.common.Themes.*
+import ulisse.infrastructures.view.components.JStyler.JStyles
 import ulisse.infrastructures.view.components.{ComposedSwing, ExtendedSwing, JStyler}
 import ulisse.infrastructures.view.map.ViewObservers.ViewObserver
 
@@ -17,34 +18,26 @@ object Form:
   def createStation(): StationForm   = StationForm()
   def createSchedule(): ScheduleForm = ScheduleForm()
 
-  private val titleFont = JStyler.defaultFont.copy(styleFont = Style.Bold, colorFont = Theme.light.text, sizeFont = 36)
+  private val formRect: JStyler.Rect       = JStyler.defaultRect.copy(padding = JStyler.createPadding(40, 0), arc = 15)
+  private val formPalette: JStyler.Palette = JStyler.backgroundPalette(Theme.light.element)
 
-  private val formStyler =
-    JStyler.rectPaletteStyler(
-      JStyler.defaultRect.copy(padding = JStyler.createPadding(40, 0), arc = 15),
-      JStyler.backgroundPalette(Theme.light.element)
-    )
-
-  private val buttonStyler =
-    JStyler.rectPaletteFontStyler(
-      JStyler.defaultRect.copy(padding = JStyler.createPadding(20, 10), arc = 10),
-      JStyler.backgroundHoverPalette(Theme.light.text, Theme.light.forwardClick),
-      JStyler.defaultFont.copy(colorFont = Theme.light.background)
-    )
-
-  private val trueButtonStyler =
-    buttonStyler.copy(palette = buttonStyler.palette.copy(clickColor = Some(Theme.light.trueClick)))
-  private val falseButtonStyler =
-    buttonStyler.copy(palette = buttonStyler.palette.copy(clickColor = Some(Theme.light.falseClick)))
+  private val titleFont  = JStyler.defaultFont.copy(styleFont = Style.Bold, colorFont = Theme.light.text, sizeFont = 36)
+  private val buttonRect = JStyler.defaultRect.copy(padding = JStyler.createPadding(20, 10), arc = 10)
+  private val buttonPalette      = JStyler.backgroundHoverPalette(Theme.light.text, Theme.light.forwardClick)
+  private val buttonFont         = JStyler.defaultFont.copy(colorFont = Theme.light.background)
+  private val trueButtonPalette  = buttonPalette.copy(clickColor = Some(Theme.light.trueClick))
+  private val falseButtonPalette = buttonPalette.copy(clickColor = Some(Theme.light.falseClick))
 
   private case class BaseForm(title: String, fields: ComposedSwing.JInfoTextField*):
-    private val mainPanel: ExtendedSwing.JBoxPanelItem = ExtendedSwing.createBoxPanel(Orientation.Vertical, formStyler)
-    private val insertForm: ComposedSwing.JInsertForm  = ComposedSwing.createInsertForm(title, fields: _*)
-    private val space                                  = 10
+    private val mainPanel: ExtendedSwing.JBoxPanelItem = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
+    mainPanel.rect = formRect
+    mainPanel.palette = formPalette
+    private val insertForm: ComposedSwing.JInsertForm = ComposedSwing.createInsertForm(title, fields: _*)
+    private val space                                 = 10
 
-    val buttonPanel: ExtendedSwing.JFlowPanelItem = ExtendedSwing.createFlowPanel(JStyler.transparent)
+    val buttonPanel: ExtendedSwing.JFlowPanelItem = ExtendedSwing.JFlowPanelItem()
 
-    insertForm.titleLabel.setStyler(insertForm.titleLabel.getStyler.copy(font = titleFont))
+    insertForm.titleLabel.fontEffect = titleFont
 
     buttonPanel.hGap = space
 
@@ -60,9 +53,15 @@ object Form:
     private val rails            = ComposedSwing.createInfoTextField("Rails")
     private val length           = ComposedSwing.createInfoTextField("Length")
 
-    private val form         = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
-    private val saveButton   = ExtendedSwing.button("Save", trueButtonStyler)
-    private val deleteButton = ExtendedSwing.button("Delete", falseButtonStyler)
+    private val form       = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
+    private val saveButton = ExtendedSwing.JButtonItem("Save")
+    saveButton.rect = buttonRect
+    saveButton.palette = trueButtonPalette
+    saveButton.fontEffect = buttonFont
+    private val deleteButton = ExtendedSwing.JButtonItem("Delete")
+    deleteButton.rect = buttonRect
+    deleteButton.palette = falseButtonPalette
+    deleteButton.fontEffect = buttonFont
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
@@ -87,8 +86,14 @@ object Form:
 
     private val form = BaseForm("Station", name, latitude, longitude, tracks)
 
-    private val saveButton   = ExtendedSwing.button("Save", trueButtonStyler)
-    private val deleteButton = ExtendedSwing.button("Delete", falseButtonStyler)
+    private val saveButton = ExtendedSwing.JButtonItem("Save")
+    saveButton.rect = buttonRect
+    saveButton.palette = trueButtonPalette
+    saveButton.fontEffect = buttonFont
+    private val deleteButton = ExtendedSwing.JButtonItem("Delete")
+    deleteButton.rect = buttonRect
+    deleteButton.palette = falseButtonPalette
+    deleteButton.fontEffect = buttonFont
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
@@ -110,8 +115,14 @@ object Form:
 
     private val form = BaseForm("Schedule", field, field1, field2)
 
-    private val saveButton   = ExtendedSwing.button("Save", trueButtonStyler)
-    private val deleteButton = ExtendedSwing.button("Delete", falseButtonStyler)
+    private val saveButton = ExtendedSwing.JButtonItem("Save")
+    saveButton.rect = buttonRect
+    saveButton.palette = trueButtonPalette
+    saveButton.fontEffect = buttonFont
+    private val deleteButton = ExtendedSwing.JButtonItem("Delete")
+    deleteButton.rect = buttonRect
+    deleteButton.palette = falseButtonPalette
+    deleteButton.fontEffect = buttonFont
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton

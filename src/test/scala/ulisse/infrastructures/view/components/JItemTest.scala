@@ -16,5 +16,5 @@ class JItemTest extends AnyFlatSpec with Matchers:
 
   "change styler" should "change background color" in:
     val newRect = defaultRect.copy(arc = 10)
-    button.setStyler(button.getStyler.copy(rect = newRect))
-    button.getStyler.rect must be(newRect)
+    button.rect = newRect
+    button.rect must be(newRect)
