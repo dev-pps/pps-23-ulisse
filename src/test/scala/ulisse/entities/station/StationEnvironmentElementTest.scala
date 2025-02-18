@@ -18,25 +18,23 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
   "A train" when:
     "arrive to a station" should:
       "be place in a track if available" in:
-        val updatedStation = train.arriveAt(station)
         station.firstAvailableTrack shouldBe Some(Track(1))
-        updatedStation.tracks.headOption.flatMap(_.train) shouldBe Some(train)
-        updatedStation.firstAvailableTrack shouldBe None
+        train.arriveAt(station) match
+          case Some(updatedStation) =>
+            updatedStation.tracks.headOption.flatMap(_.train) shouldBe Some(train)
+            updatedStation.firstAvailableTrack shouldBe None
+          case None => fail()
 
       "not be place in a track if not available" in:
-        val station = StationEnvironmentElement.createStationEnvironmentElement(Station("name", Coordinate(0, 0), 1))
-        val updatedStation = train.arriveAt(train.arriveAt(station))
-        station.firstAvailableTrack shouldBe Some(Track(1))
-        updatedStation.tracks.headOption.flatMap(_.train) shouldBe Some(train)
-        updatedStation.firstAvailableTrack shouldBe None
+        train.arriveAt(station).flatMap(train.arriveAt) shouldBe None
 
     "leave a station" should:
       "be removed from the track if it's present" in:
-        val updatedStation = train.leave(train.arriveAt(station))
-        updatedStation.tracks.headOption.flatMap(_.train) shouldBe None
-        updatedStation.firstAvailableTrack shouldBe Some(Track(1))
+        train.arriveAt(station).flatMap(train.leave) match
+          case Some(updatedStation) =>
+            updatedStation.tracks.headOption.flatMap(_.train) shouldBe None
+            updatedStation.firstAvailableTrack shouldBe Some(Track(1))
+          case None => fail()
 
       "not be removed from the track if it's not present" in:
-        val updatedStation = otherTrain.leave(train.arriveAt(station))
-        updatedStation.tracks.headOption.flatMap(_.train) shouldBe Some(train)
-        updatedStation.firstAvailableTrack shouldBe None
+        train.arriveAt(station).flatMap(otherTrain.leave) shouldBe None
