@@ -14,10 +14,10 @@ object StationEnvironmentElement:
 
   extension (train: Train)
     def arriveAt(station: StationEnvironmentElement): Option[StationEnvironmentElement] =
-      station.firstAvailableTrack.fold(station)(track => station.updateTrack(track, Some(train)))
+      station.firstAvailableTrack.map(track => station.updateTrack(track, Some(train)))
 
     def leave(station: StationEnvironmentElement): Option[StationEnvironmentElement] =
-      station.tracks.find(_.train.contains(train)).fold(station)(track => station.updateTrack(track, None))
+      station.tracks.find(_.train.contains(train)).map(track => station.updateTrack(track, None))
 
     def findInStation(stations: Seq[StationEnvironmentElement]): Option[StationEnvironmentElement] =
       stations.find(_.tracks.contains(train))
