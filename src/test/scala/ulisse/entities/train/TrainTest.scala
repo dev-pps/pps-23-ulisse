@@ -33,3 +33,7 @@ class TrainTest extends AnyFlatSpec:
     train.techType.name should be("HighSpeed")
     train.techType.maxSpeed should be(300)
     train.maxSpeed should be(train.techType.maxSpeed)
+
+  it should "provide how many meters train is long" in:
+    val expectedMeterSize = length * Wagons.UseType.Passenger.lengthSize
+    train.lengthSize should be(expectedMeterSize)

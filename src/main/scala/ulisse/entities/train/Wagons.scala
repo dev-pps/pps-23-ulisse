@@ -1,13 +1,20 @@
 package ulisse.entities.train
 
 object Wagons:
-  private type Capacity = Int
-  private case class WagonImpl(use: UseType, capacity: Capacity)
-      extends Wagon
 
-  enum UseType(val name: String):
-    case Passenger extends UseType("Passenger")
-    case Other     extends UseType("Other")
+  private object DefaultLength:
+    val passenger: LengthMeter = 26
+    val other: LengthMeter     = 18
+
+  private type Capacity    = Int
+  private type LengthMeter = Int
+  private case class WagonImpl(use: UseType, capacity: Capacity)
+      extends Wagon:
+    override def lengthSize: LengthMeter = use.lengthSize
+
+  enum UseType(val name: String, val lengthSize: LengthMeter):
+    case Passenger extends UseType("Passenger", DefaultLength.passenger)
+    case Other     extends UseType("Other", DefaultLength.other)
 
   /** A train wagon (a.k.a. train wagon, train car, railroad car) that is part of a train. */
   trait Wagon:
@@ -16,10 +23,11 @@ object Wagons:
       */
     def use: UseType
 
-    /** @return
-      *   Transport capacity of wagon
-      */
+    /** returns Transport capacity of wagon */
     def capacity: Capacity
+
+    /** Size length (metric unit) */
+    def lengthSize: LengthMeter
 
   /** Factory for [[train.model.Trains.Wagons.Wagon]] instances. */
   object Wagon:
