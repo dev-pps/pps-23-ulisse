@@ -14,10 +14,10 @@ object StationEnvironmentElement:
 
   extension (train: Train)
     def arriveAt(station: StationEnvironmentElement): StationEnvironmentElement =
-      station.firstAvailableTrack.map(track => station.updateTrack(track, Some(train))).getOrElse(station)
+      station.firstAvailableTrack.fold(station)(track => station.updateTrack(track, Some(train)))
 
     def leave(station: StationEnvironmentElement): StationEnvironmentElement =
-      station.tracks.find(_.train.contains(train)).map(track => station.updateTrack(track, None)).getOrElse(station)
+      station.tracks.find(_.train.contains(train)).fold(station)(track => station.updateTrack(track, None))
 
   private final case class StationEnvironmentElementImpl(station: Station, tracks: List[Track])
       extends StationEnvironmentElement:
