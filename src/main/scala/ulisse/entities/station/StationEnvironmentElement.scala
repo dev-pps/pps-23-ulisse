@@ -12,6 +12,13 @@ object StationEnvironmentElement:
   def createStationEnvironmentElement(station: Station): StationEnvironmentElement =
     StationEnvironmentElementImpl(station, Track.generateSequentialTracks(station.numberOfTracks))
 
+  extension (train: Train)
+    def arriveAt(station: StationEnvironmentElement): StationEnvironmentElement =
+      station.firstAvailableTrack.map(track => station.updateTrack(track, Some(train))).getOrElse(station)
+
+    def leave(station: StationEnvironmentElement): StationEnvironmentElement =
+      station.tracks.find(_.train.contains(train)).map(track => station.updateTrack(track, None)).getOrElse(station)
+
   private final case class StationEnvironmentElementImpl(station: Station, tracks: List[Track])
       extends StationEnvironmentElement:
     export station.*

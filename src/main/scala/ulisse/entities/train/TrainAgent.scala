@@ -1,6 +1,7 @@
 package ulisse.entities.train
 
 import ulisse.entities.simulation.SimulationAgent
+import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.train.Trains.Train
 
 trait TrainAgent extends Train with SimulationAgent:
