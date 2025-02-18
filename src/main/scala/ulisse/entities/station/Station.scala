@@ -21,11 +21,6 @@ trait Station:
       numberOfTracks == s.numberOfTracks
     case _ => false
 
-trait StationEnvironmentElement extends Station:
-  val tracks: List[Track]
-  def firstAvailableTrack: Option[Track] = tracks.find(_.train.isEmpty)
-  def updateTrack(track: Track, train: Option[Train]): StationEnvironmentElement
-
 /** Factory for [[Station]] instances. */
 object Station:
   /** Creates a `Station` instance. The resulting station has at least 1 track. */
