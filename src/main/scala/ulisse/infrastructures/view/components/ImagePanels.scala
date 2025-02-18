@@ -3,13 +3,14 @@ package ulisse.infrastructures.view.components
 import com.formdev.flatlaf.extras.FlatSVGIcon
 import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
 import ulisse.infrastructures.view.components.ComponentMixins.{Colorable, Rotatable}
+import ulisse.infrastructures.view.components.SwingEnhancements.Enhanced
 
 import java.awt.Color
 import javax.imageio.ImageIO
 import scala.swing.{Component, Graphics2D, Panel, UIElement}
 
 object ImagePanels:
-  trait ImagePanel          extends ExtendedSwing with Rotatable
+  trait ImagePanel          extends Enhanced with Rotatable
   trait ColorableImagePanel extends ImagePanel with Colorable
 
   object ImagePanel:
@@ -18,7 +19,7 @@ object ImagePanels:
     def createDrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit): ImagePanel = DrawnPanel(iconDrawer)
 
   private final case class ImagePanelImpl(imagePath: String)
-      extends ImagePanel with ExtendedSwing(JStyler.transparent):
+      extends ImagePanel with Enhanced:
     private val image = ImageIO.read(ClassLoader.getSystemResource(imagePath))
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
@@ -27,7 +28,7 @@ object ImagePanels:
       g.drawImage(image, (peer.getWidth - size) / 2, (peer.getHeight - size) / 2, size, size, peer)
 
   private final case class SVGPanel(svgPath: String, _color: Color)
-      extends ColorableImagePanel with ExtendedSwing(JStyler.transparent):
+      extends ColorableImagePanel with Enhanced:
     private val rawIcon = new FlatSVGIcon(svgPath)
     rawIcon.setColorFilter(ColorFilter(_ => color))
     opaque = false
@@ -44,7 +45,7 @@ object ImagePanels:
       icon.paintIcon(peer, g, (peer.getWidth - icon.getWidth) / 2, (peer.getHeight - icon.getHeight) / 2)
 
   private final case class DrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit)
-      extends ImagePanel with ExtendedSwing(JStyler.transparent):
+      extends ImagePanel with Enhanced:
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
       iconDrawer(this, g)

@@ -2,6 +2,7 @@ package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.components.ComponentConfigurations.Alignment
 import ulisse.infrastructures.view.components.JStyler
+import ulisse.infrastructures.view.components.SwingEnhancements.Enhanced
 
 import java.awt
 import java.awt.{BorderLayout, Color, Graphics}
@@ -48,25 +49,25 @@ object ComponentUtils:
       case None => component
 
     def alignLeft(): Component =
-      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
+      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
       wrapper.contents += component
       wrapper.contents += Swing.HGlue
       wrapper
 
     def alignRight(): Component =
-      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
+      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
       wrapper.contents += Swing.HGlue
       wrapper.contents += component
       wrapper
 
     def alignTop(): Component =
-      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
+      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
       wrapper.contents += component
       wrapper.contents += Swing.VGlue
       wrapper
 
     def alignBottom(): Component =
-      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)(JStyler.transparent)
+      val wrapper = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
       wrapper.contents += Swing.VGlue
       wrapper.contents += component
       wrapper
@@ -104,7 +105,5 @@ object ComponentUtils:
       component.listenTo(ps*)
       component
 
-  extension [J <: ExtendedSwing](j: J)
-    def styler(styler: JStyler.JStyler): J =
-      j.setStyler(styler)
-      j
+  extension [J <: Enhanced](j: J)
+    def styler(styler: JStyler.JStyler): J = j

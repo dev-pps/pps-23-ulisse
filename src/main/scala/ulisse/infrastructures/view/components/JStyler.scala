@@ -1,6 +1,8 @@
 package ulisse.infrastructures.view.components
 
 import java.awt.Color
+import javax.swing.BorderFactory
+import javax.swing.border.Border as SwingBorder
 import scala.swing.Font as SwingFont
 import scala.swing.Font.Style.Value as StyleFont
 
@@ -80,11 +82,23 @@ object JStyler:
     type Size    = Dimension2D[Option[Int]]
     type Padding = Dimension2D[Int]
 
-    case class Rect(size: Size, padding: Padding, arc: Int)                                     extends JStyle
+    case class Rect(size: Size, padding: Padding, arc: Int) extends JStyle:
+      val swingPadding = BorderFactory.createEmptyBorder(padding.height, padding.width, padding.height, padding.width)
+
     case class Palette(background: Color, clickColor: Option[Color], hoverColor: Option[Color]) extends JStyle
+
     case class Font(nameFont: String, styleFont: StyleFont, colorFont: Color, sizeFont: Int) extends JStyle:
       val swingFont: SwingFont = new SwingFont(nameFont, styleFont.id, sizeFont)
-    case class Border(color: Color, stroke: Int) extends JStyle
+
+    case class Border(color: Color, stroke: Int) extends JStyle:
+      val swingBorder: Rect => SwingBorder =
+        rect =>
+          BorderFactory.createEmptyBorder(
+            rect.padding.height + stroke,
+            rect.padding.width + stroke,
+            rect.padding.height + stroke,
+            rect.padding.width + stroke
+          )
 
     def createSize(width: Int, height: Int): Size = Dimension2D(Some(width), Some(height))
     def createWidthSize(width: Int): Size         = Dimension2D(Some(width), defaultSizeRect.height)

@@ -7,11 +7,12 @@ import ulisse.infrastructures.view.components.ComponentConfigurations.{
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.Selectables.Selectable
+import ulisse.infrastructures.view.components.SwingEnhancements.{Enhanced, RectEffect}
 
 import scala.swing.{BoxPanel, Component, Label, Orientation, SequentialContainer}
 
 object Cards:
-  trait JImageCard extends ExtendedSwing with SequentialContainer.Wrapper:
+  trait JImageCard extends Enhanced with RectEffect with SequentialContainer.Wrapper:
     val image: ImagePanel
     val content: Component
     def reverse(): JImageCard =
@@ -95,7 +96,7 @@ object Cards:
       content: Component,
       orientation: Orientation.Value,
       styler: JStyler.JStyler
-  ) extends BoxPanel(orientation) with ExtendedSwing(styler):
+  ) extends BoxPanel(orientation) with Enhanced:
     listenTo(image.mouse.clicks, image.mouse.moves, content.mouse.clicks, content.mouse.moves)
     contents += image.align(imageConfiguration.alignment); contents += content
 
@@ -121,8 +122,8 @@ object Cards:
     )
 
     override def selected_=(newSelected: Boolean): Unit =
-      if newSelected then setStyler(selectedStyler)
-      else setStyler(styler)
+//      if newSelected then setStyler(selectedStyler)
+//      else setStyler(styler)
       super.selected_=(newSelected)
 
   object Example:
