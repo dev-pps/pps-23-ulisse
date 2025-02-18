@@ -9,7 +9,7 @@ import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.simulation.Environments.SimulationEnvironment
 import ulisse.entities.simulation.Simulations.EngineState
-import ulisse.entities.station.Station
+import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.infrastructures.commons.TimeProviders.*
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
@@ -24,7 +24,7 @@ final case class SimulationService(
     simulationEvents.add((state: SimulationState) => {
       state.copy(simulationManager =
         state.simulationManager.withNotificationService(notificationService).setup(SimulationEnvironment(
-          appState.stationManager.stations.map(Station.createStationEnvironmentElement),
+          appState.stationManager.stations.map(StationEnvironmentElement.createStationEnvironmentElement),
           Seq[RouteEnvironmentElement](),
           Seq[SimulationAgent]()
         ))

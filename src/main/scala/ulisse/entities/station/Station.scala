@@ -14,12 +14,6 @@ trait Station:
   val name: String
   val coordinate: Coordinate
   val numberOfTracks: Int
-  override def equals(other: Any): Boolean = other match
-    case s: Station =>
-      name === s.name &&
-      coordinate == s.coordinate &&
-      numberOfTracks == s.numberOfTracks
-    case _ => false
 
 /** Factory for [[Station]] instances. */
 object Station:
@@ -41,15 +35,6 @@ object Station:
 
   private final case class StationImpl(name: String, coordinate: Coordinate, numberOfTracks: Int) extends Station:
     val id: Int = hashCode()
-
-  def createStationEnvironmentElement(station: Station): StationEnvironmentElement =
-    StationEnvironmentElementImpl(station, Track.generateSequentialTracks(station.numberOfTracks))
-
-  private final case class StationEnvironmentElementImpl(station: Station, tracks: List[Track])
-      extends StationEnvironmentElement:
-    export station.*
-    def updateTrack(track: Track, train: Option[Train]): StationEnvironmentElement =
-      copy(tracks = tracks.map(t => if t == track then t.withTrain(train) else t))
 
   /** Represents errors that can occur during `Station` creation. */
   enum Error extends BaseError:
