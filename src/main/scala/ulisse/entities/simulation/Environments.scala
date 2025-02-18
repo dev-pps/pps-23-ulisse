@@ -7,6 +7,7 @@ import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.station.StationEnvironmentElement.*
+import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.utils.CollectionUtils.*
 
 object Environments:
@@ -40,25 +41,30 @@ object Environments:
         val stepActions = agents.map(a => a -> a.doStep(dt, this)).toMap
         stepActions.foldLeft(this.copy(agents = Seq())) {
           case (env, (agent: TrainAgent, Some(Actions.MoveBy(d)))) =>
-            if agent.distanceTravelled > 0 then
-              findRoute(agent).map(route =>
-                if agent.distanceTravelled + d >= route.length then
-                  env.copy(agents = agents ++ Seq(agent.distanceTravelled = 0)).arriveToDestination(route, agent)
-                else
-                  env.copy(agents = agents ++ Seq(agent.updateDistanceTravelled(d)))
-              ).getOrElse(env)
-            else
-              env.copy(agents = agents ++ Seq(agent.updateDistanceTravelled(d)))
+            if agent.isOnRoute then updateAgentOnRoute(agent, d)
+            else updateAgentInStation(agent, d)
           case (env, (agent, _)) => env.copy(agents = agents ++ Seq(agent))
         }
-      private def findRoute(agent: TrainAgent): Option[RouteEnvironmentElement] =
-        routes.find(_.trains.exists(_.contains(agent)))
-      private def findStation(agent: TrainAgent): Option[StationEnvironmentElement] =
-        stations.find(_.tracks.contains(agent))
+
+      private def updateAgentOnRoute(agent: TrainAgent, distance: Double): SimulationEnvironmentImpl =
+        agent.findInRoutes(routes).fold(this)(route =>
+          val arriveAtDestination = agent.distanceTravelled + distance >= route.length
+          if arriveAtDestination then
+            copy(agents = agents ++ Seq(agent.resetDistanceTravelled())).arriveToDestination(route, agent)
+          else
+            copy(agents = agents ++ Seq(agent.updateDistanceTravelled(distance)))
+        )
+
+      private def updateAgentInStation(agent: TrainAgent, distance: Double): SimulationEnvironmentImpl =
+        agent.findInStation(stations).fold(this)(station =>
+          copy(agents = agents ++ Seq(agent)).leaveStation(station, agent)
+        )
 
       private def leaveStation(station: StationEnvironmentElement, train: TrainAgent): SimulationEnvironmentImpl =
         this.copy(stations = stations.updateWhen(_ == station)(train.leave))
       private def arriveToDestination(route: Route, train: TrainAgent): SimulationEnvironmentImpl =
+        //se arriva a destinazione, deve arrivare alla stazione di arrivo e togliersi dalla rotaia
+
         this.copy(stations = stations.updateWhen(_.coordinate == route.arrival.coordinate)(train.arriveAt))
 
       def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment =
