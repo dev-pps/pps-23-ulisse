@@ -6,34 +6,37 @@ import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.train.TrainAgent
+import ulisse.entities.station.StationEnvironmentElement.*
+import ulisse.utils.CollectionUtils.*
 
 object Environments:
   trait EnvironmentElement
-  trait SimulationEnvironment:
-    def doStep(dt: Int): SimulationEnvironment
+  trait RailwayEnvironment:
+    def doStep(dt: Int): RailwayEnvironment
     def stations: Seq[StationEnvironmentElement]
     def routes: Seq[RouteEnvironmentElement]
     def agents: Seq[SimulationAgent]
-    def stations_=(newStations: Seq[StationEnvironmentElement]): SimulationEnvironment
-    def routes_=(newRoutes: Seq[RouteEnvironmentElement]): SimulationEnvironment
-    def agents_=(newAgents: Seq[SimulationAgent]): SimulationEnvironment
+    def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment
+    def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment
+    def agents_=(newAgents: Seq[SimulationAgent]): RailwayEnvironment
 
-  object SimulationEnvironment:
+  object RailwayEnvironment:
     def apply(
         stations: Seq[StationEnvironmentElement],
         routes: Seq[RouteEnvironmentElement],
         agents: Seq[SimulationAgent]
-    ): SimulationEnvironment =
+    ): RailwayEnvironment =
       SimulationEnvironmentImpl(stations, routes, agents)
-    def empty(): SimulationEnvironment =
+
+    def empty(): RailwayEnvironment =
       apply(Seq[StationEnvironmentElement](), Seq[RouteEnvironmentElement](), Seq[SimulationAgent]())
 
     private final case class SimulationEnvironmentImpl(
         stations: Seq[StationEnvironmentElement],
         routes: Seq[RouteEnvironmentElement],
         agents: Seq[SimulationAgent]
-    ) extends SimulationEnvironment:
-      def doStep(dt: Int): SimulationEnvironment =
+    ) extends RailwayEnvironment:
+      def doStep(dt: Int): RailwayEnvironment =
         val stepActions = agents.map(a => a -> a.doStep(dt, this)).toMap
         stepActions.foldLeft(this.copy(agents = Seq())) {
           case (env, (agent: TrainAgent, Some(Actions.MoveBy(d)))) =>
@@ -52,20 +55,15 @@ object Environments:
         routes.find(_.trains.exists(_.contains(agent)))
       private def findStation(agent: TrainAgent): Option[StationEnvironmentElement] =
         stations.find(_.tracks.contains(agent))
-//      private def leaveStation(station: StationEnvironmentElement, train: TrainAgent): SimulationEnvironment =
-//        this.copy(stations = stations.map(s => if s == station then s.updateTrack(station.tracks.find(_.train.contains(train)).get, None) else s))
-      private def arriveToDestination(route: Route, train: TrainAgent): SimulationEnvironmentImpl =
-        this.copy(stations =
-          stations.map(s =>
-            if s.coordinate == route.arrival.coordinate then
-              s.firstAvailableTrack.map(track => s.updateTrack(track, Some(train))).getOrElse(s)
-            else s
-          )
-        )
 
-      def stations_=(newStations: Seq[StationEnvironmentElement]): SimulationEnvironment =
+      private def leaveStation(station: StationEnvironmentElement, train: TrainAgent): SimulationEnvironmentImpl =
+        this.copy(stations = stations.updateWhen(_ == station)(train.leave))
+      private def arriveToDestination(route: Route, train: TrainAgent): SimulationEnvironmentImpl =
+        this.copy(stations = stations.updateWhen(_.coordinate == route.arrival.coordinate)(train.arriveAt))
+
+      def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment =
         copy(stations = newStations)
-      def routes_=(newRoutes: Seq[RouteEnvironmentElement]): SimulationEnvironment =
+      def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment =
         copy(routes = newRoutes)
-      def agents_=(newAgents: Seq[SimulationAgent]): SimulationEnvironment =
+      def agents_=(newAgents: Seq[SimulationAgent]): RailwayEnvironment =
         copy(agents = newAgents)
