@@ -1,13 +1,13 @@
 package ulisse.applications.managers
 
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
-import ulisse.entities.simulation.Environments.SimulationEnvironment
+import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
 
 trait SimulationManager:
   def engineState: EngineState
   def simulationData: SimulationData
-  def setup(environment: SimulationEnvironment): SimulationManager
+  def setup(environment: RailwayEnvironment): SimulationManager
   def start(): SimulationManager
   def stop(): SimulationManager
   def reset(): SimulationManager
@@ -21,7 +21,7 @@ object SimulationManager:
   ): SimulationManager =
     SimulationManagerImpl(
       EngineState(false, cyclesPerSecond, None, 0, 0),
-      SimulationData(0, 0, SimulationEnvironment.empty()),
+      SimulationData(0, 0, RailwayEnvironment.empty()),
       notificationService,
       timeProvider
     )
@@ -59,7 +59,7 @@ object SimulationManager:
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ) extends SimulationManager:
 
-    override def setup(environment: SimulationEnvironment): SimulationManager =
+    override def setup(environment: RailwayEnvironment): SimulationManager =
       copy(simulationData = simulationData.copy(simulationEnvironment = environment))
     override def start(): SimulationManager =
       copy(engineState.copy(true))

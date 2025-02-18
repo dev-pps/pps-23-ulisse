@@ -1,7 +1,7 @@
 package ulisse.entities.simulation
 
 import cats.{Functor, Monad}
-import ulisse.entities.simulation.Environments.SimulationEnvironment
+import ulisse.entities.simulation.Environments.RailwayEnvironment
 
 object Simulations:
   object Actions:
@@ -70,7 +70,7 @@ object Simulations:
           copy(lastUpdate = Some(currentUpdate))
 
   object SimulationData:
-    def empty(): SimulationData = SimulationData(0, 0, SimulationEnvironment.empty())
+    def empty(): SimulationData = SimulationData(0, 0, RailwayEnvironment.empty())
     extension (simulationData: SimulationData)
       def increaseStepByOne(): SimulationData = simulationData.copy(step = simulationData.step + 1)
       def increaseSecondElapsedBy(delta: Double): SimulationData =
@@ -79,7 +79,7 @@ object Simulations:
   final case class SimulationData(
       step: Int,
       secondElapsed: Double,
-      simulationEnvironment: SimulationEnvironment
+      simulationEnvironment: RailwayEnvironment
   ):
     def reset(): SimulationData =
-      copy(step = 0, secondElapsed = 0, simulationEnvironment = SimulationEnvironment.empty())
+      copy(step = 0, secondElapsed = 0, simulationEnvironment = RailwayEnvironment.empty())

@@ -7,7 +7,7 @@ import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
 import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.SimulationAgent
-import ulisse.entities.simulation.Environments.SimulationEnvironment
+import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.entities.simulation.Simulations.EngineState
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.infrastructures.commons.TimeProviders.*
@@ -23,7 +23,7 @@ final case class SimulationService(
   eventQueue.add((appState: AppState) => {
     simulationEvents.add((state: SimulationState) => {
       state.copy(simulationManager =
-        state.simulationManager.withNotificationService(notificationService).setup(SimulationEnvironment(
+        state.simulationManager.withNotificationService(notificationService).setup(RailwayEnvironment(
           appState.stationManager.stations.map(StationEnvironmentElement.createStationEnvironmentElement),
           Seq[RouteEnvironmentElement](),
           Seq[SimulationAgent]()
