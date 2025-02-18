@@ -6,7 +6,7 @@ import ulisse.entities.simulation.Environments.EnvironmentElement
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
-import ulisse.utils.OptionUtilities.when
+import ulisse.utils.OptionUtils.when
 
 trait RouteEnvironmentElement extends Route with EnvironmentElement:
   val minPermittedDistanceBetweenTrains: Double
