@@ -1,8 +1,8 @@
 package ulisse.entities.simulation
 
-import ulisse.entities.simulation.Environments.SimulationEnvironment
+import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.entities.simulation.Simulations.Actions.SimulationAction
 import ulisse.entities.train.Trains.Train
 
 trait SimulationAgent:
-  def doStep(dt: Int, simulationEnvironment: SimulationEnvironment): Option[SimulationAction]
+  def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[SimulationAction]
