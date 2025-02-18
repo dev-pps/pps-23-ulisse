@@ -1,6 +1,6 @@
 package ulisse.entities.timetable
 
-import ulisse.entities.Routes.Route
+import ulisse.entities.Routes.TypeRoute
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.ScheduleTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
 import ulisse.entities.train.Trains.Train
@@ -12,95 +12,96 @@ import scala.collection.immutable.ListMap
 /** Object containing traits and utility method for creation and use of TrainTimetable */
 object Timetables:
 
+  type Length           = Double
   private type Time     = ScheduleTime
   private type WaitTime = Int
-  import ulisse.entities.timetable.MockedEntities.*
+
+  case class RailInfo(length: Length, typeRoute: TypeRoute)
 
   extension (i: Int)
     def toWaitTime: WaitTime = i
 
   extension (t: TrainTimetable)
-    def stopStations: List[Route]    = t.table.filter(_._2.waitTime.nonEmpty).keys.toList
-    def transitStations: List[Route] = t.table.filter(_._2.waitTime.isEmpty).keys.toList
-    def routes: List[Route]          = t.table.keys.toList
+    def stopStations: List[Station] = t.table.filter(_._2.waitTime.nonEmpty).keys.toList
+    def transitStations: List[Station] =
+      t.table.filter(_._2.waitTime.isEmpty).keys.toList.filterNot(s =>
+        s.equals(t.arrivingStation) || s.equals(t.startStation)
+      )
+    def routes: List[(Station, Station)] = t.table.keys.zip(t.table.keys.drop(1)).toList
 
   trait Timetable:
     def train: Train
     def startStation: Station
     def departureTime: ClockTime
-    def table: ListMap[Route, Time]
+    def table: ListMap[Station, Time]
 
   trait TrainTimetable extends Timetable:
     def arrivingStation: Station
     def arrivingTime: Option[ClockTime]
 
   trait TimeEstimator:
-    def ETA(lastTime: Option[Time], route: Route, train: Train): Option[ClockTime]
+    def ETA(lastTime: Option[Time], railInfo: RailInfo, train: Train): Option[ClockTime]
 
   private object UnrealTimeEstimator extends TimeEstimator:
-    def ETA(lastTime: Option[Time], lastRoute: Route, train: Train): Option[ClockTime] =
+    def ETA(lastTime: Option[Time], railInfo: RailInfo, train: Train): Option[ClockTime] =
       for
-        distance        <- Some(lastRoute.length)
-        travelMinutes   <- Some((distance / Math.min(train.maxSpeed, lastRoute.technology.maxSpeed)) * 60)
-        offsetTime      <- lastTime
+        travelMinutes <- Some((railInfo.length / Math.min(train.maxSpeed, railInfo.typeRoute.technology.maxSpeed)) * 60)
+        offsetTime    <- lastTime
         travelStartTime <- offsetTime.departure
         arrivingTime    <- h(travelStartTime.h).m(travelStartTime.m + travelMinutes.toInt).toOption
       yield arrivingTime
 
   /** Default time estimator just considers distance between last station and the given one and train speed. No
     * acceleration and acceleration are considered.
-    *
-    * @return
-    *   TimeEstimator
     */
   given defaultTimeEstimator: TimeEstimator = UnrealTimeEstimator
 
   /** Train timetable to be defined */
   trait PartialTimetable extends Timetable:
-    def stopsIn(station: Station, waitTime: WaitTime): PartialTimetable
-    def transitIn(station: Station): PartialTimetable
-    def arrivesTo(station: Station): TrainTimetable
+    def stopsIn(station: Station, waitTime: WaitTime)(railInfo: RailInfo): PartialTimetable
+    def transitIn(station: Station)(railInfo: RailInfo): PartialTimetable
+    def arrivesTo(station: Station)(railInfo: RailInfo): TrainTimetable
 
   /** Factory of PartialTimetable */
   object PartialTimetable:
     def apply(
         train: Train,
-        travelsOn: Route,
+        startStation: Station,
         departureTime: Either[ClockTimeErrors, ClockTime]
     ): Either[ClockTimeErrors, PartialTimetable] =
       for
         depTime <- departureTime
       yield PartialTrainTimetable(
         train,
-        travelsOn,
+        startStation,
         depTime,
-        ListMap((travelsOn, StartScheduleTime(Some(depTime))))
+        ListMap((startStation, StartScheduleTime(Some(depTime))))
       )
 
     private case class PartialTrainTimetable(
         train: Train,
-        travelsRoute: Route,
+        startStation: Station,
         departureTime: ClockTime,
-        table: ListMap[Route, Time]
+        table: ListMap[Station, Time]
     )(using timeEstimationStrategy: TimeEstimator) extends PartialTimetable:
       private def lastDepartureTime: Option[Time] = table.lastOption.map(_._2)
-      override def stopsIn(route: Route, waitTime: WaitTime): PartialTimetable =
-        insertRoute(
-          route,
-          AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, route, train), Some(waitTime))
+      override def stopsIn(station: Station, waitTime: WaitTime)(railInfo: RailInfo): PartialTimetable =
+        insertStation(
+          station,
+          AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), Some(waitTime))
         )
 
-      override def transitIn(route: Route): PartialTimetable =
-        insertRoute(route, AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, route, train), None))
+      override def transitIn(station: Station)(railInfo: RailInfo): PartialTimetable =
+        insertStation(station, AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), None))
 
-      override def arrivesTo(route: Route): TrainTimetable =
+      override def arrivesTo(station: Station)(railInfo: RailInfo): TrainTimetable =
         TrainTimetableImpl(
-          insertRoute(route, EndScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, route, train))),
-          route.arrival
+          insertStation(station, EndScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train))),
+          station
         )
 
-      private def insertRoute(route: Route, time: Time): PartialTimetable =
-        this.copy(table = table.updated(route, time))
+      private def insertStation(station: Station, time: Time) =
+        this.copy(table = table.updated(station, time))
 
     private case class TrainTimetableImpl(
         private val partialTrainTimetable: PartialTimetable,
