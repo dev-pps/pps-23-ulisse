@@ -2,13 +2,13 @@ package ulisse.entities.simulation
 
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
-import ulisse.entities.simulation.Agents.SimulationAgent
+import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.train.TrainAgent
 
 object Environments:
-
+  trait EnvironmentElement
   trait SimulationEnvironment:
     def doStep(dt: Int): SimulationEnvironment
     def stations: Seq[StationEnvironmentElement]
@@ -36,16 +36,16 @@ object Environments:
       def doStep(dt: Int): SimulationEnvironment =
         val stepActions = agents.map(a => a -> a.doStep(dt, this)).toMap
         stepActions.foldLeft(this.copy(agents = Seq())) {
-          case (env, (agent: TrainAgent, Actions.MoveBy(d))) =>
-            if agent.travelDistance > 0 then
+          case (env, (agent: TrainAgent, Some(Actions.MoveBy(d)))) =>
+            if agent.distanceTravelled > 0 then
               findRoute(agent).map(route =>
-                if agent.travelDistance + d >= route.length then
-                  env.copy(agents = agents ++ Seq(agent.travelDistance = 0)).arriveToDestination(route, agent)
+                if agent.distanceTravelled + d >= route.length then
+                  env.copy(agents = agents ++ Seq(agent.distanceTravelled = 0)).arriveToDestination(route, agent)
                 else
-                  env.copy(agents = agents ++ Seq(agent.updateTravelDistance(d)))
+                  env.copy(agents = agents ++ Seq(agent.updateDistanceTravelled(d)))
               ).getOrElse(env)
             else
-              env.copy(agents = agents ++ Seq(agent.updateTravelDistance(d)))
+              env.copy(agents = agents ++ Seq(agent.updateDistanceTravelled(d)))
           case (env, (agent, _)) => env.copy(agents = agents ++ Seq(agent))
         }
       private def findRoute(agent: TrainAgent): Option[RouteEnvironmentElement] =
