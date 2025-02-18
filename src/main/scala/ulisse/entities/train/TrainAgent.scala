@@ -9,3 +9,4 @@ trait TrainAgent extends Train with SimulationAgent:
   def distanceTravelled_=(newTravelDistance: Double): TrainAgent
   def resetDistanceTravelled(): TrainAgent                       = distanceTravelled = 0
   def updateDistanceTravelled(distanceDelta: Double): TrainAgent = distanceTravelled += distanceDelta
+  def isOnRoute: Boolean                                         = distanceTravelled > 0
