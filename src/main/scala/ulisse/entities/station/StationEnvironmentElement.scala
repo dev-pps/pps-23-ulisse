@@ -2,6 +2,7 @@ package ulisse.entities.station
 
 import ulisse.entities.simulation.Environments.EnvironmentElement
 import ulisse.entities.train.Trains.Train
+import ulisse.utils.CollectionUtils.*
 
 trait StationEnvironmentElement extends Station with EnvironmentElement:
   val tracks: List[Track]
@@ -27,4 +28,4 @@ object StationEnvironmentElement:
     export station.*
 
     def updateTrack(track: Track, train: Option[Train]): StationEnvironmentElement =
-      copy(tracks = tracks.map(t => if t == track then t.withTrain(train) else t))
+      copy(tracks = tracks.updateWhen(_ == track)(_.withTrain(train)))
