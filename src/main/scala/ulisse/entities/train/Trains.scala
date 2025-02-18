@@ -42,6 +42,9 @@ object Trains:
     /** Amount of wagons */
     def length: Int
 
+    /** Length size in meters */
+    def lengthSize: Int
+
     /** @return
       *   max speed reachable by train
       */
@@ -89,5 +92,6 @@ object Trains:
         wagon: Wagon,
         length: Int
     ) extends Train:
-      def maxSpeed: Int = techType.maxSpeed
-      def capacity: Int = wagon.capacity * length
+      override def maxSpeed: Int   = techType.maxSpeed
+      override def capacity: Int   = wagon.capacity * length
+      override def lengthSize: Int = length * wagon.lengthSize
