@@ -74,3 +74,5 @@ final case class StationSettings():
   val list = LinkedBlockingQueue[RouteManager => RouteManager]()
   val port = RouteService(list)
   val map  = GUIView(port)
+
+@main def prova(): Unit = ()

@@ -11,7 +11,7 @@ import ulisse.infrastructures.view.components.ComponentConfigurations.{
 import ulisse.infrastructures.view.components.ComponentMixins.UpdatableContainer
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
-import ulisse.infrastructures.view.components.JStyler
+import ulisse.infrastructures.view.components.JStyles
 import ulisse.infrastructures.view.components.Selectables.SelectableGroup
 import ulisse.infrastructures.view.map.{EditorsView, MapPanel}
 import ulisse.infrastructures.view.menu.Menu
@@ -30,10 +30,10 @@ object SideMenu:
     private val menu_item_height    = 50
     private val logo_size           = 50
     private val openCloseButtonSize = 25
-    private val menuCardStyle = JStyler.rectPaletteStyler(
-      JStyler.rect(JStyler.defaultSizeRect, JStyler.Dimension2D(5, 5), 25),
-      JStyler.palette(JStyler.transparentColor, Theme.light.forwardClick.withAlpha(150), Theme.light.forwardClick)
-    )
+//    private val menuCardStyle = JStyle.rectPaletteStyler(
+//      JStyle.rect(JStyle.defaultSizeRect, JStyle.Dimension2D(5, 5), 25),
+//      JStyle.palette(JStyle.transparentColor, Theme.light.forwardClick.withAlpha(150), Theme.light.forwardClick)
+//      )
 
     private val header = buildHeader()
 
@@ -75,26 +75,24 @@ object SideMenu:
     private def buildHeader(): JImageCard =
       val headerLeftContent = JImageCard.horizontal(
         ImagePanel.createImagePanel("icons/logo_circular.png").fixedSize(logo_size, logo_size),
-        Label("Ulisse").alignLeft(),
-        JStyler.transparent.copy(rect = JStyler.defaultRect.copy(padding = JStyler.createPadding(10, 10)))
+        Label("Ulisse").alignLeft()
+//        JStyle.transparent.copy(rect = JStyle.defaultRect.copy(padding = JStyle.createPadding(10, 10)))
       )
       val headerRightContent =
         ImagePanel.createSVGPanel("icons/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(
           openCloseButtonSize,
           openCloseButtonSize
-        ).styler(menuCardStyle).genericClickReaction(menuCallback)
+        ).genericClickReaction(menuCallback)
 
       JImageCard.horizontalWithConfiguration(
         ComponentWithConfiguration(headerRightContent, ComponentConfiguration(Alignment.Center)),
-        headerLeftContent,
-        JStyler.transparent
+        headerLeftContent
       ).reverse()
 
     private def buildMenuCard(imagePath: String, label: String): SelectableJImageCard =
       SelectableJImageCard.horizontal(
         ImagePanel.createSVGPanel(imagePath, Color.BLACK).fixedSize(menu_item_height, menu_item_height),
-        Label(label).alignLeft(),
-        menuCardStyle
+        Label(label).alignLeft()
       )
 
     private def updateSize(): Unit =
@@ -111,7 +109,7 @@ object SideMenu:
       private def realPreferredSize(): Dimension =
         new Dimension(
           menu_item_height + (if imageCard.content.visible then imageCard.content.preferredSize.width
-                              else 0) + 2 * imageCard.rect.padding.width,
-          menu_item_height + 2 * imageCard.rect.padding.height
+                              else 0) + 2 * imageCard.rect.padding.a,
+          menu_item_height + 2 * imageCard.rect.padding.b
         )
       private def toggleLabel(): Unit = imageCard.content.visible = !imageCard.content.visible
