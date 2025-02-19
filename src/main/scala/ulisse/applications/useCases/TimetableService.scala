@@ -69,7 +69,7 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
     // TODO: use cats validated (chain of errors) to provide user all errors that occured during timetable creation
     for
       train            <- trains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
-      stationEntities  <- usrStations.validateStations(routes).toRight(GenericError(s"some station not found"))
+      stationEntities  <- usrStations.validateStations(routes).toRight(GenericError(s"some route not exists"))
       startFrom        <- stationEntities.headOption.toRight(GenericError(s"start station not found"))
       arriveTo         <- stationEntities.lastOption.toRight(GenericError(s"arriving station not found"))
       partialTimetable <- PartialTimetable(train, startFrom._1.departure, Right(departureTime))
