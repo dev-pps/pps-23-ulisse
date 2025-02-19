@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.components.ComponentConfigurations.Alignment
 import ulisse.infrastructures.view.components.JStyler
-import ulisse.infrastructures.view.components.SwingEnhancements.Enhanced
+import ulisse.infrastructures.view.components.SwingEnhancements.EnhancedLook
 
 import java.awt
 import java.awt.{BorderLayout, Color, Graphics}
@@ -105,5 +105,5 @@ object ComponentUtils:
       component.listenTo(ps*)
       component
 
-  extension [J <: Enhanced](j: J)
+  extension [J <: EnhancedLook](j: J)
     def styler(styler: JStyler.JStyler): J = j

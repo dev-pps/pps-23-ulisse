@@ -3,8 +3,8 @@ package ulisse.infrastructures.view.components
 import java.awt.Color
 import javax.swing.BorderFactory
 import javax.swing.border.Border as SwingBorder
-import scala.swing.Font as SwingFont
 import scala.swing.Font.Style.Value as StyleFont
+import scala.swing.{Font as SwingFont, Graphics2D}
 
 object JStyler:
   export JStyles._
@@ -84,6 +84,7 @@ object JStyler:
 
     case class Rect(size: Size, padding: Padding, arc: Int) extends JStyle:
       val swingPadding = BorderFactory.createEmptyBorder(padding.height, padding.width, padding.height, padding.width)
+      def withSize(width: Int, height: Int): Rect = copy(size = Dimension2D(Some(width), Some(height)))
 
     case class Palette(background: Color, clickColor: Option[Color], hoverColor: Option[Color]) extends JStyle
 
