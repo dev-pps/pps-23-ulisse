@@ -4,8 +4,8 @@ layout: home
 
 hero:
   name: "PPS-23-Ulisse"
-  text: "A train infrastructure simulator"
-  tagline: PPS exam project
+  text: "Il simulatore dell'infrastruttura ferroviaria"
+  tagline: Progetto di PPS
   actions:
     - theme: brand
       text: Report
