@@ -1,5 +1,8 @@
 package ulisse.infrastructures.view.components
 
+import ulisse.utils.Pair
+import ulisse.utils.Pair._
+
 import java.awt.image.{BufferedImage, ImageObserver}
 import java.awt.{Color, RenderingHints}
 import javax.imageio.ImageIO
@@ -8,15 +11,15 @@ import scala.swing.Graphics2D
 object JImages:
   export JImage._
 
-  type Position  = JStyles.Pair[Int]
-  type Dimension = JStyles.Pair[Int]
+  type Position  = Pair[Int]
+  type Dimension = Pair[Int]
 
-  val defaultPosition: Position = JStyles.Pair(0, 0)
-  val defaultSize: Dimension    = JStyles.Pair(30, 30)
+  val defaultPosition: Position = Pair(0, 0)
+  val defaultSize: Dimension    = Pair(30, 30)
 
-  def createPosition(x: Int, y: Int): Position             = JStyles.Pair(x, y)
-  def createScale(x: Float, y: Float): JStyles.Pair[Float] = JStyles.Pair(x, y)
-  def createDimension(width: Int, height: Int): Dimension  = JStyles.Pair(width, height)
+  def createPosition(x: Int, y: Int): Position            = Pair(x, y)
+  def createScale(x: Float, y: Float): Pair[Float]        = Pair(x, y)
+  def createDimension(width: Int, height: Int): Dimension = Pair(width, height)
 
   extension (g: Graphics2D)
     def drawImage(image: JImage, observer: ImageObserver): Unit =
@@ -53,8 +56,7 @@ object JImages:
       private val image      = ImageIO.read(url)
       private val silhouette = BufferedImage(image.getWidth, image.getHeight, BufferedImage.TYPE_INT_ARGB)
 
-      override val center: Position =
-        JStyles.Pair(position.a - (dimension.a / 2), position.b - (dimension.b / 2))
+      override val center: Position = Pair(position.a - (dimension.a / 2), position.b - (dimension.b / 2))
 
       private def setupSilhouette(color: Color, observer: ImageObserver): Unit =
         val graphics = silhouette.createGraphics()

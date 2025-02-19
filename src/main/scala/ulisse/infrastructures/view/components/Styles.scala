@@ -1,14 +1,14 @@
 package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.common.Themes
-import ulisse.utils.Swings
+import ulisse.utils.{Pair, Swings}
 
 import java.awt.Color
 import javax.swing.border.Border as SwingBorder
 import scala.swing.Font as SwingFont
 import scala.swing.Font.Style.Value as StyleFont
 
-object JStyles:
+object Styles:
   /** Represent transparent color. */
   val transparentColor: Color = new Color(0, 0, 0, 0)
 
@@ -59,20 +59,6 @@ object JStyles:
 
   /** Common trait to represent a style. */
   trait JStyle
-
-  /** Create a [[Pair]] to represent a pair of values of the same type. */
-  case class Pair[T](a: T, b: T):
-    def withA(newA: T): Pair[T] = copy(a = newA)
-    def withB(newB: T): Pair[T] = copy(b = newB)
-
-  /** Methods to perform operations on a [[Pair]] of [[Numeric]] values. */
-  extension [T: Numeric](pair: Pair[T])
-    def minus(other: Pair[T])(using numeric: Numeric[T]): Pair[T] =
-      Pair(numeric.minus(pair.a, other.a), numeric.minus(pair.b, other.b))
-    def plus(other: Pair[T])(using numeric: Numeric[T]): Pair[T] =
-      Pair(numeric.plus(pair.a, other.a), numeric.plus(pair.b, other.b))
-    def times(other: Pair[T])(using numeric: Numeric[T]): Pair[T] =
-      Pair(numeric.times(pair.a, other.a), numeric.times(pair.b, other.b))
 
   /** [[Size]] represent a dimension with a possible width and height. */
   private type Size = Pair[Option[Int]]

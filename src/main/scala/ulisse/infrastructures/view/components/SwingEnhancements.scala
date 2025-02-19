@@ -22,9 +22,9 @@ object SwingEnhancements:
   trait ShapeEffect extends EnhancedLook:
     self: EnhancedLook =>
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var _rect: JStyles.Rect = initRect(JStyles.defaultRect)
+    private var _rect: Styles.Rect = initRect(Styles.defaultRect)
 
-    private def initRect(newRect: JStyles.Rect): JStyles.Rect =
+    private def initRect(newRect: Styles.Rect): Styles.Rect =
       val width  = newRect.width.getOrElse(size.width)
       val height = newRect.height.getOrElse(size.height)
       size.setSize(width, height)
@@ -34,10 +34,10 @@ object SwingEnhancements:
       newRect
 
     /** Read-only property to get the shape of the component. */
-    def rect: JStyles.Rect = _rect
+    def rect: Styles.Rect = _rect
 
     /** Change the shape of the component. */
-    def rect_=(newRect: JStyles.Rect): Unit = _rect = initRect(newRect)
+    def rect_=(newRect: Styles.Rect): Unit = _rect = initRect(newRect)
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)
@@ -48,20 +48,20 @@ object SwingEnhancements:
   trait ColorEffect extends EnhancedLook:
     self: EnhancedLook =>
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var _palette: JStyles.Palette = initColor(JStyles.defaultPalette)
+    private var _palette: Styles.Palette = initColor(Styles.defaultPalette)
     listenTo(mouse.moves, mouse.clicks)
 
-    private def initColor(newPalette: JStyles.Palette): JStyles.Palette =
+    private def initColor(newPalette: Styles.Palette): Styles.Palette =
       background = newPalette.background
       revalidate()
       repaint()
       newPalette
 
     /** Read-only property to get the color of the component. */
-    def palette: JStyles.Palette = _palette
+    def palette: Styles.Palette = _palette
 
     /** Change the color of the component. */
-    def palette_=(newPalette: JStyles.Palette): Unit = _palette = initColor(newPalette)
+    def palette_=(newPalette: Styles.Palette): Unit = _palette = initColor(newPalette)
 
     reactions += {
       case event.MouseEntered(_, _, _)        => palette.hover.foreach(background = _)
@@ -78,35 +78,35 @@ object SwingEnhancements:
   trait FontEffect extends EnhancedLook:
     self: EnhancedLook =>
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var _font: JStyles.Font = initFont(JStyles.defaultFont)
+    private var _font: Styles.Font = initFont(Styles.defaultFont)
 
-    private def initFont(newFont: JStyles.Font): JStyles.Font =
+    private def initFont(newFont: Styles.Font): Styles.Font =
       font = newFont.swingFont
       foreground = newFont.color
       revalidate()
       repaint()
       newFont
 
-    def fontEffect: JStyles.Font                  = _font
-    def fontEffect_=(newFont: JStyles.Font): Unit = _font = initFont(newFont)
+    def fontEffect: Styles.Font                  = _font
+    def fontEffect_=(newFont: Styles.Font): Unit = _font = initFont(newFont)
 
   /** Trait to enhance the border of swing component and [[_border]] control border params. */
   trait BorderEffect extends EnhancedLook:
     self: EnhancedLook with ShapeEffect =>
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var _border: JStyles.Border = initBorder(JStyles.defaultBorder)
+    private var _border: Styles.Border = initBorder(Styles.defaultBorder)
 
-    private def initBorder(newBorder: JStyles.Border): JStyles.Border =
+    private def initBorder(newBorder: Styles.Border): Styles.Border =
       border = newBorder.swingBorder(rect)
       revalidate()
       repaint()
       newBorder
 
     /** Read-only property to get the border of the component. */
-    def borderEffect: JStyles.Border = _border
+    def borderEffect: Styles.Border = _border
 
     /** Change the border of the component. */
-    def borderEffect_=(newBorder: JStyles.Border): Unit = _border = initBorder(newBorder)
+    def borderEffect_=(newBorder: Styles.Border): Unit = _border = initBorder(newBorder)
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)

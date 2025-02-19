@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyles.*
+import ulisse.infrastructures.view.components.Styles.*
 
 class RectStyleTest extends AnyFlatSpec with Matchers:
 
