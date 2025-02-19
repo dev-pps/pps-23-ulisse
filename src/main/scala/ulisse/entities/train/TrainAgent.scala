@@ -18,5 +18,4 @@ object TrainAgent:
   private final case class TrainAgentImpl(train: Train, distanceTravelled: Double) extends TrainAgent:
     export train.*
     def distanceTravelled_=(newDistanceTravelled: Double): TrainAgent = copy(distanceTravelled = newDistanceTravelled)
-
     override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[Actions.SimulationAction] = None
