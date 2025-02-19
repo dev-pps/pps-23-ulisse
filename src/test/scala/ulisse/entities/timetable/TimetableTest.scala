@@ -3,31 +3,19 @@ package ulisse.entities.timetable
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
-import ulisse.entities.Coordinate
 import ulisse.entities.Routes.TypeRoute.AV
 import ulisse.entities.Routes.TypeRoute
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.ScheduleTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
 import ulisse.entities.timetable.Timetables.{toWaitTime, PartialTimetable, RailInfo, TrainTimetable}
-import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.{ClockTime, ClockTimeErrors}
+import ulisse.entities.timetable.TestMockedEntities.*
 
 import scala.collection.immutable.ListMap
 import scala.language.postfixOps
 
 class TimetableTest extends AnyFlatSpec:
-  val trainTechnology: TrainTechnology = TrainTechnology("AV", maxSpeed = 300, acceleration = 1.5, deceleration = 1.0)
-  val wagonInfo: Wagons.Wagon          = Wagons.PassengerWagon(300)
-  val AV1000Train: Train               = Train(name = "AV1000", trainTechnology, wagonInfo, length = 4)
-  private val railAV_10                = RailInfo(length = 10, typeRoute = AV)
-
-  private val stationA = Station("Station A", Coordinate(0, 0), 1)
-  private val stationB = Station("Station B", Coordinate(10, 0), 1) // 2 min from A
-  private val stationC = Station("Station C", Coordinate(25, 0), 1) // 3 min from B
-  private val stationD = Station("Station D", Coordinate(50, 0), 1) // 5 min from C
-  private val stationF = Station("Station F", Coordinate(55, 0), 1) // 1 min from D
 
   val partialTimetable: Either[ClockTimeErrors, PartialTimetable] =
     PartialTimetable(train = AV1000Train, startStation = stationA, departureTime = h(9).m(0))
