@@ -3,6 +3,7 @@ package ulisse.entities.timetable
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
+import ulisse.TestUtility.in
 import ulisse.entities.Routes.TypeRoute.AV
 import ulisse.entities.Routes.TypeRoute
 import ulisse.entities.station.Station
@@ -26,12 +27,6 @@ class TimetableTest extends AnyFlatSpec:
         .transitIn(stationC)(railAV_10)
         .stopsIn(stationD, waitTime = 10)(railAV_10)
         .arrivesTo(stationF)(railAV_10)
-
-  extension (timetable: Either[ClockTimeErrors, TrainTimetable])
-    def in(test: TrainTimetable => Unit): Unit =
-      timetable match
-        case Left(e)  => fail(s"Test init departure time error: $e")
-        case Right(t) => test(t)
 
   "When create new Timetable" should "be returned an error if departure time is not valid" in:
     val invalidDepartureTime = h(50).m(0)

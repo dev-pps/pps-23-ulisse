@@ -8,7 +8,6 @@ import ulisse.TestUtility.and
 import ulisse.applications.ports.TimetablePorts
 import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.GenericError
 import ulisse.entities.Routes
-import ulisse.entities.timetable.TestMockedEntities.{stationA, stationB, stationC, AV1000Train}
 import ulisse.entities.timetable.Timetables
 import ulisse.entities.timetable.Timetables.TrainTimetable
 import ulisse.utils.Times.FluentDeclaration.h
@@ -17,6 +16,7 @@ import scala.concurrent.duration.Duration
 import scala.language.postfixOps
 
 class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
+  import ulisse.entities.timetable.TestMockedEntities.{stationA, stationB, stationC, stationD, AV1000Train}
   def TestEnvironment(): Either[NonEmptyChain[Routes.Errors], TimetableTestEnvironment.TestEnvConfig] =
     TimetableTestEnvironment()
 
@@ -52,8 +52,13 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
     Scenario("User tries to create timetable with some not existing station names"):
       (TestEnvironment() and h(9).m(30)): (env, departureTime) =>
         Given("A valid train name, existing station names list with some invalid station name")
+        val notExistingStation = "Station Z"
+        val invalidStations    = List(notExistingStation, stationC.name, stationD.name).map(s => (s, None))
         When("User request to save timetable")
+        val requestResult = env.inputPort.createTimetable(AV1000Train.name, departureTime, invalidStations)
+        env.updateState()
         Then("should be returned an invalid station error")
+        Await.result(requestResult, Duration.Inf) shouldBe Left(GenericError("some route not exists"))
 
     Scenario("User tries to create timetable with invalid order of station names"):
       (TestEnvironment() and h(8).m(30)): (env, departureTime) =>
