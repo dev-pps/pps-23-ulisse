@@ -27,21 +27,20 @@ object RouteEnvironmentElement:
     def take(route: RouteEnvironmentElement): Option[RouteEnvironmentElement] =
       route.firstAvailableTrack.flatMap(track => route.putTrain(track, train))
 
-    def leave(route: RouteEnvironmentElement): Option[RouteEnvironmentElement] =
-      route.tracks.find(_.contains(train)).flatMap(track => route.removeTrain(train))
-
     def findInRoutes(routes: Seq[RouteEnvironmentElement]): Option[RouteEnvironmentElement] =
-      routes.find(_.tracks.exists(_.contains(train)))
+      routes.find(ree => train.existInRoute(ree.tracks))
+
+  extension (train: Train)
+    private[RouteEnvironmentElement] def existInRoute(tracks: Seq[Seq[TrainAgent]]): Boolean =
+      tracks.exists(train.existInTrack)
+    private[RouteEnvironmentElement] def existInTrack(trains: Seq[TrainAgent]): Boolean = trains.exists(train.matchId)
+    private[RouteEnvironmentElement] def matchId(otherTrain: Train): Boolean            = train.name == otherTrain.name
 
   private final case class RouteEnvironmentElementImpl(route: Route, tracks: Seq[Seq[TrainAgent]])
       extends RouteEnvironmentElement:
     export route.*
     // TODO evaluate moving this in factory method
     val minPermittedDistanceBetweenTrains: Double = 100.0
-    extension (train: Train)
-      private def existInRoute(trains: Seq[Seq[TrainAgent]]): Boolean = trains.exists(train.existInTrack)
-      private def existInTrack(trains: Seq[TrainAgent]): Boolean      = trains.exists(train.matchId)
-      private def matchId(otherTrain: Train): Boolean                 = train.name == otherTrain.name
 
     private def whenTrainExists[A](f: => A)(using train: Train): Option[A] =
       f when train.existInRoute(tracks)
@@ -55,9 +54,11 @@ object RouteEnvironmentElement:
       copy(tracks =
         tracks.updateFirstWhen(_ == routeTrack)(_ ++ Seq(train))
       ) when routeTrack.isAvailable && !train.existInRoute(tracks)
+
     def updateTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
       whenTrainExists:
         modifyItInTrack(_.updateWhen(train.matchId)(_ => train))
+
     def removeTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
       whenTrainExists:
         modifyItInTrack(_.filterNot(train.matchId))
