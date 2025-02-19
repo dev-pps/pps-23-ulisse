@@ -1,7 +1,5 @@
 package ulisse.infrastructures.view.components
 
-import ulisse.infrastructures.view.components.JStyler.JStyles
-
 import java.awt.image.{BufferedImage, ImageObserver}
 import java.awt.{Color, RenderingHints}
 import javax.imageio.ImageIO
@@ -10,15 +8,15 @@ import scala.swing.Graphics2D
 object JImages:
   export JImage._
 
-  type Position  = JStyler.Dimension2D[Int]
-  type Dimension = JStyler.Dimension2D[Int]
+  type Position  = JStyles.Pair[Int]
+  type Dimension = JStyles.Pair[Int]
 
-  val defaultPosition: Position = JStyler.Dimension2D(0, 0)
-  val defaultSize: Dimension    = JStyler.Dimension2D(30, 30)
+  val defaultPosition: Position = JStyles.Pair(0, 0)
+  val defaultSize: Dimension    = JStyles.Pair(30, 30)
 
-  def createPosition(x: Int, y: Int): Position                    = JStyler.Dimension2D(x, y)
-  def createScale(x: Float, y: Float): JStyler.Dimension2D[Float] = JStyler.Dimension2D(x, y)
-  def createDimension(width: Int, height: Int): Dimension         = JStyler.Dimension2D(width, height)
+  def createPosition(x: Int, y: Int): Position             = JStyles.Pair(x, y)
+  def createScale(x: Float, y: Float): JStyles.Pair[Float] = JStyles.Pair(x, y)
+  def createDimension(width: Int, height: Int): Dimension  = JStyles.Pair(width, height)
 
   extension (g: Graphics2D)
     def drawImage(image: JImage, observer: ImageObserver): Unit =
@@ -31,10 +29,10 @@ object JImages:
     def hasCollided(item: JImage): Boolean =
       val x          = point.x
       val y          = point.y
-      val itemX      = item.center.width
-      val itemY      = item.center.height
-      val itemWidth  = item.dimension.width
-      val itemHeight = item.dimension.height
+      val itemX      = item.center.a
+      val itemY      = item.center.b
+      val itemWidth  = item.dimension.a
+      val itemHeight = item.dimension.b
       x >= itemX && x <= itemX + itemWidth && y >= itemY && y <= itemY + itemHeight
 
   trait JImage:
@@ -56,7 +54,7 @@ object JImages:
       private val silhouette = BufferedImage(image.getWidth, image.getHeight, BufferedImage.TYPE_INT_ARGB)
 
       override val center: Position =
-        JStyler.Dimension2D(position.width - (dimension.width / 2), position.height - (dimension.height / 2))
+        JStyles.Pair(position.a - (dimension.a / 2), position.b - (dimension.b / 2))
 
       private def setupSilhouette(color: Color, observer: ImageObserver): Unit =
         val graphics = silhouette.createGraphics()
@@ -68,14 +66,14 @@ object JImages:
         graphics.dispose()
 
       override def draw(g: Graphics2D, observer: ImageObserver): Unit =
-        g.drawImage(image, center.width, center.height, dimension.width, dimension.height, observer)
+        g.drawImage(image, center.a, center.b, dimension.a, dimension.b, observer)
 
       override def drawSilhouette(g: Graphics2D, scale: Float, color: Color, observer: ImageObserver): Unit =
         setupSilhouette(color, observer)
 
-        val scaleSize     = createDimension((dimension.width * scale).toInt, (dimension.height * scale).toInt)
-        val evenSize      = scaleSize.plus(createDimension(scaleSize.width % 2, scaleSize.height % 2))
+        val scaleSize     = createDimension((dimension.a * scale).toInt, (dimension.b * scale).toInt)
+        val evenSize      = scaleSize.plus(createDimension(scaleSize.a % 2, scaleSize.b % 2))
         val differentSize = evenSize.minus(dimension)
-        val pos           = center.minus(createPosition(differentSize.width / 2, differentSize.height / 2))
+        val pos           = center.minus(createPosition(differentSize.a / 2, differentSize.b / 2))
 
-        g.drawImage(silhouette, pos.width, pos.height, evenSize.width, evenSize.height, observer)
+        g.drawImage(silhouette, pos.a, pos.b, evenSize.a, evenSize.b, observer)

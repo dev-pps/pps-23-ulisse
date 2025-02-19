@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.JStyler.*
+import ulisse.infrastructures.view.components.JStyles.*
 
 import java.awt.Color
 import scala.swing.Font
@@ -10,42 +10,53 @@ import scala.swing.Font
 class FontStyleTest extends AnyFlatSpec with Matchers:
 
   "default font style" should "be default parameters" in:
-    defaultFont.nameFont mustBe defaultNameFont
-    defaultFont.styleFont mustBe defaultStyleFont
-    defaultFont.colorFont mustBe defaultColorFont
-    defaultFont.sizeFont mustBe defaultSizeFont
+    defaultFont.name mustBe defaultNameFont
+    defaultFont.style mustBe defaultStyleFont
+    defaultFont.color mustBe defaultColorFont
+    defaultFont.size mustBe defaultSizeFont
 
-  "name font style" should "be SanSerif" in:
-    val name = nameFont("SanSerif")
-    name.nameFont mustBe "SanSerif"
-    name.styleFont mustBe defaultStyleFont
-    name.colorFont mustBe defaultColorFont
-    name.sizeFont mustBe defaultSizeFont
+  "font transform in swing font" should "be the same" in:
+    val transformInSwingFont = defaultFont.swingFont
+    val swingFont            = new Font(defaultNameFont, defaultStyleFont.id, defaultSizeFont)
 
-  "style font style" should "be Bold" in:
-    val style = styleFont(Font.Bold)
-    style.nameFont mustBe defaultNameFont
-    style.styleFont mustBe Font.Bold
-    style.colorFont mustBe defaultColorFont
-    style.sizeFont mustBe defaultSizeFont
+    transformInSwingFont mustBe swingFont
 
-  "color font style" should "be red" in:
-    val color = colorFont(Color.red)
-    color.nameFont mustBe defaultNameFont
-    color.styleFont mustBe defaultStyleFont
-    color.colorFont mustBe Color.red
-    color.sizeFont mustBe defaultSizeFont
+  "font with name" should "change name" in:
+    val fontName = "SanSerif"
+    val newFont  = defaultFont.withName(fontName)
 
-  "size font style" should "be 20" in:
-    val size = sizeFont(20)
-    size.nameFont mustBe defaultNameFont
-    size.styleFont mustBe defaultStyleFont
-    size.colorFont mustBe defaultColorFont
-    size.sizeFont mustBe 20
+    newFont must not be defaultFont
+    newFont.name mustBe fontName
 
-  "new font style" should "be SanSerif, Bold, 20" in:
-    val complete = font("SanSerif", Font.Bold, Color.red, 20)
-    complete.nameFont mustBe "SanSerif"
-    complete.styleFont mustBe Font.Bold
-    complete.colorFont mustBe Color.red
-    complete.sizeFont mustBe 20
+  "font with style" should "change style" in:
+    val fontStyle = Font.Bold
+    val newFont   = defaultFont.withStyle(fontStyle)
+
+    newFont must not be defaultFont
+    newFont.style mustBe fontStyle
+
+  "font with color" should "change color" in:
+    val fontColor = Color.red
+    val newFont   = defaultFont.withColor(fontColor)
+
+    newFont must not be defaultFont
+    newFont.color mustBe fontColor
+
+  "font with size" should "change size" in:
+    val fontSize = 20
+    val newFont  = defaultFont.withSize(fontSize)
+
+    newFont must not be defaultFont
+    newFont.size mustBe fontSize
+
+  "create a new font" should "have new name, style, color and size" in:
+    val fontName  = "SanSerif"
+    val fontStyle = Font.Bold
+    val fontColor = Color.red
+    val fontSize  = 20
+    val newFont   = createFont(fontName, fontStyle, fontColor, fontSize)
+
+    newFont.name mustBe fontName
+    newFont.style mustBe fontStyle
+    newFont.color mustBe fontColor
+    newFont.size mustBe fontSize

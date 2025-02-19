@@ -1,8 +1,7 @@
 package ulisse.infrastructures.view.common
 
 import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.JStyler.JStyles
-import ulisse.infrastructures.view.components.{ComposedSwing, ExtendedSwing, JStyler}
+import ulisse.infrastructures.view.components.{ComposedSwing, ExtendedSwing, JStyles}
 import ulisse.infrastructures.view.map.ViewObservers.ViewObserver
 
 import scala.swing.Font.Style
@@ -18,15 +17,18 @@ object Form:
   def createStation(): StationForm   = StationForm()
   def createSchedule(): ScheduleForm = ScheduleForm()
 
-  private val formRect: JStyler.Rect       = JStyler.defaultRect.copy(padding = JStyler.createPadding(40, 0), arc = 15)
-  private val formPalette: JStyler.Palette = JStyler.backgroundPalette(Theme.light.element)
+  private val formRect: JStyles.Rect       = JStyles.defaultRect.withPaddingWidthAndHeight(40, 0).withArc(15)
+  private val formPalette: JStyles.Palette = JStyles.defaultPalette.withBackground(Theme.light.element)
 
-  private val titleFont  = JStyler.defaultFont.copy(styleFont = Style.Bold, colorFont = Theme.light.text, sizeFont = 36)
-  private val buttonRect = JStyler.defaultRect.copy(padding = JStyler.createPadding(20, 10), arc = 10)
-  private val buttonPalette      = JStyler.backgroundHoverPalette(Theme.light.text, Theme.light.forwardClick)
-  private val buttonFont         = JStyler.defaultFont.copy(colorFont = Theme.light.background)
-  private val trueButtonPalette  = buttonPalette.copy(clickColor = Some(Theme.light.trueClick))
-  private val falseButtonPalette = buttonPalette.copy(clickColor = Some(Theme.light.falseClick))
+  private val titleFont  = JStyles.defaultFont.copy(style = Style.Bold, color = Theme.light.text, size = 36)
+  private val buttonRect = JStyles.defaultRect.withPaddingWidthAndHeight(20, 10)
+
+  private val buttonPalette =
+    JStyles.defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.forwardClick)
+
+  private val buttonFont         = JStyles.defaultFont.copy(color = Theme.light.background)
+  private val trueButtonPalette  = buttonPalette.copy(click = Some(Theme.light.trueClick))
+  private val falseButtonPalette = buttonPalette.copy(click = Some(Theme.light.falseClick))
 
   private case class BaseForm(title: String, fields: ComposedSwing.JInfoTextField*):
     private val mainPanel: ExtendedSwing.JBoxPanelItem = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
