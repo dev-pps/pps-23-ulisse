@@ -21,13 +21,13 @@ object ComposedSwing:
   def createToggleIconButton(onIconPath: String, offIconPath: String): JToggleIconButton =
     JToggleIconButton(onIconPath, offIconPath)
 
-  private val elementPalette: JStyles.Palette = JStyles.defaultPalette.withClick(Theme.light.overlayElement)
+  private val elementPalette: Styles.Palette = Styles.defaultPalette.withClick(Theme.light.overlayElement)
 
   case class JInfoTextField(title: String) extends ComposedSwing:
-    private val colum                       = 15
-    private val textFieldRect: JStyles.Rect = JStyles.defaultRect.withPaddingWidthAndHeight(10, 5)
-    private val paletteRect: JStyles.Palette =
-      JStyles.defaultPalette.withBackground(Theme.light.background.withAlpha(50))
+    private val colum                      = 15
+    private val textFieldRect: Styles.Rect = Styles.defaultRect.withPaddingWidthAndHeight(10, 5)
+    private val paletteRect: Styles.Palette =
+      Styles.defaultPalette.withBackground(Theme.light.background.withAlpha(50))
 
     private val mainPanel  = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
     private val labelPanel = ExtendedSwing.JFlowPanelItem()
@@ -48,10 +48,10 @@ object ComposedSwing:
     private val width  = 100
     private val height = 40
 
-    private val openPalette: JStyles.Palette =
-      JStyles.createPalette(Theme.light.background.withAlpha(50), Theme.light.forwardClick, Theme.light.forwardClick)
-    private val closePalette: JStyles.Palette =
-      JStyles.createPalette(Theme.light.overlayElement, Theme.light.forwardClick, Theme.light.forwardClick)
+    private val openPalette: Styles.Palette =
+      Styles.createPalette(Theme.light.background.withAlpha(50), Theme.light.forwardClick, Theme.light.forwardClick)
+    private val closePalette: Styles.Palette =
+      Styles.createPalette(Theme.light.overlayElement, Theme.light.forwardClick, Theme.light.forwardClick)
 
     private val mainPanel = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
     mainPanel.palette = openPalette
@@ -95,7 +95,7 @@ object ComposedSwing:
     override def component[T >: Component]: T = mainPanel
 
   case class JNavBar(iconLabels: JIconLabel*) extends ComposedSwing:
-    private val panelRect: JStyles.Rect = JStyles.defaultRect.withPaddingWidthAndHeight(40, 20)
+    private val panelRect: Styles.Rect = Styles.defaultRect.withPaddingWidthAndHeight(40, 20)
 
     private val mainPanel = ExtendedSwing.JFlowPanelItem()
     mainPanel.rect = panelRect
@@ -116,7 +116,7 @@ object ComposedSwing:
     override def component[T >: Component]: T = mainPanel
 
   case class JTabbedPane(iconLabels: JIconLabel*) extends ComposedSwing:
-    private val panelPalette: JStyles.Palette = JStyles.defaultPalette.withBackground(Theme.light.element)
+    private val panelPalette: Styles.Palette = Styles.defaultPalette.withBackground(Theme.light.element)
 
     private val mainPanel = ExtendedSwing.JBorderPanelItem()
     mainPanel.palette = panelPalette

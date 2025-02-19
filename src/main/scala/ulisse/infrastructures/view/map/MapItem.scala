@@ -2,8 +2,9 @@ package ulisse.infrastructures.view.map
 
 import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.components.JImages.*
-import ulisse.infrastructures.view.components.JStyles
+import ulisse.infrastructures.view.components.Styles
 import ulisse.infrastructures.view.map.ViewObservers.ViewObservable
+import ulisse.utils.Pair
 
 import java.awt
 import java.awt.Color
@@ -23,14 +24,14 @@ trait MapItem extends ViewObservable[Point]:
 
 object MapItem:
   def createSingleItem(imagePath: String, x: Int, y: Int): SingleItem =
-    SingleItem(imagePath, JStyles.Pair(x, y), defaultSize)
+    SingleItem(imagePath, Pair(x, y), defaultSize)
 
   sealed case class SingleItem(imagePath: String, pos: Position, dim: Dimension) extends MapItem:
     private val image          = JImage.createWithPosition(imagePath, pos, dim)
     private val itemObservable = ViewObservers.createObservable[Point]
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var currentColorSilhouette: Color = JStyles.transparentColor
+    private var currentColorSilhouette: Color = Styles.transparentColor
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var isSilhouetteShown: Boolean = false
 

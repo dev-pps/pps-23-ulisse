@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.common
 
 import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.{ComposedSwing, ExtendedSwing, JStyles}
+import ulisse.infrastructures.view.components.{ComposedSwing, ExtendedSwing, Styles}
 import ulisse.infrastructures.view.map.ViewObservers.ViewObserver
 
 import scala.swing.Font.Style
@@ -17,16 +17,16 @@ object Form:
   def createStation(): StationForm   = StationForm()
   def createSchedule(): ScheduleForm = ScheduleForm()
 
-  private val formRect: JStyles.Rect       = JStyles.defaultRect.withPaddingWidthAndHeight(40, 0).withArc(15)
-  private val formPalette: JStyles.Palette = JStyles.defaultPalette.withBackground(Theme.light.element)
+  private val formRect: Styles.Rect       = Styles.defaultRect.withPaddingWidthAndHeight(40, 0).withArc(15)
+  private val formPalette: Styles.Palette = Styles.defaultPalette.withBackground(Theme.light.element)
 
-  private val titleFont  = JStyles.defaultFont.copy(style = Style.Bold, color = Theme.light.text, size = 36)
-  private val buttonRect = JStyles.defaultRect.withPaddingWidthAndHeight(20, 10)
+  private val titleFont  = Styles.defaultFont.copy(style = Style.Bold, color = Theme.light.text, size = 36)
+  private val buttonRect = Styles.defaultRect.withPaddingWidthAndHeight(20, 10)
 
   private val buttonPalette =
-    JStyles.defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.forwardClick)
+    Styles.defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.forwardClick)
 
-  private val buttonFont         = JStyles.defaultFont.copy(color = Theme.light.background)
+  private val buttonFont         = Styles.defaultFont.copy(color = Theme.light.background)
   private val trueButtonPalette  = buttonPalette.copy(click = Some(Theme.light.trueClick))
   private val falseButtonPalette = buttonPalette.copy(click = Some(Theme.light.falseClick))
 

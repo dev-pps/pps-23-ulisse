@@ -11,7 +11,7 @@ import ulisse.infrastructures.view.components.ComponentConfigurations.{
 import ulisse.infrastructures.view.components.ComponentMixins.UpdatableContainer
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
-import ulisse.infrastructures.view.components.JStyles
+import ulisse.infrastructures.view.components.Styles
 import ulisse.infrastructures.view.components.Selectables.SelectableGroup
 import ulisse.infrastructures.view.map.{EditorsView, MapPanel}
 import ulisse.infrastructures.view.menu.Menu

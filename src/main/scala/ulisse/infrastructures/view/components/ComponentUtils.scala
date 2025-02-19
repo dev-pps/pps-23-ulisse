@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.components.ComponentConfigurations.Alignment
-import ulisse.infrastructures.view.components.JStyles
+import ulisse.infrastructures.view.components.Styles
 import ulisse.infrastructures.view.components.SwingEnhancements.EnhancedLook
 
 import java.awt
