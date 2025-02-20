@@ -73,10 +73,10 @@ object ImageEnhancements:
     def palette_=(newPalette: Styles.Palette): Unit = _palette = initColor(newPalette)
 
     reactions += {
-      case _: event.MouseEntered  => palette.hover.foreach(background = _)
-      case _: event.MouseExited   => palette.hover.foreach(_ => background = palette.background)
-      case _: event.MousePressed  => palette.click.foreach(background = _)
-      case _: event.MouseReleased => palette.click.foreach(_ => background = palette.background)
+      case _: event.MouseEntered  => palette.hoverClick.foreach(background = _)
+      case _: event.MouseExited   => palette.hoverClick.foreach(_ => background = palette.background)
+      case _: event.MousePressed  => palette.clickColor.foreach(background = _)
+      case _: event.MouseReleased => palette.clickColor.foreach(_ => background = palette.background)
     }
 
     override protected def paintImage(g: Graphics2D): Unit =

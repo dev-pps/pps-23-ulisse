@@ -20,20 +20,19 @@ object Form:
   private val formRect: Styles.Rect       = Styles.defaultRect.withPaddingWidthAndHeight(40, 0).withArc(15)
   private val formPalette: Styles.Palette = Styles.defaultPalette.withBackground(Theme.light.element)
 
-  private val titleFont  = Styles.defaultFont.copy(style = Style.Bold, color = Theme.light.text, size = 36)
+  private val titleFont  = Styles.defaultFont.copy(style = Style.Bold, size = 36)
   private val buttonRect = Styles.defaultRect.withPaddingWidthAndHeight(20, 10)
 
   private val buttonPalette =
-    Styles.defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.forwardClick)
+    Styles.defaultPalette.withBackground(Theme.light.text).withHoverColor(Theme.light.forwardClick)
 
-  private val buttonFont         = Styles.defaultFont.copy(color = Theme.light.background)
-  private val trueButtonPalette  = buttonPalette.copy(click = Some(Theme.light.trueClick))
-  private val falseButtonPalette = buttonPalette.copy(click = Some(Theme.light.falseClick))
+  private val trueButtonPalette  = buttonPalette.copy(clickColor = Some(Theme.light.trueClick))
+  private val falseButtonPalette = buttonPalette.copy(clickColor = Some(Theme.light.falseClick))
 
   private case class BaseForm(title: String, fields: ComposedSwing.JInfoTextField*):
     private val mainPanel: ExtendedSwing.JBoxPanelItem = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
     mainPanel.rect = formRect
-    mainPanel.palette = formPalette
+    mainPanel.rectPalette = formPalette
     private val insertForm: ComposedSwing.JInsertForm = ComposedSwing.createInsertForm(title, fields: _*)
     private val space                                 = 10
 
@@ -58,12 +57,12 @@ object Form:
     private val form       = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
     private val saveButton = ExtendedSwing.JButtonItem("Save")
     saveButton.rect = buttonRect
-    saveButton.palette = trueButtonPalette
-    saveButton.fontEffect = buttonFont
+    saveButton.rectPalette = trueButtonPalette
+//    saveButton.fontEffect = buttonFont
     private val deleteButton = ExtendedSwing.JButtonItem("Delete")
     deleteButton.rect = buttonRect
-    deleteButton.palette = falseButtonPalette
-    deleteButton.fontEffect = buttonFont
+    deleteButton.rectPalette = falseButtonPalette
+//    deleteButton.fontEffect = buttonFont
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
@@ -90,12 +89,12 @@ object Form:
 
     private val saveButton = ExtendedSwing.JButtonItem("Save")
     saveButton.rect = buttonRect
-    saveButton.palette = trueButtonPalette
-    saveButton.fontEffect = buttonFont
+    saveButton.rectPalette = trueButtonPalette
+//    saveButton.fontEffect = buttonFont
     private val deleteButton = ExtendedSwing.JButtonItem("Delete")
     deleteButton.rect = buttonRect
-    deleteButton.palette = falseButtonPalette
-    deleteButton.fontEffect = buttonFont
+    deleteButton.rectPalette = falseButtonPalette
+//    deleteButton.fontEffect = buttonFont
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
@@ -119,12 +118,12 @@ object Form:
 
     private val saveButton = ExtendedSwing.JButtonItem("Save")
     saveButton.rect = buttonRect
-    saveButton.palette = trueButtonPalette
-    saveButton.fontEffect = buttonFont
+    saveButton.rectPalette = trueButtonPalette
+//    saveButton.fontColor = buttonFont
     private val deleteButton = ExtendedSwing.JButtonItem("Delete")
     deleteButton.rect = buttonRect
-    deleteButton.palette = falseButtonPalette
-    deleteButton.fontEffect = buttonFont
+    deleteButton.rectPalette = falseButtonPalette
+//    deleteButton.fontEffect = buttonFont
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
