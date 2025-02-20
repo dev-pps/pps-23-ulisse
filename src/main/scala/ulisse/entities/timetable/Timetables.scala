@@ -60,9 +60,9 @@ object Timetables:
     */
   private object UnrealTimeEstimator extends TimeEstimator:
     def ETA(lastTime: Option[Time], railInfo: RailInfo, train: Train): Option[ClockTime] =
+      val travelMinutes = (railInfo.length / Math.min(train.maxSpeed, railInfo.typeRoute.technology.maxSpeed)) * 60
       for
-        travelMinutes <- Some((railInfo.length / Math.min(train.maxSpeed, railInfo.typeRoute.technology.maxSpeed)) * 60)
-        offsetTime    <- lastTime
+        offsetTime      <- lastTime
         travelStartTime <- offsetTime.departure
         arrivingTime    <- h(travelStartTime.h).m(travelStartTime.m + travelMinutes.toInt).toOption
       yield arrivingTime
