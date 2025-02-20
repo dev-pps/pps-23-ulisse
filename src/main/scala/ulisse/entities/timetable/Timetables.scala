@@ -93,14 +93,14 @@ object Timetables:
     ): Either[ClockTimeErrors, PartialTimetable] =
       for
         depTime <- departureTime
-      yield PartialTrainTimetable(
+      yield PartialTimetableImpl(
         train,
         startStation,
         depTime,
         ListMap((startStation, StartScheduleTime(Some(depTime))))
       )
 
-    private case class PartialTrainTimetable(
+    private case class PartialTimetableImpl(
         train: Train,
         startStation: Station,
         departureTime: ClockTime,
