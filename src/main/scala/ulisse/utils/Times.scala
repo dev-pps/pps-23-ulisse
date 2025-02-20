@@ -1,7 +1,6 @@
 package ulisse.utils
 
 import ulisse.utils.Errors.{BaseError, ErrorMessage}
-
 import scala.annotation.targetName
 
 object Times:
@@ -21,10 +20,15 @@ object Times:
     override def toString: String = s"$h:$m"
 
   object ClockTime:
+    private val maxDayHours   = 23
+    private val minDayHours   = 0
+    private val maxDayMinutes = 59
+    private val minDayMinutes = 0
+
     def apply(h: Int, m: Int): Either[ClockTimeErrors, ClockTime] =
       for
-        h <- ValidationUtils.validateRange(h, 0, 23, InvalidHours())
-        m <- ValidationUtils.validateRange(m, 0, 59, InvalidMinutes())
+        h <- ValidationUtils.validateRange(h, minDayHours, maxDayHours, InvalidHours())
+        m <- ValidationUtils.validateRange(m, minDayMinutes, maxDayMinutes, InvalidMinutes())
       yield ClockTimeImpl(h, m)
 
     private case class ClockTimeImpl(h: Int, m: Int) extends ClockTime
@@ -52,15 +56,9 @@ object Times:
       def m(minutes: Int): Either[ClockTimeErrors, ClockTime] = ClockTime(hb.hours, minutes)
 
   /** Ordering implementation for ClockTime.
-    *
     * ClockTimes are compared by hours (`h`) and then by minutes (`m`) if hours are equals.
     */
-  given Ordering[ClockTime] with
-    override def compare(x: ClockTime, y: ClockTime): Int =
-      val hoursComparison = x.h.compare(y.h)
-      hoursComparison match
-        case _ if hoursComparison == 0 => x.m.compare(y.m)
-        case _                         => hoursComparison
+  given Ordering[ClockTime] = Ordering.by(ct => (ct.h, ct.m))
 
   /** @param t
     *   first TimeClock
@@ -125,8 +123,10 @@ object Times:
       summon[Ordering[ClockTime]].compare(time, time2) == 0
 
   private def calculateSum(t: ClockTime, t2: ClockTime): Either[ClockTimeErrors, ClockTime] =
-    val totalMinutes = t.m + t2.m
-    val extraHours   = totalMinutes / 60
-    val minutes      = totalMinutes              % 60
-    val hours        = (t.h + t2.h + extraHours) % 24
+    val minutesInHour = 60
+    val hoursInDay    = 24
+    val totalMinutes  = t.m + t2.m
+    val extraHours    = totalMinutes / minutesInHour
+    val minutes       = totalMinutes              % minutesInHour
+    val hours         = (t.h + t2.h + extraHours) % hoursInDay
     ClockTime(hours, minutes)
