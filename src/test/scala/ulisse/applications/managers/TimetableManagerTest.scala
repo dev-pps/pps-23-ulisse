@@ -5,18 +5,12 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
 import TimetableManagers.TimetableManagerErrors.{AcceptanceError, TimetableNotFound}
+import ulisse.TestUtility.in
 import ulisse.entities.Routes.TypeRoute.AV
 import ulisse.entities.timetable.Timetables.{PartialTimetable, RailInfo, TrainTimetable}
 import ulisse.utils.Times.FluentDeclaration.h
 
 class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
-
-  import ulisse.utils.Times.ClockTimeErrors
-  extension (timetable: Either[ClockTimeErrors, TrainTimetable])
-    def performTest(test: TrainTimetable => Unit): Unit =
-      timetable match
-        case Left(err) => fail(s"Some invalid timetable was used in test! error: $err")
-        case Right(t)  => test(t)
 
   import ulisse.entities.train.Trains.{Train, TrainTechnology}
   private def trainRV_3905: Train =
@@ -39,7 +33,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
       )
 
     Scenario("Save new train timetable"):
-      testTimetable performTest: simpleTimetable =>
+      testTimetable in: simpleTimetable =>
         val managerWithSimpleTimetable = TimetableManagers.TimetableManager(List(simpleTimetable))
         Given("a TrainTimetable and a new brand TimeTableManager")
         val emptyManager = TimetableManagers.emptyManager()
@@ -57,7 +51,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
               .arrivesTo(stationC)(railAV_10)
           )
         Then("Should be returned an error and timetable is not saved")
-        overlappedTimetable.performTest: t2 =>
+        overlappedTimetable in: t2 =>
           managerWithSimpleTimetable.save(t2) should be(
             Left(AcceptanceError("Overlapped timetable: train not available"))
           )
@@ -69,7 +63,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
             .arrivesTo(stationC)(railAV_10)
         )
         Then("Should be returned an error and timetable is not saved")
-        newValidTimetable.performTest: t2 =>
+        newValidTimetable.in: t2 =>
           managerWithSimpleTimetable.save(t2) should be(Right(TimetableManagers.TimetableManager(List(
             simpleTimetable,
             t2
@@ -84,7 +78,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
       res should be(Left(TimetableNotFound("trainName")))
 
     Scenario("Remove a train timetable"):
-      testTimetable performTest: t =>
+      testTimetable in: t =>
         Given("A timetable manager with one timetable for a train")
         val manager = TimetableManagers.TimetableManager(List(t))
         When("I request to remove that timetable")
@@ -97,7 +91,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
           case Left(e)  => fail(s"Unexpected result: $e")
 
     Scenario("Remove a train timetable that not saved"):
-      testTimetable performTest: t =>
+      testTimetable in: t =>
         Given("A timetable manager empty")
         val manager = TimetableManagers.emptyManager()
         When("I request to remove that timetable")
