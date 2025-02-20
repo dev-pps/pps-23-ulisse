@@ -12,8 +12,8 @@ class FontStyleTest extends AnyFlatSpec with Matchers:
   "default font style" should "be default parameters" in:
     defaultFont.name mustBe defaultNameFont
     defaultFont.style mustBe defaultStyleFont
-    defaultFont.color mustBe defaultColorFont
     defaultFont.size mustBe defaultSizeFont
+    defaultFont.palette mustBe defaultPalette
 
   "font transform in swing font" should "be the same" in:
     val transformInSwingFont = defaultFont.swingFont
@@ -35,13 +35,6 @@ class FontStyleTest extends AnyFlatSpec with Matchers:
     newFont must not be defaultFont
     newFont.style mustBe fontStyle
 
-  "font with color" should "change color" in:
-    val fontColor = Color.red
-    val newFont   = defaultFont.withColor(fontColor)
-
-    newFont must not be defaultFont
-    newFont.color mustBe fontColor
-
   "font with size" should "change size" in:
     val fontSize = 20
     val newFont  = defaultFont.withSize(fontSize)
@@ -58,5 +51,4 @@ class FontStyleTest extends AnyFlatSpec with Matchers:
 
     newFont.name mustBe fontName
     newFont.style mustBe fontStyle
-    newFont.color mustBe fontColor
     newFont.size mustBe fontSize

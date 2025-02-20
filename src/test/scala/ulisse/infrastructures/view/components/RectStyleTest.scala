@@ -10,6 +10,7 @@ class RectStyleTest extends AnyFlatSpec with Matchers:
     defaultRect.size must be(defaultSizeRect)
     defaultRect.padding must be(defaultPaddingRect)
     defaultRect.arc must be(defaultRoundRect)
+    defaultRect.palette must be(defaultPalette)
 
   "rect with size" should "change size" in:
     val size    = createSize(10, 20)

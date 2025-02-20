@@ -21,7 +21,7 @@ object ComposedSwing:
   def createToggleIconButton(onIconPath: String, offIconPath: String): JToggleIconButton =
     JToggleIconButton(onIconPath, offIconPath)
 
-  private val elementPalette: Styles.Palette = Styles.defaultPalette.withClick(Theme.light.overlayElement)
+  private val elementPalette: Styles.Palette = Styles.defaultPalette.withClickColor(Theme.light.overlayElement)
 
   case class JInfoTextField(title: String) extends ComposedSwing:
     private val colum                      = 15
@@ -35,7 +35,7 @@ object ComposedSwing:
     private val label     = ExtendedSwing.JLabelItem(title)
     private val textField = ExtendedSwing.JTextFieldItem(colum)
     textField.rect = textFieldRect
-    textField.palette = paletteRect
+    textField.rectPalette = paletteRect
 
     labelPanel.contents += label
     mainPanel.contents += labelPanel
@@ -54,7 +54,7 @@ object ComposedSwing:
       Styles.createPalette(Theme.light.overlayElement, Theme.light.forwardClick, Theme.light.forwardClick)
 
     private val mainPanel = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
-    mainPanel.palette = openPalette
+    mainPanel.rectPalette = openPalette
 
     private val icon  = createSVGPanel(iconPath, Theme.light.background)
     private val label = ExtendedSwing.JLabelItem(text)
@@ -81,14 +81,14 @@ object ComposedSwing:
     def showIconAndText(): Unit =
       icon.color = Theme.light.overlayElement
       label.visible = true
-      mainPanel.palette = openPalette
+      mainPanel.rectPalette = openPalette
       mainPanel.repaint()
       mainPanel.validate()
 
     def showIcon(): Unit =
       icon.color = Theme.light.background
       label.visible = false
-      mainPanel.palette = closePalette
+      mainPanel.rectPalette = closePalette
       mainPanel.repaint()
       mainPanel.validate()
 
@@ -119,7 +119,7 @@ object ComposedSwing:
     private val panelPalette: Styles.Palette = Styles.defaultPalette.withBackground(Theme.light.element)
 
     private val mainPanel = ExtendedSwing.JBorderPanelItem()
-    mainPanel.palette = panelPalette
+    mainPanel.rectPalette = panelPalette
     private val pagesPanel = ExtendedSwing.JFlowPanelItem()
 
     private val navBar = createNavbar(iconLabels: _*)
