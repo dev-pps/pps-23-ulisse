@@ -23,10 +23,7 @@ final case class StationService(
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState) => {
       val updatedMap = state.stationManager.addStation(station)
-      updatedMap match
-        case Left(value: E) => p.success(Left(value)); state
-        case Right(value) =>
-          p.success(Right(value.stations)); state.copy(stationManager = value)
+      updateState(p, state, updatedMap)
     })
     p.future
 
@@ -34,10 +31,7 @@ final case class StationService(
     val p = Promise[Either[E, SM]]()
     eventQueue.add((state: AppState) => {
       val updatedMap = state.stationManager.removeStation(station)
-      updatedMap match
-        case Left(value: E) => p.success(Left(value)); state
-        case Right(value) =>
-          p.success(Right(value.stations)); state.copy(stationManager = value)
+      updateState(p, state, updatedMap)
     })
     p.future
 
