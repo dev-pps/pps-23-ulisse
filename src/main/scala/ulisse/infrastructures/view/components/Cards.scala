@@ -5,7 +5,7 @@ import ulisse.infrastructures.view.components.ComponentConfigurations.{
   ComponentWithConfiguration
 }
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
+import ulisse.infrastructures.view.components.Images.ImagePanel
 import ulisse.infrastructures.view.components.Selectables.Selectable
 import ulisse.infrastructures.view.components.SwingEnhancements.{EnhancedLook, ShapeEffect}
 
@@ -118,16 +118,16 @@ object Cards:
   object Example:
     val imageCardExample: JImageCard =
       Cards.JImageCard.vertical(
-        ImagePanels.Example.imagePanelExample,
+        Images.Example.imagePanelExample,
         Label("Logo").centerHorizontally()
       )
     val svgCardExample: JImageCard =
       Cards.JImageCard.horizontal(
-        ImagePanels.Example.svgPanelExample,
+        Images.Example.svgPanelExample,
         Label("Map").centerHorizontally()
       )
     val drawnCardExample: JImageCard =
       Cards.JImageCard.horizontal(
-        ImagePanels.Example.drawnPanelExample,
+        Images.Example.drawnPanelExample,
         Label("Cross").centerHorizontally()
       )

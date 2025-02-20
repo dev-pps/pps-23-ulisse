@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.ImagePanels.ImagePanel.createSVGPanel
+import ulisse.infrastructures.view.components.Images.ImagePanel.createSVGPanel
 
 import java.awt
 import java.awt.Dimension
@@ -107,7 +107,7 @@ object ComposedSwing:
     mainPanel.listenTo(mainPanel.mouse.clicks)
     iconLabels.foreach(iconLabel =>
       iconLabel.component.reactions += {
-        case event.MousePressed(_, _, _, _, _) =>
+        case _: event.MousePressed =>
           iconLabels.foreach(_.showIcon())
           iconLabel.showIconAndText()
       }

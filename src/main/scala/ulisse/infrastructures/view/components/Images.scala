@@ -9,7 +9,7 @@ import java.awt.Color
 import javax.imageio.ImageIO
 import scala.swing.{Component, Graphics2D, UIElement}
 
-object ImagePanels:
+object Images:
   trait ImagePanel          extends EnhancedLook with Rotatable
   trait ColorableImagePanel extends ImagePanel with Colorable
 
@@ -20,13 +20,14 @@ object ImagePanels:
 
   private final case class ImagePanelImpl(imagePath: String) extends ImagePanel with EnhancedLook:
     private val image = ImageIO.read(ClassLoader.getSystemResource(imagePath))
+
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
-      val size = math.min(peer.getWidth, peer.getHeight)
-      g.rotate(math.toRadians(rotation), peer.getWidth / 2, peer.getHeight / 2)
-      g.drawImage(image, (peer.getWidth - size) / 2, (peer.getHeight - size) / 2, size, size, peer)
+      val imgSize = math.min(size.width, size.height)
+      g.rotate(math.toRadians(rotation), size.width / 2, size.getHeight / 2)
+      g.drawImage(image, (size.width - imgSize) / 2, (size.height - imgSize) / 2, imgSize, imgSize, peer)
 
-  private final case class SVGPanel(svgPath: String, _color: Color) extends ColorableImagePanel with EnhancedLook:
+  private final case class SVGPanel(svgPath: String, _color: Color) extends ColorableImagePanel:
     private val rawIcon = new FlatSVGIcon(svgPath)
     rawIcon.setColorFilter(ColorFilter(_ => color))
     opaque = false
@@ -36,12 +37,12 @@ object ImagePanels:
 
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
-      g.rotate(math.toRadians(rotation), peer.getWidth / 2, peer.getHeight / 2)
-      val size = math.min(peer.getWidth, peer.getHeight)
-      val icon = rawIcon.derive(size, size)
-      icon.paintIcon(peer, g, (peer.getWidth - icon.getWidth) / 2, (peer.getHeight - icon.getHeight) / 2)
+      g.rotate(math.toRadians(rotation), size.width / 2, size.height / 2)
+      val imgSize = math.min(size.width, size.height)
+      val icon    = rawIcon.derive(imgSize, imgSize)
+      icon.paintIcon(peer, g, (size.width - icon.getWidth) / 2, (size.height - icon.getHeight) / 2)
 
-  private final case class DrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit) extends ImagePanel with EnhancedLook:
+  private final case class DrawnPanel(iconDrawer: (UIElement, Graphics2D) => Unit) extends ImagePanel:
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
       iconDrawer(this, g)

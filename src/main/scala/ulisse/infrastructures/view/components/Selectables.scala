@@ -7,6 +7,7 @@ import scala.swing.Component
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
 object Selectables:
 
+  // comportamento come il radio button
   trait Selectable extends Component:
     private var _selected: Boolean = false
     def selected: Boolean          = _selected
