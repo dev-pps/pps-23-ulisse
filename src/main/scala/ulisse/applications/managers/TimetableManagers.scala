@@ -31,14 +31,17 @@ object TimetableManagers:
         newTimetable: TrainTimetable,
         trainTables: List[TrainTimetable]
     ): Either[AcceptanceError, TrainTimetable] =
-      trainTables.find(t =>
-        val r =
+      def isNotOverlapping(t: TrainTimetable): Boolean =
+        val overlaps =
           for
             arriving    <- t.arrivingTime
             newArriving <- newTimetable.arrivingTime
-          yield newTimetable.departureTime > arriving || newArriving >= t.departureTime
-        r.getOrElse(false)
-      ).map(_ => AcceptanceError("Overlapped timetable: train not available")).toLeft(newTimetable)
+          yield newTimetable.departureTime >= arriving || t.departureTime >= newArriving
+        overlaps.getOrElse(false)
+
+      trainTables.exists(isNotOverlapping) match
+        case true => Right(newTimetable)
+        case _    => Left(AcceptanceError("Overlapped timetable: train not available"))
 
   given defaultAcceptancePolicy: AcceptanceTimetablePolicy = DefaultAcceptancePolicy
 

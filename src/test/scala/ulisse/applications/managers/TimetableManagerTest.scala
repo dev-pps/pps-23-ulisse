@@ -46,7 +46,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
         Given("Timetable manager with some train's timetable saved")
         When("I save new train timetable that overlaps on existing ones")
         val overlappedTimetable =
-          PartialTimetable(trainRV_3905, startStation = stationA, departureTime = h(9).m(30)).map(
+          PartialTimetable(trainRV_3905, startStation = stationA, departureTime = h(9).m(2)).map(
             _.transitIn(stationB)(railAV_10)
               .arrivesTo(stationC)(railAV_10)
           )
@@ -57,13 +57,14 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
           )
 
         Given("Timetable manager with some train's timetable saved")
-        When("I save new train timetable that overlaps on existing ones")
-        val newValidTimetable = PartialTimetable(trainRV_3905, startStation = stationA, departureTime = h(1).m(0)).map(
-          _.transitIn(stationB)(railAV_10)
-            .arrivesTo(stationC)(railAV_10)
-        )
+        When("I save new train timetable that Not overlaps")
+        val newValidTimetable =
+          PartialTimetable(trainRV_3905, startStation = stationA, departureTime = h(10).m(35)).map(
+            _.transitIn(stationB)(railAV_10)
+              .arrivesTo(stationC)(railAV_10)
+          )
         Then("Should be returned an error and timetable is not saved")
-        newValidTimetable.in: t2 =>
+        newValidTimetable in: t2 =>
           managerWithSimpleTimetable.save(t2) should be(Right(TimetableManagers.TimetableManager(List(
             simpleTimetable,
             t2
