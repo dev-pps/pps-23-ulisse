@@ -8,6 +8,7 @@ import scala.concurrent.Future
 object TimetablePorts:
 
   type StationId     = String
+  type WaitingTime   = Option[Int]
   type RequestResult = Either[TimetableServiceErrors, List[TrainTimetable]]
 
   import ulisse.utils.Errors.{BaseError, ErrorNotExist, ErrorValidation}
@@ -35,7 +36,7 @@ object TimetablePorts:
     def createTimetable(
         trainName: String,
         departureTime: ClockTime,
-        stations: List[(StationId, Option[Int])]
+        stations: List[(StationId, WaitingTime)]
     ): Future[RequestResult]
 
     /** Deletes timetable identified by `trainName` and `departureTime`. If table is found is deleted, otherwise is
