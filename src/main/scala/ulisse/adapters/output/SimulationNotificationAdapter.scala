@@ -6,10 +6,6 @@ import ulisse.entities.simulation.Simulations.SimulationData
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.simulation.SimulationPage
 
-trait SimulationNotificationAdapterRequirements:
-  def simulationPageComponent: SimulationPage
-
-final case class SimulationNotificationAdapter(requirements: SimulationNotificationAdapterRequirements)
-    extends SimulationPorts.Output with SimulationNotificationAdapterRequirements:
-  override def simulationPageComponent: SimulationPage      = requirements.simulationPageComponent
-  override def stepNotification(data: SimulationData): Unit = simulationPageComponent.updateData(data)
+final case class SimulationNotificationAdapter(simulationPage: SimulationPage)
+    extends SimulationPorts.Output:
+  override def stepNotification(data: SimulationData): Unit = simulationPage.updateData(data)
