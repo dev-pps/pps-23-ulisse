@@ -4,7 +4,7 @@ import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentMixins.UpdatableContainer
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
+import ulisse.infrastructures.view.components.Images.ImagePanel
 import ulisse.infrastructures.view.components.{ComposedSwing, Styles}
 import ulisse.infrastructures.view.dashboard.Dashboard
 

@@ -81,6 +81,7 @@ object ComponentUtils:
     def center(): Component =
       centerHorizontally().centerVertically()
 
+    // tenere d'occhio
     def genericClickReaction(action: () => Unit): C =
       component.listenTo(component.mouse.clicks)
       component.reactions += {

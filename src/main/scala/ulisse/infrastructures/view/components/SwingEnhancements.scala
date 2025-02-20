@@ -6,7 +6,6 @@ import scala.swing.{event, Component, Graphics2D}
 object SwingEnhancements:
   /** Base trait decorator to enhanced look of swing [[Component]] */
   trait EnhancedLook extends Component:
-    self: Component =>
     opaque = false
 
     /** Paint the custom appearance of the component. */
@@ -20,7 +19,6 @@ object SwingEnhancements:
 
   /** Trait to enhance the shape of swing component and [[_rect]] control shape params. */
   trait ShapeEffect extends EnhancedLook:
-    self: EnhancedLook =>
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _rect: Styles.Rect = initRect(Styles.defaultRect)
 
@@ -46,7 +44,6 @@ object SwingEnhancements:
 
   /** Trait to enhance the color of swing component and [[_palette]] control color params. */
   trait ColorEffect extends EnhancedLook:
-    self: EnhancedLook =>
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _palette: Styles.Palette = initColor(Styles.defaultPalette)
     listenTo(mouse.moves, mouse.clicks)
@@ -76,7 +73,6 @@ object SwingEnhancements:
 
   /** Trait to enhance the font of swing component and [[_font]] control font params. */
   trait FontEffect extends EnhancedLook:
-    self: EnhancedLook =>
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _font: Styles.Font = initFont(Styles.defaultFont)
 
@@ -92,7 +88,7 @@ object SwingEnhancements:
 
   /** Trait to enhance the border of swing component and [[_border]] control border params. */
   trait BorderEffect extends EnhancedLook:
-    self: EnhancedLook with ShapeEffect =>
+    self: ShapeEffect =>
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _border: Styles.Border = initBorder(Styles.defaultBorder)
 
