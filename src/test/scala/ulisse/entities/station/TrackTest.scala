@@ -4,6 +4,8 @@ import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
+import ulisse.entities.train.Trains.{Train, TrainTechnology}
+import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 class TrackTest extends AnyWordSpec with Matchers:
 
@@ -43,3 +45,15 @@ class TrackTest extends AnyWordSpec with Matchers:
         List(-1, 0).foreach(invalidPlatformNumber =>
           Track.generateSequentialTracks(invalidPlatformNumber) shouldBe List()
         )
+
+    "is updated with a train" should:
+      "return a new track with the specified train" in:
+        val train       = Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5)
+        val trackNumber = 1
+        val track       = Track(trackNumber)
+        track.withTrain(Some(train)).train shouldBe Some(train)
+        track.withTrain(Some(train)).platform shouldBe trackNumber
+        track.withTrain(None).train shouldBe None
+        track.withTrain(None).platform shouldBe trackNumber
+        track.withTrain(Some(train)).withTrain(None).train shouldBe None
+        track.withTrain(Some(train)).withTrain(None).platform shouldBe trackNumber
