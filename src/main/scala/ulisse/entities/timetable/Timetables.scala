@@ -2,7 +2,7 @@ package ulisse.entities.timetable
 
 import ulisse.entities.Routes.TypeRoute
 import ulisse.entities.station.Station
-import ulisse.entities.timetable.ScheduleTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
+import ulisse.entities.timetable.TrainStationTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Times.{ClockTime, ClockTimeErrors}
 import ulisse.utils.Times.FluentDeclaration.h
@@ -13,7 +13,7 @@ import scala.collection.immutable.ListMap
 object Timetables:
 
   private type Length   = Double
-  private type Time     = ScheduleTime
+  private type Time     = TrainStationTime
   private type WaitTime = Int
 
   /** Rail info `length` and [[TypeRoute]] used to estimate `ScheduleTime` of station. */
