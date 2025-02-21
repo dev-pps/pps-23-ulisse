@@ -8,6 +8,7 @@ import ulisse.utils.Times.ClockTime
 
 object TimetableManagers:
 
+  /** Errors that can returned by manager */
   trait TimetableManagerErrors extends BaseError
   object TimetableManagerErrors:
     final case class AcceptanceError(reason: String) extends ErrorMessage(s"Timetable not approved: $reason")
@@ -17,16 +18,13 @@ object TimetableManagers:
 
   /** A rules specification for accepting new `timetable`. Checks are done by method `accept`. */
   trait AcceptanceTimetablePolicy:
-    /** @param timetable
-      *   [[TrainTimetable]] to check.
-      * @param tables
-      *   all TrainTimetables used by acceptance policy.
-      * @return
-      *   returns the timetable otherwise if timetable not pass policy rules is returned an [[AcceptanceError]]
+    /** Returns the `timetable` otherwise if is not accepted by policy rules is returned an [[AcceptanceError]].
+      * Param `tables` is a list of TrainTimetable used by acceptance policy for checks
       */
     def accept(timetable: TrainTimetable, tables: List[TrainTimetable]): Either[AcceptanceError, TrainTimetable]
 
-  private object DefaultAcceptancePolicy extends AcceptanceTimetablePolicy:
+  /** Default acceptance policy of new timetables. New timetable are accepted if there is no overlapping between tables. */
+  private object NoOverlappingTimePolicy extends AcceptanceTimetablePolicy:
     override def accept(
         newTimetable: TrainTimetable,
         trainTables: List[TrainTimetable]
@@ -39,64 +37,43 @@ object TimetableManagers:
           yield newTimetable.departureTime >= arriving || t.departureTime >= newArriving
         overlaps.getOrElse(false)
 
-      trainTables.exists(isNotOverlapping) match
-        case true => Right(newTimetable)
-        case _    => Left(AcceptanceError("Overlapped timetable: train not available"))
+      if trainTables.exists(isNotOverlapping) then
+        Right(newTimetable)
+      else
+        Left(AcceptanceError("Overlapped timetable: train not available"))
 
-  given defaultAcceptancePolicy: AcceptanceTimetablePolicy = DefaultAcceptancePolicy
+  given defaultAcceptancePolicy: AcceptanceTimetablePolicy = NoOverlappingTimePolicy
 
+  /** Return an empty manager */
   def emptyManager(): TimetableManager =
     TimetableManager(List.empty)
 
   trait TimetableManager:
-    /** Save new timetable for a train. Timetable is accepted if passes the `acceptancePolicy` rules.
-      * @param timetable
-      *   `TrainTimetable` to add
-      * @param acceptancePolicy
-      *   `AcceptanceContextPolicy` that defines timetable acceptance rules
-      * @return
-      *   `Right` of updated `TimetableManager`, in case of error and `Left` of `TimetableManagerErrors`
+    /** Save new `timetable` for a train. Timetable is accepted if passes the `acceptancePolicy` rules.
+      * Returns `Right` of updated `TimetableManager` otherwise `Left` of `TimetableManagerErrors` in case of errors.
       */
     def save(timetable: TrainTimetable)(using
         acceptancePolicy: AcceptanceTimetablePolicy
     ): Either[TimetableManagerErrors, TimetableManager]
 
-    /** Removes train's timetable identified by `trainName` and `departureTime`
-      * @param trainName
-      *   Train name
-      * @param departureTime
-      *   departure time of train
-      * @return
-      *   Updated TimetableManager otherwise Left of [[TimetableNotFound]]
+    /** Removes train's timetable identified by `trainName` and `departureTime`.
+      * Returns an updated TimetableManager otherwise Left of [[TimetableNotFound]]
       */
     def remove(trainName: String, departureTime: ClockTime): Either[TimetableNotFound, TimetableManager]
 
-    /** Gets all timetables of a train.
-      * @param trainName
-      *   Train's name
-      * @return
-      *   If al least one timetable is saved returns List of TrainTimetables, otherwise a Left of `TimetableNotFound`
+    /** Gets all timetables of a given `trainName`
+      * If al least one timetable is saved returns List of TrainTimetables, otherwise a Left of `TimetableNotFound`
       */
     def tablesOf(trainName: String): Either[TimetableNotFound, List[TrainTimetable]]
 
   object TimetableManager:
-    /** Creates new TimetableManager starting from given list of timetables. The `timetables` are not checked by the
+    /** Returns TimetableManager initialized with given list of `timetables`. The `timetables` are not checked by the
       * [[AcceptanceTimetablePolicy]].
-      *
-      * @param timetables
-      *   List of timetables
-      * @return
-      *   Returns initialized TimetableManager
       */
     def apply(timetables: List[TrainTimetable]): TimetableManager =
       TimetableManagerImpl(timetables.groupBy(_.train))
 
-    /** Creates new Timetable manager
-      * @param timetables
-      *   Initial manager state as Map
-      * @return
-      *   Returns initialized TimetableManager
-      */
+    /** Returns new TimetableManager initialized with a given `timetables` map. */
     def fromMap(timetables: Map[Train, List[TrainTimetable]]): TimetableManager =
       TimetableManagerImpl(timetables)
 
