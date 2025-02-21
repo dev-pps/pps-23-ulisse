@@ -41,9 +41,10 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
         val emptyManager = TimetableManagers.emptyManager()
         When("I request to save timetable built on a sequence of connected stations (exist route between station)")
         Then("timetable should be saved")
-        for
-          m <- emptyManager.save(simpleTimetable)
-        yield m.tablesOf(trainName = trainRV_3905.name) should be(Right(List(simpleTimetable)))
+        val res = emptyManager.save(simpleTimetable)
+        res match
+          case Left(e)  => fail(s"Error in saving timetable: $e")
+          case Right(m) => m.tablesOf(trainName = trainRV_3905.name) should be(Right(List(simpleTimetable)))
 
         Given("Timetable manager with some train's timetable saved")
         When("I save new train timetable that overlaps on existing ones")
