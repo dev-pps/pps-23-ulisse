@@ -82,7 +82,7 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
           val createTable1Res = env.inputPort.createTimetable(trainName, time1, stationsTable1)
           val createTable2Res = env.inputPort.createTimetable(trainName, time2, stationsTable2)
           When("User request timetables giving valid train name")
-          val timetableOfResult = env.inputPort.timetableOf(trainName)
+          val timetableOfResult = env.inputPort.timetablesOf(trainName)
           env.updateState()
           Then("should be returned all saved timetables")
           Await.result(createTable1Res, Duration.Inf) match
