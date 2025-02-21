@@ -10,7 +10,7 @@ class PaletteStyleTest extends AnyFlatSpec with Matchers:
   "default palette " should "have only background" in:
     defaultPalette.background must be(defaultColor)
     defaultPalette.clickColor must be(withOutColor)
-    defaultPalette.hoverClick must be(withOutColor)
+    defaultPalette.hoverColor must be(withOutColor)
 
   "palette with background" should "change background color" in:
     val background      = Color.green
@@ -31,7 +31,7 @@ class PaletteStyleTest extends AnyFlatSpec with Matchers:
     val newPaletteColor = defaultPalette.withHoverColor(hover)
 
     newPaletteColor.background must be(defaultColor)
-    newPaletteColor.hoverClick must be(Some(hover))
+    newPaletteColor.hoverColor must be(Some(hover))
 
   "create a new palette" should "have a new background, click and hover" in:
     val background      = Color.green
@@ -41,4 +41,4 @@ class PaletteStyleTest extends AnyFlatSpec with Matchers:
 
     newPaletteColor.background must be(background)
     newPaletteColor.clickColor must be(Some(clickColor))
-    newPaletteColor.hoverClick must be(Some(hover))
+    newPaletteColor.hoverColor must be(Some(hover))

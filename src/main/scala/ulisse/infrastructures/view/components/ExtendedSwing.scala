@@ -7,11 +7,9 @@ import scala.swing.*
 
 object ExtendedSwing:
 
-  case class JBorderPanelItem() extends BorderPanel
-      with EnhancedLook with ShapeEffect with FontEffect with BorderEffect
+  case class JBorderPanelItem() extends BorderPanel with ShapeEffect with FontEffect
 
-  case class JFlowPanelItem() extends FlowPanel
-      with ShapeEffect with FontEffect with BorderEffect:
+  case class JFlowPanelItem() extends FlowPanel with ShapeEffect with FontEffect:
     private val layout = new FlowLayout(FlowLayout.CENTER, 0, 0)
     peer.setLayout(layout)
     export layout._
@@ -19,14 +17,10 @@ object ExtendedSwing:
   case class JBoxPanelItem(orientation: Orientation.Value) extends BoxPanel(orientation)
       with ShapeEffect with FontEffect with BorderEffect
 
-  case class JPanelItem() extends Panel
-      with ShapeEffect with FontEffect with BorderEffect
+  case class JPanelItem() extends Panel with ShapeEffect with FontEffect
 
-  case class JButtonItem(label: String) extends Button(label)
-      with ShapeEffect with FontEffect with BorderEffect
+  case class JButtonItem(label: String) extends Button(label) with ShapeEffect with FontEffect
 
-  case class JLabelItem(label: String) extends Label(label)
-      with ShapeEffect with FontEffect with BorderEffect
+  case class JLabelItem(label: String) extends Label(label) with ShapeEffect with FontEffect
 
-  case class JTextFieldItem(colum: Int) extends TextField(colum)
-      with ShapeEffect with FontEffect with BorderEffect
+  case class JTextFieldItem(colum: Int) extends TextField(colum) with ShapeEffect with FontEffect

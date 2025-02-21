@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.components.Styles.EnhancedLookExtension.*
 
-import java.awt.{BasicStroke, Color, RenderingHints}
+import java.awt.{BasicStroke, RenderingHints}
 import scala.swing.{Component, Graphics2D}
 
 object SwingEnhancements:
@@ -11,7 +11,9 @@ object SwingEnhancements:
     opaque = false
 
     /** Update the graphic component. */
-    def updateGraphics(): Unit = revalidate(); repaint()
+    def updateGraphics(): Unit =
+      revalidate()
+      repaint()
 
     /** Paint the custom appearance of the component. */
     protected def paintLook(g: Graphics2D): Unit = ()
@@ -29,12 +31,13 @@ object SwingEnhancements:
 
     this.updateRect(rect)
     listenTo(mouse.moves, mouse.clicks)
+    reactions += this.initColorReactions(() => rectPalette)
 
     /** Read-only property to get the shape of the component. */
     def rect: Styles.Rect = _rect
 
     /** Change the shape of the component. */
-    def rect_=(newRect: Styles.Rect): Unit = _rect = newRect; this.updateRect(rect)
+    def rect_=(newRect: Styles.Rect): Unit = { (_rect = newRect); this.updateRect(rect) }
 
     def rectPalette: Styles.Palette                  = rect.palette
     def rectPalette_=(palette: Styles.Palette): Unit = rect = rect.withPalette(palette)
@@ -47,16 +50,17 @@ object SwingEnhancements:
   /** Trait to enhance the font of swing component and [[_font]] control font params. */
   trait FontEffect extends EnhancedLook:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var _font: Styles.Font = Styles.defaultFont.withPalette(Styles.defaultPalette.withBackground(Color.BLACK))
+    private var _font: Styles.Font = Styles.defaultFont
 
     this.updateFont(fontEffect)
     listenTo(mouse.moves, mouse.clicks)
+    reactions += this.initColorReactions(() => fontPalette)
 
     /** Read-only property to get the font effect of the component. */
     def fontEffect: Styles.Font = _font
 
     /** Change the font effect of the component. */
-    def fontEffect_=(newFont: Styles.Font): Unit = _font = newFont; this.updateFont(fontEffect)
+    def fontEffect_=(newFont: Styles.Font): Unit = { (_font = newFont); this.updateFont(fontEffect) }
 
     def fontPalette: Styles.Palette                  = fontEffect.palette
     def fontPalette_=(palette: Styles.Palette): Unit = fontEffect = fontEffect.withPalette(palette)
@@ -73,12 +77,13 @@ object SwingEnhancements:
 
     this.updateBorder(rect, Styles.defaultBorder)
     listenTo(mouse.moves, mouse.clicks)
+    reactions += this.initColorReactions(() => rectPalette)
 
     /** Read-only property to get the border of the component. */
     def borderEffect: Styles.Border = _border
 
     /** Change the border of the component. */
-    def borderEffect_=(newBorder: Styles.Border): Unit = _border = newBorder; this.updateBorder(rect, borderEffect)
+    def borderEffect_=(border: Styles.Border): Unit = { (_border = border); this.updateBorder(rect, borderEffect) }
 
     def borderPalette: Styles.Palette                  = borderEffect.palette
     def borderPalette_=(palette: Styles.Palette): Unit = borderEffect = borderEffect.withPalette(palette)
