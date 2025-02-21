@@ -89,7 +89,7 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
         newManager
 
   /** Returns list of all TrainTimetable saved for a given `trainName` */
-  def timetableOf(trainName: String): Future[RequestResult] =
+  def timetablesOf(trainName: String): Future[RequestResult] =
     stateEventQueue.updateWith: (state, promise) =>
       for
         res <- state.timetableManager.tablesOf(trainName)

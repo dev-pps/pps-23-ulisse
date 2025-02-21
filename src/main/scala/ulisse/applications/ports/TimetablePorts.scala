@@ -13,6 +13,7 @@ object TimetablePorts:
 
   import ulisse.utils.Errors.{BaseError, ErrorNotExist, ErrorValidation}
   trait TimetableServiceErrors extends BaseError
+
   object TimetableServiceErrors:
     final case class TrainTablesNotExist(trainName: String) extends ErrorNotExist(s"train $trainName")
         with TimetableServiceErrors
@@ -23,15 +24,10 @@ object TimetablePorts:
     final case class GenericError(reason: String)            extends ErrorMessage(reason) with TimetableServiceErrors
 
   trait Input:
-    /** Requests to create a new timetable for a `trainName` train that stops or transit in some stations.
-      * @param trainName
-      *   Train's name
-      * @param departureTime
-      *   Departure time of train from first station
-      * @param stations
-      *   Ordered list of stations where first element is starting station, last one is arriving.
-      * @return
-      *   Returns updated list of timetable otherwise a [[TimetableServiceErrors]]
+    /**   Returns updated list of timetables when `trainName`, `departureTime` and `stations`
+      * (list of stations where first element is starting station, last one is arriving).
+      *
+      *   Returns a [[TimetableServiceErrors]] if any of param is invalid.
       */
     def createTimetable(
         trainName: String,
@@ -39,20 +35,8 @@ object TimetablePorts:
         stations: List[(StationId, WaitingTime)]
     ): Future[RequestResult]
 
-    /** Deletes timetable identified by `trainName` and `departureTime`. If table is found is deleted, otherwise is
-      * returned an error.
-      * @param trainName
-      *   Train's name
-      * @param departureTime
-      *   [[ClockTime]]
-      * @return
-      *   Returns updated list of train's Timetables otherwise a [[TimetableServiceErrors]]
-      */
+    /** Returns updated list of train's Timetables with removed train identified by `trainName` and `departureTime` otherwise a [[TimetableServiceErrors]]. */
     def deleteTimetable(trainName: String, departureTime: ClockTime): Future[RequestResult]
 
-    /** @param trainName
-      *   Train's name
-      * @return
-      *   List of train's Timetables
-      */
-    def timetableOf(trainName: String): Future[RequestResult]
+    /** Returns List of train's Timetables when `trainName` is valid, otherwise a [[TimetableServiceErrors]] */
+    def timetablesOf(trainName: String): Future[RequestResult]
