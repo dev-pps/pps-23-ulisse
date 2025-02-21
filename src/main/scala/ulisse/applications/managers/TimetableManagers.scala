@@ -37,7 +37,7 @@ object TimetableManagers:
           yield newTimetable.departureTime >= arriving || t.departureTime >= newArriving
         overlaps.getOrElse(false)
 
-      if trainTables.exists(isNotOverlapping) then
+      if trainTables.isEmpty || trainTables.exists(isNotOverlapping) then
         Right(newTimetable)
       else
         Left(AcceptanceError("Overlapped timetable: train not available"))

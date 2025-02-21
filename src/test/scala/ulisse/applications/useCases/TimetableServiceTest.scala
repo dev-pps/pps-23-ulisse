@@ -6,13 +6,14 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers.shouldBe
 import ulisse.TestUtility.{and, in}
 import ulisse.applications.ports.TimetablePorts
+import ulisse.applications.ports.TimetablePorts.RequestResult
 import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.GenericError
 import ulisse.entities.Routes
 import ulisse.entities.timetable.Timetables
 import ulisse.entities.timetable.Timetables.TrainTimetable
 import ulisse.utils.Times.FluentDeclaration.h
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 import scala.language.postfixOps
 
@@ -73,6 +74,13 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
 
   Feature("User can get timetables of a train"):
     Scenario("User request all timetables of a train"):
+
+      def handleTableCreationRes(tableResult: Future[RequestResult], tableName: String): Unit = {
+        Await.result(tableResult, Duration.Inf) match
+          case Left(e)  => fail(s"$tableName not created: $e")
+          case Right(_) => println(s"test $tableName created")
+      }
+
       TestEnvironment() in: env =>
         (h(9).m(30) and h(18).m(30)): (time1, time2) =>
           Given("Train name and that there are at least one timetable saved")
@@ -87,10 +95,9 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
           Then("should be returned all saved timetables")
           Await.result(createTable1Res, Duration.Inf) match
             case Left(e)  => fail(s"table 1 not created: $e")
-            case Right(_) => println("table 1 OK")
-          Await.result(createTable2Res, Duration.Inf) match
-            case Left(e)  => fail(s"table 2 not created: $e")
-            case Right(_) => println("table 2 OK")
+            case Right(_) => println("test table 1 created")
+          handleTableCreationRes(createTable1Res, "table 1")
+          handleTableCreationRes(createTable2Res, "table 2")
           Await.result(timetableOfResult, Duration.Inf) match
             case Left(e) => fail(s"error in retrieving tables with correct train name: $e")
             case Right(List(t: TrainTimetable, t2: TrainTimetable)) =>
@@ -99,7 +106,7 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
               t.startStation shouldBe stationA
               t.transitStations shouldBe List(stationB)
               t2.departureTime shouldBe time2
-              t2.arrivingStation shouldBe stationC
-              t2.startStation shouldBe stationD
+              t2.arrivingStation shouldBe stationD
+              t2.startStation shouldBe stationC
               t2.transitStations shouldBe List.empty[TrainTimetable]
             case r => fail(s"wrong return type: $r")
