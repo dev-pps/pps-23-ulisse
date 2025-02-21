@@ -7,7 +7,7 @@ import ulisse.utils.{Pair, Swings}
 import java.awt.Color
 import javax.swing.border.Border as SwingBorder
 import scala.swing.Font.Style.Value as StyleFont
-import scala.swing.{event, Font as SwingFont}
+import scala.swing.{event, Font as SwingFont, Reactions, Swing}
 
 @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 object Styles:
@@ -32,13 +32,14 @@ object Styles:
   val defaultSizeFont: Int        = 13
 
   /** Default [[Palette]]. */
-  val defaultPalette: Palette = Palette(defaultColor, withOutColor, withOutColor)
+  val defaultPalette: Palette     = Palette(defaultColor, withOutColor, withOutColor)
+  val defaultPaletteFont: Palette = defaultPalette.withBackground(Themes.Theme.light.text)
 
   /** Default [[Rect]]. */
   val defaultRect: Rect = Rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)
 
   /** Default [[Font]]. */
-  val defaultFont: Font = Font(defaultNameFont, defaultStyleFont, defaultSizeFont)
+  val defaultFont: Font = Font(defaultNameFont, defaultStyleFont, defaultSizeFont, defaultPaletteFont)
 
   /** Default [[Border]]. */
   val defaultBorder: Border = Border(defaultStroke)
@@ -72,16 +73,20 @@ object Styles:
   /** Methods to create a [[Padding]] with the given [[width]] and [[height]]. */
   def createPadding(width: Int, height: Int): Padding = Pair(width, height)
 
-  /** Create a [[Palette]] to represent a color with the given [[background]], [[clickColor]] and [[hoverClick]]. */
-  case class Palette(background: Color, clickColor: Option[Color], hoverClick: Option[Color]) extends Style:
+  /** Create a [[Palette]] to represent a color with the given [[background]], [[clickColor]] and [[hoverColor]]. */
+  case class Palette(background: Color, clickColor: Option[Color], hoverColor: Option[Color]) extends Style:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _currentColor: Color = background
 
-    def currentColor: Color                   = _currentColor
-    def currentColor_=(color: Color): Unit    = _currentColor = color
-    def withBackground(color: Color): Palette = copy(background = color)
-    def withClickColor(color: Color): Palette = copy(clickColor = Some(color))
-    def withHoverColor(color: Color): Palette = copy(hoverClick = Some(color))
+    def currentColor: Color                        = _currentColor
+    private def currentColor_=(color: Color): Unit = _currentColor = color
+    def withBackground(color: Color): Palette      = copy(background = color)
+    def withClickColor(color: Color): Palette      = copy(clickColor = Some(color))
+    def withHoverColor(color: Color): Palette      = copy(hoverColor = Some(color))
+    def hoverAction(): Unit                        = hoverColor.foreach(currentColor = _)
+    def exitAction(): Unit                         = hoverColor.foreach(_ => currentColor = background)
+    def clickAction(): Unit                        = clickColor.foreach(currentColor = _)
+    def releaseAction(): Unit                      = clickColor.foreach(_ => currentColor = background)
 
   /** Create a [[Rect]] to represent a rounded rectangle with the given [[size]], [[padding]], [[arc]] and [[palette]]. */
   case class Rect(size: Size, padding: Padding, arc: Int, palette: Palette = defaultPalette) extends Style:
@@ -118,16 +123,11 @@ object Styles:
     extension (component: EnhancedLook)
 
       /** Initialize the color reactions of the component with the given [[palette]]. */
-      def initColorReactions(palette: Palette): Unit = component.reactions += {
-        case _: event.MouseEntered =>
-          palette.hoverClick.foreach(palette.currentColor = _); component.updateGraphics()
-        case _: event.MouseExited =>
-          palette.hoverClick.foreach(_ => palette.currentColor = palette.background); component.updateGraphics()
-        case _: event.MousePressed =>
-          palette.clickColor.foreach(palette.currentColor = _); component.updateGraphics()
-        case _: event.MouseReleased =>
-          palette.hoverClick.foreach(_ => palette.currentColor = palette.background); component.updateGraphics()
-      }
+      def initColorReactions(palette: () => Palette): Reactions.Reaction =
+        case _: event.MouseEntered  => { palette().hoverAction(); component.updateGraphics() }
+        case _: event.MouseExited   => { palette().exitAction(); component.updateGraphics() }
+        case _: event.MousePressed  => { palette().clickAction(); component.updateGraphics() }
+        case _: event.MouseReleased => { palette().releaseAction(); component.updateGraphics() }
 
       /** Update the shape of the component with the given [[rect]]. */
       def updateRect(rect: Rect): Unit =
@@ -135,17 +135,14 @@ object Styles:
         val height = rect.height.getOrElse(component.size.height)
         component.size.setSize(width, height)
         component.border = rect.swingPadding
-        component.initColorReactions(rect.palette)
         component.updateGraphics()
 
       /** Update the font of the component with the given [[font]]. */
       def updateFont(font: Font): Unit =
         component.font = font.swingFont
-        component.initColorReactions(font.palette)
         component.updateGraphics()
 
       /** Update the border of the component with the given [[border]]. */
       def updateBorder(rect: Rect, border: Border): Unit =
         component.border = border.swingBorder(rect)
-        component.initColorReactions(border.palette)
         component.updateGraphics()

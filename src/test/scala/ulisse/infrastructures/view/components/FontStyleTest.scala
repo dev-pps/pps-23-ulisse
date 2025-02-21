@@ -13,7 +13,7 @@ class FontStyleTest extends AnyFlatSpec with Matchers:
     defaultFont.name mustBe defaultNameFont
     defaultFont.style mustBe defaultStyleFont
     defaultFont.size mustBe defaultSizeFont
-    defaultFont.palette mustBe defaultPalette
+    defaultFont.palette mustBe defaultPaletteFont
 
   "font transform in swing font" should "be the same" in:
     val transformInSwingFont = defaultFont.swingFont
