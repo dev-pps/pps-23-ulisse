@@ -3,7 +3,7 @@ package ulisse.applications.useCases
 import ulisse.applications.managers.TimetableManagers.{TimetableManager, TimetableManagerErrors}
 import ulisse.applications.ports.TimetablePorts
 import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{GenericError, OverlapError, TrainTablesNotExist}
-import ulisse.applications.ports.TimetablePorts.{RequestResult, StationId, TimetableServiceErrors}
+import ulisse.applications.ports.TimetablePorts.{RequestResult, StationId, TimetableServiceErrors, WaitingTime}
 import ulisse.entities.Routes.Route
 import ulisse.entities.timetable.MockedEntities.AppStateTimetable
 import ulisse.entities.timetable.Timetables.{PartialTimetable, RailInfo, TrainTimetable}
@@ -18,14 +18,12 @@ import scala.concurrent.{Future, Promise}
 /** Timetable service that jobs is like gatekeeper and enqueue edits to app state using `stateEventQueue` queue. */
 final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateTimetable => AppStateTimetable])
     extends TimetablePorts.Input:
-
-  extension (toCheck: List[(StationId, Option[Int])])
+  extension (toCheck: List[(StationId, WaitingTime)])
     /** @param existingRoutes
       *   Route and technology actually saved
-      * @return
-      *   Returns list of ValidRoute if sequence of Stations name is valid
+      * Returns a list of pair `(Route, WaitingTime)` starting from `toCheck` list. If some route does not exist `None` is returned.
       */
-    private def validateStations(existingRoutes: List[Route]): Option[List[(Route, Option[Int])]] =
+    private def validateStations(existingRoutes: List[Route]): Option[List[(Route, WaitingTime)]] =
       extension (route: Route)
         private def hasStationNames(a: String, b: String): Boolean =
           val arrivalName   = route.arrival.name
@@ -42,10 +40,13 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
       Option.when(routesFound.sizeIs == userStationsPair.size):
         routesFound
 
+  /** Given `trainName`, `departureTime` and stations with its waitingTime a new TrainTimetable should be saved.
+    * Returns a `TimetableServiceErrors` in case of error during creation.
+    */
   def createTimetable(
       trainName: String,
       departureTime: ClockTime,
-      stations: List[(StationId, Option[Int])]
+      stations: List[(StationId, WaitingTime)]
   ): Future[RequestResult] = stateEventQueue.updateWith: (state, promise) =>
     val savedRoutes: List[Route] = state.routeManager.routes
     val savedTrains              = state.trainManager.trains
@@ -60,13 +61,11 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
   private def buildTimetable(
       trainName: String,
       departureTime: ClockTime,
-      usrStations: List[(StationId, Option[Int])]
+      usrStations: List[(StationId, WaitingTime)]
   )(
       trains: List[Train],
       routes: List[Route]
   ): Either[BaseError, TrainTimetable] =
-    // given train name, departureTime, and sequence of route an related wait time  ==> create timetable
-    // TODO: use cats validated (chain of errors) to provide user all errors that occured during timetable creation
     for
       train            <- trains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
       stationEntities  <- usrStations.validateStations(routes).toRight(GenericError(s"some route not exists"))
@@ -79,6 +78,7 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
       case (timetable, (route, None)) => timetable.transitIn(route.arrival)(RailInfo(route.length, route.typology))
     }.arrivesTo(arriveTo._1.arrival)(RailInfo(arriveTo._1.length, arriveTo._1.typology))
 
+  /** Given `trainName` and `departureTime` if timetable exist then is deleted, otherwise an `TrainTablesNotExist` error. */
   def deleteTimetable(trainName: String, departureTime: ClockTime): Future[RequestResult] =
     stateEventQueue.updateWith: (state, promise) =>
       for
@@ -88,6 +88,7 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
         promise.success(Right(tablesList))
         newManager
 
+  /** Returns list of all TrainTimetable saved for a given `trainName` */
   def timetableOf(trainName: String): Future[RequestResult] =
     stateEventQueue.updateWith: (state, promise) =>
       for
@@ -97,11 +98,7 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
         state.timetableManager
 
   extension (error: BaseError)
-    /** Error converter: from [[BaseError]] errors to exposed service ones [[TimetableServiceErrors]]
-      *
-      * @return
-      *   `TimetableServiceErrors`, service error.
-      */
+    /** Returns `TimetableServiceErrors` starting from any error that is a `BaseError` errors. */
     private def toServiceError: TimetableServiceErrors =
       error match
         case TimetableManagerErrors.AcceptanceError(reason)      => OverlapError(reason)
