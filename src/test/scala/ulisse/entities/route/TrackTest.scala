@@ -13,11 +13,11 @@ class TrackTest extends AnyWordSpec with Matchers:
   private val defaultWagon                        = Wagon(UseType.Passenger, 50)
   private val defaultWagonNumber                  = 5
   private val train3905 =
-    TrainAgent.createTrainAgent(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
+    TrainAgent.apply(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
   private val train3906 =
-    TrainAgent.createTrainAgent(Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber))
+    TrainAgent.apply(Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber))
   private val train3907 =
-    TrainAgent.createTrainAgent(Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber))
+    TrainAgent.apply(Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber))
 
   "A track" when:
     "created" should:

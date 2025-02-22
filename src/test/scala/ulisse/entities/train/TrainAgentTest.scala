@@ -11,7 +11,7 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
   private val defaultWagon       = Wagon(UseType.Passenger, 50)
   private val defaultWagonNumber = 5
   private val train              = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber)
-  private val trainAgent         = TrainAgent.createTrainAgent(train)
+  private val trainAgent         = TrainAgent.apply(train)
 
   "TrainAgent" when:
     "created" should:
