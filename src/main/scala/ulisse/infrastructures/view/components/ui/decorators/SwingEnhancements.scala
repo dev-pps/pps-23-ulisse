@@ -1,6 +1,6 @@
-package ulisse.infrastructures.view.components
+package ulisse.infrastructures.view.components.ui.decorators
 
-import ulisse.infrastructures.view.components.Styles.EnhancedLookExtension.*
+import Styles.EnhancedLookExtension.*
 
 import java.awt.{BasicStroke, RenderingHints}
 import scala.swing.{Component, Graphics2D}

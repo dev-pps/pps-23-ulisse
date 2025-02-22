@@ -1,23 +1,19 @@
 package ulisse.infrastructures.view.dashboard
 
-import ulisse.infrastructures.view.{SimulationSettings, StationSettings}
+import ulisse.infrastructures.view.{ SimulationSettings, StationSettings }
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.Cards.*
-import ulisse.infrastructures.view.components.ComponentConfigurations.{
-  Alignment,
-  ComponentConfiguration,
-  ComponentWithConfiguration
-}
+import ulisse.infrastructures.view.components.ComponentConfigurations.{ Alignment, ComponentConfiguration, ComponentWithConfiguration }
 import ulisse.infrastructures.view.components.ComponentMixins.UpdatableContainer
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.Images.ImagePanel
-import ulisse.infrastructures.view.components.Styles
+import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.components.Selectables.SelectableGroup
-import ulisse.infrastructures.view.map.EditorsView
-import ulisse.infrastructures.view.simulation.SimulationPage
+import ulisse.infrastructures.view.map.{ EditorsView, MapPanel }
+import ulisse.infrastructures.view.menu.Menu
 
-import java.awt.{Color, Insets}
-import scala.swing.*
+import java.awt.{ Color, Insets }
+import scala.swing.{ BoxPanel, Component, Dimension, Label, Orientation, Reactor, Swing }
 
 trait SideMenu extends Component
 object SideMenu:

@@ -3,7 +3,7 @@ package ulisse.infrastructures.view.components
 import com.formdev.flatlaf.extras.FlatSVGIcon
 import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
 import ulisse.infrastructures.view.components.ComponentMixins.{Colorable, Rotatable}
-import ulisse.infrastructures.view.components.SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.EnhancedLook
 
 import java.awt.Color
 import javax.imageio.ImageIO

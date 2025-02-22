@@ -7,7 +7,7 @@ import ulisse.infrastructures.view.components.ComponentConfigurations.{
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.Images.ImagePanel
 import ulisse.infrastructures.view.components.Selectables.Selectable
-import ulisse.infrastructures.view.components.SwingEnhancements.{EnhancedLook, ShapeEffect}
+import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.{EnhancedLook, ShapeEffect}
 
 import scala.swing.*
 

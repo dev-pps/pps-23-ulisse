@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.Styles.*
+import ulisse.infrastructures.view.components.ui.ExtendedSwing
 
 class JItemTest extends AnyFlatSpec with Matchers:
   val text: String = "Hello"

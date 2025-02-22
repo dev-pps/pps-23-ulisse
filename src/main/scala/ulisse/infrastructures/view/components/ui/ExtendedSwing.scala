@@ -1,6 +1,6 @@
-package ulisse.infrastructures.view.components
+package ulisse.infrastructures.view.components.ui
 
-import ulisse.infrastructures.view.components.SwingEnhancements.*
+import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.{BorderEffect, FontEffect, ShapeEffect}
 
 import java.awt.FlowLayout
 import scala.swing.*
