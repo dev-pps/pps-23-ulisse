@@ -13,10 +13,10 @@ import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.entities.route.RouteEnvironmentElement.given
 
 class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
-  given configuration: TrackConfiguration = TrackConfiguration(100.0, 200.0 + train3905.length)
-  private val defaultTechnology           = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
-  private val defaultWagon                = Wagon(UseType.Passenger, 50)
-  private val defaultWagonNumber          = 5
+  given minPermittedDistanceBetweenTrains: Double = 100.0
+  private val defaultTechnology                   = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
+  private val defaultWagon                        = Wagon(UseType.Passenger, 50)
+  private val defaultWagonNumber                  = 5
   private val train3905 =
     TrainAgent.createTrainAgent(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
   private val train3906 =
@@ -26,9 +26,9 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
 
   def route: RouteEnvironmentElement =
     // Create a route with 2 tracks and a length of 200.0 + trainLength, min distance between two train is 100.0 with this factory method
-    validateRoute.flatMap(_.withLength(configuration.trackLength)) match
+    validateRoute.flatMap(_.withLength(2 * minPermittedDistanceBetweenTrains + train3905.length)) match
       case Left(errors) => fail()
-      case Right(route) => RouteEnvironmentElement(route, configuration.minPermittedDistanceBetweenTrains)
+      case Right(route) => RouteEnvironmentElement(route, minPermittedDistanceBetweenTrains)
 
   "RouteEnvironmentElement" should:
     "have two empty tracks" in:
@@ -36,11 +36,11 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
       route.tracks.forall(_.isEmpty) shouldBe true
 
     "have a default minPermittedDistanceBetweenTrains of 100.0" in:
-      route.tracks.forall(_.configuration.minPermittedDistanceBetweenTrains == 100.0) shouldBe true
+      route.tracks.forall(_.minPermittedDistanceBetweenTrains == 100.0) shouldBe true
 
     "have a length greater or equal than minPermittedDistanceBetweenTrains + train3905 length" in:
       route.tracks.forall(
-        route.length >= _.configuration.minPermittedDistanceBetweenTrains + train3905.length
+        route.length >= _.minPermittedDistanceBetweenTrains + train3905.length
       ) shouldBe true
 
   "A trainAgent" when:
