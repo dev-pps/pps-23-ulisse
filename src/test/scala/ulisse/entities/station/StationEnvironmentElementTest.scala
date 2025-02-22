@@ -10,7 +10,7 @@ import ulisse.entities.station.StationEnvironmentElement.*
 class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
   private val numberOfTracks            = 2
   private val station                   = Station("name", Coordinate(0, 0), numberOfTracks)
-  private val stationEnvironmentElement = StationEnvironmentElement.createStationEnvironmentElement(station)
+  private val stationEnvironmentElement = StationEnvironmentElement.apply(station)
   private val defaultTechnology         = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
   private val defaultWagon              = Wagon(UseType.Passenger, 50)
   private val defaultWagonNumber        = 5
@@ -25,20 +25,20 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
         stationEnvironmentElement.coordinate shouldBe station.coordinate
 
       "have 'numberOfTracks' empty tracks" in:
-        stationEnvironmentElement.tracks.size shouldBe numberOfTracks
-        stationEnvironmentElement.tracks.forall(_.train.isEmpty) shouldBe true
+        stationEnvironmentElement.platforms.size shouldBe numberOfTracks
+        stationEnvironmentElement.platforms.forall(_.train.isEmpty) shouldBe true
 
       "have a first available track" in:
-        stationEnvironmentElement.firstAvailableTrack shouldBe Some(Track(1))
+        stationEnvironmentElement.firstAvailablePlatform shouldBe Some(Platform(1))
 
   "A train" when:
     "arrive to a stationEnvironmentElement" should:
       "be place in a track if available" in:
-        stationEnvironmentElement.firstAvailableTrack shouldBe Some(Track(1))
+        stationEnvironmentElement.firstAvailablePlatform shouldBe Some(Platform(1))
         train3905.arriveAt(stationEnvironmentElement) match
           case Some(updatedStation) =>
-            updatedStation.tracks.headOption.flatMap(_.train) shouldBe Some(train3905)
-            updatedStation.firstAvailableTrack shouldBe Some(Track(2))
+            updatedStation.platforms.headOption.flatMap(_.train) shouldBe Some(train3905)
+            updatedStation.firstAvailablePlatform shouldBe Some(Platform(2))
           case None => fail()
 
       "not be place in a track if it's already in the stationEnvironmentElement" in:
@@ -53,8 +53,8 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
       "be removed from the track if it's present" in:
         train3905.arriveAt(stationEnvironmentElement).flatMap(train3905.leave) match
           case Some(updatedStation) =>
-            updatedStation.tracks.headOption.flatMap(_.train) shouldBe None
-            updatedStation.firstAvailableTrack shouldBe Some(Track(1))
+            updatedStation.platforms.headOption.flatMap(_.train) shouldBe None
+            updatedStation.firstAvailablePlatform shouldBe Some(Platform(1))
           case None => fail()
 
       "not be removed from the track if it's not present" in:
@@ -70,13 +70,13 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
 
     "update track" should:
       "be updated if the track is available" in:
-        stationEnvironmentElement.updateTrack(Track(1), Some(train3905)) match
+        stationEnvironmentElement.updatePlatform(Platform(1), Some(train3905)) match
           case Some(updatedStation) =>
-            updatedStation.tracks shouldBe List(Track(1).withTrain(Some(train3905)), Track(2))
+            updatedStation.platforms shouldBe List(Platform(1).withTrain(Some(train3905)), Platform(2))
           case None => fail()
 
       "not be updated if the track is not available" in:
-        stationEnvironmentElement.updateTrack(Track(1), Some(train3905)) match
+        stationEnvironmentElement.updatePlatform(Platform(1), Some(train3905)) match
           case Some(updatedStation) =>
-            updatedStation.tracks shouldBe List(Track(1).withTrain(Some(train3905)), Track(2))
+            updatedStation.platforms shouldBe List(Platform(1).withTrain(Some(train3905)), Platform(2))
           case None => fail()
