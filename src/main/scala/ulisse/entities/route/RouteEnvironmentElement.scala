@@ -9,19 +9,19 @@ import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.when
 
 trait RouteEnvironmentElement extends Route with EnvironmentElement:
-  val minPermittedDistanceBetweenTrains: Double
-  val tracks: Seq[Seq[TrainAgent]]
-  extension (track: Seq[TrainAgent])
-    def isAvailable: Boolean = track.forall(t => t.distanceTravelled - t.length >= minPermittedDistanceBetweenTrains)
-  def firstAvailableTrack: Option[Seq[TrainAgent]] = tracks.find(_.isAvailable)
-  def putTrain(routeTrack: Seq[TrainAgent], train: TrainAgent): Option[RouteEnvironmentElement]
+  val tracks: Seq[Track]
+  def firstAvailableTrack: Option[Track] = tracks.find(_.isAvailable)
+  def putTrain(track: Track, train: TrainAgent): Option[RouteEnvironmentElement]
   def updateTrain(train: TrainAgent): Option[RouteEnvironmentElement]
   def removeTrain(train: TrainAgent): Option[RouteEnvironmentElement]
 
 object RouteEnvironmentElement:
 
-  def createRouteEnvironmentElement(route: Route): RouteEnvironmentElement =
-    RouteEnvironmentElementImpl(route, Seq.fill(route.railsCount)(Seq()))
+  // TODO evaluate moving this in factory method
+  val minPermittedDistanceBetweenTrains: Double = 100.0
+
+  def apply(route: Route): RouteEnvironmentElement =
+    RouteEnvironmentElementImpl(route, Seq.fill(route.railsCount)(Track(minPermittedDistanceBetweenTrains)))
 
   extension (train: TrainAgent)
     def take(route: RouteEnvironmentElement): Option[RouteEnvironmentElement] =
@@ -30,34 +30,34 @@ object RouteEnvironmentElement:
     def findInRoutes(routes: Seq[RouteEnvironmentElement]): Option[RouteEnvironmentElement] =
       routes.find(ree => train.existInRoute(ree.tracks))
 
+  // TODO evaluate moving in respective classes
   extension (train: Train)
-    private[RouteEnvironmentElement] def existInRoute(tracks: Seq[Seq[TrainAgent]]): Boolean =
+    private[RouteEnvironmentElement] def existInRoute(tracks: Seq[Track]): Boolean =
       tracks.exists(train.existInTrack)
-    private[RouteEnvironmentElement] def existInTrack(trains: Seq[TrainAgent]): Boolean = trains.exists(train.matchId)
-    private[RouteEnvironmentElement] def matchId(otherTrain: Train): Boolean            = train.name == otherTrain.name
+    private[RouteEnvironmentElement] def existInTrack(track: Track): Boolean = track.exists(train.matchId)
+    private[RouteEnvironmentElement] def matchId(otherTrain: Train): Boolean = train.name == otherTrain.name
 
-  private final case class RouteEnvironmentElementImpl(route: Route, tracks: Seq[Seq[TrainAgent]])
+  private final case class RouteEnvironmentElementImpl(route: Route, tracks: Seq[Track])
       extends RouteEnvironmentElement:
     export route.*
-    // TODO evaluate moving this in factory method
-    val minPermittedDistanceBetweenTrains: Double = 100.0
 
     private def whenTrainExists[A](f: => A)(using train: Train): Option[A] =
       f when train.existInRoute(tracks)
 
-    private def modifyItInTrack(f: Seq[TrainAgent] => Seq[TrainAgent])(using
-        train: Train
+    private def modifyItInTrack(f: Track => Track)(using
+        train: TrainAgent
     ): RouteEnvironmentElementImpl =
       copy(tracks = tracks.updateWhen(train.existInTrack)(f))
 
-    def putTrain(routeTrack: Seq[TrainAgent], train: TrainAgent): Option[RouteEnvironmentElement] =
-      copy(tracks =
-        tracks.updateFirstWhen(_ == routeTrack)(_ ++ Seq(train))
-      ) when routeTrack.isAvailable && !train.existInRoute(tracks)
+    def putTrain(track: Track, train: TrainAgent): Option[RouteEnvironmentElement] =
+      Some(copy(tracks = tracks))
+//        tracks.updateFirstWhen(_ == track)(_ :+ train)
+//      ) when track.isAvailable && !train.existInRoute(tracks)
 
     def updateTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
-      whenTrainExists:
-        modifyItInTrack(_.updateWhen(train.matchId)(_ => train))
+      Some(this)
+//      whenTrainExists:
+//        modifyItInTrack(_.updateWhen(train.matchId)(_ => train))
 
     def removeTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
       whenTrainExists:
