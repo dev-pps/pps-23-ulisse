@@ -24,7 +24,7 @@ final case class SimulationService(
     simulationEvents.add((state: SimulationState) => {
       state.copy(simulationManager =
         state.simulationManager.withNotificationService(notificationService).setup(RailwayEnvironment(
-          appState.stationManager.stations.map(StationEnvironmentElement.createStationEnvironmentElement),
+          appState.stationManager.stations.map(StationEnvironmentElement.apply),
           Seq[RouteEnvironmentElement](),
           Seq[SimulationAgent]()
         ))
