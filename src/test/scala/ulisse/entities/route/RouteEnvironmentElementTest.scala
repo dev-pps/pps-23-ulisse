@@ -108,16 +108,22 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           train3905
         )) shouldBe None
 
-//      "not be placed if it's not available" in:
-//        route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905).flatMap(_.putTrain(Seq(train3905), train3906)) shouldBe None
-//
-//      "be place behind if is possible" in:
-//        val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
-//        route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905Updated).flatMap(_.putTrain(Seq(train3905Updated), train3906)) match
-//          case Some(updatedRoute) =>
-//            updatedRoute.tracks shouldBe Seq(Seq(train3905Updated, train3906), Seq())
-//            updatedRoute.firstAvailableTrack shouldBe Some(Seq())
-//          case None => fail()
+      "not be placed if it's not available" in:
+        route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905).flatMap(_.putTrain(
+          Track(minPermittedDistanceBetweenTrains, train3905),
+          train3906
+        )) shouldBe None
+
+      "be place behind if is possible" in:
+        val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
+        route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905Updated).flatMap(_.putTrain(
+          Track(minPermittedDistanceBetweenTrains, train3905Updated),
+          train3906
+        )) match
+          case Some(updatedRoute) =>
+            updatedRoute.tracks shouldBe Seq(Seq(train3905Updated, train3906), Seq())
+            updatedRoute.firstAvailableTrack shouldBe Some(Seq())
+          case None => fail()
 
     "update in a route" should:
       "be updated if present" in:

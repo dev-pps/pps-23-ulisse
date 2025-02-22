@@ -1,5 +1,6 @@
 package ulisse.entities.route
 
+import cats.Id
 import ulisse.entities
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.Environments.EnvironmentElement
@@ -47,17 +48,21 @@ object RouteEnvironmentElement:
     private def modifyItInTrack(f: Track => Track)(using
         train: TrainAgent
     ): RouteEnvironmentElementImpl =
-      copy(tracks = tracks.updateWhen(train.existInTrack)(f))
+      def wrappedF(f: Track => Track)(in: Track): Id[Track] = Id(f(in))
+      copy(tracks = tracks.updateWhenWithEffects(train.existInTrack)(wrappedF(f)))
 
     def putTrain(track: Track, train: TrainAgent): Option[RouteEnvironmentElement] =
-      Some(copy(tracks = tracks))
-//        tracks.updateFirstWhen(_ == track)(_ :+ train)
-//      ) when track.isAvailable && !train.existInRoute(tracks)
+      if train.existInRoute(tracks) then
+        import cats.instances.either.*
+        tracks.updateFirstWhenWithEffects(_ == track)(_ :+ train).toOption.map(tracks => copy(tracks = tracks))
+      else None
 
     def updateTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
-      Some(this)
-//      whenTrainExists:
-//        modifyItInTrack(_.updateWhen(train.matchId)(_ => train))
+      if train.existInRoute(tracks) then
+        tracks.updateWhenWithEffects(train.existInTrack)(_.updateWhen(train.matchId)(_ => train)).toOption.map(tracks =>
+          copy(tracks = tracks)
+        )
+      else None
 
     def removeTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
       whenTrainExists:
