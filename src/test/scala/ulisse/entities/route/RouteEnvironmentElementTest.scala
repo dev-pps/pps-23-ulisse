@@ -18,11 +18,11 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
   private val defaultWagon                        = Wagon(UseType.Passenger, 50)
   private val defaultWagonNumber                  = 5
   private val train3905 =
-    TrainAgent.createTrainAgent(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
+    TrainAgent.apply(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
   private val train3906 =
-    TrainAgent.createTrainAgent(Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber))
+    TrainAgent.apply(Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber))
   private val train3907 =
-    TrainAgent.createTrainAgent(Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber))
+    TrainAgent.apply(Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber))
 
   def route: RouteEnvironmentElement =
     // Create a route with 2 tracks and a length of 200.0 + trainLength, min distance between two train is 100.0 with this factory method
@@ -136,12 +136,14 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           train3906
         )) shouldBe None
 
-      "be place behind if is possible" in:
+      "be place behind if it is possible" in:
         val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
-        route.putTrain(Track(), train3905Updated).flatMap(_.putTrain(
-          Track(train3905Updated),
-          train3906
-        )) match
+        route.putTrain(Track(), train3905).flatMap(_.updateTrain(train3905Updated)).flatMap(
+          _.putTrain(
+            Track(train3905Updated),
+            train3906
+          )
+        ) match
           case Some(updatedRoute) =>
             updatedRoute.tracks shouldBe Seq(
               Track(train3905Updated, train3906),

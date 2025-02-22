@@ -6,6 +6,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
+import ulisse.entities.train.TrainAgent
 
 class PlatformTest extends AnyWordSpec with Matchers:
 
@@ -48,7 +49,8 @@ class PlatformTest extends AnyWordSpec with Matchers:
 
     "is updated with a train" should:
       "return a new platform with the specified train" in:
-        val train          = Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5)
+        val train =
+          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
         val platformNumber = 1
         val platform       = Platform(platformNumber)
         platform.withTrain(Some(train)).train shouldBe Some(train)
