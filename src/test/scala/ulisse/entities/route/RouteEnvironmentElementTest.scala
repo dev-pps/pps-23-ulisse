@@ -43,20 +43,32 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
   "A trainAgent" when:
     "take a route" should:
       "be place in a track if it empty" in:
-        route.firstAvailableTrack shouldBe Some(Seq())
+        route.firstAvailableTrack shouldBe Some(Track(minPermittedDistanceBetweenTrains))
         train3905.take(route) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks.find(_.contains(train3905)) shouldBe Some(Seq(train3905))
-            updatedRoute.firstAvailableTrack shouldBe Some(Seq())
-            updatedRoute.tracks shouldBe Seq(Seq(train3905), Seq())
+            updatedRoute.tracks.find(_.contains(train3905)) shouldBe Some(Track(
+              minPermittedDistanceBetweenTrains,
+              train3905
+            ))
+            updatedRoute.firstAvailableTrack shouldBe Some(Track(minPermittedDistanceBetweenTrains))
+            updatedRoute.tracks shouldBe Seq(
+              Track(minPermittedDistanceBetweenTrains, train3905),
+              Track(minPermittedDistanceBetweenTrains)
+            )
           case None => fail()
 
       "not be place in a track if not available" in:
         train3905.take(route).flatMap(train3906.take) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks.find(_.contains(train3906)) shouldBe Some(Seq(train3906))
+            updatedRoute.tracks.find(_.contains(train3906)) shouldBe Some(Track(
+              minPermittedDistanceBetweenTrains,
+              train3906
+            ))
             updatedRoute.firstAvailableTrack shouldBe None
-            updatedRoute.tracks shouldBe Seq(Seq(train3905), Seq(train3906))
+            updatedRoute.tracks shouldBe Seq(
+              Track(minPermittedDistanceBetweenTrains, train3905),
+              Track(minPermittedDistanceBetweenTrains, train3906)
+            )
             train3907.take(updatedRoute) shouldBe None
           case None => fail()
 
@@ -70,10 +82,14 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
         train3905.take(route).flatMap(_.updateTrain(train3905Updated)) match
           case Some(updatedRoute) =>
-            updatedRoute.firstAvailableTrack shouldBe Some(Seq(train3905Updated))
+            updatedRoute.firstAvailableTrack shouldBe Some(Track(minPermittedDistanceBetweenTrains, train3905Updated))
             train3906.take(updatedRoute) match
               case Some(updatedRoute) =>
-                updatedRoute.tracks.find(_.contains(train3906)) shouldBe Some(Seq(train3905Updated, train3906))
+                updatedRoute.tracks.find(_.contains(train3906)) shouldBe Some(Track(
+                  minPermittedDistanceBetweenTrains,
+                  train3905Updated,
+                  train3906
+                ))
               case None => fail()
           case None => fail()
 
@@ -89,8 +105,11 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
       "be placed in the first matching track" in:
         route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks shouldBe Seq(Seq(train3905), Seq())
-            updatedRoute.firstAvailableTrack shouldBe Some(Seq())
+            updatedRoute.tracks shouldBe Seq(
+              Track(minPermittedDistanceBetweenTrains, train3905),
+              Track(minPermittedDistanceBetweenTrains)
+            )
+            updatedRoute.firstAvailableTrack shouldBe Some(Track(minPermittedDistanceBetweenTrains))
           case None => fail()
 
         route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905).flatMap(_.putTrain(
@@ -98,7 +117,10 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           train3906
         )) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks shouldBe Seq(Seq(train3905), Seq(train3906))
+            updatedRoute.tracks shouldBe Seq(
+              Track(minPermittedDistanceBetweenTrains, train3905),
+              Track(minPermittedDistanceBetweenTrains, train3906)
+            )
             updatedRoute.firstAvailableTrack shouldBe None
           case None => fail()
 
@@ -121,8 +143,11 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           train3906
         )) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks shouldBe Seq(Seq(train3905Updated, train3906), Seq())
-            updatedRoute.firstAvailableTrack shouldBe Some(Seq())
+            updatedRoute.tracks shouldBe Seq(
+              Track(minPermittedDistanceBetweenTrains, train3905Updated, train3906),
+              Track(minPermittedDistanceBetweenTrains)
+            )
+            updatedRoute.firstAvailableTrack shouldBe Some(Track(minPermittedDistanceBetweenTrains))
           case None => fail()
 
     "update in a route" should:
@@ -131,7 +156,10 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         train3905.take(route).flatMap(_.updateTrain(updatedTrain3905)) match
           case Some(updatedRoute) =>
             updatedRoute.tracks.find(_.contains(train3905)) shouldBe None
-            updatedRoute.tracks shouldBe Seq(Seq(updatedTrain3905), Seq())
+            updatedRoute.tracks shouldBe Seq(
+              Track(minPermittedDistanceBetweenTrains, updatedTrain3905),
+              Track(minPermittedDistanceBetweenTrains)
+            )
           case None => fail()
 
       "not be updated if not present" in:
@@ -142,7 +170,10 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         train3905.take(route).flatMap(_.removeTrain(train3905)) match
           case Some(updatedRoute) =>
             updatedRoute.tracks.find(_.contains(train3905)) shouldBe None
-            updatedRoute.tracks shouldBe Seq(Seq(), Seq())
+            updatedRoute.tracks shouldBe Seq(
+              Track(minPermittedDistanceBetweenTrains),
+              Track(minPermittedDistanceBetweenTrains)
+            )
           case None => fail()
 
       "not be removed if not present" in:
