@@ -1,6 +1,5 @@
 package ulisse.entities.route
 
-import cats.Id
 import ulisse.entities
 import ulisse.utils.OptionUtils.*
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option
@@ -19,11 +18,9 @@ trait RouteEnvironmentElement extends Route with EnvironmentElement:
 
 object RouteEnvironmentElement:
 
-  // TODO evaluate moving this in factory method
-  val minPermittedDistanceBetweenTrains: Double = 100.0
-
-  def apply(route: Route): RouteEnvironmentElement =
-    RouteEnvironmentElementImpl(route, Seq.fill(route.railsCount)(Track(minPermittedDistanceBetweenTrains)))
+  def apply(route: Route, minPermittedDistanceBetweenTrains: Double): RouteEnvironmentElement =
+    given Double = minPermittedDistanceBetweenTrains
+    RouteEnvironmentElementImpl(route, Seq.fill(route.railsCount)(Track()))
 
   extension (train: TrainAgent)
     def take(route: RouteEnvironmentElement): Option[RouteEnvironmentElement] =
