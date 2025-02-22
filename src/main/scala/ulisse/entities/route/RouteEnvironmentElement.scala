@@ -19,7 +19,7 @@ trait RouteEnvironmentElement extends Route with EnvironmentElement:
 object RouteEnvironmentElement:
 
   def apply(route: Route, minPermittedDistanceBetweenTrains: Double): RouteEnvironmentElement =
-    given TrackConfiguration(minPermittedDistanceBetweenTrains, route.length)
+    given Double = minPermittedDistanceBetweenTrains
     RouteEnvironmentElementImpl(route, Seq.fill(route.railsCount)(Track()))
 
   extension (train: TrainAgent)
