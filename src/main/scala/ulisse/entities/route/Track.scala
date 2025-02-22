@@ -8,11 +8,10 @@ import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateRange, validateUniqueItems}
 
 import scala.annotation.targetName
-class TrackConfiguration(val minPermittedDistanceBetweenTrains: Double, val trackLength: Double)
 trait Track:
   val trains: Seq[TrainAgent]
-  def configuration: TrackConfiguration
-  def isAvailable: Boolean = trains.forall(t => t.distanceTravelled - t.length >= configuration.minPermittedDistanceBetweenTrains)
+  def minPermittedDistanceBetweenTrains: Double
+  def isAvailable: Boolean = trains.forall(t => t.distanceTravelled - t.length >= minPermittedDistanceBetweenTrains)
   @targetName("appendedTrain")
   def :+(train: TrainAgent): Either[NonEmptyChain[Track.Errors], Track]
   def updateWhen(p: TrainAgent => Boolean)(f: TrainAgent => TrainAgent): Either[NonEmptyChain[Track.Errors], Track]
@@ -20,21 +19,21 @@ trait Track:
   export trains.{contains, exists, isEmpty}
 
 object Track:
-  def apply(trains: TrainAgent*)(using configuration: TrackConfiguration): Track =
-    TrackImpl(trains.distinctBy(_.name).filter(_.length <= configuration.trackLength).filter(t =>
-      t.distanceTravelled + t.length <= configuration.trackLength
-    ))
+  def apply(trains: TrainAgent*)(using minPermittedDistanceBetweenTrains: Double): Track =
+    TrackImpl(trains.distinctBy(_.name))
   def createCheckedTrack(
       trains: TrainAgent*
-  )(using configuration: TrackConfiguration): Either[NonEmptyChain[Track.Errors], Track] =
-    
-      validateUniqueItems(trains.map(_.name), Errors.DuplicateTrains).toValidatedNec.map(_ => Track(trains*))
+  )(using minPermittedDistanceBetweenTrains: Double): Either[NonEmptyChain[Track.Errors], Track] =
+    validateUniqueItems(trains.map(_.name), Errors.DuplicateTrains)
+      .toValidatedNec
+      .map(_ => Track(trains*))
       .toEither
 
-  private final case class TrackImpl(trains: Seq[TrainAgent])(using val configuration: TrackConfiguration)
+  private final case class TrackImpl(trains: Seq[TrainAgent])(using val minPermittedDistanceBetweenTrains: Double)
       extends Track:
     @targetName("appendedTrain")
     override def :+(train: TrainAgent): Either[NonEmptyChain[Track.Errors], Track] =
+      // TODO evaluate if is needed
       val moved =
         if train.distanceTravelled > 0 then
           Left(Errors.TrainAlreadyMoved)
