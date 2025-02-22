@@ -10,12 +10,13 @@ import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.entities.route.RouteEnvironmentElement.*
+import ulisse.entities.route.RouteEnvironmentElement.given
 
 class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
-
-  private val defaultTechnology  = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
-  private val defaultWagon       = Wagon(UseType.Passenger, 50)
-  private val defaultWagonNumber = 5
+  given defaultMinPermittedDistanceBetweenTrains: Double = 100.0
+  private val defaultTechnology                          = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
+  private val defaultWagon                               = Wagon(UseType.Passenger, 50)
+  private val defaultWagonNumber                         = 5
   private val train3905 =
     TrainAgent.createTrainAgent(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
   private val train3906 =
@@ -27,7 +28,7 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
     // Create a route with 2 tracks and a length of 200.0 + trainLength, min distance between two train is 100.0 with this factory method
     validateRoute.flatMap(_.withLength(200.0 + train3905.length)) match
       case Left(errors) => fail()
-      case Right(route) => RouteEnvironmentElement.apply(route)
+      case Right(route) => RouteEnvironmentElement(route, defaultMinPermittedDistanceBetweenTrains)
 
   "RouteEnvironmentElement" should:
     "have two empty tracks" in:
@@ -43,17 +44,16 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
   "A trainAgent" when:
     "take a route" should:
       "be place in a track if it empty" in:
-        route.firstAvailableTrack shouldBe Some(Track(minPermittedDistanceBetweenTrains))
+        route.firstAvailableTrack shouldBe Some(Track())
         train3905.take(route) match
           case Some(updatedRoute) =>
             updatedRoute.tracks.find(_.contains(train3905)) shouldBe Some(Track(
-              minPermittedDistanceBetweenTrains,
               train3905
             ))
-            updatedRoute.firstAvailableTrack shouldBe Some(Track(minPermittedDistanceBetweenTrains))
+            updatedRoute.firstAvailableTrack shouldBe Some(Track())
             updatedRoute.tracks shouldBe Seq(
-              Track(minPermittedDistanceBetweenTrains, train3905),
-              Track(minPermittedDistanceBetweenTrains)
+              Track(train3905),
+              Track()
             )
           case None => fail()
 
@@ -61,13 +61,12 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         train3905.take(route).flatMap(train3906.take) match
           case Some(updatedRoute) =>
             updatedRoute.tracks.find(_.contains(train3906)) shouldBe Some(Track(
-              minPermittedDistanceBetweenTrains,
               train3906
             ))
             updatedRoute.firstAvailableTrack shouldBe None
             updatedRoute.tracks shouldBe Seq(
-              Track(minPermittedDistanceBetweenTrains, train3905),
-              Track(minPermittedDistanceBetweenTrains, train3906)
+              Track(train3905),
+              Track(train3906)
             )
             train3907.take(updatedRoute) shouldBe None
           case None => fail()
@@ -82,11 +81,10 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
         train3905.take(route).flatMap(_.updateTrain(train3905Updated)) match
           case Some(updatedRoute) =>
-            updatedRoute.firstAvailableTrack shouldBe Some(Track(minPermittedDistanceBetweenTrains, train3905Updated))
+            updatedRoute.firstAvailableTrack shouldBe Some(Track(train3905Updated))
             train3906.take(updatedRoute) match
               case Some(updatedRoute) =>
                 updatedRoute.tracks.find(_.contains(train3906)) shouldBe Some(Track(
-                  minPermittedDistanceBetweenTrains,
                   train3905Updated,
                   train3906
                 ))
@@ -103,51 +101,51 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
 
     "put in a route" should:
       "be placed in the first matching track" in:
-        route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905) match
+        route.putTrain(Track(), train3905) match
           case Some(updatedRoute) =>
             updatedRoute.tracks shouldBe Seq(
-              Track(minPermittedDistanceBetweenTrains, train3905),
-              Track(minPermittedDistanceBetweenTrains)
+              Track(train3905),
+              Track()
             )
-            updatedRoute.firstAvailableTrack shouldBe Some(Track(minPermittedDistanceBetweenTrains))
+            updatedRoute.firstAvailableTrack shouldBe Some(Track())
           case None => fail()
 
-        route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905).flatMap(_.putTrain(
-          Track(minPermittedDistanceBetweenTrains),
+        route.putTrain(Track(), train3905).flatMap(_.putTrain(
+          Track(),
           train3906
         )) match
           case Some(updatedRoute) =>
             updatedRoute.tracks shouldBe Seq(
-              Track(minPermittedDistanceBetweenTrains, train3905),
-              Track(minPermittedDistanceBetweenTrains, train3906)
+              Track(train3905),
+              Track(train3906)
             )
             updatedRoute.firstAvailableTrack shouldBe None
           case None => fail()
 
       "not be placed if it's already in the route" in:
-        route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905).flatMap(_.putTrain(
-          Track(minPermittedDistanceBetweenTrains),
+        route.putTrain(Track(), train3905).flatMap(_.putTrain(
+          Track(),
           train3905
         )) shouldBe None
 
       "not be placed if it's not available" in:
-        route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905).flatMap(_.putTrain(
-          Track(minPermittedDistanceBetweenTrains, train3905),
+        route.putTrain(Track(), train3905).flatMap(_.putTrain(
+          Track(train3905),
           train3906
         )) shouldBe None
 
       "be place behind if is possible" in:
         val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
-        route.putTrain(Track(minPermittedDistanceBetweenTrains), train3905Updated).flatMap(_.putTrain(
-          Track(minPermittedDistanceBetweenTrains, train3905Updated),
+        route.putTrain(Track(), train3905Updated).flatMap(_.putTrain(
+          Track(train3905Updated),
           train3906
         )) match
           case Some(updatedRoute) =>
             updatedRoute.tracks shouldBe Seq(
-              Track(minPermittedDistanceBetweenTrains, train3905Updated, train3906),
-              Track(minPermittedDistanceBetweenTrains)
+              Track(train3905Updated, train3906),
+              Track()
             )
-            updatedRoute.firstAvailableTrack shouldBe Some(Track(minPermittedDistanceBetweenTrains))
+            updatedRoute.firstAvailableTrack shouldBe Some(Track())
           case None => fail()
 
     "update in a route" should:
@@ -157,8 +155,8 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           case Some(updatedRoute) =>
             updatedRoute.tracks.find(_.contains(train3905)) shouldBe None
             updatedRoute.tracks shouldBe Seq(
-              Track(minPermittedDistanceBetweenTrains, updatedTrain3905),
-              Track(minPermittedDistanceBetweenTrains)
+              Track(updatedTrain3905),
+              Track()
             )
           case None => fail()
 
@@ -171,8 +169,8 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           case Some(updatedRoute) =>
             updatedRoute.tracks.find(_.contains(train3905)) shouldBe None
             updatedRoute.tracks shouldBe Seq(
-              Track(minPermittedDistanceBetweenTrains),
-              Track(minPermittedDistanceBetweenTrains)
+              Track(),
+              Track()
             )
           case None => fail()
 
