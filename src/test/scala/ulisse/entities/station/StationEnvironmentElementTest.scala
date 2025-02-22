@@ -6,6 +6,7 @@ import ulisse.entities.Coordinate
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.entities.station.StationEnvironmentElement.*
+import ulisse.entities.train.TrainAgent
 
 class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
   private val numberOfTracks            = 2
@@ -14,9 +15,9 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
   private val defaultTechnology         = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
   private val defaultWagon              = Wagon(UseType.Passenger, 50)
   private val defaultWagonNumber        = 5
-  private val train3905                 = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber)
-  private val train3906                 = Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber)
-  private val train3907                 = Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber)
+  private val train3905                 = TrainAgent(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
+  private val train3906                 = TrainAgent(Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber))
+  private val train3907                 = TrainAgent(Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber))
 
   "A StationEnvironmentElement" when:
     "created" should:
