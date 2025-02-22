@@ -6,30 +6,30 @@ import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.when
 
 trait StationEnvironmentElement extends Station with EnvironmentElement:
-  val tracks: List[Track]
-  def firstAvailableTrack: Option[Track] = tracks.find(_.train.isEmpty)
-  def updateTrack(track: Track, train: Option[Train]): Option[StationEnvironmentElement]
+  val platforms: List[Platform]
+  def firstAvailablePlatform: Option[Platform] = platforms.find(_.train.isEmpty)
+  def updatePlatform(platform: Platform, train: Option[Train]): Option[StationEnvironmentElement]
 
 object StationEnvironmentElement:
-  def createStationEnvironmentElement(station: Station): StationEnvironmentElement =
-    StationEnvironmentElementImpl(station, Track.generateSequentialTracks(station.numberOfTracks))
+  def apply(station: Station): StationEnvironmentElement =
+    StationEnvironmentElementImpl(station, Platform.generateSequentialPlatforms(station.numberOfTracks))
 
   extension (train: Train)
     def arriveAt(station: StationEnvironmentElement): Option[StationEnvironmentElement] =
-      station.firstAvailableTrack.flatMap(track => station.updateTrack(track, Some(train)))
+      station.firstAvailablePlatform.flatMap(track => station.updatePlatform(track, Some(train)))
 
     def leave(station: StationEnvironmentElement): Option[StationEnvironmentElement] =
-      station.tracks.find(_.train.contains(train)).flatMap(track => station.updateTrack(track, None))
+      station.platforms.find(_.train.contains(train)).flatMap(track => station.updatePlatform(track, None))
 
     def findInStation(stations: Seq[StationEnvironmentElement]): Option[StationEnvironmentElement] =
       // TODO check impl
-      stations.find(_.tracks.exists(_.train.map(_.name).contains(train.name)))
+      stations.find(_.platforms.exists(_.train.map(_.name).contains(train.name)))
 
-  private final case class StationEnvironmentElementImpl(station: Station, tracks: List[Track])
+  private final case class StationEnvironmentElementImpl(station: Station, platforms: List[Platform])
       extends StationEnvironmentElement:
     export station.*
 
-    def updateTrack(track: Track, train: Option[Train]): Option[StationEnvironmentElement] =
-      copy(tracks = tracks.updateWhen(_ == track)(_.withTrain(train))) when !tracks.exists(
+    def updatePlatform(platform: Platform, train: Option[Train]): Option[StationEnvironmentElement] =
+      copy(platforms = platforms.updateWhen(_ == platform)(_.withTrain(train))) when !platforms.exists(
         train.isDefined && _.train == train
       )
