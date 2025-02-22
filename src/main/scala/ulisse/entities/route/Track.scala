@@ -19,6 +19,7 @@ trait Track:
   export trains.{contains, exists, isEmpty}
 
 object Track:
+  // TODO evaluate if leave there minPermittedDistanceBetweenTrains or pass as parameter for isAvailable
   def apply(trains: TrainAgent*)(using minPermittedDistanceBetweenTrains: Double): Track =
     TrackImpl(trains.distinctBy(_.name))
   def createCheckedTrack(
