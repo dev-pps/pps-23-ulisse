@@ -1,27 +1,17 @@
-package ulisse.infrastructures.view.components
+package ulisse.infrastructures.view.components.ui.decorators
 
 import com.formdev.flatlaf.extras.FlatSVGIcon
 import ulisse.infrastructures.view.components.ui.decorators.Styles
+import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.EnhancedLook
 
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import scala.swing.{event, Component, Graphics2D}
 
-object ImageEnhancements:
+object ImageEffects:
 
-  trait ImageEnhanced extends Component:
-    self: Component =>
-    opaque = false
-
-    protected def paintImage(g: Graphics2D): Unit = ()
-
-    override protected def paintComponent(g: Graphics2D): Unit =
-      g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-      paintImage(g)
-      super.paintComponent(g)
-
-  trait ImageEffect() extends ImageEnhanced:
+  trait ImageEffect() extends EnhancedLook:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _image: Option[BufferedImage] = Option.empty
 
@@ -36,8 +26,8 @@ object ImageEnhancements:
     def image: Option[BufferedImage] = _image
     def image_=(path: String): Unit  = _image = initImage(path)
 
-    override protected def paintImage(g: Graphics2D): Unit =
-      super.paintImage(g)
+    override protected def paintLook(g: Graphics2D): Unit =
+      super.paintLook(g)
       // tornare indietro basta l'affine transform
       // g.rotate(math.toRadians(rotation), size.width / 2, size.getHeight / 2)
       image.foreach(image =>
@@ -45,7 +35,7 @@ object ImageEnhancements:
         g.drawImage(image, (size.width - imgSize) / 2, (size.height - imgSize) / 2, imgSize, imgSize, peer)
       )
 
-  trait SVGEffect extends ImageEnhanced:
+  trait SVGEffect extends EnhancedLook:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _svgIcon: Option[FlatSVGIcon] = Option.empty
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
@@ -80,9 +70,8 @@ object ImageEnhancements:
       case _: event.MouseReleased => palette.clickColor.foreach(_ => background = palette.background)
     }
 
-    override protected def paintImage(g: Graphics2D): Unit =
-      super.paintImage(g)
-
+    override protected def paintLook(g: Graphics2D): Unit =
+      super.paintLook(g)
 //      svgIcon.foreach(icon =>
 //
 //        val imgSize = math.min(size.width, size.height)
