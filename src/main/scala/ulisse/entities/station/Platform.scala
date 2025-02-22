@@ -2,6 +2,7 @@ package ulisse.entities.station
 
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
+import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.validatePositive
@@ -10,7 +11,7 @@ import ulisse.utils.ValidationUtils.validatePositive
 trait Platform:
   // TODO evaluate if is needed a value for length of the platform track
   val platformNumber: Int
-  val train: Option[Train]
+  val train: Option[TrainAgent]
 
 /** Factory for [[Platform]] instances. */
 object Platform:
@@ -28,10 +29,10 @@ object Platform:
     List.tabulate(numberOfTracks)(i => PlatformImpl(step(i), None))
 
   extension (platform: Platform)
-    def withTrain(train: Option[Train]): Platform = PlatformImpl(platform.platformNumber, train)
+    def withTrain(train: Option[TrainAgent]): Platform = PlatformImpl(platform.platformNumber, train)
 
   /** Represents errors that can occur during `Track` creation. */
   enum Error extends BaseError:
     case InvalidPlatformNumber
 
-  private final case class PlatformImpl(platformNumber: Int, train: Option[Train]) extends Platform
+  private final case class PlatformImpl(platformNumber: Int, train: Option[TrainAgent]) extends Platform

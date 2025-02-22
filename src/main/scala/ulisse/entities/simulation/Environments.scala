@@ -16,14 +16,17 @@ object Environments:
     def doStep(dt: Int): RailwayEnvironment
     def stations: Seq[StationEnvironmentElement]
     def routes: Seq[RouteEnvironmentElement]
-    def agents: Seq[SimulationAgent] = stations.flatMap()
+    def agents: Seq[SimulationAgent] =
+      stations.flatMap(_.platforms.flatMap(_.train)) ++ routes.flatMap(_.tracks.flatMap(_.trains))
     def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment
     def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment
 
   object RailwayEnvironment:
+    // TODO evaluate where to do the initial placement of the trains
     def apply(
         stations: Seq[StationEnvironmentElement],
-        routes: Seq[RouteEnvironmentElement]
+        routes: Seq[RouteEnvironmentElement],
+        agents: Seq[SimulationAgent]
     ): RailwayEnvironment =
       SimulationEnvironmentImpl(stations, routes)
 
@@ -32,31 +35,33 @@ object Environments:
 
     private final case class SimulationEnvironmentImpl(
         stations: Seq[StationEnvironmentElement],
-        routes: Seq[RouteEnvironmentElement],
-        agents: Seq[SimulationAgent]
+        routes: Seq[RouteEnvironmentElement]
     ) extends RailwayEnvironment:
       def doStep(dt: Int): RailwayEnvironment =
         val stepActions = agents.map(a => a -> a.doStep(dt, this)).toMap
-        stepActions.foldLeft(this.copy(agents = Seq())) {
-          case (env, (agent: TrainAgent, Some(Actions.MoveBy(d)))) =>
-            if agent.isOnRoute then updateAgentOnRoute(agent, d)
-            else updateAgentInStation(agent, d)
-          case (env, (agent, _)) => env.copy(agents = agents ++ Seq(agent))
-        }
+//        stepActions.foldLeft(this) {
+//          case (env, (agent: TrainAgent, Some(Actions.MoveBy(d)))) =>
+//            if agent.isOnRoute then updateAgentOnRoute(agent, d)
+//            else updateAgentInStation(agent, d)
+//          case (env, (agent, _)) => env.copy(agents = agents ++ Seq(agent))
+//        }
+        this
 
       private def updateAgentOnRoute(agent: TrainAgent, distance: Double): SimulationEnvironmentImpl =
-        agent.findInRoutes(routes).fold(this)(route =>
-          val arriveAtDestination = agent.distanceTravelled + distance >= route.length
-          if arriveAtDestination then
-            copy(agents = agents ++ Seq(agent.resetDistanceTravelled())).arriveToDestination(route, agent)
-          else
-            copy(agents = agents ++ Seq(agent.updateDistanceTravelled(distance)))
-        )
+//        agent.findInRoutes(routes).fold(this)(route =>
+//          val arriveAtDestination = agent.distanceTravelled + distance >= route.length
+//          if arriveAtDestination then
+//            copy(agents = agents ++ Seq(agent.resetDistanceTravelled())).arriveToDestination(route, agent)
+//          else
+//            copy(agents = agents ++ Seq(agent.updateDistanceTravelled(distance)))
 
-      private def updateAgentInStation(agent: TrainAgent, distance: Double): SimulationEnvironmentImpl =
-        agent.findInStation(stations).fold(this)(station =>
-          copy(agents = agents ++ Seq(agent)).leaveStation(station, agent)
-        )
+//        )
+        this
+
+//      private def updateAgentInStation(agent: TrainAgent, distance: Double): SimulationEnvironmentImpl =
+//        agent.findInStation(stations).fold(this)(station =>
+//          copy(agents = agents ++ Seq(agent)).leaveStation(station, agent)
+//        )
 
       private def leaveStation(station: StationEnvironmentElement, train: TrainAgent): SimulationEnvironmentImpl =
 //        this.copy(stations = stations.updateWhen(_ == station)(train.leave))
@@ -71,5 +76,3 @@ object Environments:
         copy(stations = newStations)
       def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment =
         copy(routes = newRoutes)
-      def agents_=(newAgents: Seq[SimulationAgent]): RailwayEnvironment =
-        copy(agents = newAgents)

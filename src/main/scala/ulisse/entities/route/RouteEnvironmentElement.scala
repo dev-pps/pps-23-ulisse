@@ -25,7 +25,10 @@ object RouteEnvironmentElement:
   extension (train: TrainAgent)
     def take(route: RouteEnvironmentElement): Option[RouteEnvironmentElement] =
       route.firstAvailableTrack.flatMap(track => route.putTrain(track, train))
-
+      
+    def leave(route: RouteEnvironmentElement): Option[RouteEnvironmentElement] =
+      route.removeTrain
+      
     def findInRoutes(routes: Seq[RouteEnvironmentElement]): Option[RouteEnvironmentElement] =
       routes.find(ree => train.existInRoute(ree.tracks))
 
@@ -40,7 +43,7 @@ object RouteEnvironmentElement:
       extends RouteEnvironmentElement:
     export route.*
 
-    private def whenTrainExists[A](f: => A)(using train: Train): Option[A] =
+    private def whenTrainExists[A](f: => A)(using train: TrainAgent): Option[A] =
       f when train.existInRoute(tracks)
 
     private def modifyItInTrack(f: Track => Track)(using
@@ -49,11 +52,13 @@ object RouteEnvironmentElement:
       copy(tracks = tracks.updateWhen(train.existInTrack)(f))
 
     def putTrain(track: Track, train: TrainAgent): Option[RouteEnvironmentElement] =
+      println(track.isAvailable && !train.existInRoute(tracks))
       tracks.updateFirstWhenWithEffects(_ == track)(_ :+ train).toOption.map(tracks =>
         copy(tracks = tracks)
       ) when track.isAvailable && !train.existInRoute(tracks)
 
     def updateTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
+      // TODO investigate why is not working using whenTrainExists
       tracks.updateWhenWithEffects(train.existInTrack)(_.updateWhen(train.matchId)(_ => train)).toOption.map(tracks =>
         copy(tracks = tracks)
       ) when train.existInRoute(tracks)
