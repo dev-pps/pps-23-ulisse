@@ -16,18 +16,16 @@ object Environments:
     def doStep(dt: Int): RailwayEnvironment
     def stations: Seq[StationEnvironmentElement]
     def routes: Seq[RouteEnvironmentElement]
-    def agents: Seq[SimulationAgent]
+    def agents: Seq[SimulationAgent] = stations.flatMap()
     def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment
     def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment
-    def agents_=(newAgents: Seq[SimulationAgent]): RailwayEnvironment
 
   object RailwayEnvironment:
     def apply(
         stations: Seq[StationEnvironmentElement],
-        routes: Seq[RouteEnvironmentElement],
-        agents: Seq[SimulationAgent]
+        routes: Seq[RouteEnvironmentElement]
     ): RailwayEnvironment =
-      SimulationEnvironmentImpl(stations, routes, agents)
+      SimulationEnvironmentImpl(stations, routes)
 
     def empty(): RailwayEnvironment =
       apply(Seq[StationEnvironmentElement](), Seq[RouteEnvironmentElement](), Seq[SimulationAgent]())

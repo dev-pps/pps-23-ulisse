@@ -8,6 +8,7 @@ import ulisse.utils.ValidationUtils.validatePositive
 
 /** Defines a track in a station. */
 trait Platform:
+  // TODO evaluate if is needed a value for length of the platform track
   val platformNumber: Int
   val train: Option[Train]
 
@@ -15,7 +16,7 @@ trait Platform:
 object Platform:
 
   /** Creates a `Track` instance. If platform number is not positive it is set to 1 */
-  def apply(platformNumber: Int): Platform = TrackImpl(math.max(1, platformNumber), None)
+  def apply(platformNumber: Int): Platform = PlatformImpl(math.max(1, platformNumber), None)
 
   /** Creates a `Track` instance with validation. If platform number is not positive an error is returned */
   def createCheckedPlatform(platformNumber: Int): Either[NonEmptyChain[Error], Platform] =
@@ -24,13 +25,13 @@ object Platform:
   /** Creates a List of `Track` instance. If the specified numberOfTracks is not positive an empty List is returned */
   def generateSequentialPlatforms(numberOfTracks: Int): List[Platform] =
     val step: Int => Int = _ + 1
-    List.tabulate(numberOfTracks)(i => TrackImpl(step(i), None))
+    List.tabulate(numberOfTracks)(i => PlatformImpl(step(i), None))
 
-  extension (track: Platform)
-    def withTrain(train: Option[Train]): Platform = TrackImpl(track.platformNumber, train)
+  extension (platform: Platform)
+    def withTrain(train: Option[Train]): Platform = PlatformImpl(platform.platformNumber, train)
 
   /** Represents errors that can occur during `Track` creation. */
   enum Error extends BaseError:
     case InvalidPlatformNumber
 
-  private final case class TrackImpl(platformNumber: Int, train: Option[Train]) extends Platform
+  private final case class PlatformImpl(platformNumber: Int, train: Option[Train]) extends Platform
