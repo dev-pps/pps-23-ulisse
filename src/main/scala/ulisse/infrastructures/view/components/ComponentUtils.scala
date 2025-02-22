@@ -1,8 +1,9 @@
 package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.components.ComponentConfigurations.Alignment
-import ulisse.infrastructures.view.components.Styles
-import ulisse.infrastructures.view.components.SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.components.ui.ExtendedSwing
+import ulisse.infrastructures.view.components.ui.decorators.Styles
 
 import java.awt
 import java.awt.{BorderLayout, Color, Graphics}

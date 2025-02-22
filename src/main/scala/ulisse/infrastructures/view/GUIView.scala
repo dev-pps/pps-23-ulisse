@@ -2,7 +2,6 @@ package ulisse.infrastructures.view
 
 import ulisse.applications.ports.RoutePorts.Input
 import ulisse.infrastructures.view.common.CentralController
-import ulisse.infrastructures.view.components.Styles.*
 import ulisse.infrastructures.view.map.MapPanel
 
 import scala.concurrent.ExecutionContext

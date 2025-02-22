@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.components
 
 import com.formdev.flatlaf.extras.FlatSVGIcon
+import ulisse.infrastructures.view.components.ui.decorators.Styles
 
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
