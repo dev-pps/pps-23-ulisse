@@ -3,6 +3,7 @@ package ulisse.infrastructures.view.components
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
+import ulisse.infrastructures.view.components.ui.decorators.Styles.defaultRect
 
 class JItemTest extends AnyFlatSpec with Matchers:
   val text: String = "Hello"

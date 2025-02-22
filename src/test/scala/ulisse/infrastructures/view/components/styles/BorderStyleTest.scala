@@ -1,7 +1,8 @@
-package ulisse.infrastructures.view.components
+package ulisse.infrastructures.view.components.styles
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
+import ulisse.infrastructures.view.components.ui.decorators.Styles._
 
 class BorderStyleTest extends AnyFlatSpec with Matchers:
   "default border" should "have color and stroke" in:

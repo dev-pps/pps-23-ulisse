@@ -1,7 +1,8 @@
-package ulisse.infrastructures.view.components
+package ulisse.infrastructures.view.components.styles
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
+import ulisse.infrastructures.view.components.ui.decorators.Styles.*
 
 import java.awt.Color
 import scala.swing.Font
