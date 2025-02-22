@@ -123,8 +123,7 @@ object ComposedSwing:
     private val pagesPanel = ExtendedSwing.JFlowPanelItem()
 
     private val navBar = createNavbar(iconLabels: _*)
-    private val pages =
-      iconLabels.map(iconLabel => (iconLabel, ExtendedSwing.JFlowPanelItem())).toMap
+    private val pages  = iconLabels.map(iconLabel => (iconLabel, ExtendedSwing.JFlowPanelItem())).toMap
 
     pages.values.foreach(_.visible = false)
     pagesPanel.contents ++= pages.values
@@ -141,6 +140,7 @@ object ComposedSwing:
       }
     )
 
+    pages.headOption.foreach((key, _) => paneOf(key))
     def paneOf(label: JIconLabel): ExtendedSwing.JFlowPanelItem = pages(label)
     override def component[T >: Component]: T                   = mainPanel
 
