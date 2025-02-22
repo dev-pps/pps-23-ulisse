@@ -6,7 +6,8 @@ import java.awt.FlowLayout
 import scala.swing.*
 
 object ExtendedSwing:
-
+  trait ExtendedSwing
+  
   case class JBorderPanelItem() extends BorderPanel with ShapeEffect with FontEffect
 
   case class JFlowPanelItem() extends FlowPanel with ShapeEffect with FontEffect:
