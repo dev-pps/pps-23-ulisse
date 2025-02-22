@@ -1,7 +1,6 @@
 package ulisse.infrastructures.view.common
 
-import ulisse.infrastructures.view.components.ComposedSwing
-
+import ulisse.infrastructures.view.components.ui.ComposedSwing
 import scala.swing.Component
 
 trait CentralController:

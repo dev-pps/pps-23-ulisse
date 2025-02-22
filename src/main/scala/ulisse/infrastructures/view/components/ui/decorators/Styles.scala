@@ -1,7 +1,7 @@
-package ulisse.infrastructures.view.components
+package ulisse.infrastructures.view.components.ui.decorators
 
 import ulisse.infrastructures.view.common.Themes
-import ulisse.infrastructures.view.components.SwingEnhancements.EnhancedLook
+import SwingEnhancements.EnhancedLook
 import ulisse.utils.{Pair, Swings}
 
 import java.awt.Color

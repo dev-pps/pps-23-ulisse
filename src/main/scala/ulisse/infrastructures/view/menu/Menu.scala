@@ -5,7 +5,8 @@ import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentMixins.UpdatableContainer
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.Images.ImagePanel
-import ulisse.infrastructures.view.components.{ComposedSwing, Styles}
+import ulisse.infrastructures.view.components.ui.ComposedSwing
+import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.dashboard.Dashboard
 import ulisse.infrastructures.view.simulation.SimulationPage.SimulationPageControlPanel
 

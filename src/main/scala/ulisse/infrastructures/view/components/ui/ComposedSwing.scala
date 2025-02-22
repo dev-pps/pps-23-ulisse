@@ -1,7 +1,8 @@
-package ulisse.infrastructures.view.components
+package ulisse.infrastructures.view.components.ui
 
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.Images.ImagePanel.createSVGPanel
+import ulisse.infrastructures.view.components.ui.decorators.Styles
 
 import java.awt
 import java.awt.Dimension
