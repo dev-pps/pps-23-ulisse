@@ -1,3 +1,19 @@
+## [1.11.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.10.2...v1.11.0) (2025-02-22)
+
+### Features
+
+* common trait to extended of swing components ([ed244bb](https://github.com/dev-pps/pps-23-ulisse/commit/ed244bb47f5305a4bbfa990f5fc40639b9a30da8))
+* create mixin to create customComponent ([5bbcc62](https://github.com/dev-pps/pps-23-ulisse/commit/5bbcc627f1b0cd6d4cf875f2e13bcbdd44cbbdce))
+* create pair ([c4028d3](https://github.com/dev-pps/pps-23-ulisse/commit/c4028d3a6e69db029f493c14e4a694733e01eb1d))
+* default page in JTabbedPane ([7c1085c](https://github.com/dev-pps/pps-23-ulisse/commit/7c1085cbeb743904fb7b6034c51e586bb39253fe))
+* new styles system ([11eb1a6](https://github.com/dev-pps/pps-23-ulisse/commit/11eb1a6774cfa0d1f2af4c2cac6bff2a4be150bf))
+* the graphics system was changed, using pattern decorator and mixin technology ([6bbe161](https://github.com/dev-pps/pps-23-ulisse/commit/6bbe16162b54cb68a88c4a8101f9cfb9fda44960))
+
+### Bug Fixes
+
+* remove italian comment and main to test ([057c913](https://github.com/dev-pps/pps-23-ulisse/commit/057c913859f460f30bf6dd4500e2e074f56cb502))
+* restored style reactions ([c3efec3](https://github.com/dev-pps/pps-23-ulisse/commit/c3efec3c7f07e70e8d058e7e0ea8413cf0f084b1))
+
 ## [1.10.2](https://github.com/dev-pps/pps-23-ulisse/compare/v1.10.1...v1.10.2) (2025-02-15)
 
 ### Bug Fixes
