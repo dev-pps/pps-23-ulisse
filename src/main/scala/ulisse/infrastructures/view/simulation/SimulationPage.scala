@@ -7,8 +7,7 @@ import ulisse.infrastructures.view.components.LayeredContainers.JLayeredPane
 
 import scala.swing.{BorderPanel, BoxPanel, Component, Label, Orientation, Swing}
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.components.ImagePanels.ImagePanel
-import ulisse.infrastructures.view.components.JStyler
+import ulisse.infrastructures.view.components.Images.ImagePanel
 
 import java.awt.{BorderLayout, Color}
 import scala.concurrent.ExecutionContext
@@ -38,10 +37,10 @@ object SimulationPage:
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   final case class SimulationPageControlPanel(controller: SimulationPageAdapter)
       extends BoxPanel(Orientation.Vertical):
-    private val pageControlImageButtonStyle = JStyler.rectPaletteStyler(
-      JStyler.rect(JStyler.defaultSizeRect, JStyler.Dimension2D(5, 5), 25),
-      JStyler.palette(JStyler.transparentColor, Theme.light.forwardClick.withAlpha(150), Theme.light.forwardClick)
-    )
+//    private val pageControlImageButtonStyle = JStyler.rectPaletteStyler(
+//      JStyler.rect(JStyler.defaultSizeRect, JStyler.Dimension2D(5, 5), 25),
+//      JStyler.palette(JStyler.transparentColor, Theme.light.forwardClick.withAlpha(150), Theme.light.forwardClick)
+//    )
     var timing                   = 0L
     val notificationLabel: Label = Label("Step: 0")
     private val startImage: ImagePanel =
@@ -52,7 +51,7 @@ object SimulationPage:
           pauseImage.visible = true
           println("[View]Simulation started")
         )
-      ).styler(pageControlImageButtonStyle)
+      ) // .styler(pageControlImageButtonStyle)
     private val pauseImage: ImagePanel =
       ImagePanel.createSVGPanel("icons/pause.svg", Color.ORANGE).fixedSize(50, 50).visible(false).genericClickReaction(
         () =>
@@ -61,7 +60,7 @@ object SimulationPage:
             startImage.visible = true
             println(s"[View]Simulation stopped${(System.currentTimeMillis() - timing) / 1000.0}")
           )
-      ).styler(pageControlImageButtonStyle)
+      ) // .styler(pageControlImageButtonStyle)
     private val resetImage =
       ImagePanel.createSVGPanel("icons/reset.svg", Color.ORANGE).fixedSize(50, 50).genericClickReaction(() =>
         controller.reset().onComplete(_ =>
@@ -71,7 +70,7 @@ object SimulationPage:
           notificationLabel.text = "Step: 0"
           println(s"[View]Simulation reset${(System.currentTimeMillis() - timing) / 1000}")
         )
-      ).styler(pageControlImageButtonStyle)
+      ) // .styler(pageControlImageButtonStyle)
     background = Theme.light.element
     contents += Swing.VGlue
     contents += notificationLabel.centerHorizontally()
