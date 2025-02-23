@@ -1,14 +1,11 @@
 package ulisse.entities.station
 
-import ulisse.entities.simulation.{Environments, SimulationAgent}
 import ulisse.entities.simulation.Environments
-import ulisse.entities.simulation.Environments.{EnvironmentElement, StationEnvironmentElement2, TrainAgentEEWrapper}
-import ulisse.entities.train.TrainAgent
-import ulisse.entities.train.Trains.Train
-import ulisse.utils.OptionUtils.given_Conversion_Option_Option
+import ulisse.entities.simulation.Environments.TrainAgentEEWrapper
 import ulisse.entities.station.Platform.existInPlatform
+import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.*
-import ulisse.utils.OptionUtils.when
+import ulisse.utils.OptionUtils.{given_Conversion_Option_Option, when}
 
 trait StationEnvironmentElement extends Station with TrainAgentEEWrapper[StationEnvironmentElement]:
   override type TAC = Platform
