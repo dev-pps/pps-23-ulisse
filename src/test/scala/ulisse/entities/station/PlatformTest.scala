@@ -34,28 +34,81 @@ class PlatformTest extends AnyWordSpec with Matchers:
           Platform.createCheckedPlatform(platformNumber) shouldBe Left(Chain(Platform.Errors.InvalidPlatformNumber))
         )
     "is created sequentially" should:
-      "be a Platforms list with sequential number of platform starting from 1" in:
-        List(1, 2, 5, 10).foreach(platformNumber =>
-          Platform.generateSequentialPlatforms(platformNumber).zip(1 to platformNumber).foreach {
+      "be a platforms list with sequential number of platform starting from 1" in:
+        List(1, 2, 5, 10).foreach: platformNumber =>
+          Platform.generateSequentialPlatforms(platformNumber).zip(1 to platformNumber).foreach:
             case (track, expectedPlatformNumber) =>
               (track.platformNumber, track.train) shouldBe (expectedPlatformNumber, None)
-          }
-        )
 
       "be a empty platforms list if desired number of platform is lesser or equal than 0" in:
         List(-1, 0).foreach(invalidPlatformNumber =>
           Platform.generateSequentialPlatforms(invalidPlatformNumber) shouldBe List()
         )
 
-    "is updated with a train" should:
+    "a train is put in" should:
       "return a new platform with the specified train" in:
         val train =
           TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
         val platformNumber = 1
         val platform       = Platform(platformNumber)
-        platform.withTrain(Some(train)).train shouldBe Some(train)
-        platform.withTrain(Some(train)).platformNumber shouldBe platformNumber
-        platform.withTrain(None).train shouldBe None
-        platform.withTrain(None).platformNumber shouldBe platformNumber
-        platform.withTrain(Some(train)).withTrain(None).train shouldBe None
-        platform.withTrain(Some(train)).withTrain(None).platformNumber shouldBe platformNumber
+        platform.putTrain(train).map(p => (p.platformNumber, p.train)) shouldBe Some(platformNumber, Some(train))
+
+      "return none if the platform already contains a train" in:
+        val train =
+          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
+        val otherTrain =
+          TrainAgent(Train("3906", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
+        val platformNumber = 1
+        val platform       = Platform(platformNumber).putTrain(train)
+        platform.flatMap(_.putTrain(train)) shouldBe None
+        platform.flatMap(_.putTrain(otherTrain)) shouldBe None
+
+    "a train is updated" should:
+      "return a new platform with the specified train if it's present" in:
+        val train =
+          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
+        val updatedTrain   = train.updateDistanceTravelled(10)
+        val platformNumber = 1
+        val platform       = Platform(platformNumber).putTrain(train)
+        platform.flatMap(_.updateTrain(train)).map(p => (p.platformNumber, p.train)) shouldBe Some(
+          platformNumber,
+          Some(train)
+        )
+        platform.flatMap(_.updateTrain(updatedTrain)).map(p => (p.platformNumber, p.train)) shouldBe Some(
+          platformNumber,
+          Some(updatedTrain)
+        )
+
+      "return none if the platform doesn't contain the specified train" in:
+        val train =
+          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
+        val otherTrain =
+          TrainAgent(Train("3906", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
+        val platformNumber = 1
+        val platform       = Platform(platformNumber).putTrain(train)
+        platform.flatMap(_.updateTrain(otherTrain)) shouldBe None
+
+    "a train is removed" should:
+      "return a new platform without the specified train if it's present" in:
+        val train =
+          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
+        val updatedTrain   = train.updateDistanceTravelled(10)
+        val platformNumber = 1
+        val platform       = Platform(platformNumber).putTrain(train)
+        platform.flatMap(_.removeTrain(train)).map(p => (p.platformNumber, p.train)) shouldBe Some((
+          platformNumber,
+          None
+        ))
+        platform.flatMap(_.removeTrain(updatedTrain)).map(p => (p.platformNumber, p.train)) shouldBe Some((
+          platformNumber,
+          None
+        ))
+
+      "return none if the platform doesn't contain the specified train" in:
+        val train =
+          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
+        val otherTrain =
+          TrainAgent(Train("3906", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
+        val platformNumber = 1
+        val platform       = Platform(platformNumber).putTrain(train)
+        platform.flatMap(_.removeTrain(otherTrain)) shouldBe None
