@@ -8,7 +8,7 @@ import ulisse.entities.Routes.TypeRoute.AV
 import ulisse.entities.Routes.TypeRoute
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.TrainStationTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
-import ulisse.entities.timetable.Timetables.{toWaitTime, PartialTimetable, RailInfo, TrainTimetable}
+import ulisse.entities.timetable.Timetables.{toWaitTime, RailInfo, TimetableBuilder, TrainTimetable}
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.{ClockTime, ClockTimeErrors}
 import ulisse.entities.timetable.TestMockedEntities.*
@@ -18,11 +18,11 @@ import scala.language.postfixOps
 
 class TimetableTest extends AnyFlatSpec:
 
-  val partialTimetable: PartialTimetable =
-    PartialTimetable(train = AV1000Train, startStation = stationA, departureTime = h(9).m(0).getOrDefault)
+  val timetableBuilder: TimetableBuilder =
+    TimetableBuilder(train = AV1000Train, startStation = stationA, departureTime = h(9).m(0).getOrDefault)
 
   val AV1000TimeTable: TrainTimetable =
-    partialTimetable.stopsIn(stationB, waitTime = 5)(railAV_10)
+    timetableBuilder.stopsIn(stationB, waitTime = 5)(railAV_10)
       .transitIn(stationC)(railAV_10)
       .stopsIn(stationD, waitTime = 10)(railAV_10)
       .arrivesTo(stationF)(railAV_10)
@@ -33,7 +33,7 @@ class TimetableTest extends AnyFlatSpec:
 
   "TrainTimetable" should "calculate arriving and departure time of each station where train arrives" in:
     val timeTableWithStops =
-      partialTimetable
+      timetableBuilder
         .stopsIn(stationB, 5)(RailInfo(length = 10, typeRoute = AV))
         .arrivesTo(stationC)(RailInfo(length = 15, typeRoute = AV))
 
@@ -45,7 +45,7 @@ class TimetableTest extends AnyFlatSpec:
 
   "TrainTimetable" should "consider also station of transit in estimation of arriving time" in:
     val timetableWithTransits = // 9:00
-      partialTimetable.transitIn(stationB)(RailInfo(length = 10, typeRoute = AV)) // 2 min from A = 9:02
+      timetableBuilder.transitIn(stationB)(RailInfo(length = 10, typeRoute = AV)) // 2 min from A = 9:02
         .transitIn(stationC)(RailInfo(length = 15, typeRoute = AV))               // 3 min from B = 9:05
         .transitIn(stationD)(RailInfo(length = 25, typeRoute = AV))               // 5 min from C = 9:10
         .arrivesTo(stationF)(RailInfo(length = 5, typeRoute = AV))                // 1 min from D = 9:11
@@ -53,7 +53,7 @@ class TimetableTest extends AnyFlatSpec:
 
   "TrainTimetable" should "provide couple with nearest stations names" in:
     val AV1000TimeTable =
-      partialTimetable
+      timetableBuilder
         .stopsIn(stationB, waitTime = 5)(railAV_10)
         .stopsIn(stationC, waitTime = 5)(railAV_10)
         .arrivesTo(stationD)(railAV_10)

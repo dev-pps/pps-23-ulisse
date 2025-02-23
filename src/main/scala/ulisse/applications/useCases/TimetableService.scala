@@ -6,7 +6,7 @@ import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{GenericE
 import ulisse.applications.ports.TimetablePorts.{RequestResult, StationId, TimetableServiceErrors, WaitingTime}
 import ulisse.entities.Routes.Route
 import ulisse.entities.timetable.MockedEntities.AppStateTimetable
-import ulisse.entities.timetable.Timetables.{PartialTimetable, RailInfo, TrainTimetable}
+import ulisse.entities.timetable.Timetables.{RailInfo, TimetableBuilder, TrainTimetable}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.Times.ClockTime
@@ -14,7 +14,6 @@ import ulisse.utils.Times.ClockTime
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
-//----------------------------------------------------------------------
 /** Timetable service that jobs is like gatekeeper and enqueue edits to app state using `stateEventQueue` queue. */
 final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateTimetable => AppStateTimetable])
     extends TimetablePorts.Input:
@@ -71,7 +70,7 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
       stationEntities <- usrStations.validateStations(routes).toRight(GenericError(s"some route not exists"))
       startFrom       <- stationEntities.headOption.toRight(GenericError(s"start station not found"))
       arriveTo        <- stationEntities.lastOption.toRight(GenericError(s"arriving station not found"))
-    yield stationEntities.foldLeft(PartialTimetable(train, startFrom._1.departure, departureTime)) {
+    yield stationEntities.foldLeft(TimetableBuilder(train, startFrom._1.departure, departureTime)) {
       case (timetable, (route, Some(waitTime))) =>
         timetable.stopsIn(route.arrival, waitTime)(RailInfo(route.length, route.typology))
       case (timetable, (route, None)) => timetable.transitIn(route.arrival)(RailInfo(route.length, route.typology))

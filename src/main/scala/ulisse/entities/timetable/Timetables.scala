@@ -36,14 +36,14 @@ object Timetables:
     def routes: List[(Station, Station)] = t.table.keys.zip(t.table.keys.drop(1)).toList
 
   /** Basic timetable */
-  trait Timetable:
+  trait PartialTimetable:
     def train: Train
     def startStation: Station
     def departureTime: ClockTime
     def table: ListMap[Station, StationTime]
 
   /** Complete timetable containing arriving station and ClockTime */
-  trait TrainTimetable extends Timetable:
+  trait TrainTimetable extends PartialTimetable:
     def arrivingStation: Station
     def arrivingTime: Option[ClockTime]
 
@@ -76,13 +76,14 @@ object Timetables:
   /** Partial train timetable to be defined.
     * Methods allows to define station where train stops, transit or arrives.
     */
-  trait PartialTimetable extends Timetable:
-    def stopsIn(station: Station, waitTime: WaitTime)(railInfo: RailInfo): PartialTimetable
-    def transitIn(station: Station)(railInfo: RailInfo): PartialTimetable
+  trait TimetableBuilder:
+    def stopsIn(station: Station, waitTime: WaitTime)(railInfo: RailInfo): TimetableBuilder
+    def transitIn(station: Station)(railInfo: RailInfo): TimetableBuilder
     def arrivesTo(station: Station)(railInfo: RailInfo): TrainTimetable
+    def partialTimetable: PartialTimetable
 
   /** Factory of PartialTimetable */
-  object PartialTimetable:
+  object TimetableBuilder:
     /** Returns `PartialTimetable` given train, startStation (where train departs) and departureTime from startStation.
       * If `departureTime` is invalid is returned an [[TimeErrors]]
       */
@@ -90,41 +91,49 @@ object Timetables:
         train: Train,
         startStation: Station,
         departureTime: ClockTime
-    ): PartialTimetable =
-      PartialTimetableImpl(
+    ): TimetableBuilder =
+      TimetableBuilderImpl(
         train,
         startStation,
         departureTime,
         ListMap((startStation, StartScheduleTime(Some(departureTime))))
       )
 
-    private case class PartialTimetableImpl(
+    private case class TimetableBuilderImpl(
         train: Train,
         startStation: Station,
         departureTime: ClockTime,
         table: ListMap[Station, StationTime]
-    )(using timeEstimationStrategy: TimeEstimator) extends PartialTimetable:
+    )(using timeEstimationStrategy: TimeEstimator) extends TimetableBuilder:
       private def lastDepartureTime: Option[StationTime] = table.lastOption.map(_._2)
-      override def stopsIn(station: Station, waitTime: WaitTime)(railInfo: RailInfo): PartialTimetable =
+      override def stopsIn(station: Station, waitTime: WaitTime)(railInfo: RailInfo): TimetableBuilder =
         insertStation(
           station,
           AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), Some(waitTime))
         )
 
-      override def transitIn(station: Station)(railInfo: RailInfo): PartialTimetable =
+      override def transitIn(station: Station)(railInfo: RailInfo): TimetableBuilder =
         insertStation(station, AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), None))
 
       override def arrivesTo(station: Station)(railInfo: RailInfo): TrainTimetable =
         TrainTimetableImpl(
-          insertStation(station, EndScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train))),
+          insertStation(
+            station,
+            EndScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train))
+          ).partialTimetable,
           station
         )
 
       private def insertStation(station: Station, ClockTime: StationTime) =
         this.copy(table = table.updated(station, ClockTime))
 
+      override def partialTimetable: PartialTimetable = PartialTimetableImpl(this)
+
+      private case class PartialTimetableImpl(private val builder: TimetableBuilderImpl) extends PartialTimetable:
+        export builder.{departureTime, startStation, table, train}
+
     private case class TrainTimetableImpl(
-        private val partialTrainTimetable: Timetable,
+        private val partialTrainTimetable: PartialTimetable,
         arrivingStation: Station
     ) extends TrainTimetable:
       export partialTrainTimetable.{departureTime, startStation, table, train}
