@@ -8,14 +8,11 @@ import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.when
 
-trait StationEnvironmentElement extends Station with EnvironmentElement:
+trait StationEnvironmentElement extends Station with EnvironmentElement[StationEnvironmentElement]:
   override type TrainContainer = Platform
   val platforms: List[TrainContainer]
   def firstAvailablePlatform: Option[TrainContainer] = platforms.find(_.train.isEmpty)
   def updatePlatform(platform: Platform, train: Option[TrainAgent]): Option[StationEnvironmentElement]
-  def putTrain(trainContainer: TrainContainer, train: TrainAgent): Option[StationEnvironmentElement]
-  def updateTrain(train: TrainAgent): Option[StationEnvironmentElement]
-  def removeTrain(train: TrainAgent): Option[StationEnvironmentElement]
 
 object StationEnvironmentElement:
   def apply(station: Station): StationEnvironmentElement =
