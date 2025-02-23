@@ -2,13 +2,14 @@ package ulisse.entities.station
 
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
+import ulisse.entities.simulation.Environments.EnvironmentElementContainer
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.validatePositive
 
 /** Defines a track in a station. */
-trait Platform:
+trait Platform extends EnvironmentElementContainer:
   // TODO evaluate if is needed a value for length of the platform track
   val platformNumber: Int
   val train: Option[TrainAgent]
