@@ -79,41 +79,20 @@ class TrackTest extends AnyWordSpec with Matchers:
 
     "a train is updated with a new train" should:
       "be updated with the new train" in:
-        Track(train3905, train3906).updateWhen(_.name == train3905.name)(_ =>
-          train3907
-        ) match
-          case Left(_) => fail()
-          case Right(ut) =>
-            ut.trains shouldBe Seq(train3907, train3906)
-            ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
-
-      "not be updated if the train is not present" in:
-        Track(train3905, train3906).updateWhen(_.name == train3907.name)(_ =>
-          train3907
-        ) match
-          case Left(_) => fail()
-          case Right(ut) =>
+        Track(train3905, train3906).updateTrain(train3905) match
+          case Some(ut) =>
             ut.trains shouldBe Seq(train3905, train3906)
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
+          case None => fail()
 
-      "not be updated if the train is already present" in:
-        Track(train3905, train3906).updateWhen(_.name == train3905.name)(_ =>
-          train3906
-        ) shouldBe Left(Chain(Track.Errors.DuplicateTrains))
+        Track(train3905, train3906).updateTrain(train3905.updateDistanceTravelled(10)) match
+          case Some(ut) =>
+            ut.trains shouldBe Seq(train3905.updateDistanceTravelled(10), train3906)
+            ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
+          case None => fail()
 
-      "not be updated if is already present a train with the same name" in:
-        Track(train3905, train3906).updateWhen(_.name == train3905.name)(_ =>
-          train3906.updateDistanceTravelled(10)
-        ) shouldBe Left(Chain(Track.Errors.DuplicateTrains))
-
-    "A track" should:
-//      "be filtered" in:
-//        Track(train3905, train3906).filterNot(
-//          _.name == train3905.name
-//        ).trains shouldBe Seq(train3906)
-//        Track(train3905, train3906).filterNot(
-//          _.name == train3907.name
-//        ).trains shouldBe Seq(train3905, train3906)
+      "not be updated if the train is not present" in:
+        Track(train3905, train3906).updateTrain(train3907) shouldBe None
 
       "be available" in:
         Track().isAvailable shouldBe true

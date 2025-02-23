@@ -54,7 +54,7 @@ object RouteEnvironmentElement:
 
     def updateTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
       // TODO investigate why is not working using whenTrainExists
-      tracks.updateWhenWithEffects(train.existInTrack)(_.updateWhen(train.matchId)(_ => train)).toOption.map(tracks =>
+      tracks.updateWhenWithEffects(train.existInTrack)(_.updateTrain(train)).map(tracks =>
         copy(tracks = tracks)
       ) when (train existInRoute this)
 
