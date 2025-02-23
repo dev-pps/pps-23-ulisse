@@ -5,15 +5,15 @@ import ulisse.infrastructures.view.components.ComponentConfigurations.{
   ComponentWithConfiguration
 }
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.components.Images.ImagePanel
 import ulisse.infrastructures.view.components.Selectables.Selectable
+import ulisse.infrastructures.view.components.ui.ExtendedSwing.PicturePanel
 import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.{EnhancedLook, ShapeEffect}
 
 import scala.swing.*
 
 object Cards:
   trait JImageCard extends EnhancedLook with ShapeEffect with SequentialContainer.Wrapper:
-    val image: ImagePanel
+    val image: PicturePanel
     val content: Component
     def reverse(): JImageCard =
       @SuppressWarnings(Array("org.wartremover.warts.MutableDataStructures"))
@@ -25,14 +25,14 @@ object Cards:
   trait SelectableJImageCard extends JImageCard with Selectable
 
   object JImageCard:
-    def horizontal(image: ImagePanel, component: Component): JImageCard =
+    def horizontal(image: PicturePanel, component: Component): JImageCard =
       JImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Horizontal)
 
-    def vertical(image: ImagePanel, component: Component): JImageCard =
+    def vertical(image: PicturePanel, component: Component): JImageCard =
       JImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Vertical)
 
     def horizontalWithConfiguration(
-        imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
+        imageWithConfiguration: ComponentWithConfiguration[PicturePanel],
         component: Component
     ): JImageCard =
       JImageCardImpl(
@@ -43,7 +43,7 @@ object Cards:
       )
 
     def verticalWithConfiguration(
-        imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
+        imageWithConfiguration: ComponentWithConfiguration[PicturePanel],
         component: Component
     ): JImageCard =
       JImageCardImpl(
@@ -54,14 +54,14 @@ object Cards:
       )
 
   object SelectableJImageCard:
-    def horizontal(image: ImagePanel, component: Component): SelectableJImageCard =
+    def horizontal(image: PicturePanel, component: Component): SelectableJImageCard =
       SelectableJImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Horizontal)
 
-    def vertical(image: ImagePanel, component: Component): SelectableJImageCard =
+    def vertical(image: PicturePanel, component: Component): SelectableJImageCard =
       SelectableJImageCardImpl(image, ComponentConfiguration.empty(), component, Orientation.Vertical)
 
     def horizontalWithConfiguration(
-        imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
+        imageWithConfiguration: ComponentWithConfiguration[PicturePanel],
         component: Component
     ): SelectableJImageCard =
       SelectableJImageCardImpl(
@@ -72,7 +72,7 @@ object Cards:
       )
 
     def verticalWithConfiguration(
-        imageWithConfiguration: ComponentWithConfiguration[ImagePanel],
+        imageWithConfiguration: ComponentWithConfiguration[PicturePanel],
         component: Component
     ): SelectableJImageCard =
       SelectableJImageCardImpl(
@@ -83,7 +83,7 @@ object Cards:
       )
 
   private class BaseJImageCard(
-      image: ImagePanel,
+      image: PicturePanel,
       imageConfiguration: ComponentConfiguration,
       content: Component,
       orientation: Orientation.Value
@@ -92,7 +92,7 @@ object Cards:
     contents += image.align(imageConfiguration.alignment); contents += content
 
   private final case class JImageCardImpl(
-      image: ImagePanel,
+      image: PicturePanel,
       imageConfiguration: ComponentConfiguration,
       content: Component,
       orientation: Orientation.Value
@@ -100,7 +100,7 @@ object Cards:
       with JImageCard
 
   private final case class SelectableJImageCardImpl(
-      image: ImagePanel,
+      image: PicturePanel,
       imageConfiguration: ComponentConfiguration,
       content: Component,
       orientation: Orientation.Value
@@ -115,19 +115,19 @@ object Cards:
 //      else setStyler(styler)
       super.selected_=(newSelected)
 
-  object Example:
-    val imageCardExample: JImageCard =
-      Cards.JImageCard.vertical(
-        Images.Example.imagePanelExample,
-        Label("Logo").centerHorizontally()
-      )
-    val svgCardExample: JImageCard =
-      Cards.JImageCard.horizontal(
-        Images.Example.svgPanelExample,
-        Label("Map").centerHorizontally()
-      )
-    val drawnCardExample: JImageCard =
-      Cards.JImageCard.horizontal(
-        Images.Example.drawnPanelExample,
-        Label("Cross").centerHorizontally()
-      )
+//  object Example:
+//    val imageCardExample: JImageCard =
+//      Cards.JImageCard.vertical(
+//        Images.Example.PicturePanelExample,
+//        Label("Logo").centerHorizontally()
+//      )
+//    val svgCardExample: JImageCard =
+//      Cards.JImageCard.horizontal(
+//        Images.Example.svgPanelExample,
+//        Label("Map").centerHorizontally()
+//      )
+//    val drawnCardExample: JImageCard =
+//      Cards.JImageCard.horizontal(
+//        Images.Example.drawnPanelExample,
+//        Label("Cross").centerHorizontally()
+//      )

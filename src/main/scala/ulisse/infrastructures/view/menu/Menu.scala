@@ -4,8 +4,8 @@ import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentMixins.UpdatableContainer
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.components.Images.ImagePanel
 import ulisse.infrastructures.view.components.ui.ComposedSwing
+import ulisse.infrastructures.view.components.ui.ExtendedSwing.PicturePanel
 import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.dashboard.Dashboard
 import ulisse.infrastructures.view.simulation.SimulationPage.SimulationPageControlPanel
@@ -15,11 +15,11 @@ import scala.swing.*
 
 final case class Menu(root: UpdatableContainer) extends BorderPanel:
   preferredSize = new Dimension(600, 400)
+  val picture = PicturePanel()
+  picture.picture = "icons/add.svg"
+
   private val card =
-    JImageCard.vertical(
-      ImagePanel.createSVGPanel("icons/add.svg", Color.BLACK),
-      Label("new").centerHorizontally()
-    )
+    JImageCard.vertical(picture, Label("new").centerHorizontally())
       .fixedSize(100, 100)
       .genericClickReaction(() => root.update(Dashboard(root))
 //      .styler(

@@ -11,13 +11,15 @@ import scala.swing.{Component, Graphics2D}
 object ImageEffects:
   private val identityTransform: AffineTransform = new AffineTransform()
 
-  trait ImageEffect() extends EnhancedLook:
+  /** Represent a picture effect. */
+  trait PictureEffect() extends EnhancedLook:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _picture: Picture = Images.defaultPicture
 
     updateGraphics()
 
     def picture: Picture               = _picture
+    def angle: Int                     = picture.rotation.angle
     def picture_=(path: String): Unit  = { _picture = picture.withPath(path); updateGraphics() }
     def withRotation(angle: Int): Unit = { _picture = picture.withRotation(angle); updateGraphics() }
 
@@ -30,6 +32,7 @@ object ImageEffects:
         g.setTransform(identityTransform)
       )
 
+  /** Represent an SVG effect. */
   trait SVGEffect extends EnhancedLook:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _svgIcon: SVGIcon = Images.defaultSVGIcon
@@ -39,6 +42,7 @@ object ImageEffects:
     reactions += this.initColorReactions(() => svgIconPalette)
 
     def svgIcon: SVGIcon               = _svgIcon
+    def angle: Int                     = svgIcon.rotation.angle
     def svgIcon_=(path: String): Unit  = _svgIcon = svgIcon.withPath(path)
     def withRotation(angle: Int): Unit = { _svgIcon = svgIcon.withRotation(angle); updateGraphics() }
 

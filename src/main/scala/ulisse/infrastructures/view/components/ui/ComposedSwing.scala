@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.components.ui
 
 import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.Images.ImagePanel.createSVGPanel
+import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
 import ulisse.infrastructures.view.components.ui.decorators.Styles
 
 import java.awt
@@ -57,7 +57,8 @@ object ComposedSwing:
     private val mainPanel = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
     mainPanel.rectPalette = openPalette
 
-    private val icon  = createSVGPanel(iconPath, Theme.light.background)
+    private val icon = SVGPanel()
+    icon.svgIcon = iconPath
     private val label = ExtendedSwing.JLabelItem(text)
 
     icon.preferredSize = Dimension(height, height)
@@ -69,10 +70,11 @@ object ComposedSwing:
     mainPanel.contents += label
 
     mainPanel.reactions += {
-      case event.MouseEntered(_, _, _) => icon.color = Theme.light.background
+      case event.MouseEntered(_, _, _) =>
+        icon.svgIconPalette = icon.svgIconPalette.withBackground(Theme.light.background)
       case event.MouseExited(_, _, _) =>
         val color = if (label.visible) Theme.light.overlayElement else Theme.light.background
-        icon.color = color
+        icon.svgIconPalette = icon.svgIconPalette.withBackground(color)
       case event.MousePressed(_, _, _, _, _) =>
         if (label.visible) showIcon() else showIconAndText()
       case event.MouseReleased(_, _, _, _, _) =>
@@ -80,14 +82,14 @@ object ComposedSwing:
     }
 
     def showIconAndText(): Unit =
-      icon.color = Theme.light.overlayElement
+      icon.svgIconPalette = icon.svgIconPalette.withBackground(Theme.light.overlayElement)
       label.visible = true
       mainPanel.rectPalette = openPalette
       mainPanel.repaint()
       mainPanel.validate()
 
     def showIcon(): Unit =
-      icon.color = Theme.light.background
+      icon.svgIconPalette = icon.svgIconPalette.withBackground(Theme.light.background)
       label.visible = false
       mainPanel.rectPalette = closePalette
       mainPanel.repaint()
@@ -167,9 +169,13 @@ object ComposedSwing:
 
   case class JToggleIconButton(onIconPath: String, offIconPath: String) extends ComposedSwing:
     private val mainPanel = ExtendedSwing.JFlowPanelItem()
-    private val onIcon    = createSVGPanel(onIconPath, Theme.light.background)
-    private val offIcon   = createSVGPanel(offIconPath, Theme.light.background)
-    private val size      = 40
+    private val onIcon    = SVGPanel()
+    onIcon.svgIcon = onIconPath
+    onIcon.svgIconPalette = onIcon.svgIconPalette.withBackground(Theme.light.background)
+    private val offIcon = SVGPanel()
+    offIcon.svgIcon = offIconPath
+    offIcon.svgIconPalette = offIcon.svgIconPalette.withBackground(Theme.light.background)
+    private val size = 40
 
     onIcon.preferredSize = Dimension(size, size)
     offIcon.preferredSize = Dimension(size, size)
