@@ -1,21 +1,19 @@
 package ulisse.entities.route
 
 import ulisse.entities
+import ulisse.entities.route.Routes.Route
+import ulisse.entities.route.Track.existInTrack
+import ulisse.entities.simulation.Environments
+import ulisse.entities.simulation.Environments.TrainAgentEEWrapper
+import ulisse.entities.train.TrainAgent
+import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.*
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option
-import ulisse.entities.route.Routes.Route
-import ulisse.entities.simulation.Environments.EnvironmentElement
-import ulisse.entities.simulation.Simulations.Actions.SimulationAction
-import ulisse.entities.simulation.{Environments, SimulationAgent}
-import ulisse.entities.train.TrainAgent
-import ulisse.entities.train.Trains.Train
-import ulisse.utils.CollectionUtils.*
-import ulisse.entities.route.Track.existInTrack
 
-trait RouteEnvironmentElement extends Route with EnvironmentElement[RouteEnvironmentElement]:
-  override type TrainContainer = Track
-  val tracks: Seq[TrainContainer]
-  def firstAvailableTrack: Option[TrainContainer] = tracks.find(_.isAvailable)
+trait RouteEnvironmentElement extends Route with TrainAgentEEWrapper[RouteEnvironmentElement]:
+  override type TAC = Track
+  val tracks: Seq[TAC]
+  def firstAvailableTrack: Option[TAC] = tracks.find(_.isAvailable)
 
 object RouteEnvironmentElement:
 
@@ -44,12 +42,12 @@ object RouteEnvironmentElement:
     private def whenTrainExists[A](f: => A)(using train: TrainAgent): Option[A] =
       f when train.existInRoute(this)
 
-    private def modifyItInTrack(f: Track => Track)(using
+    private def modifyItInTrack(f: TAC => TAC)(using
         train: TrainAgent
     ): RouteEnvironmentElementImpl =
       copy(tracks = tracks.updateWhen(train.existInTrack)(f))
 
-    def putTrain(track: Track, train: TrainAgent): Option[RouteEnvironmentElement] =
+    def putTrain(track: TAC, train: TrainAgent): Option[RouteEnvironmentElement] =
       tracks.updateFirstWhenWithEffects(_ == track)(_.putTrain(train)).map(tracks =>
         copy(tracks = tracks)
       ) when track.isAvailable && !(train existInRoute this)
@@ -61,6 +59,7 @@ object RouteEnvironmentElement:
       ) when (train existInRoute this)
 
     def removeTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
+      println(train existInRoute this)
       tracks.updateWhenWithEffects(train.existInTrack)(_.removeTrain(train)).map(tracks =>
         copy(tracks = tracks)
       ) when (train existInRoute this)

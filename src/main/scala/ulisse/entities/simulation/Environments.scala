@@ -1,13 +1,11 @@
 package ulisse.entities.simulation
 
-import ulisse.entities.route.{RouteEnvironmentElement, Track}
-import ulisse.entities.route.Routes.Route
-import ulisse.entities.simulation.SimulationAgent
-import ulisse.entities.simulation.Simulations.Actions
-import ulisse.entities.station.{Platform, Platform2, Station, StationEnvironmentElement}
-import ulisse.entities.train.TrainAgent
-import ulisse.entities.station.StationEnvironmentElement.*
+import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.RouteEnvironmentElement.*
+import ulisse.entities.simulation.Simulations.Actions
+import ulisse.entities.station.StationEnvironmentElement.*
+import ulisse.entities.station.{Platform2, Station, StationEnvironmentElement}
+import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.*
 
 object Environments:

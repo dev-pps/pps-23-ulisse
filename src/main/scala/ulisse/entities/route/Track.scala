@@ -18,8 +18,6 @@ trait Track extends TrainAgentsContainer[Track]:
     trains.forall(t => t.distanceTravelled - t.length >= minPermittedDistanceBetweenTrains)
   override def putTrain(train: TrainAgent): Option[Track]    = :+(train).toOption
   override def updateTrain(train: TrainAgent): Option[Track] = updateWhen(_.name == train.name)(_ => train).toOption
-  override def removeTrain(train: TrainAgent): Option[Track] =
-    trains.find(_.name == train.name).flatMap(_ => updateWhen(_.name != train.name)(_ => train).toOption)
   @targetName("appendedTrain")
   def :+(train: TrainAgent): Either[NonEmptyChain[Track.Errors], Track]
   def updateWhen(p: TrainAgent => Boolean)(f: TrainAgent => TrainAgent): Either[NonEmptyChain[Track.Errors], Track]
@@ -58,10 +56,9 @@ object Track:
     override def updateWhen(p: TrainAgent => Boolean)(f: TrainAgent => TrainAgent)
         : Either[NonEmptyChain[Track.Errors], Track] =
       Track.createCheckedTrack(trains.updateWhen(p)(f)*)
-//    override def filterNot(p: TrainAgent => Boolean): Track = copy(trains = trains.filterNot(p))
 
-    override def putTrain(train: TrainAgent): Option[Track]    = Some(this)
-    override def updateTrain(train: TrainAgent): Option[Track] = Some(this)
-    override def removeTrain(train: TrainAgent): Option[Track] = Some(this)
+    override def removeTrain(train: TrainAgent): Option[Track] =
+      trains.find(train.matchId).map(_ => copy(trains = trains.filterNot(train.matchId)))
+
   enum Errors extends BaseError:
     case DuplicateTrains, TrainAlreadyMoved
