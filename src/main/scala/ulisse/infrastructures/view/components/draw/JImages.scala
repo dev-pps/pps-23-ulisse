@@ -1,7 +1,7 @@
-package ulisse.infrastructures.view.components
+package ulisse.infrastructures.view.components.draw
 
 import ulisse.utils.Pair
-import ulisse.utils.Pair._
+import ulisse.utils.Pair.*
 
 import java.awt.image.{BufferedImage, ImageObserver}
 import java.awt.{Color, RenderingHints}

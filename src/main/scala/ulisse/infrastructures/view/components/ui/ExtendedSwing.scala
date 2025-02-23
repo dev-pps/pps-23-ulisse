@@ -4,21 +4,30 @@ import ulisse.infrastructures.view.components.ui.decorators.ImageEffects.{Pictur
 import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.{FontEffect, ShapeEffect}
 
 import java.awt.FlowLayout
+import javax.swing.JLayeredPane
 import scala.swing.*
 
 object ExtendedSwing:
 
-  case class JBorderPanelItem() extends BorderPanel with ShapeEffect with FontEffect
+  case class LayeredPanel() extends BorderPanel with ShapeEffect:
+    private val layeredPane = new JLayeredPane()
+    layout(Component.wrap(layeredPane)) = BorderPanel.Position.Center
+
+    def add(component: Component): Unit =
+      layeredPane.add(component.peer)
+      revalidate()
+      repaint()
+
+  case class JBorderPanelItem() extends BorderPanel with ShapeEffect
 
   case class JFlowPanelItem() extends FlowPanel with ShapeEffect with FontEffect:
     private val layout = new FlowLayout(FlowLayout.CENTER, 0, 0)
     peer.setLayout(layout)
     export layout._
 
-  case class JBoxPanelItem(orientation: Orientation.Value) extends BoxPanel(orientation)
-      with ShapeEffect with FontEffect
+  case class JBoxPanelItem(orientation: Orientation.Value) extends BoxPanel(orientation) with ShapeEffect
 
-  case class JPanelItem() extends Panel with ShapeEffect with FontEffect
+  case class JPanelItem() extends Panel with ShapeEffect
 
   case class PicturePanel() extends Panel with ShapeEffect with PictureEffect
 
