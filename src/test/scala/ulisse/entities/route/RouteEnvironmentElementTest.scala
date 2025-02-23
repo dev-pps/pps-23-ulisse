@@ -76,12 +76,12 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
       "not be place if it's already in the route" in:
         train3905.take(route).flatMap(train3905.take) shouldBe None
         train3905.take(route).flatMap(
-          _.updateAgent(train3905.updateDistanceTravelled(100.0 + train3905.length))
+          _.updateTrain(train3905.updateDistanceTravelled(100.0 + train3905.length))
         ).flatMap(train3905.take) shouldBe None
 
       "be place in a track if available" in:
         val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
-        train3905.take(route).flatMap(_.updateAgent(train3905Updated)) match
+        train3905.take(route).flatMap(_.updateTrain(train3905Updated)) match
           case Some(updatedRoute) =>
             updatedRoute.firstAvailableTrack shouldBe Some(Track(train3905Updated))
             train3906.take(updatedRoute) match
@@ -103,7 +103,7 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
 
     "put in a route" should:
       "be placed in the first matching track" in:
-        route.putAgent(Track(), train3905) match
+        route.putTrain(Track(), train3905) match
           case Some(updatedRoute) =>
             updatedRoute.tracks shouldBe Seq(
               Track(train3905),
@@ -112,7 +112,7 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
             updatedRoute.firstAvailableTrack shouldBe Some(Track())
           case None => fail()
 
-        route.putAgent(Track(), train3905).flatMap(_.putAgent(
+        route.putTrain(Track(), train3905).flatMap(_.putTrain(
           Track(),
           train3906
         )) match
@@ -125,21 +125,21 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           case None => fail()
 
       "not be placed if it's already in the route" in:
-        route.putAgent(Track(), train3905).flatMap(_.putAgent(
+        route.putTrain(Track(), train3905).flatMap(_.putTrain(
           Track(),
           train3905
         )) shouldBe None
 
       "not be placed if it's not available" in:
-        route.putAgent(Track(), train3905).flatMap(_.putAgent(
+        route.putTrain(Track(), train3905).flatMap(_.putTrain(
           Track(train3905),
           train3906
         )) shouldBe None
 
       "be place behind if it is possible" in:
         val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
-        route.putAgent(Track(), train3905).flatMap(_.updateAgent(train3905Updated)).flatMap(
-          _.putAgent(
+        route.putTrain(Track(), train3905).flatMap(_.updateTrain(train3905Updated)).flatMap(
+          _.putTrain(
             Track(train3905Updated),
             train3906
           )
@@ -155,7 +155,7 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
     "update in a route" should:
       "be updated if present" in:
         val updatedTrain3905 = train3905.updateDistanceTravelled(1)
-        train3905.take(route).flatMap(_.updateAgent(updatedTrain3905)) match
+        train3905.take(route).flatMap(_.updateTrain(updatedTrain3905)) match
           case Some(updatedRoute) =>
             updatedRoute.tracks.find(_.contains(train3905)) shouldBe None
             updatedRoute.tracks shouldBe Seq(
@@ -165,11 +165,11 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           case None => fail()
 
       "not be updated if not present" in:
-        route.updateAgent(train3905) shouldBe None
+        route.updateTrain(train3905) shouldBe None
 
     "remove from a route" should:
       "be removed if present" in:
-        train3905.take(route).flatMap(_.removeAgent(train3905)) match
+        train3905.take(route).flatMap(_.removeTrain(train3905)) match
           case Some(updatedRoute) =>
             updatedRoute.tracks.find(_.contains(train3905)) shouldBe None
             updatedRoute.tracks shouldBe Seq(
@@ -179,4 +179,4 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           case None => fail()
 
       "not be removed if not present" in:
-        route.removeAgent(train3905) shouldBe None
+        route.removeTrain(train3905) shouldBe None
