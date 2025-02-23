@@ -3,10 +3,10 @@ package ulisse.entities.station
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
-import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.entities.station.StationEnvironmentElement.*
 import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.Trains.{Train, TrainTechnology}
+import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
   private val numberOfTracks            = 2
@@ -53,31 +53,6 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
         train3905.arriveAt(stationEnvironmentElement).flatMap(train3906.arriveAt).flatMap(
           train3907.arriveAt
         ) shouldBe None
-
-    "leave a stationEnvironmentElement" should:
-      "be removed from the track if it's present" in:
-        train3905.arriveAt(stationEnvironmentElement).flatMap(train3905.leave) match
-          case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe None
-            updatedStation.firstAvailablePlatform shouldBe Some(Platform(1))
-          case None => fail()
-        train3905.arriveAt(stationEnvironmentElement).flatMap(train3905.updateDistanceTravelled(10).leave) match
-          case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe None
-            updatedStation.firstAvailablePlatform shouldBe Some(Platform(1))
-          case None => fail()
-
-      "not be removed from the track if it's not present" in:
-        train3905.arriveAt(stationEnvironmentElement).flatMap(train3906.leave) shouldBe None
-        train3905.arriveAt(stationEnvironmentElement).flatMap(train3905.leave).flatMap(train3905.leave) shouldBe None
-
-    "find in stations" should:
-      "be found if is present" in:
-        val seeOption = train3905.arriveAt(stationEnvironmentElement)
-        seeOption.flatMap(see => train3905.findInStations(Seq(see))) shouldBe seeOption
-
-      "not be found if is not present" in:
-        train3905.findInStations(Seq(stationEnvironmentElement)) shouldBe None
 
     "put in a platform" should:
       "be place in a track if available" in:

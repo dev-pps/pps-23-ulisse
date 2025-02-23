@@ -1,15 +1,15 @@
 package ulisse.entities.route
 
-import cats.data.{NonEmptyChain, ValidatedNec}
+import cats.data.NonEmptyChain
 import cats.syntax.all.*
-import ulisse.entities.simulation.Environments.TrainAgentsContainer
-import ulisse.entities.simulation.SimulationAgent
+import ulisse.entities.simulation.EnvironmentElements.TrainAgentsContainer
 import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
 import ulisse.utils.Errors.BaseError
-import ulisse.utils.ValidationUtils.{validatePositive, validateRange, validateUniqueItems}
+import ulisse.utils.ValidationUtils.{validateRange, validateUniqueItems}
 
 import scala.annotation.targetName
+
 trait Track extends TrainAgentsContainer[Track]:
   // TODO evaluate if is needed a numberid
   val trains: Seq[TrainAgent]
@@ -19,7 +19,8 @@ trait Track extends TrainAgentsContainer[Track]:
   override def putTrain(train: TrainAgent): Option[Track] = :+(train).toOption
   @targetName("appendedTrain")
   def :+(train: TrainAgent): Either[NonEmptyChain[Track.Errors], Track]
-  export trains.{contains, isEmpty}
+  override def contains(train: TrainAgent): Boolean = trains.exists(train.matchId)
+  export trains.isEmpty
 
 object Track:
   // TODO evaluate if leave there minPermittedDistanceBetweenTrains or pass as parameter for isAvailable
@@ -33,9 +34,6 @@ object Track:
       .map(_ => Track(trains*))
       .toEither
 
-  extension (train: TrainAgent)
-    def existInTrack(track: Track): Boolean = track.trains.exists(train.matchId)
-
   private final case class TrackImpl(trains: Seq[TrainAgent])(using val minPermittedDistanceBetweenTrains: Double)
       extends Track:
     @targetName("appendedTrain")
@@ -47,7 +45,9 @@ object Track:
       ).mapN((_, t) => t).toEither
 
     override def updateTrain(train: TrainAgent): Option[Track] = // updateWhen(train.matchId)(_ => train).toOption
-      Track.createCheckedTrack(trains.updateWhen(train.matchId)(_ => train)*).toOption
+      if trains.exists(train.matchId) then
+        Track.createCheckedTrack(trains.updateWhen(train.matchId)(_ => train)*).toOption
+      else None
 
     override def removeTrain(train: TrainAgent): Option[Track] =
       trains.find(train.matchId).map(_ => copy(trains = trains.filterNot(train.matchId)))

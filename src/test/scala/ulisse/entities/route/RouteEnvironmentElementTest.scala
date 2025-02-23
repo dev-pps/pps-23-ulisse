@@ -3,14 +3,11 @@ package ulisse.entities.route
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.applications.managers.RouteManagerTest.validateRoute
-import ulisse.entities.Coordinate
-import ulisse.entities.route.Routes.{Route, TypeRoute}
-import ulisse.entities.station.Station
+import ulisse.entities.route.RouteEnvironmentElement.*
+import ulisse.entities.route.Routes.Route
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
-import ulisse.entities.route.RouteEnvironmentElement.*
-import ulisse.entities.route.RouteEnvironmentElement.given
 
 class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
   given minPermittedDistanceBetweenTrains: Double = 100.0
@@ -93,14 +90,6 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
               case None => fail()
           case None => fail()
 
-    "find in routes" should:
-      "be found if it's in the route" in:
-        val reeOption = train3905.take(route)
-        reeOption.flatMap(ree => train3905.findInRoutes(Seq(ree))) shouldBe reeOption
-
-      "not be found if it's not in the route" in:
-        train3905.findInRoutes(Seq(route)) shouldBe None
-
     "put in a route" should:
       "be placed in the first matching track" in:
         route.putTrain(Track(), train3905) match
@@ -157,7 +146,9 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         val updatedTrain3905 = train3905.updateDistanceTravelled(1)
         train3905.take(route).flatMap(_.updateTrain(updatedTrain3905)) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks.find(_.contains(train3905)) shouldBe None
+            updatedRoute.tracks.find(_.contains(train3905)) shouldBe Some(Track(
+              updatedTrain3905
+            ))
             updatedRoute.tracks shouldBe Seq(
               Track(updatedTrain3905),
               Track()

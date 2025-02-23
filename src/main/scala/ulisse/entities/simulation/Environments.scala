@@ -1,27 +1,14 @@
 package ulisse.entities.simulation
 
 import ulisse.entities.route.RouteEnvironmentElement
-import ulisse.entities.route.RouteEnvironmentElement.*
+import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.simulation.Simulations.Actions
+import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.station.StationEnvironmentElement.*
-import ulisse.entities.station.{Platform2, Station, StationEnvironmentElement}
 import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.*
 
 object Environments:
-  trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
-    self: TAC =>
-    def isAvailable: Boolean
-    def putTrain(train: TrainAgent): Option[TAC]
-    def updateTrain(train: TrainAgent): Option[TAC]
-    def removeTrain(train: TrainAgent): Option[TAC]
-
-  trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE]]:
-    self: EE =>
-    type TAC <: TrainAgentsContainer[?]
-    def putTrain(container: TAC, train: TrainAgent): Option[EE]
-    def updateTrain(train: TrainAgent): Option[EE]
-    def removeTrain(train: TrainAgent): Option[EE]
 
   trait RailwayEnvironment:
     def doStep(dt: Int): RailwayEnvironment
@@ -73,9 +60,9 @@ object Environments:
       private def updateEnvironmentWith(agent: TrainAgent): SimulationEnvironmentImpl =
         updateAgentOnRoute(agent).updateAgentInStation(agent)
       private def updateAgentOnRoute(agent: TrainAgent): SimulationEnvironmentImpl =
-        agent.findInRoutes(routes).fold(this)(ree => routeUpdateFunction(ree, agent))
+        agent.findIn(routes).fold(this)(ree => routeUpdateFunction(ree, agent))
       private def updateAgentInStation(agent: TrainAgent): SimulationEnvironmentImpl =
-        agent.findInStations(stations).fold(this)(see => copy(stations = stations.updateWhen(_ == see)(s => s)))
+        agent.findIn(stations).fold(this)(see => copy(stations = stations.updateWhen(_ == see)(s => s)))
 
       private def routeUpdateFunction(route: RouteEnvironmentElement, agent: TrainAgent): SimulationEnvironmentImpl =
         agent.distanceTravelled match
