@@ -72,8 +72,8 @@ object ComposedSwing:
     mainPanel.contents += icon
     mainPanel.contents += labelPanel
 
-    icon.listenTo(mainPanel.mouseEvents ++ label.mouseEvents: _*)
-    mainPanel.listenTo(label.mouseEvents ++ icon.mouseEvents: _*)
+    icon.listenTo(labelPanel.mouseEvents ++ mainPanel.mouseEvents ++ label.mouseEvents: _*)
+    mainPanel.listenTo(labelPanel.mouseEvents ++ label.mouseEvents ++ icon.mouseEvents: _*)
     mainPanel.reactions += {
       case _: event.MousePressed => if (label.visible) showIcon() else showIconAndText()
     }
@@ -112,10 +112,7 @@ object ComposedSwing:
     override def component[T >: Component]: T = mainPanel
 
   case class JTabbedPane(iconLabels: JIconLabel*) extends ComposedSwing:
-    private val panelPalette: Styles.Palette = Styles.defaultPalette.withBackground(Theme.light.element)
-
-    private val mainPanel = ExtendedSwing.JBorderPanelItem()
-    mainPanel.rectPalette = panelPalette
+    private val mainPanel  = ExtendedSwing.JBorderPanelItem()
     private val pagesPanel = ExtendedSwing.JFlowPanelItem()
 
     private val navBar = createNavbar(iconLabels: _*)
@@ -129,7 +126,7 @@ object ComposedSwing:
 
     iconLabels.foreach(iconLabel =>
       iconLabel.component.reactions += {
-        case event.MousePressed(_, _, _, _, _) =>
+        case _: event.MousePressed =>
           pages.values.foreach(_.visible = false)
           paneOf(iconLabel).visible = true
       }
