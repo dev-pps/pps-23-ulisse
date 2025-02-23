@@ -5,6 +5,7 @@ import ulisse.utils.OptionUtils.*
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.Environments.{EnvironmentElement, EnvironmentElementContainer}
+import ulisse.entities.simulation.Simulations.Actions.SimulationAction
 import ulisse.entities.simulation.{Environments, SimulationAgent}
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
@@ -57,7 +58,7 @@ object RouteEnvironmentElement:
         case _ => None
 
     override def putAgent(
-        container: EnvironmentElementContainer,
+        container: EnvironmentElementContainer[?],
         agent: SimulationAgent
     ): Option[RouteEnvironmentElement] =
       (container, agent) match
