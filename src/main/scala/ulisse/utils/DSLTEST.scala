@@ -52,10 +52,10 @@ object DSLTEST:
     override def updateTrain(trainAgent: TrainAgent): Option[TestRoute] = Some(this)
 //  def updateEnvironmentState: EnvironmentElementUpdater[TestRoute] =
 //    (agent, envEl) => envEl.flatMap(env => env.updateTrain(agent))
-  def update(p1: TrainAgent, p2: TestRoute): Option[TestRoute] =
-    p2.updateTrain(p1)
-  def update(p1: TrainAgent, p2: TestStation): Option[TestStation] =
-    p2.updateTrain(p1)
+//  def update(p1: TrainAgent, p2: TestRoute): Option[TestRoute] =
+//    p2.updateTrain(p1)
+//  def update(p1: TrainAgent, p2: TestStation): Option[TestStation] =
+//    p2.updateTrain(p1)
 
   extension (trainAgent: TrainAgent)
     def findInRoutes(routes: Seq[TestRoute]): Option[TestRoute] =
@@ -78,8 +78,11 @@ object DSLTEST:
     type EnvironmentElementUpdaterFunction[EnvironmentElementWhereAgentIs] =
       UpdateRequirement[EnvironmentElementWhereAgentIs] => UpdatedEnvironmentElement[EnvironmentElementWhereAgentIs]
 
-    def updateEnvironmentState: EnvironmentElementUpdater[TestRoute] =
-      (agent, envEl) => envEl.flatMap(env => env.updateTrain(agent))
+    def updateEnvironmentState(t: TrainAgent, eo: Option[TestEnv]): UpdatedEnvironmentElement[TestEnv] =
+      eo.flatMap {
+        case e: TestRoute   => e.updateTrain(agent) // , envEl) => envEl.flatMap(env => env.updateTrain(agent))
+        case e: TestStation => e.updateTrain(agent) // , envEl) => envEl.flatMap(env => env.updateTrain(agent))
+      }
 
     def updateEnvironmentState2: EnvironmentElementUpdater[TestStation] =
       (agent, envEl) => envEl.flatMap(env => env.updateTrain(agent))
@@ -95,11 +98,11 @@ object DSLTEST:
     extension [EnvironmentElementWhereAgentIs <: TestEnv](p1: EnvironmentElementUpdater[EnvironmentElementWhereAgentIs])
       def when(p2: TrainAgent): UpdateRequirement[EnvironmentElementWhereAgentIs] = (p2, p1)
 
-    val result: UpdatedEnvironmentElement[TestRoute]    = updateEnvironmentState when agent is foundInRoutes
+//    val result: UpdatedEnvironmentElement[TestRoute]    = updateEnvironmentState when agent is foundInRoutes
     val result2: UpdatedEnvironmentElement[TestStation] = updateEnvironmentState2 when agent is foundInStations
 //    result and result2
     updateState:
-      updateEnvironmentState when agent is foundInRoutes
+//      updateEnvironmentState when agent is foundInRoutes
       updateEnvironmentState2 when agent is foundInStations
 
 //    def updateState(s: () => (UpdatedEnvironmentElement[TestRoute], UpdatedEnvironmentElement[TestStation])): (UpdatedEnvironmentElement[TestRoute], UpdatedEnvironmentElement[TestStation]) = s()
