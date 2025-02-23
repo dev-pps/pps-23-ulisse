@@ -11,11 +11,18 @@ import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.utils.CollectionUtils.*
 
 object Environments:
-  trait EnvironmentElementContainer
-  trait EnvironmentElement[E <: EnvironmentElement[E]]:
-    def putAgent(container: EnvironmentElementContainer, agent: SimulationAgent): Option[E]
-    def updateAgent(agent: SimulationAgent): Option[E]
-    def removeAgent(agent: SimulationAgent): Option[E]
+  trait EnvironmentElementContainer[EEC <: EnvironmentElementContainer[EEC]]:
+    self: EEC =>
+    def isAvailable: Boolean
+    def putAgent(agent: SimulationAgent): Option[EEC]
+    def updateAgent(agent: SimulationAgent): Option[EEC]
+    def removeAgent(agent: SimulationAgent): Option[EEC]
+  
+  trait EnvironmentElement[EC <: EnvironmentElement[EC]]:
+    self: EC =>
+    def putAgent(container: EnvironmentElementContainer[?], agent: SimulationAgent): Option[EC]
+    def updateAgent(agent: SimulationAgent): Option[EC]
+    def removeAgent(agent: SimulationAgent): Option[EC]
 
   trait RailwayEnvironment:
     def doStep(dt: Int): RailwayEnvironment
