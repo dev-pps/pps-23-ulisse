@@ -2,13 +2,14 @@ package ulisse.entities.route
 
 import cats.data.{NonEmptyChain, ValidatedNec}
 import cats.syntax.all.*
+import ulisse.entities.simulation.Environments.EnvironmentElementContainer
 import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateRange, validateUniqueItems}
 
 import scala.annotation.targetName
-trait Track:
+trait Track extends EnvironmentElementContainer:
   val trains: Seq[TrainAgent]
   def minPermittedDistanceBetweenTrains: Double
   def isAvailable: Boolean = trains.forall(t => t.distanceTravelled - t.length >= minPermittedDistanceBetweenTrains)
