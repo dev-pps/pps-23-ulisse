@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.map
 
 import ulisse.infrastructures.view.common.CentralController
-import ulisse.infrastructures.view.components.LayeredContainers.JLayeredPane
+import ulisse.infrastructures.view.components.container.LayeredContainers.JLayeredPane
 import ulisse.infrastructures.view.map.MapPanel
 import ulisse.infrastructures.view.menu.Menu
 

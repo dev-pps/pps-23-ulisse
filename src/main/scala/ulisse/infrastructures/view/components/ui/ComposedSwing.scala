@@ -25,18 +25,17 @@ object ComposedSwing:
   private val elementPalette: Styles.Palette = Styles.defaultPalette.withClickColor(Theme.light.overlayElement)
 
   case class JInfoTextField(title: String) extends ComposedSwing:
-    private val colum                      = 15
-    private val textFieldRect: Styles.Rect = Styles.defaultRect.withPaddingWidthAndHeight(10, 5)
-    private val paletteRect: Styles.Palette =
-      Styles.defaultPalette.withBackground(Theme.light.background.withAlpha(50))
+    private val colum               = 15
+    private val textFieldPadding    = Styles.createPadding(10, 5)
+    private val textFieldBackground = Theme.light.background.withAlpha(50)
 
     private val mainPanel  = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
     private val labelPanel = ExtendedSwing.JFlowPanelItem()
+    private val label      = ExtendedSwing.JLabelItem(title)
+    private val textField  = ExtendedSwing.JTextFieldItem(colum)
 
-    private val label     = ExtendedSwing.JLabelItem(title)
-    private val textField = ExtendedSwing.JTextFieldItem(colum)
-    textField.rect = textFieldRect
-    textField.rectPalette = paletteRect
+    textField.rect = textField.rect.withPadding(textFieldPadding)
+    textField.rectPalette = textField.rectPalette.withBackground(textFieldBackground)
 
     labelPanel.contents += label
     mainPanel.contents += labelPanel
