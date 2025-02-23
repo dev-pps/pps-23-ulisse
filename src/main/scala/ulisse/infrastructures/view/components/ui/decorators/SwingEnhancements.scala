@@ -33,14 +33,14 @@ object SwingEnhancements:
     private var _rect: Styles.Rect = Styles.defaultRect
 
     this.updateRect(rect)
-    listenTo(mouse.moves, mouse.clicks)
+    listenTo(mouseEvents: _*)
     reactions += this.initColorReactions(() => rectPalette)
 
     /** Read-only property to get the shape of the component. */
     def rect: Styles.Rect = _rect
 
     /** Change the shape of the component. */
-    def rect_=(newRect: Styles.Rect): Unit = { (_rect = newRect); this.updateRect(rect) }
+    def rect_=(newRect: Styles.Rect): Unit = { _rect = newRect; this.updateRect(rect) }
 
     def rectPalette: Styles.Palette                  = rect.palette
     def rectPalette_=(palette: Styles.Palette): Unit = rect = rect.withPalette(palette)
@@ -56,7 +56,7 @@ object SwingEnhancements:
     private var _font: Styles.Font = Styles.defaultFont
 
     this.updateFont(fontEffect)
-    listenTo(mouse.moves, mouse.clicks)
+    listenTo(mouseEvents: _*)
     reactions += this.initColorReactions(() => fontPalette)
 
     /** Read-only property to get the font effect of the component. */
@@ -79,7 +79,7 @@ object SwingEnhancements:
     private var _border: Styles.Border = Styles.defaultBorder
 
     this.updateBorder(rect, Styles.defaultBorder)
-    listenTo(mouse.moves, mouse.clicks)
+    listenTo(mouseEvents: _*)
     reactions += this.initColorReactions(() => rectPalette)
 
     /** Read-only property to get the border of the component. */

@@ -43,11 +43,11 @@ object ImageEffects:
 
     def svgIcon: SVGIcon               = _svgIcon
     def angle: Int                     = svgIcon.rotation.angle
-    def svgIcon_=(path: String): Unit  = _svgIcon = svgIcon.withPath(path)
+    def svgIcon_=(path: String): Unit  = { _svgIcon = svgIcon.withPath(path); updateGraphics() }
     def withRotation(angle: Int): Unit = { _svgIcon = svgIcon.withRotation(angle); updateGraphics() }
 
     def svgIconPalette: Styles.Palette                  = svgIcon.palette
-    def svgIconPalette_=(palette: Styles.Palette): Unit = { _svgIcon = svgIcon.withPalette(palette); updateGraphics() }
+    def svgIconPalette_=(palette: Styles.Palette): Unit = _svgIcon = svgIcon.withPalette(palette)
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)

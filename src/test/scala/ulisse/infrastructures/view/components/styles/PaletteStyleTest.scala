@@ -42,3 +42,18 @@ class PaletteStyleTest extends AnyFlatSpec with Matchers:
     newPaletteColor.background must be(background)
     newPaletteColor.clickColor must be(Some(clickColor))
     newPaletteColor.hoverColor must be(Some(hover))
+
+  "check current color" should "be the background color" in:
+    val background      = Color.green
+    val newPaletteColor = defaultPalette.withBackground(background)
+
+    newPaletteColor.currentColor must be(background)
+
+  "check current color after hover" should "be the hover color" in:
+    val background      = Color.green
+    val hover           = Color.red
+    val newPaletteColor = defaultPalette.withBackground(background).withHover(hover)
+
+    newPaletteColor.hoverAction()
+    newPaletteColor.currentColor must be(hover)
+    defaultPalette.currentColor must not be hover

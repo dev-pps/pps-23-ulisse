@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.components.ui
 
 import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.ui.ExtendedSwing.{createPicturePanel, SVGPanel}
+import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
 import ulisse.infrastructures.view.components.ui.decorators.Styles
 
 import java.awt
@@ -52,7 +52,7 @@ object ComposedSwing:
     private val rectOpenPalette  = rectClosePalette.withBackground(Theme.light.background.withAlpha(50))
 
     private val iconClosePalette =
-      Styles.createBackgroundPalette(Theme.light.background).withHover(Theme.light.background)
+      Styles.createPalette(Theme.light.background, Theme.light.background, Theme.light.background)
     private val iconOpenPalette = iconClosePalette.withBackground(Theme.light.overlay)
 
     private val mainPanel  = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
@@ -64,52 +64,51 @@ object ComposedSwing:
     label.preferredSize = Dimension(width, height)
 
     icon.svgIconPalette = iconOpenPalette
-    label.rectPalette = Styles.transparentPalette
     mainPanel.rectPalette = rectOpenPalette
+    label.rectPalette = Styles.transparentPalette
     labelPanel.rectPalette = Styles.transparentPalette
-
-    icon.listenTo(mainPanel.mouseEvents ++ label.mouseEvents: _*)
-    mainPanel.listenTo(mainPanel.mouseEvents ++ label.mouseEvents ++ icon.mouseEvents: _*)
 
     labelPanel.contents += label
     mainPanel.contents += icon
     mainPanel.contents += labelPanel
 
+    icon.listenTo(mainPanel.mouseEvents ++ label.mouseEvents: _*)
+    mainPanel.listenTo(label.mouseEvents ++ icon.mouseEvents: _*)
     mainPanel.reactions += {
       case _: event.MousePressed => if (label.visible) showIcon() else showIconAndText()
     }
 
     def showIconAndText(): Unit =
       label.visible = true
-      mainPanel.rectPalette = rectOpenPalette
       icon.svgIconPalette = iconOpenPalette
+      mainPanel.rectPalette = rectOpenPalette
 
     def showIcon(): Unit =
       label.visible = false
-      mainPanel.rectPalette = rectClosePalette
       icon.svgIconPalette = iconClosePalette
+      mainPanel.rectPalette = rectClosePalette
 
     override def component[T >: Component]: T = mainPanel
 
   case class JNavBar(iconLabels: JIconLabel*) extends ComposedSwing:
-    private val panelRect: Styles.Rect = Styles.defaultRect.withPaddingWidthAndHeight(40, 20)
+    private val padding = Styles.createPadding(40, 20)
 
     private val mainPanel = ExtendedSwing.JFlowPanelItem()
-    mainPanel.rect = panelRect
+    mainPanel.rect = mainPanel.rect.withPadding(padding)
     mainPanel.hGap = 5
 
     mainPanel.contents ++= iconLabels.map(_.component)
-    iconLabels.foreach(_.showIcon())
+    closeAll()
 
-    mainPanel.listenTo(mainPanel.mouse.clicks)
-    iconLabels.foreach(iconLabel =>
-      iconLabel.component.reactions += {
+    iconLabels.foreach(icon =>
+      icon.component.reactions += {
         case _: event.MousePressed =>
-          iconLabels.foreach(_.showIcon())
-          iconLabel.showIconAndText()
+          closeAll()
+          icon.showIconAndText()
       }
     )
 
+    private def closeAll(): Unit              = iconLabels.foreach(_.showIcon())
     override def component[T >: Component]: T = mainPanel
 
   case class JTabbedPane(iconLabels: JIconLabel*) extends ComposedSwing:
@@ -128,7 +127,6 @@ object ComposedSwing:
     mainPanel.layout(navBar.component) = BorderPanel.Position.North
     mainPanel.layout(pagesPanel) = BorderPanel.Position.Center
 
-    mainPanel.listenTo(navBar.component.mouse.clicks)
     iconLabels.foreach(iconLabel =>
       iconLabel.component.reactions += {
         case event.MousePressed(_, _, _, _, _) =>
@@ -137,7 +135,8 @@ object ComposedSwing:
       }
     )
 
-    pages.headOption.foreach((key, _) => paneOf(key))
+    iconLabels.headOption.foreach(iconLabel => paneOf(iconLabel).visible = true)
+
     def paneOf(label: JIconLabel): ExtendedSwing.JFlowPanelItem = pages(label)
     override def component[T >: Component]: T                   = mainPanel
 
