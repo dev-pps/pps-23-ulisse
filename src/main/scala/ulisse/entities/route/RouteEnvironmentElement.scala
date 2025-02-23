@@ -4,16 +4,18 @@ import ulisse.entities
 import ulisse.utils.OptionUtils.*
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option
 import ulisse.entities.route.Routes.Route
-import ulisse.entities.simulation.Environments.{EnvironmentElement, EnvironmentElementContainer}
 import ulisse.entities.simulation.Simulations.Actions.SimulationAction
 import ulisse.entities.simulation.{Environments, SimulationAgent}
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
 
-trait RouteEnvironmentElement extends Route with EnvironmentElement[RouteEnvironmentElement]:
+trait RouteEnvironmentElement extends Route:
   val tracks: Seq[Track]
   def firstAvailableTrack: Option[Track] = tracks.find(_.isAvailable)
+  def putTrain(track: Track, train: TrainAgent): Option[RouteEnvironmentElement]
+  def updateTrain(train: TrainAgent): Option[RouteEnvironmentElement]
+  def removeTrain(train: TrainAgent): Option[RouteEnvironmentElement]
 
 object RouteEnvironmentElement:
 
@@ -23,11 +25,11 @@ object RouteEnvironmentElement:
 
   extension (train: TrainAgent)
     def take(route: RouteEnvironmentElement): Option[RouteEnvironmentElement] =
-      route.firstAvailableTrack.flatMap(track => route.putAgent(track, train))
+      route.firstAvailableTrack.flatMap(track => route.putTrain(track, train))
 
     // TODO add testing (is equal to removeTrain)
     def leave(route: RouteEnvironmentElement): Option[RouteEnvironmentElement] =
-      route.removeAgent(train)
+      route.removeTrain(train)
 
     def findInRoutes(routes: Seq[RouteEnvironmentElement]): Option[RouteEnvironmentElement] =
       routes.find(ree => train.existInRoute(ree.tracks))
@@ -51,36 +53,17 @@ object RouteEnvironmentElement:
     ): RouteEnvironmentElementImpl =
       copy(tracks = tracks.updateWhen(train.existInTrack)(f))
 
-    override def removeAgent(agent: SimulationAgent): Option[RouteEnvironmentElement] =
-      agent match
-        case train: TrainAgent =>
-          removeTrain(using train)
-        case _ => None
-
-    override def putAgent(
-        container: EnvironmentElementContainer[?],
-        agent: SimulationAgent
-    ): Option[RouteEnvironmentElement] =
-      (container, agent) match
-        case (track: Track, train: TrainAgent) => putTrain(track, train)
-        case _                                 => None
-
-    private def putTrain(track: Track, train: TrainAgent): Option[RouteEnvironmentElement] =
+    def putTrain(track: Track, train: TrainAgent): Option[RouteEnvironmentElement] =
       tracks.updateFirstWhenWithEffects(_ == track)(_ :+ train).toOption.map(tracks =>
         copy(tracks = tracks)
       ) when track.isAvailable && !train.existInRoute(tracks)
 
-    def updateAgent(agent: SimulationAgent): Option[RouteEnvironmentElement] =
-      agent match
-        case train: TrainAgent => updateTrain(using train)
-        case _                 => None
-
-    private def updateTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
+    def updateTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
       // TODO investigate why is not working using whenTrainExists
       tracks.updateWhenWithEffects(train.existInTrack)(_.updateWhen(train.matchId)(_ => train)).toOption.map(tracks =>
         copy(tracks = tracks)
       ) when train.existInRoute(tracks)
 
-    private def removeTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
+    def removeTrain(using train: TrainAgent): Option[RouteEnvironmentElement] =
       whenTrainExists:
         modifyItInTrack(_.filterNot(train.matchId))
