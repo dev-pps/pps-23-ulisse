@@ -12,6 +12,8 @@ trait StationEnvironmentElement extends Station with EnvironmentElement:
   val platforms: List[Platform]
   def firstAvailablePlatform: Option[Platform] = platforms.find(_.train.isEmpty)
   def updatePlatform(platform: Platform, train: Option[TrainAgent]): Option[StationEnvironmentElement]
+  def updateTrain(train: TrainAgent): Option[StationEnvironmentElement]
+  def removeTrain(train: TrainAgent): Option[StationEnvironmentElement]
 
 object StationEnvironmentElement:
   def apply(station: Station): StationEnvironmentElement =
@@ -22,7 +24,7 @@ object StationEnvironmentElement:
       station.firstAvailablePlatform.flatMap(track => station.updatePlatform(track, Some(train)))
 
     def leave(station: StationEnvironmentElement): Option[StationEnvironmentElement] =
-      station.platforms.find(_.train.contains(train)).flatMap(track => station.updatePlatform(track, None))
+      station.removeTrain(train)
 
     def findInStations(stations: Seq[StationEnvironmentElement]): Option[StationEnvironmentElement] =
       // TODO check impl
@@ -36,3 +38,9 @@ object StationEnvironmentElement:
       copy(platforms = platforms.updateWhen(_ == platform)(_.withTrain(train))) when !platforms.exists(
         train.isDefined && _.train == train
       )
+
+    def updateTrain(train: TrainAgent): Option[StationEnvironmentElement] =
+      platforms.find(_.train.contains(train)).flatMap(updatePlatform(_, Some(train)))
+
+    def removeTrain(train: TrainAgent): Option[StationEnvironmentElement] =
+      platforms.find(_.train.contains(train)).flatMap(updatePlatform(_, None))
