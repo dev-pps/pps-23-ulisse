@@ -64,10 +64,10 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
     "find in stations" should:
       "be found if is present" in:
         val seeOption = train3905.arriveAt(stationEnvironmentElement)
-        seeOption.flatMap(see => train3905.findInStation(Seq(see))) shouldBe seeOption
+        seeOption.flatMap(see => train3905.findInStations(Seq(see))) shouldBe seeOption
 
       "not be found if is not present" in:
-        train3905.findInStation(Seq(stationEnvironmentElement)) shouldBe None
+        train3905.findInStations(Seq(stationEnvironmentElement)) shouldBe None
 
     "update track" should:
       "be updated if the track is available" in:

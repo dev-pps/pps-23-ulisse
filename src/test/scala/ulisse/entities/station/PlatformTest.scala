@@ -31,7 +31,7 @@ class PlatformTest extends AnyWordSpec with Matchers:
 
       "return chain of errors if the platform number is lesser or equal than 0" in:
         List(-1, 0).foreach(platformNumber =>
-          Platform.createCheckedPlatform(platformNumber) shouldBe Left(Chain(Platform.Error.InvalidPlatformNumber))
+          Platform.createCheckedPlatform(platformNumber) shouldBe Left(Chain(Platform.Errors.InvalidPlatformNumber))
         )
     "is created sequentially" should:
       "be a Platforms list with sequential number of platform starting from 1" in:

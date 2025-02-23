@@ -4,13 +4,14 @@ import ulisse.entities
 import ulisse.utils.OptionUtils.*
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option
 import ulisse.entities.route.Routes.Route
+import ulisse.entities.simulation.Environments.EnvironmentElement
 import ulisse.entities.simulation.Simulations.Actions.SimulationAction
 import ulisse.entities.simulation.{Environments, SimulationAgent}
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
 
-trait RouteEnvironmentElement extends Route:
+trait RouteEnvironmentElement extends Route with EnvironmentElement:
   val tracks: Seq[Track]
   def firstAvailableTrack: Option[Track] = tracks.find(_.isAvailable)
   def putTrain(track: Track, train: TrainAgent): Option[RouteEnvironmentElement]
