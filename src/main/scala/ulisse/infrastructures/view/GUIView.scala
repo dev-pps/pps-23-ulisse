@@ -2,14 +2,12 @@ package ulisse.infrastructures.view
 
 import ulisse.applications.ports.RoutePorts.Input
 import ulisse.infrastructures.view.common.CentralController
+import ulisse.infrastructures.view.components.ComponentUtils.*
+import ulisse.infrastructures.view.components.ui.{ComposedSwing, ExtendedSwing}
 import ulisse.infrastructures.view.map.MapPanel
 
-import scala.concurrent.ExecutionContext
 import scala.swing.*
 import scala.swing.BorderPanel.Position.*
-
-given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
-  Swing.onEDT(runnable.run())
 
 trait GUIView
 
@@ -19,23 +17,62 @@ object GUIView:
   private case class GUIViewImpl(uiPort: Input) extends MainFrame, GUIView:
     title = "Map"
     visible = true
-    preferredSize = new Dimension(800, 800)
+    preferredSize = new Dimension(1000, 1000)
 
-    private val mainPane  = BorderPanel()
-    private val glassPane = BorderPanel()
+    private val mainLayeredPane = ExtendedSwing.LayeredPanel()
+    private val pageLayeredPane = ExtendedSwing.LayeredPanel()
 
+    /** Menu panel, contains primary actions (new, import, ...). */
+    private val menuPanel = ExtendedSwing.JBorderPanelItem()
+
+    /** Dashboard panel, contains simulation, map, ... */
+    private val dashboardPanel = ExtendedSwing.JBorderPanelItem()
+
+    /** Map controller, contains map and route form. */
     private val mapController = CentralController.createMap()
-    private val mapPanel      = MapPanel.empty()
+
+    /** Map panel, contains elements graphic. */
+    private val mapPanel = MapPanel.empty()
+
+    pageLayeredPane.add(mapPanel)
+    pageLayeredPane.add(mapController.component)
+
+    mainLayeredPane.add(pageLayeredPane)
+    mainLayeredPane.add(dashboardPanel)
+    mainLayeredPane.add(menuPanel)
 
     mapPanel.attach(mapController.stationForm.mapObserver)
     mapPanel.attachItem(mapController.routeForm.mapObserver)
 
-    glassPane.opaque = false
-    glassPane.visible = true
+    // Menu panel
+    private val newIcon  = ComposedSwing.JIconLabel("icons/add.svg", "new")
+    private val boxPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
+    private val panel    = ExtendedSwing.JFlowPanelItem()
+    panel.contents += newIcon.component
+    boxPanel.contents += Swing.VGlue
+    boxPanel.contents += panel
+    menuPanel.layout(boxPanel) = Center
+    // ---------------
 
-    mainPane.layout(mapPanel) = Center
-    glassPane.layout(mapController.component) = East
+    // Dashboard panel
+    private val borderPanel            = ExtendedSwing.JBorderPanelItem()
+    private val boxDashboardPanelNorth = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
+    private val boxDashboardPanelSouth = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
 
-    contents = mainPane
-    peer.setGlassPane(glassPane.peer)
-    glassPane.visible = true
+    private val dashboardIconsNorth = for _ <- 1 to 4 yield ComposedSwing.JIconLabel("icons/add.svg", "new")
+    private val dashboardIconsSouth = for _ <- 1 to 2 yield ComposedSwing.JIconLabel("icons/add.svg", "new")
+
+    dashboardIconsNorth.map(icon => ExtendedSwing.createFlowPanel(icon.component))
+      .map(panel => { panel.vGap = 10; panel })
+      .foreach(boxDashboardPanelNorth.contents += _)
+
+    dashboardIconsSouth.map(icon => ExtendedSwing.createFlowPanel(icon.component))
+      .map(panel => { panel.vGap = 10; panel })
+      .foreach(boxDashboardPanelSouth.contents += _)
+
+    borderPanel.layout(boxDashboardPanelNorth) = North
+    borderPanel.layout(boxDashboardPanelSouth) = South
+    dashboardPanel.layout(borderPanel) = West
+    // ---------------
+
+    contents = mainLayeredPane

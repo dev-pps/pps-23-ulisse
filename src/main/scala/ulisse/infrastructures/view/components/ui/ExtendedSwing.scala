@@ -3,14 +3,15 @@ package ulisse.infrastructures.view.components.ui
 import ulisse.infrastructures.view.components.ui.decorators.ImageEffects.{PictureEffect, SVGEffect}
 import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.{FontEffect, ShapeEffect}
 
-import java.awt.FlowLayout
-import javax.swing.JLayeredPane
+import java.awt.{BorderLayout, FlowLayout}
+import javax.swing.{BoxLayout, JLayeredPane}
 import scala.swing.*
 
 object ExtendedSwing:
 
   case class LayeredPanel() extends BorderPanel with ShapeEffect:
     private val layeredPane = new JLayeredPane()
+    layeredPane.setLayout(new BorderLayout())
     layout(Component.wrap(layeredPane)) = BorderPanel.Position.Center
 
     def add(component: Component): Unit =
@@ -19,6 +20,11 @@ object ExtendedSwing:
       repaint()
 
   case class JBorderPanelItem() extends BorderPanel with ShapeEffect
+
+  def createFlowPanel(component: Component*): FlowPanel =
+    val panel = JFlowPanelItem()
+    panel.contents ++= component
+    panel
 
   case class JFlowPanelItem() extends FlowPanel with ShapeEffect with FontEffect:
     private val layout = new FlowLayout(FlowLayout.CENTER, 0, 0)
