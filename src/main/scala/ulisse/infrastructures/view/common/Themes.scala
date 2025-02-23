@@ -11,9 +11,9 @@ object Themes:
       val background: Color,
       val text: Color,
       val element: Color,
-      val overlayElement: Color,
-      val forwardClick: Color,
-      val backwardClick: Color,
+      val overlay: Color,
+      val click: Color,
+      val backClick: Color,
       val trueClick: Color,
       val falseClick: Color
   )
@@ -25,9 +25,9 @@ object Themes:
           background = Color.decode("#f7f8ff"),
           text = Color.decode("#2C2C2C"),
           element = Color.decode("#d6dbf5"),
-          overlayElement = Color.decode("#a2aace"),
-          forwardClick = Color.decode("#418dff"),
-          backwardClick = Color.decode("#c0c1c8"),
+          overlay = Color.decode("#a2aace"),
+          click = Color.decode("#418dff"),
+          backClick = Color.decode("#c0c1c8"),
           trueClick = Color.decode("#59f759"),
           falseClick = Color.decode("#f75959")
         )

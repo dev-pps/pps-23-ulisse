@@ -1,14 +1,17 @@
 package ulisse.infrastructures.view.components.ui.decorators
 
-import Styles.EnhancedLookExtension.*
+import ulisse.infrastructures.view.components.ui.decorators.Styles.EnhancedLookExtension.*
 
 import java.awt.{BasicStroke, RenderingHints}
-import scala.swing.{Component, Graphics2D}
+import scala.swing.{Component, Graphics2D, Publisher}
 
 object SwingEnhancements:
   /** Base trait decorator to enhanced look of swing [[Component]] */
   trait EnhancedLook extends Component:
     opaque = false
+
+    /** Read-only property to get the mouse events of the component. */
+    def mouseEvents: List[Publisher] = List(mouse.moves, mouse.clicks)
 
     /** Update the graphic component. */
     def updateGraphics(): Unit =

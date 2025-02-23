@@ -1,13 +1,13 @@
 package ulisse.infrastructures.view.components.ui.decorators
 
 import ulisse.infrastructures.view.common.Themes
-import SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.EnhancedLook
 import ulisse.utils.{Pair, Swings}
 
 import java.awt.Color
 import javax.swing.border.Border as SwingBorder
 import scala.swing.Font.Style.Value as StyleFont
-import scala.swing.{event, Font as SwingFont, Reactions, Swing}
+import scala.swing.{event, Font as SwingFont, Reactions}
 
 @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 object Styles:
@@ -33,6 +33,7 @@ object Styles:
 
   /** Default [[Palette]]. */
   val defaultPalette: Palette     = Palette(defaultColor, withOutColor, withOutColor)
+  val transparentPalette: Palette = Palette(transparentColor, withOutColor, withOutColor)
   val defaultPaletteFont: Palette = defaultPalette.withBackground(Themes.Theme.light.text)
 
   /** Default [[Rect]]. */
@@ -48,9 +49,12 @@ object Styles:
   def createRect(width: Int, height: Int, padding: Int, arc: Int): Rect =
     Rect(Pair(Some(width), Some(height)), Pair(padding, padding), arc)
 
-  /** Create a [[Size]] with the given [[width]] and [[height]]. */
+  /** Create a [[Palette]] with the given [[background]], [[click]] and [[hover]]. */
   def createPalette(background: Color, click: Color, hover: Color): Palette =
     Palette(background, Some(click), Some(hover))
+
+  /** Create a [[Palette]] with the given [[background]]. */
+  def createBackgroundPalette(background: Color): Palette = Palette(background, withOutColor, withOutColor)
 
   /** Create a [[Font]] with the given [[name]], [[style]] and [[size]]. */
   def createFont(name: String, style: StyleFont, color: Color, size: Int): Font = Font(name, style, size)
@@ -81,12 +85,12 @@ object Styles:
     def currentColor: Color                        = _currentColor
     private def currentColor_=(color: Color): Unit = _currentColor = color
     def withBackground(color: Color): Palette      = copy(background = color)
-    def withClickColor(color: Color): Palette      = copy(clickColor = Some(color))
-    def withHoverColor(color: Color): Palette      = copy(hoverColor = Some(color))
+    def withClick(color: Color): Palette           = copy(clickColor = Some(color))
+    def withHover(color: Color): Palette           = copy(hoverColor = Some(color))
     def hoverAction(): Unit                        = hoverColor.foreach(currentColor = _)
-    def exitAction(): Unit                         = hoverColor.foreach(_ => currentColor = background)
+    def exitAction(): Unit                         = currentColor = background
     def clickAction(): Unit                        = clickColor.foreach(currentColor = _)
-    def releaseAction(): Unit                      = clickColor.foreach(_ => currentColor = background)
+    def releaseAction(): Unit                      = currentColor = background
 
   /** Create a [[Rect]] to represent a rounded rectangle with the given [[size]], [[padding]], [[arc]] and [[palette]]. */
   case class Rect(size: Size, padding: Padding, arc: Int, palette: Palette = defaultPalette) extends Style:

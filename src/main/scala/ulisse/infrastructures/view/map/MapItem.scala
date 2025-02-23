@@ -46,14 +46,14 @@ object MapItem:
     override def onHover(mousePoint: Point): Unit =
       if hasCollided(mousePoint) then
         isSilhouetteShown = true
-        currentColorSilhouette = Theme.light.overlayElement
+        currentColorSilhouette = Theme.light.overlay
       else
         isSilhouetteShown = false
 
     override def onClick(mousePoint: Point): Unit =
       if hasCollided(mousePoint) then
         isSilhouetteShown = true
-        currentColorSilhouette = Theme.light.forwardClick
+        currentColorSilhouette = Theme.light.click
         itemObservable.notifyOnClick(mousePoint)
 
     override def onRelease(mousePoint: Point): Unit =
