@@ -1,19 +1,17 @@
 package ulisse.applications.useCases
 
-import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.applications.managers.SimulationManager
+import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.{AppState, SimulationState}
-import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
-import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
-import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.simulation.Environments.RailwayEnvironment
+import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.simulation.Simulations.EngineState
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.infrastructures.commons.TimeProviders.*
 
-import java.util.concurrent.{Executors, LinkedBlockingQueue}
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import java.util.concurrent.LinkedBlockingQueue
+import scala.concurrent.{Future, Promise}
 
 final case class SimulationService(
     eventQueue: LinkedBlockingQueue[AppState => AppState],

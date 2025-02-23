@@ -2,15 +2,11 @@ package ulisse.entities.station
 
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
-import ulisse.entities.simulation.Environments.TrainAgentsContainer
-import ulisse.entities.simulation.SimulationAgent
+import ulisse.entities.simulation.EnvironmentElements.TrainAgentsContainer
 import ulisse.entities.train.TrainAgent
-import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.BaseError
-import ulisse.utils.ValidationUtils.validatePositive
 import ulisse.utils.OptionUtils.when
-
-import scala.annotation.targetName
+import ulisse.utils.ValidationUtils.validatePositive
 
 trait Platform2 extends Platform
 
@@ -19,7 +15,8 @@ trait Platform extends TrainAgentsContainer[Platform]:
   // TODO evaluate if is needed a value for length of the platform track
   val platformNumber: Int
   val train: Option[TrainAgent]
-  override def isAvailable: Boolean = train.isEmpty
+  override def isAvailable: Boolean                 = train.isEmpty
+  override def contains(train: TrainAgent): Boolean = this.train.exists(train.matchId)
 
 /** Factory for [[Platform]] instances. */
 object Platform:
@@ -36,9 +33,6 @@ object Platform:
     val step: Int => Int = _ + 1
     List.tabulate(numberOfTracks)(i => PlatformImpl(step(i), None))
 
-  extension (train: TrainAgent)
-    def existInPlatform(platform: Platform): Boolean = platform.train.exists(train.matchId)
-
   /** Represents errors that can occur during `Track` creation. */
   enum Errors extends BaseError:
     case InvalidPlatformNumber
@@ -48,6 +42,6 @@ object Platform:
     override def putTrain(train: TrainAgent): Option[Platform] =
       copy(train = Some(train)) when isAvailable
     override def updateTrain(train: TrainAgent): Option[Platform] =
-      copy(train = Some(train)) when (train existInPlatform this)
+      copy(train = Some(train)) when contains(train)
     override def removeTrain(train: TrainAgent): Option[Platform] =
-      copy(train = None) when (train existInPlatform this)
+      copy(train = None) when contains(train)

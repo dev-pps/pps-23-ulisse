@@ -4,9 +4,9 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
-import ulisse.applications.{AppState, SimulationState}
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
+import ulisse.applications.{AppState, SimulationState}
 import ulisse.entities.simulation.Simulations.EngineState
 import ulisse.entities.station.Station
 
