@@ -11,28 +11,7 @@ import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.utils.CollectionUtils.*
 
 object Environments:
-//  trait EnvironmentElementContainer[SA <: SimulationAgent, EEC <: EnvironmentElementContainer[SA, EEC]]:
-//    self: EEC =>
-//    def isAvailable: Boolean
-//    def putAgent(agent: SA): Option[EEC]
-//    def updateAgent(agent: SA): Option[EEC]
-//    def removeAgent(agent: SA): Option[EEC]
-//
-//  trait TrainEnvironmentElementContainer[TEEC <: TrainEnvironmentElementContainer[TEEC]] extends EnvironmentElementContainer[TrainAgent, TEEC]:
-//    self: TEEC =>
-//
-//  trait EnvironmentElement[EC <: EnvironmentElement[EC]]:
-//    self: EC =>
-//    type SA <: SimulationAgent
-//    type EEC <: EnvironmentElementContainer[SA, ?]
-//    def putAgent(container: EEC, agent: SA): Option[EC]
-//    def updateAgent(agent: SA): Option[EC]
-//    def removeAgent(agent: SA): Option[EC]
-//
-//  trait TrainEnvironmentElement[TEE <: TrainEnvironmentElement[TEE]] extends EnvironmentElement[TEE]:
-//    self: TEE =>
-//    type EEC = TrainEnvironmentElementContainer[?]
-//    type SA = EEC#SA
+  trait EnvironmentElement
 
   trait RailwayEnvironment:
     def doStep(dt: Int): RailwayEnvironment
@@ -77,62 +56,6 @@ object Environments:
             //      (for now is not possible since station doesn't take into account rail platform track length)
             //  or enter the route
             //  or completely leave the station
-//            object EnvironmentUpdater:
-//              type TYPE
-//              type UpdatedRouteEnvironmentElement = Option[RouteEnvironmentElement]
-//              type RouteWhereAgentIs              = Option[RouteEnvironmentElement]
-//              type EnvironmentElementUpdater      = (TrainAgent, RouteWhereAgentIs) => UpdatedRouteEnvironmentElement
-//              type RouteWhereAgentIsFinder        = TrainAgent => RouteWhereAgentIs
-//              type RouteUpdateRequirement         = (TrainAgent, RouteEnvironmentElementUpdater)
-//              type RouteUpdaterFunction           = RouteUpdateRequirement => UpdatedRouteEnvironmentElement
-//
-//              val updateEnvironmentState: EnvironmentElementUpdater = (agent, route) =>
-//                route.map(r => r.arrival)
-//                route.flatMap(_.updateAgent(agent))
-//              val foundInRoutes: RouteUpdaterFunction = (agent, usir) => usir(agent, agent.findInRoutes(routes))
-//              extension (p1: RouteUpdateRequirement)
-//                def is(p2: RouteUpdaterFunction): UpdatedRouteEnvironmentElement = p2(p1)
-//
-//              extension (p1: RouteEnvironmentElementUpdater)
-//                def when(p2: TrainAgent): RouteUpdateRequirement = (p2, p1)
-//
-//              updateEnvironmentState when agent is foundInRoutes
-//
-//            type UpdatedRouteEnvironmentElement = Option[RouteEnvironmentElement]
-//            type RouteWhereAgentIs              = Option[RouteEnvironmentElement]
-//            type RouteEnvironmentElementUpdater = (TrainAgent, RouteWhereAgentIs) => UpdatedRouteEnvironmentElement
-//            type RouteWhereAgentIsFinder        = TrainAgent => RouteWhereAgentIs
-//            type RouteUpdateRequirement         = (TrainAgent, RouteEnvironmentElementUpdater)
-//            type RouteUpdaterFunction           = RouteUpdateRequirement => UpdatedRouteEnvironmentElement
-//
-//            val updateStateInRoute: RouteEnvironmentElementUpdater =
-//              (agent, route) => route.flatMap(_.updateAgent(agent))
-//            val foundInRoutes: RouteUpdaterFunction = (agent, usir) => usir(agent, agent.findInRoutes(routes))
-//            extension (p1: RouteUpdateRequirement)
-//              def is(p2: RouteUpdaterFunction): UpdatedRouteEnvironmentElement = p2(p1)
-//
-//            extension (p1: RouteEnvironmentElementUpdater)
-//              def when(p2: TrainAgent): RouteUpdateRequirement = (p2, p1)
-//
-//            updateStateInRoute when agent is foundInRoutes
-//
-//            type UpdatedStationEnvironmentElement = Option[StationEnvironmentElement]
-//            type StationWhereAgentIs              = Option[StationEnvironmentElement]
-//            type StationEnvironmentElementUpdater =
-//              (TrainAgent, StationWhereAgentIs) => UpdatedStationEnvironmentElement
-//            type StationWhereAgentIsFinder = TrainAgent => StationWhereAgentIs
-//            type StationUpdateRequirement  = (TrainAgent, StationEnvironmentElementUpdater)
-//            type StationUpdaterFunction    = StationUpdateRequirement => UpdatedStationEnvironmentElement
-//
-//            val updateStateInStation: StationEnvironmentElementUpdater = (agent, station) => station
-//            val foundInStations: StationUpdaterFunction = (agent, usis) => usis(agent, agent.findInStation(stations))
-//            extension (p1: StationUpdateRequirement)
-//              def is2(p2: StationUpdaterFunction): UpdatedStationEnvironmentElement = p2(p1)
-//
-//            extension (p1: StationEnvironmentElementUpdater)
-//              def when2(p2: TrainAgent): StationUpdateRequirement = (p2, p1)
-//
-//            updateStateInStation when2 agent is2 foundInStations
 
             //                  findInRoutes(routes).fold(this)(route =>
 //                    val arriveAtDestination = agent.distanceTravelled + d >= route.length
