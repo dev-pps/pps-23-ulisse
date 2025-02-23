@@ -1,12 +1,13 @@
 package ulisse.entities.station
 
+import ulisse.entities.simulation.{Environments, SimulationAgent}
 import ulisse.entities.simulation.Environments.EnvironmentElement
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.when
 
-trait StationEnvironmentElement extends Station with EnvironmentElement:
+trait StationEnvironmentElement extends Station with EnvironmentElement[StationEnvironmentElement]:
   val platforms: List[Platform]
   def firstAvailablePlatform: Option[Platform] = platforms.find(_.train.isEmpty)
   def updatePlatform(platform: Platform, train: Option[TrainAgent]): Option[StationEnvironmentElement]
@@ -29,6 +30,25 @@ object StationEnvironmentElement:
   private final case class StationEnvironmentElementImpl(station: Station, platforms: List[Platform])
       extends StationEnvironmentElement:
     export station.*
+
+    override def putAgent(
+        container: Environments.EnvironmentElementContainer,
+        agent: SimulationAgent
+    ): Option[StationEnvironmentElement] =
+      (container, agent) match
+        case (platform: Platform, train: TrainAgent) => updatePlatform(platform, Some(train))
+        case _                                       => None
+
+    override def removeAgent(agent: SimulationAgent): Option[StationEnvironmentElement] =
+      agent match
+        case train: TrainAgent => platforms.find(_.train.contains(train)).flatMap(track => updatePlatform(track, None))
+        case _                 => None
+
+    override def updateAgent(agent: SimulationAgent): Option[StationEnvironmentElement] =
+      agent match
+        case train: TrainAgent =>
+          platforms.find(_.train.contains(train)).flatMap(track => updatePlatform(track, Some(train)))
+        case _ => None
 
     def updatePlatform(platform: Platform, train: Option[TrainAgent]): Option[StationEnvironmentElement] =
       copy(platforms = platforms.updateWhen(_ == platform)(_.withTrain(train))) when !platforms.exists(
