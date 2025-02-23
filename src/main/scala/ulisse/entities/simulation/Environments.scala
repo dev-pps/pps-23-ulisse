@@ -13,6 +13,7 @@ import ulisse.utils.CollectionUtils.*
 object Environments:
   trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
     self: TAC =>
+    def isAvailable: Boolean
     def putTrain(train: TrainAgent): Option[TAC]
     def updateTrain(train: TrainAgent): Option[TAC]
     def removeTrain(train: TrainAgent): Option[TAC]
@@ -21,26 +22,6 @@ object Environments:
     self: EE =>
     type TAC <: TrainAgentsContainer[?]
     def putTrain(container: TAC, train: TrainAgent): Option[EE]
-    def updateTrain(train: TrainAgent): Option[EE]
-    def removeTrain(train: TrainAgent): Option[EE]
-
-  trait StationEnvironmentElement2 extends Station with TrainAgentEEWrapper[StationEnvironmentElement2]:
-    override type TAC <: Platform
-    def platforms: List[TAC]
-    def firstAvailablePlatform: Option[TAC] = platforms.find(_.train.isEmpty)
-
-  case class StationEnvironmentElementImpl2(platforms: List[Platform2], station: Station)
-      extends StationEnvironmentElement2:
-    export station.*
-    type TAC = Platform2
-    def putTrain(container: Platform2, train: TrainAgent): Option[StationEnvironmentElement2] = Some(this)
-    def updateTrain(train: TrainAgent): Option[StationEnvironmentElement2]                    = Some(this)
-    def removeTrain(train: TrainAgent): Option[StationEnvironmentElement2]                    = Some(this)
-
-  trait EnvironmentElement[EE <: EnvironmentElement[EE]]:
-    self: EE =>
-    type TrainContainer
-    def putTrain(trainContainer: TrainContainer, train: TrainAgent): Option[EE]
     def updateTrain(train: TrainAgent): Option[EE]
     def removeTrain(train: TrainAgent): Option[EE]
 

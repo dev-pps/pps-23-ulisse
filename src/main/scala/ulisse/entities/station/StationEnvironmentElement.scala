@@ -6,7 +6,7 @@ import ulisse.entities.simulation.Environments.{EnvironmentElement, StationEnvir
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option
-
+import ulisse.entities.station.Platform.existInPlatform
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.when
 
@@ -27,26 +27,26 @@ object StationEnvironmentElement:
       station.removeTrain(train)
 
     def findInStations(stations: Seq[StationEnvironmentElement]): Option[StationEnvironmentElement] =
-      stations.find(_.platforms.exists(_.train.map(_.name).contains(train.name)))
+      stations.find(train.existInStation)
+
+    def existInStation(station: StationEnvironmentElement): Boolean =
+      station.platforms.exists(train.existInPlatform)
 
   private final case class StationEnvironmentElementImpl(station: Station, platforms: List[Platform])
       extends StationEnvironmentElement:
     export station.*
-    extension (train: TrainAgent)
-      private def existIn(platforms: List[Platform]): Boolean =
-        platforms.exists(_.train.map(_.name).contains(train.name))
 
     def putTrain(trainContainer: TAC, train: TrainAgent): Option[StationEnvironmentElement] =
       platforms.find(_ == trainContainer)
         .flatMap(_.putTrain(train))
         .map(updatedPlatform =>
           copy(platforms = platforms.updateWhen(_ == trainContainer)(_ => updatedPlatform))
-        ) when !(train existIn platforms)
+        ) when !(train existInStation this)
     def updateTrain(train: TrainAgent): Option[StationEnvironmentElement] =
-      platforms.updateWhenWithEffects(_.train.map(_.name).contains(train.name))(_.updateTrain(train)).map(pfs =>
+      platforms.updateWhenWithEffects(train.existInPlatform)(_.updateTrain(train)).map(pfs =>
         copy(platforms = pfs)
-      ) when (train existIn platforms)
+      ) when (train existInStation this)
     def removeTrain(train: TrainAgent): Option[StationEnvironmentElement] =
-      platforms.updateWhenWithEffects(_.train.map(_.name).contains(train.name))(_.removeTrain(train)).map(pfs =>
+      platforms.updateWhenWithEffects(train.existInPlatform)(_.removeTrain(train)).map(pfs =>
         copy(platforms = pfs)
-      ) when (train existIn platforms)
+      ) when (train existInStation this)
