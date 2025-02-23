@@ -11,11 +11,12 @@ import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.utils.CollectionUtils.*
 
 object Environments:
-  trait EnvironmentElement:
+  trait EnvironmentElement[EE <: EnvironmentElement[EE]]:
+    self: EE =>
     type TrainContainer
-    def putTrain(trainContainer: TrainContainer, train: TrainAgent): Option[EnvironmentElement]
-    def updateTrain(train: TrainAgent): Option[EnvironmentElement]
-    def removeTrain(train: TrainAgent): Option[EnvironmentElement]
+    def putTrain(trainContainer: TrainContainer, train: TrainAgent): Option[EE]
+    def updateTrain(train: TrainAgent): Option[EE]
+    def removeTrain(train: TrainAgent): Option[EE]
 
   trait RailwayEnvironment:
     def doStep(dt: Int): RailwayEnvironment
