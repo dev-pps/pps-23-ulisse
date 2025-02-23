@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers.should
 import TimetableManagers.TimetableManagerErrors.{AcceptanceError, TimetableNotFound}
 import ulisse.TestUtility.in
 import ulisse.entities.Routes.TypeRoute.AV
-import ulisse.entities.timetable.Timetables.{RailInfo, TimetableBuilder, TrainTimetable}
+import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.utils.Times.FluentDeclaration.h
 
 class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:

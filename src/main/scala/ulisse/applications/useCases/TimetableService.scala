@@ -6,7 +6,7 @@ import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{GenericE
 import ulisse.applications.ports.TimetablePorts.{RequestResult, StationId, TimetableServiceErrors, WaitingTime}
 import ulisse.entities.Routes.Route
 import ulisse.entities.timetable.MockedEntities.AppStateTimetable
-import ulisse.entities.timetable.Timetables.{RailInfo, TimetableBuilder, TrainTimetable}
+import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.Times.ClockTime
@@ -64,7 +64,7 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
   )(
       trains: List[Train],
       routes: List[Route]
-  ): Either[BaseError, TrainTimetable] =
+  ): Either[BaseError, Timetable] =
     for
       train           <- trains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
       stationEntities <- usrStations.validateStations(routes).toRight(GenericError(s"some route not exists"))

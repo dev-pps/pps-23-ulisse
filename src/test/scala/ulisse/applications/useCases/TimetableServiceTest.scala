@@ -10,7 +10,7 @@ import ulisse.applications.ports.TimetablePorts.RequestResult
 import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.GenericError
 import ulisse.entities.Routes
 import ulisse.entities.timetable.Timetables
-import ulisse.entities.timetable.Timetables.TrainTimetable
+import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.utils.Times.FluentDeclaration.h
 
 import scala.concurrent.{Await, Future}
@@ -34,7 +34,7 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
         Then("timetable should be saved without errors")
         Await.result(requestResult, Duration.Inf) match
           case Left(e) => fail(s"Timetable not created cause: $e")
-          case Right(List(t: TrainTimetable)) =>
+          case Right(List(t: Timetable)) =>
             t.departureTime shouldBe departureTime
             t.arrivingStation shouldBe stationC
             t.startStation shouldBe stationA
@@ -100,7 +100,7 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
           handleTableCreationRes(createTable2Res, "table 2")
           Await.result(timetableOfResult, Duration.Inf) match
             case Left(e) => fail(s"error in retrieving tables with correct train name: $e")
-            case Right(List(t: TrainTimetable, t2: TrainTimetable)) =>
+            case Right(List(t: Timetable, t2: Timetable)) =>
               t.departureTime shouldBe time1
               t.arrivingStation shouldBe stationC
               t.startStation shouldBe stationA
@@ -108,5 +108,5 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
               t2.departureTime shouldBe time2
               t2.arrivingStation shouldBe stationD
               t2.startStation shouldBe stationC
-              t2.transitStations shouldBe List.empty[TrainTimetable]
+              t2.transitStations shouldBe List.empty[Timetable]
             case r => fail(s"wrong return type: $r")
