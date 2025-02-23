@@ -22,7 +22,7 @@ object Timetables:
   extension (i: Int)
     def toWaitTime: WaitTime = i
 
-  extension (t: TrainTimetable)
+  extension (t: Timetable)
     /** Returns list of [[Station]] where train stops */
     def stopStations: List[Station] = t.table.filter(_._2.waitTime.nonEmpty).keys.toList
 
@@ -43,7 +43,7 @@ object Timetables:
     def table: ListMap[Station, StationTime]
 
   /** Complete timetable containing arriving station and ClockTime */
-  trait TrainTimetable extends PartialTimetable:
+  trait Timetable extends PartialTimetable:
     def arrivingStation: Station
     def arrivingTime: Option[ClockTime]
 
@@ -79,7 +79,7 @@ object Timetables:
   trait TimetableBuilder:
     def stopsIn(station: Station, waitTime: WaitTime)(railInfo: RailInfo): TimetableBuilder
     def transitIn(station: Station)(railInfo: RailInfo): TimetableBuilder
-    def arrivesTo(station: Station)(railInfo: RailInfo): TrainTimetable
+    def arrivesTo(station: Station)(railInfo: RailInfo): Timetable
     def partialTimetable: PartialTimetable
 
   /** Factory of PartialTimetable */
@@ -115,8 +115,8 @@ object Timetables:
       override def transitIn(station: Station)(railInfo: RailInfo): TimetableBuilder =
         insertStation(station, AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), None))
 
-      override def arrivesTo(station: Station)(railInfo: RailInfo): TrainTimetable =
-        TrainTimetableImpl(
+      override def arrivesTo(station: Station)(railInfo: RailInfo): Timetable =
+        TimetableImpl(
           insertStation(
             station,
             EndScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train))
@@ -132,10 +132,10 @@ object Timetables:
       private case class PartialTimetableImpl(private val builder: TimetableBuilderImpl) extends PartialTimetable:
         export builder.{departureTime, startStation, table, train}
 
-    private case class TrainTimetableImpl(
+    private case class TimetableImpl(
         private val partialTrainTimetable: PartialTimetable,
         arrivingStation: Station
-    ) extends TrainTimetable:
+    ) extends Timetable:
       export partialTrainTimetable.{departureTime, startStation, table, train}
       override def arrivingTime: Option[ClockTime] =
         for

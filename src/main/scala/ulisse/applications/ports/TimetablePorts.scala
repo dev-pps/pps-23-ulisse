@@ -1,6 +1,6 @@
 package ulisse.applications.ports
 
-import ulisse.entities.timetable.Timetables.TrainTimetable
+import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.utils.Errors.ErrorMessage
 import ulisse.utils.Times.{ClockTime, Time}
 import scala.concurrent.Future
@@ -9,7 +9,7 @@ object TimetablePorts:
 
   type StationId     = String
   type WaitingTime   = Option[Int]
-  type RequestResult = Either[TimetableServiceErrors, List[TrainTimetable]]
+  type RequestResult = Either[TimetableServiceErrors, List[Timetable]]
 
   import ulisse.utils.Errors.{BaseError, ErrorNotExist, ErrorValidation}
   trait TimetableServiceErrors extends BaseError
