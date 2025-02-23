@@ -2,6 +2,7 @@ package ulisse.entities.route
 
 import cats.data.{NonEmptyChain, ValidatedNec}
 import cats.syntax.all.*
+import ulisse.entities.simulation.Environments.TrainAgentsContainer
 import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
@@ -9,7 +10,7 @@ import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateRange, validateUniqueItems}
 
 import scala.annotation.targetName
-trait Track:
+trait Track extends TrainAgentsContainer[Track]:
   // TODO evaluate if is needed an numberid
   val trains: Seq[TrainAgent]
   def minPermittedDistanceBetweenTrains: Double
@@ -53,5 +54,8 @@ object Track:
       Track.createCheckedTrack(trains.updateWhen(p)(f)*)
     override def filterNot(p: TrainAgent => Boolean): Track = copy(trains = trains.filterNot(p))
 
+    override def putTrain(train: TrainAgent): Option[Track]    = Some(this)
+    override def updateTrain(train: TrainAgent): Option[Track] = Some(this)
+    override def removeTrain(train: TrainAgent): Option[Track] = Some(this)
   enum Errors extends BaseError:
     case DuplicateTrains, TrainAlreadyMoved
