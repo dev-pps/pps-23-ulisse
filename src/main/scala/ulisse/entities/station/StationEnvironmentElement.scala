@@ -5,14 +5,15 @@ import ulisse.entities.simulation.Environments
 import ulisse.entities.simulation.Environments.{EnvironmentElement, StationEnvironmentElement2, TrainAgentEEWrapper}
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
+import ulisse.utils.OptionUtils.given_Conversion_Option_Option
+
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.when
 
 trait StationEnvironmentElement extends Station with TrainAgentEEWrapper[StationEnvironmentElement]:
-  override type TAC <: Platform
+  override type TAC = Platform
   val platforms: List[TAC]
   def firstAvailablePlatform: Option[TAC] = platforms.find(_.train.isEmpty)
-  def updatePlatform(platform: TAC, train: Option[TrainAgent]): Option[StationEnvironmentElement]
 
 object StationEnvironmentElement:
   def apply(station: Station): StationEnvironmentElement =
@@ -20,27 +21,32 @@ object StationEnvironmentElement:
 
   extension (train: TrainAgent)
     def arriveAt(station: StationEnvironmentElement): Option[StationEnvironmentElement] =
-      station.firstAvailablePlatform.flatMap(track => station.updatePlatform(track, Some(train)))
+      station.firstAvailablePlatform.flatMap(platform => station.putTrain(platform, train))
 
     def leave(station: StationEnvironmentElement): Option[StationEnvironmentElement] =
       station.removeTrain(train)
 
     def findInStations(stations: Seq[StationEnvironmentElement]): Option[StationEnvironmentElement] =
-      // TODO check impl
       stations.find(_.platforms.exists(_.train.map(_.name).contains(train.name)))
 
   private final case class StationEnvironmentElementImpl(station: Station, platforms: List[Platform])
       extends StationEnvironmentElement:
     export station.*
-    override type TAC = Platform
-    def updatePlatform(platform: TAC, train: Option[TrainAgent]): Option[StationEnvironmentElement] =
-      copy(platforms = platforms.updateWhen(_ == platform)(_.withTrain(train))) when !platforms.exists(
-        train.isDefined && _.train == train
-      )
+    extension (train: TrainAgent)
+      private def existIn(platforms: List[Platform]): Boolean =
+        platforms.exists(_.train.map(_.name).contains(train.name))
 
     def putTrain(trainContainer: TAC, train: TrainAgent): Option[StationEnvironmentElement] =
-      platforms.find(_ == trainContainer).flatMap(p)
+      platforms.find(_ == trainContainer)
+        .flatMap(_.putTrain(train))
+        .map(updatedPlatform =>
+          copy(platforms = platforms.updateWhen(_ == trainContainer)(_ => updatedPlatform))
+        ) when !(train existIn platforms)
     def updateTrain(train: TrainAgent): Option[StationEnvironmentElement] =
-      platforms.find(_.train.contains(train)).flatMap(updatePlatform(_, Some(train)))
+      platforms.updateWhenWithEffects(_.train.map(_.name).contains(train.name))(_.updateTrain(train)).map(pfs =>
+        copy(platforms = pfs)
+      ) when (train existIn platforms)
     def removeTrain(train: TrainAgent): Option[StationEnvironmentElement] =
-      platforms.find(_.train.contains(train)).flatMap(updatePlatform(_, None))
+      platforms.updateWhenWithEffects(_.train.map(_.name).contains(train.name))(_.removeTrain(train)).map(pfs =>
+        copy(platforms = pfs)
+      ) when (train existIn platforms)

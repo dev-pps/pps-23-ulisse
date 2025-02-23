@@ -20,7 +20,6 @@ trait Platform extends TrainAgentsContainer[Platform]:
   val platformNumber: Int
   val train: Option[TrainAgent]
   def isAvailable: Boolean = train.isEmpty
-  def withTrain(train: Option[TrainAgent]): Platform
 
 /** Factory for [[Platform]] instances. */
 object Platform:
@@ -42,8 +41,9 @@ object Platform:
     case InvalidPlatformNumber
 
   private final case class PlatformImpl(platformNumber: Int, train: Option[TrainAgent]) extends Platform:
-    def withTrain(train: Option[TrainAgent]): Platform = copy(train = train)
-    def putTrain(train: TrainAgent): Option[Platform]  = copy(train = Some(train)) when isAvailable
+    // TODO evaluate if could be nice to introduce a control to check if the train is entering the station or is already moved
+    def putTrain(train: TrainAgent): Option[Platform] =
+      copy(train = Some(train)) when isAvailable
     def updateTrain(train: TrainAgent): Option[Platform] =
       copy(train = Some(train)) when this.train.map(_.name).contains(train.name)
     def removeTrain(train: TrainAgent): Option[Platform] =
