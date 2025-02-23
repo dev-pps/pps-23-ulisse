@@ -1,12 +1,13 @@
 package ulisse.infrastructures.view.components.ui
 
 import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
+import ulisse.infrastructures.view.components.ui.ExtendedSwing.{createPicturePanel, SVGPanel}
 import ulisse.infrastructures.view.components.ui.decorators.Styles
 
 import java.awt
 import java.awt.Dimension
 import scala.swing.*
+import scala.swing.MenuBar.NoMenuBar.mouse
 
 trait ComposedSwing:
   def component[T >: Component]: T
@@ -22,8 +23,7 @@ object ComposedSwing:
   def createToggleIconButton(onIconPath: String, offIconPath: String): JToggleIconButton =
     JToggleIconButton(onIconPath, offIconPath)
 
-  private val elementPalette: Styles.Palette = Styles.defaultPalette.withClickColor(Theme.light.overlayElement)
-
+  /** Represents a text field with a [[title]] */
   case class JInfoTextField(title: String) extends ComposedSwing:
     private val colum               = 15
     private val textFieldPadding    = Styles.createPadding(10, 5)
@@ -48,51 +48,46 @@ object ComposedSwing:
     private val width  = 100
     private val height = 40
 
-    private val openPalette: Styles.Palette =
-      Styles.createPalette(Theme.light.background.withAlpha(50), Theme.light.forwardClick, Theme.light.forwardClick)
-    private val closePalette: Styles.Palette =
-      Styles.createPalette(Theme.light.overlayElement, Theme.light.forwardClick, Theme.light.forwardClick)
+    private val rectClosePalette = Styles.createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
+    private val rectOpenPalette  = rectClosePalette.withBackground(Theme.light.background.withAlpha(50))
 
-    private val mainPanel = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
-    mainPanel.rectPalette = openPalette
+    private val iconClosePalette =
+      Styles.createBackgroundPalette(Theme.light.background).withHover(Theme.light.background)
+    private val iconOpenPalette = iconClosePalette.withBackground(Theme.light.overlay)
 
-    private val icon = SVGPanel()
-    icon.svgIcon = iconPath
-    private val label = ExtendedSwing.JLabelItem(text)
+    private val mainPanel  = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
+    private val labelPanel = ExtendedSwing.JFlowPanelItem()
+    private val icon       = ExtendedSwing.createSVGPanel(iconPath)
+    private val label      = ExtendedSwing.JLabelItem(text)
 
     icon.preferredSize = Dimension(height, height)
     label.preferredSize = Dimension(width, height)
 
-    mainPanel.listenTo(label.mouse.clicks, label.mouse.moves, icon.mouse.clicks, icon.mouse.moves)
+    icon.svgIconPalette = iconOpenPalette
+    label.rectPalette = Styles.transparentPalette
+    mainPanel.rectPalette = rectOpenPalette
+    labelPanel.rectPalette = Styles.transparentPalette
 
+    icon.listenTo(mainPanel.mouseEvents ++ label.mouseEvents: _*)
+    mainPanel.listenTo(mainPanel.mouseEvents ++ label.mouseEvents ++ icon.mouseEvents: _*)
+
+    labelPanel.contents += label
     mainPanel.contents += icon
-    mainPanel.contents += label
+    mainPanel.contents += labelPanel
 
     mainPanel.reactions += {
-      case event.MouseEntered(_, _, _) =>
-        icon.svgIconPalette = icon.svgIconPalette.withBackground(Theme.light.background)
-      case event.MouseExited(_, _, _) =>
-        val color = if (label.visible) Theme.light.overlayElement else Theme.light.background
-        icon.svgIconPalette = icon.svgIconPalette.withBackground(color)
-      case event.MousePressed(_, _, _, _, _) =>
-        if (label.visible) showIcon() else showIconAndText()
-      case event.MouseReleased(_, _, _, _, _) =>
-        if (label.visible) showIconAndText() else showIcon()
+      case _: event.MousePressed => if (label.visible) showIcon() else showIconAndText()
     }
 
     def showIconAndText(): Unit =
-      icon.svgIconPalette = icon.svgIconPalette.withBackground(Theme.light.overlayElement)
       label.visible = true
-      mainPanel.rectPalette = openPalette
-      mainPanel.repaint()
-      mainPanel.validate()
+      mainPanel.rectPalette = rectOpenPalette
+      icon.svgIconPalette = iconOpenPalette
 
     def showIcon(): Unit =
-      icon.svgIconPalette = icon.svgIconPalette.withBackground(Theme.light.background)
       label.visible = false
-      mainPanel.rectPalette = closePalette
-      mainPanel.repaint()
-      mainPanel.validate()
+      mainPanel.rectPalette = rectClosePalette
+      icon.svgIconPalette = iconClosePalette
 
     override def component[T >: Component]: T = mainPanel
 

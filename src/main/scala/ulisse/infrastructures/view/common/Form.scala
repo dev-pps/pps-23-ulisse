@@ -25,7 +25,7 @@ object Form:
   private val buttonRect = Styles.defaultRect.withPaddingWidthAndHeight(20, 10)
 
   private val buttonPalette =
-    Styles.defaultPalette.withBackground(Theme.light.text).withHoverColor(Theme.light.forwardClick)
+    Styles.defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.click)
 
   private val trueButtonPalette  = buttonPalette.copy(clickColor = Some(Theme.light.trueClick))
   private val falseButtonPalette = buttonPalette.copy(clickColor = Some(Theme.light.falseClick))

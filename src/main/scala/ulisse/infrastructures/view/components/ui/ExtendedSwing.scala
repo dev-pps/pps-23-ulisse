@@ -29,9 +29,18 @@ object ExtendedSwing:
 
   case class JPanelItem() extends Panel with ShapeEffect
 
-  case class PicturePanel() extends Panel with ShapeEffect with PictureEffect
+  def createPicturePanel(path: String): PicturePanel =
+    val panel = PicturePanel()
+    panel.picture = path
+    panel
 
-  case class SVGPanel() extends Panel with ShapeEffect with SVGEffect
+  def createSVGPanel(path: String): SVGPanel =
+    val panel = SVGPanel()
+    panel.svgIcon = path
+    panel
+
+  case class PicturePanel() extends Panel with PictureEffect
+  case class SVGPanel()     extends Panel with SVGEffect
 
   case class JButtonItem(label: String) extends Button(label) with ShapeEffect with FontEffect
 

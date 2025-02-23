@@ -21,14 +21,14 @@ class PaletteStyleTest extends AnyFlatSpec with Matchers:
 
   "palette with click" should "change background color" in:
     val clickColor      = Color.blue
-    val newPaletteColor = defaultPalette.withClickColor(clickColor)
+    val newPaletteColor = defaultPalette.withClick(clickColor)
 
     newPaletteColor.background must be(defaultColor)
     newPaletteColor.clickColor must be(Some(clickColor))
 
   "palette with hover" should "change hover color" in:
     val hover           = Color.red
-    val newPaletteColor = defaultPalette.withHoverColor(hover)
+    val newPaletteColor = defaultPalette.withHover(hover)
 
     newPaletteColor.background must be(defaultColor)
     newPaletteColor.hoverColor must be(Some(hover))
