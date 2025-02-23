@@ -2,6 +2,7 @@ package ulisse.entities.station
 
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
+import ulisse.entities.simulation.Environments.TrainAgentsContainer
 import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
@@ -11,7 +12,7 @@ import ulisse.utils.ValidationUtils.validatePositive
 import scala.annotation.targetName
 
 /** Defines a track in a station. */
-trait Platform:
+trait Platform extends TrainAgentsContainer[Platform]:
   // TODO evaluate if is needed a value for length of the platform track
   val platformNumber: Int
   val train: Option[TrainAgent]
@@ -38,4 +39,7 @@ object Platform:
     case InvalidPlatformNumber
 
   private final case class PlatformImpl(platformNumber: Int, train: Option[TrainAgent]) extends Platform:
-    def withTrain(train: Option[TrainAgent]): Platform = copy(train = train)
+    def withTrain(train: Option[TrainAgent]): Platform   = copy(train = train)
+    def putTrain(train: TrainAgent): Option[Platform]    = Some(copy(train = Some(train)))
+    def updateTrain(train: TrainAgent): Option[Platform] = Some(copy(train = Some(train)))
+    def removeTrain(train: TrainAgent): Option[Platform] = Some(copy(train = None))
