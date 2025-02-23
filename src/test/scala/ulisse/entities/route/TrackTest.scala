@@ -107,13 +107,13 @@ class TrackTest extends AnyWordSpec with Matchers:
         ) shouldBe Left(Chain(Track.Errors.DuplicateTrains))
 
     "A track" should:
-      "be filtered" in:
-        Track(train3905, train3906).filterNot(
-          _.name == train3905.name
-        ).trains shouldBe Seq(train3906)
-        Track(train3905, train3906).filterNot(
-          _.name == train3907.name
-        ).trains shouldBe Seq(train3905, train3906)
+//      "be filtered" in:
+//        Track(train3905, train3906).filterNot(
+//          _.name == train3905.name
+//        ).trains shouldBe Seq(train3906)
+//        Track(train3905, train3906).filterNot(
+//          _.name == train3907.name
+//        ).trains shouldBe Seq(train3905, train3906)
 
       "be available" in:
         Track().isAvailable shouldBe true
