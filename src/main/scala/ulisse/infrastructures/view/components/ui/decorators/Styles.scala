@@ -88,9 +88,9 @@ object Styles:
     def withClick(color: Color): Palette           = copy(clickColor = Some(color))
     def withHover(color: Color): Palette           = copy(hoverColor = Some(color))
     def hoverAction(): Unit                        = hoverColor.foreach(currentColor = _)
-    def exitAction(): Unit                         = currentColor = background
     def clickAction(): Unit                        = clickColor.foreach(currentColor = _)
-    def releaseAction(): Unit                      = currentColor = background
+    def exitAction(): Unit                         = hoverColor.foreach(_ => currentColor = background)
+    def releaseAction(): Unit                      = clickColor.foreach(_ => currentColor = background)
 
   /** Create a [[Rect]] to represent a rounded rectangle with the given [[size]], [[padding]], [[arc]] and [[palette]]. */
   case class Rect(size: Size, padding: Padding, arc: Int, palette: Palette = defaultPalette) extends Style:
@@ -128,10 +128,10 @@ object Styles:
 
       /** Initialize the color reactions of the component with the given [[palette]]. */
       def initColorReactions(palette: () => Palette): Reactions.Reaction =
-        case _: event.MouseEntered  => { palette().hoverAction(); component.updateGraphics() }
-        case _: event.MouseExited   => { palette().exitAction(); component.updateGraphics() }
         case _: event.MousePressed  => { palette().clickAction(); component.updateGraphics() }
         case _: event.MouseReleased => { palette().releaseAction(); component.updateGraphics() }
+        case _: event.MouseEntered  => { palette().hoverAction(); component.updateGraphics() }
+        case _: event.MouseExited   => { palette().exitAction(); component.updateGraphics() }
 
       /** Update the shape of the component with the given [[rect]]. */
       def updateRect(rect: Rect): Unit =
