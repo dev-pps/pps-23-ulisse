@@ -6,6 +6,7 @@ import scala.annotation.targetName
 object Times:
   private type Hour   = Int
   private type Minute = Int
+  private type Second = Int
 
   /** Errors that can be returned on ClockTime creation. */
   sealed trait ClockTimeErrors(val time: Time) extends BaseError
@@ -16,23 +17,25 @@ object Times:
   trait Time:
     def h: Hour
     def m: Minute
+    def s: Second
     override def toString: String = s"$h:$m"
 
   object Time:
-    def apply(h: Hour, m: Minute): Time = TimeImpl(h, m)
-    private case class TimeImpl(h: Hour, m: Int) extends Time
+    def apply(h: Hour, m: Minute, s: Second): Time = TimeImpl(h, m, s)
+    private case class TimeImpl(h: Hour, m: Minute, s: Second) extends Time
 
   trait ClockTime extends Time:
     def asTime: Time
 
   object ClockTime:
-    private val maxDayHours   = 23
-    private val minDayHours   = 0
-    private val maxDayMinutes = 59
-    private val minDayMinutes = 0
+    private val maxDayHours        = 23
+    private val minDayHours        = 0
+    private val maxDayMinutes      = 59
+    private val minDayMinutes      = 0
+    private val ignoredSecondValue = 0
 
     def apply(h: Hour, m: Minute): Either[ClockTimeErrors, ClockTime] =
-      val time = Time(h, m)
+      val time = Time(h, m, ignoredSecondValue)
       for
         h <- ValidationUtils.validateRange(h, minDayHours, maxDayHours, InvalidHours(time))
         m <- ValidationUtils.validateRange(m, minDayMinutes, maxDayMinutes, InvalidMinutes(time))
@@ -47,7 +50,7 @@ object Times:
       def defaultTime(currentTime: Time): Time
 
     private object FixedTimeDefault extends DefaultTimeStrategy:
-      override def defaultTime(currentTime: Time): Time = Time(0, 0)
+      override def defaultTime(currentTime: Time): Time = Time(0, 0, ignoredSecondValue)
 
     given predefinedDefaultTime: DefaultTimeStrategy = FixedTimeDefault
 
@@ -61,7 +64,8 @@ object Times:
           case Right(ct) => ct
 
     private case class ClockTimeImpl(h: Hour, m: Minute) extends ClockTime:
-      override def asTime: Time = Time(h, m)
+      override def asTime: Time = Time(h, m, ignoredSecondValue)
+      override def s: Second    = ignoredSecondValue
 
   object FluentDeclaration:
     /** ClockTime builder
