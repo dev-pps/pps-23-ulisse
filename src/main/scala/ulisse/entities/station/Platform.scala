@@ -8,8 +8,11 @@ import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.validatePositive
+import ulisse.utils.OptionUtils.when
 
 import scala.annotation.targetName
+
+trait Platform2 extends Platform
 
 /** Defines a track in a station. */
 trait Platform extends TrainAgentsContainer[Platform]:
@@ -39,7 +42,9 @@ object Platform:
     case InvalidPlatformNumber
 
   private final case class PlatformImpl(platformNumber: Int, train: Option[TrainAgent]) extends Platform:
-    def withTrain(train: Option[TrainAgent]): Platform   = copy(train = train)
-    def putTrain(train: TrainAgent): Option[Platform]    = Some(copy(train = Some(train)))
-    def updateTrain(train: TrainAgent): Option[Platform] = Some(copy(train = Some(train)))
-    def removeTrain(train: TrainAgent): Option[Platform] = Some(copy(train = None))
+    def withTrain(train: Option[TrainAgent]): Platform = copy(train = train)
+    def putTrain(train: TrainAgent): Option[Platform]  = copy(train = Some(train)) when isAvailable
+    def updateTrain(train: TrainAgent): Option[Platform] =
+      copy(train = Some(train)) when this.train.map(_.name).contains(train.name)
+    def removeTrain(train: TrainAgent): Option[Platform] =
+      copy(train = None) when this.train.map(_.name).contains(train.name)
