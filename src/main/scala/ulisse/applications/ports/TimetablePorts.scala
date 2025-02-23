@@ -2,7 +2,7 @@ package ulisse.applications.ports
 
 import ulisse.entities.timetable.Timetables.TrainTimetable
 import ulisse.utils.Errors.ErrorMessage
-import ulisse.utils.Times.ClockTime
+import ulisse.utils.Times.{ClockTime, Time}
 import scala.concurrent.Future
 
 object TimetablePorts:

@@ -67,12 +67,11 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
       routes: List[Route]
   ): Either[BaseError, TrainTimetable] =
     for
-      train            <- trains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
-      stationEntities  <- usrStations.validateStations(routes).toRight(GenericError(s"some route not exists"))
-      startFrom        <- stationEntities.headOption.toRight(GenericError(s"start station not found"))
-      arriveTo         <- stationEntities.lastOption.toRight(GenericError(s"arriving station not found"))
-      partialTimetable <- PartialTimetable(train, startFrom._1.departure, Right(departureTime))
-    yield stationEntities.foldLeft(partialTimetable) {
+      train           <- trains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
+      stationEntities <- usrStations.validateStations(routes).toRight(GenericError(s"some route not exists"))
+      startFrom       <- stationEntities.headOption.toRight(GenericError(s"start station not found"))
+      arriveTo        <- stationEntities.lastOption.toRight(GenericError(s"arriving station not found"))
+    yield stationEntities.foldLeft(PartialTimetable(train, startFrom._1.departure, departureTime)) {
       case (timetable, (route, Some(waitTime))) =>
         timetable.stopsIn(route.arrival, waitTime)(RailInfo(route.length, route.typology))
       case (timetable, (route, None)) => timetable.transitIn(route.arrival)(RailInfo(route.length, route.typology))

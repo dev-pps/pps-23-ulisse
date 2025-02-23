@@ -4,7 +4,7 @@ import ulisse.applications.managers.TimetableManagers.TimetableManagerErrors.{Ac
 import ulisse.entities.timetable.Timetables.TrainTimetable
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist}
-import ulisse.utils.Times.ClockTime
+import ulisse.utils.Times.{===, >=, ClockTime, Time}
 
 object TimetableManagers:
 
