@@ -6,9 +6,9 @@ import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentConfigurations.{ Alignment, ComponentConfiguration, ComponentWithConfiguration }
 import ulisse.infrastructures.view.components.ComponentMixins.UpdatableContainer
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.components.Images.ImagePanel
-import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.components.Selectables.SelectableGroup
+import ulisse.infrastructures.view.components.ui.ExtendedSwing.PicturePanel
+import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.map.{ EditorsView, MapPanel }
 import ulisse.infrastructures.view.menu.Menu
 
@@ -49,7 +49,7 @@ object SideMenu:
 
     private def menuCallback(): Unit =
       menuContent.foreach(_.toggleLabel())
-      header.image.rotation = header.image.rotation + 180
+      header.image.withRotation(header.image.angle + 180)
       revalidate()
       updateSize()
 
@@ -72,15 +72,17 @@ object SideMenu:
 
     private def buildHeader(): JImageCard =
       val headerLeftContent = JImageCard.horizontal(
-        ImagePanel.createImagePanel("icons/logo_circular.png").fixedSize(logo_size, logo_size),
+        PicturePanel(),
+//        ImagePanel.createImagePanel("icons/logo_circular.png").fixedSize(logo_size, logo_size),
         Label("Ulisse").alignLeft()
 //        JStyle.transparent.copy(rect = JStyle.defaultRect.copy(padding = JStyle.createPadding(10, 10)))
       )
       val headerRightContent =
-        ImagePanel.createSVGPanel("icons/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(
-          openCloseButtonSize,
-          openCloseButtonSize
-        ).genericClickReaction(menuCallback)
+        PicturePanel()
+//        ImagePanel.createSVGPanel("icons/keyboard_double_arrow_left.svg", Color.BLACK).fixedSize(
+//          openCloseButtonSize,
+//          openCloseButtonSize
+//        ).genericClickReaction(menuCallback)
 
       JImageCard.horizontalWithConfiguration(
         ComponentWithConfiguration(headerRightContent, ComponentConfiguration(Alignment.Center)),
@@ -89,7 +91,8 @@ object SideMenu:
 
     private def buildMenuCard(imagePath: String, label: String): SelectableJImageCard =
       SelectableJImageCard.horizontal(
-        ImagePanel.createSVGPanel(imagePath, Color.BLACK).fixedSize(menu_item_height, menu_item_height),
+        PicturePanel(),
+//        ImagePanel.createSVGPanel(imagePath, Color.BLACK).fixedSize(menu_item_height, menu_item_height),
         Label(label).alignLeft()
       )
 

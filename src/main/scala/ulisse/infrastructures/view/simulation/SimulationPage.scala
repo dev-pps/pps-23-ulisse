@@ -5,11 +5,11 @@ import ulisse.entities.simulation.Simulations.SimulationData
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.LayeredContainers.JLayeredPane
 
-import scala.swing.{BorderPanel, BoxPanel, Component, Label, Orientation, Swing}
+import scala.swing.{ BorderPanel, BoxPanel, Component, Label, Orientation, Swing }
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.components.Images.ImagePanel
+import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
 
-import java.awt.{BorderLayout, Color}
+import java.awt.{ BorderLayout, Color }
 import scala.concurrent.ExecutionContext
 
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
@@ -43,34 +43,45 @@ object SimulationPage:
 //    )
     var timing                   = 0L
     val notificationLabel: Label = Label("Step: 0")
-    private val startImage: ImagePanel =
-      ImagePanel.createSVGPanel("icons/play.svg", Color.ORANGE).fixedSize(50, 50).genericClickReaction(() =>
-        controller.start().onComplete(_ =>
-          if timing == 0 then timing = System.currentTimeMillis()
-          startImage.visible = false
-          pauseImage.visible = true
-          println("[View]Simulation started")
-        )
-      ) // .styler(pageControlImageButtonStyle)
-    private val pauseImage: ImagePanel =
-      ImagePanel.createSVGPanel("icons/pause.svg", Color.ORANGE).fixedSize(50, 50).visible(false).genericClickReaction(
-        () =>
-          controller.stop().onComplete(_ =>
-            pauseImage.visible = false
-            startImage.visible = true
-            println(s"[View]Simulation stopped${(System.currentTimeMillis() - timing) / 1000.0}")
-          )
-      ) // .styler(pageControlImageButtonStyle)
+
+    private val startImage: SVGPanel =
+      val image = SVGPanel()
+      image.svgIcon = "icons/play.svg"
+      image
+      // TODO: to integrate event click
+//      ImagePanel.createSVGPanel("icons/play.svg", Color.ORANGE).fixedSize(50, 50).genericClickReaction(() =>
+//        controller.start().onComplete(_ =>
+//          if timing == 0 then timing = System.currentTimeMillis()
+//          startImage.visible = false
+//          pauseImage.visible = true
+//          println("[View]Simulation started")
+//        )
+//      ) // .styler(pageControlImageButtonStyle)
+    private val pauseImage: SVGPanel =
+      val image = SVGPanel()
+      image.svgIcon = "icons/pause.svg"
+      image
+//      ImagePanel.createSVGPanel("icons/pause.svg", Color.ORANGE).fixedSize(50, 50).visible(false).genericClickReaction(
+//        () =>
+//          controller.stop().onComplete(_ =>
+//            pauseImage.visible = false
+//            startImage.visible = true
+//            println(s"[View]Simulation stopped${(System.currentTimeMillis() - timing) / 1000.0}")
+//          )
+//      ) // .styler(pageControlImageButtonStyle)
     private val resetImage =
-      ImagePanel.createSVGPanel("icons/reset.svg", Color.ORANGE).fixedSize(50, 50).genericClickReaction(() =>
-        controller.reset().onComplete(_ =>
-          timing = 0
-          startImage.visible = true
-          pauseImage.visible = false
-          notificationLabel.text = "Step: 0"
-          println(s"[View]Simulation reset${(System.currentTimeMillis() - timing) / 1000}")
-        )
-      ) // .styler(pageControlImageButtonStyle)
+      val image = SVGPanel()
+      image.svgIcon = "icons/reset.svg"
+      image
+//      ImagePanel.createSVGPanel("icons/reset.svg", Color.ORANGE).fixedSize(50, 50).genericClickReaction(() =>
+//        controller.reset().onComplete(_ =>
+//          timing = 0
+//          startImage.visible = true
+//          pauseImage.visible = false
+//          notificationLabel.text = "Step: 0"
+//          println(s"[View]Simulation reset${(System.currentTimeMillis() - timing) / 1000}")
+//        )
+//      ) // .styler(pageControlImageButtonStyle)
     background = Theme.light.element
     contents += Swing.VGlue
     contents += notificationLabel.centerHorizontally()
