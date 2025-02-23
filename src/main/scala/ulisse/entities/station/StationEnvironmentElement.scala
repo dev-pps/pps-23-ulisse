@@ -1,7 +1,7 @@
 package ulisse.entities.station
 
 import ulisse.entities.simulation.{Environments, SimulationAgent}
-import ulisse.entities.simulation.Environments.EnvironmentElement
+import ulisse.entities.simulation.Environments.{EnvironmentElement, EnvironmentElementContainer}
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
@@ -32,7 +32,7 @@ object StationEnvironmentElement:
     export station.*
 
     override def putAgent(
-        container: Environments.EnvironmentElementContainer,
+        container: EnvironmentElementContainer[?],
         agent: SimulationAgent
     ): Option[StationEnvironmentElement] =
       (container, agent) match
