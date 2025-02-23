@@ -11,7 +11,11 @@ import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.utils.CollectionUtils.*
 
 object Environments:
-  trait EnvironmentElement
+  trait EnvironmentElement:
+    type TrainContainer
+    def putTrain(trainContainer: TrainContainer, train: TrainAgent): Option[EnvironmentElement]
+    def updateTrain(train: TrainAgent): Option[EnvironmentElement]
+    def removeTrain(train: TrainAgent): Option[EnvironmentElement]
 
   trait RailwayEnvironment:
     def doStep(dt: Int): RailwayEnvironment
@@ -43,20 +47,21 @@ object Environments:
         // that because an agent when enters a station doesn't leave immediately the route and vice versa
         // also for future improvements, an agent when crossing two rails will be in two rails at the same time
         val agentsWithActions = agents.map(a => a -> a.doStep(dt, this))
-        agentsWithActions.foldLeft(this){(env, agentWithAction) => agentWithAction match
-          case (agent: TrainAgent, Some(Actions.MoveBy(d))) =>
-            // Update Idea: startByMovingAgent
-            // If is already on a route,
-            //  could remain completely on the route
-            //  or enter the station
-            //  or completely leave the route
-            // If is already on a station,
-            //  could remain completely on the station
-            //      (for now is not possible since station doesn't take into account rail platform track length)
-            //  or enter the route
-            //  or completely leave the station
-            env.updateEnvironmentWith(agent.updateDistanceTravelled(d))
-          case _ => this
+        agentsWithActions.foldLeft(this) { (env, agentWithAction) =>
+          agentWithAction match
+            case (agent: TrainAgent, Some(Actions.MoveBy(d))) =>
+              // Update Idea: startByMovingAgent
+              // If is already on a route,
+              //  could remain completely on the route
+              //  or enter the station
+              //  or completely leave the route
+              // If is already on a station,
+              //  could remain completely on the station
+              //      (for now is not possible since station doesn't take into account rail platform track length)
+              //  or enter the route
+              //  or completely leave the station
+              env.updateEnvironmentWith(agent.updateDistanceTravelled(d))
+            case _ => this
         }
 
       private def updateEnvironmentWith(agent: TrainAgent): SimulationEnvironmentImpl =
@@ -68,24 +73,34 @@ object Environments:
 
       private def routeUpdateFunction(route: RouteEnvironmentElement, agent: TrainAgent): SimulationEnvironmentImpl =
         agent.distanceTravelled match
-          case d if d >= route.length + agent.length => route.removeTrain(agent) match
-            case Some(ree) => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree))
-            case _ => this
-          case d if d >= route.length => (stations.find(_.name == route.arrival.name).flatMap(destination => agent.arriveAt(destination)), route.updateTrain(agent)) match
-            case (Some(see), Some(ree)) => copy(stations.updateWhen(_.name == see.name)(_ => see), routes.updateWhen(_.id == ree.id)(_ => ree))
-            case _ => this
+          case d if d >= route.length + agent.length =>
+            route.removeTrain(agent) match
+              case Some(ree) => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree))
+              case _         => this
+          case d if d >= route.length =>
+            (
+              stations.find(_.name == route.arrival.name).flatMap(destination => agent.arriveAt(destination)),
+              route.updateTrain(agent)
+            ) match
+              case (Some(see), Some(ree)) =>
+                copy(stations.updateWhen(_.name == see.name)(_ => see), routes.updateWhen(_.id == ree.id)(_ => ree))
+              case _ => this
           case _ => route.updateTrain(agent) match
-            case Some(ree) => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree))
-            case _ => this
+              case Some(ree) => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree))
+              case _         => this
 
-      private def stationUpdateFunction(station: StationEnvironmentElement, agent: TrainAgent): SimulationEnvironmentImpl =
+      private def stationUpdateFunction(
+          station: StationEnvironmentElement,
+          agent: TrainAgent
+      ): SimulationEnvironmentImpl =
         agent.distanceTravelled match
-          case d if d >= agent.length => station.removeTrain(agent) match
-            case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
-            case _ => this
+          case d if d >= agent.length =>
+            station.removeTrain(agent) match
+              case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
+              case _         => this
           case _ => station.updateTrain(agent) match
-            case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
-            case _ => this
+              case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
+              case _         => this
 
       def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment =
         copy(stations = newStations)
