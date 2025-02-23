@@ -2,7 +2,6 @@ package ulisse.entities.route
 
 import cats.data.{NonEmptyChain, ValidatedNec}
 import cats.syntax.all.*
-import ulisse.entities.simulation.Environments.EnvironmentElementContainer
 import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
@@ -10,7 +9,8 @@ import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateRange, validateUniqueItems}
 
 import scala.annotation.targetName
-trait Track extends EnvironmentElementContainer[Track]:
+trait Track:
+  // TODO evaluate if is needed an numberid
   val trains: Seq[TrainAgent]
   def minPermittedDistanceBetweenTrains: Double
   def isAvailable: Boolean = trains.forall(t => t.distanceTravelled - t.length >= minPermittedDistanceBetweenTrains)
@@ -52,20 +52,6 @@ object Track:
         : Either[NonEmptyChain[Track.Errors], Track] =
       Track.createCheckedTrack(trains.updateWhen(p)(f)*)
     override def filterNot(p: TrainAgent => Boolean): Track = copy(trains = trains.filterNot(p))
-
-    override def putAgent(agent: SimulationAgent): Option[Track] = agent match
-      case train: TrainAgent => :+(train).toOption
-      case _                 => None
-
-    override def updateAgent(agent: SimulationAgent): Option[Track] = agent match
-      case train: TrainAgent =>
-        updateWhen(_.name == train.name)(_ => train).toOption
-      case _ => None
-
-    override def removeAgent(agent: SimulationAgent): Option[Track] = agent match
-      case train: TrainAgent =>
-        filterNot(_.name == train.name).some
-      case _ => None
 
   enum Errors extends BaseError:
     case DuplicateTrains, TrainAlreadyMoved
