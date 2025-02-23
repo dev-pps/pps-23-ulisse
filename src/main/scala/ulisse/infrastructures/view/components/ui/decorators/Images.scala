@@ -8,9 +8,10 @@ import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 
 object Images:
+  val defaultAngle: Int = 0
 
-  val defaultPicture: Picture = new Picture("")
-  val defaultSVGIcon: SVGIcon = new SVGIcon("", Styles.defaultPalette)
+  val defaultPicture: Picture = new Picture("", defaultAngle)
+  val defaultSVGIcon: SVGIcon = new SVGIcon("", defaultAngle, Styles.defaultPalette)
 
   /** Represent a generic image. */
   trait Image:
@@ -24,20 +25,27 @@ object Images:
 
     def withPath(newPath: String): SourceImage = copy(path = newPath)
 
-  /** Represent a generic image with a [[SourceImage]]. */
-  case class Picture(source: SourceImage) extends Image:
-    def this(path: String) = this(SourceImage(path))
-    export source.bufferImage
+  /** Represent a rotation with [[angle]]. */
+  case class Rotation(angle: Int):
+    def toRadians: Double                  = math.toRadians(angle)
+    def withAngle(newAngle: Int): Rotation = copy(angle = newAngle)
 
-    def withPath(path: String): Picture = copy(source = source.withPath(path))
+  /** Represent a generic image with a [[SourceImage]]. */
+  case class Picture(source: SourceImage, rotation: Rotation) extends Image:
+    def this(path: String, angle: Int) = this(SourceImage(path), Rotation(angle))
+    export source.bufferImage, rotation.toRadians
+
+    def withPath(path: String): Picture   = copy(source = source.withPath(path))
+    def withRotation(angle: Int): Picture = copy(rotation = Rotation(angle))
 
   /** Represent an SVG image with [[SourceImage]] and [[Palette]]. */
-  case class SVGIcon(source: SourceImage, palette: Palette) extends Image:
-    def this(path: String, palette: Palette) = this(SourceImage(path), palette)
+  case class SVGIcon(source: SourceImage, rotation: Rotation, palette: Palette) extends Image:
+    def this(path: String, angle: Int, palette: Palette) = this(SourceImage(path), Rotation(angle), palette)
     val icon: Option[FlatSVGIcon] = source.bufferImage.map(_ => new FlatSVGIcon(source.path))
 
-    export source.bufferImage
+    export source.bufferImage, rotation.toRadians
     icon.foreach(_.setColorFilter(ColorFilter(_ => palette.currentColor)))
 
     def withPath(path: String): SVGIcon           = copy(source = source.withPath(path))
+    def withRotation(angle: Int): SVGIcon         = copy(rotation = Rotation(angle))
     def withPalette(newPalette: Palette): SVGIcon = copy(palette = newPalette)
