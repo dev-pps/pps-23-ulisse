@@ -9,9 +9,11 @@ import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.when
 
 trait StationEnvironmentElement extends Station with EnvironmentElement:
-  val platforms: List[Platform]
-  def firstAvailablePlatform: Option[Platform] = platforms.find(_.train.isEmpty)
+  override type TrainContainer = Platform
+  val platforms: List[TrainContainer]
+  def firstAvailablePlatform: Option[TrainContainer] = platforms.find(_.train.isEmpty)
   def updatePlatform(platform: Platform, train: Option[TrainAgent]): Option[StationEnvironmentElement]
+  def putTrain(trainContainer: TrainContainer, train: TrainAgent): Option[StationEnvironmentElement]
   def updateTrain(train: TrainAgent): Option[StationEnvironmentElement]
   def removeTrain(train: TrainAgent): Option[StationEnvironmentElement]
 
@@ -39,8 +41,9 @@ object StationEnvironmentElement:
         train.isDefined && _.train == train
       )
 
+    def putTrain(trainContainer: TrainContainer, train: TrainAgent): Option[StationEnvironmentElement] =
+      platforms.find(_ == trainContainer).flatMap(updatePlatform(_, Some(train)))
     def updateTrain(train: TrainAgent): Option[StationEnvironmentElement] =
       platforms.find(_.train.contains(train)).flatMap(updatePlatform(_, Some(train)))
-
     def removeTrain(train: TrainAgent): Option[StationEnvironmentElement] =
       platforms.find(_.train.contains(train)).flatMap(updatePlatform(_, None))
