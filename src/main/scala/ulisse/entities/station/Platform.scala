@@ -19,7 +19,7 @@ trait Platform extends TrainAgentsContainer[Platform]:
   // TODO evaluate if is needed a value for length of the platform track
   val platformNumber: Int
   val train: Option[TrainAgent]
-  def isAvailable: Boolean = train.isEmpty
+  override def isAvailable: Boolean = train.isEmpty
 
 /** Factory for [[Platform]] instances. */
 object Platform:
@@ -36,15 +36,18 @@ object Platform:
     val step: Int => Int = _ + 1
     List.tabulate(numberOfTracks)(i => PlatformImpl(step(i), None))
 
+  extension (train: TrainAgent)
+    def existInPlatform(platform: Platform): Boolean = platform.train.exists(train.matchId)
+
   /** Represents errors that can occur during `Track` creation. */
   enum Errors extends BaseError:
     case InvalidPlatformNumber
 
   private final case class PlatformImpl(platformNumber: Int, train: Option[TrainAgent]) extends Platform:
     // TODO evaluate if could be nice to introduce a control to check if the train is entering the station or is already moved
-    def putTrain(train: TrainAgent): Option[Platform] =
+    override def putTrain(train: TrainAgent): Option[Platform] =
       copy(train = Some(train)) when isAvailable
-    def updateTrain(train: TrainAgent): Option[Platform] =
-      copy(train = Some(train)) when this.train.map(_.name).contains(train.name)
-    def removeTrain(train: TrainAgent): Option[Platform] =
-      copy(train = None) when this.train.map(_.name).contains(train.name)
+    override def updateTrain(train: TrainAgent): Option[Platform] =
+      copy(train = Some(train)) when (train existInPlatform this)
+    override def removeTrain(train: TrainAgent): Option[Platform] =
+      copy(train = None) when (train existInPlatform this)
