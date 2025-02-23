@@ -11,13 +11,10 @@ import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
 
-trait RouteEnvironmentElement extends Route with EnvironmentElement:
+trait RouteEnvironmentElement extends Route with EnvironmentElement[RouteEnvironmentElement]:
   override type TrainContainer = Track
   val tracks: Seq[TrainContainer]
   def firstAvailableTrack: Option[TrainContainer] = tracks.find(_.isAvailable)
-  def putTrain(track: TrainContainer, train: TrainAgent): Option[RouteEnvironmentElement]
-  def updateTrain(train: TrainAgent): Option[RouteEnvironmentElement]
-  def removeTrain(train: TrainAgent): Option[RouteEnvironmentElement]
 
 object RouteEnvironmentElement:
 
