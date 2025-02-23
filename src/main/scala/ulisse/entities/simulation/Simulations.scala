@@ -1,6 +1,5 @@
 package ulisse.entities.simulation
 
-import cats.{Functor, Monad}
 import ulisse.entities.simulation.Environments.RailwayEnvironment
 
 object Simulations:
