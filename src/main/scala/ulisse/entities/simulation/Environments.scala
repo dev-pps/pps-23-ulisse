@@ -4,13 +4,35 @@ import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.simulation.Simulations.Actions
-import ulisse.entities.station.StationEnvironmentElement
+import ulisse.entities.station.{Platform, Station, StationEnvironmentElement}
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.station.StationEnvironmentElement.*
 import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.utils.CollectionUtils.*
 
 object Environments:
+  trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
+    self: TAC =>
+    def putTrain(train: TrainAgent): Option[TAC]
+    def updateTrain(train: TrainAgent): Option[TAC]
+    def removeTrain(train: TrainAgent): Option[TAC]
+
+  trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE, TAC], TAC <: TrainAgentsContainer[TAC]]:
+    self: EE =>
+    def putTrain(container: TAC, train: TrainAgent): Option[EE]
+    def updateTrain(train: TrainAgent): Option[EE]
+    def removeTrain(train: TrainAgent): Option[EE]
+
+  trait StationEnvironmentElement2 extends Station with TrainAgentEEWrapper[StationEnvironmentElement2, Platform]:
+    def platforms: List[Platform]
+
+  case class StationEnvironmentElementImpl2(platforms: List[Platform], station: Station)
+      extends StationEnvironmentElement2:
+    export station.*
+    def putTrain(container: Platform, train: TrainAgent): Option[StationEnvironmentElement2] = Some(this)
+    def updateTrain(train: TrainAgent): Option[StationEnvironmentElement2]                   = Some(this)
+    def removeTrain(train: TrainAgent): Option[StationEnvironmentElement2]                   = Some(this)
+
   trait EnvironmentElement[EE <: EnvironmentElement[EE]]:
     self: EE =>
     type TrainContainer
