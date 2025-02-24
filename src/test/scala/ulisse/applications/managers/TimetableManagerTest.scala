@@ -77,7 +77,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
 
       Given("Timetable manager with some train's timetable saved")
       When("I save new train timetable that Not overlaps")
-      h(10).m(35) in: departureTime =>
+      h(12).m(35) in: departureTime =>
         val newValidTimetable =
           TimetableBuilder(trainRV_3905, startStation = stationA, departureTime)
             .transitIn(stationB)(railAV_10)
@@ -85,10 +85,9 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
 
         Then("Should be returned ah updated manager with new timetable")
         val result = managerWithSimpleTimetable.save(newValidTimetable)
-        result should be(Right(TimetableManagers.TimetableManager(List(
-          timetableABC,
-          newValidTimetable
-        ))))
+        result match
+          case Left(e)  => fail(s"save new timetable failed: $e")
+          case Right(m) => m.tables should be(Seq(timetableABC, newValidTimetable))
 
   Feature("Users can retrieve timetables saved"):
     val timetableManager = TimetableManagers.TimetableManager(List(timetableAB, timetableBC, timetableABC))
@@ -106,7 +105,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
       val timetableSavedResult = timetableManager.tables
       Then("Should returned 3 timetables")
       timetableSavedResult.size should be(3)
-      timetableSavedResult.map(_.departureTime.asTime) should be(Seq(Time(12, 0, 0), Time(20, 30, 0), Time(9, 0, 0)))
+      timetableSavedResult.map(_.departureTime.asTime) should be(Seq(Time(20, 30, 0), Time(12, 0, 0), Time(9, 0, 0)))
 
     Scenario("Request all timetables filtered by departure station"):
       Given("A timetable manager with some timetables saved")
