@@ -10,7 +10,7 @@ import javax.imageio.ImageIO
 object Images:
   val defaultAngle: Int = 0
 
-  val defaultPicture: Picture = new Picture("", defaultAngle)
+  val defaultPicture: Picture = new Picture("", defaultAngle, Styles.defaultRoundRect)
   val defaultSVGIcon: SVGIcon = new SVGIcon("", defaultAngle, Styles.defaultPalette)
 
   /** Represent a generic image. */
@@ -32,12 +32,13 @@ object Images:
     def withAngle(newAngle: Int): Rotation = copy(angle = newAngle)
 
   /** Represent a generic image with a [[SourceImage]]. */
-  case class Picture(source: SourceImage, rotation: Rotation) extends Image:
-    def this(path: String, angle: Int) = this(SourceImage(path), Rotation(angle))
+  case class Picture(source: SourceImage, rotation: Rotation, arc: Int) extends Image:
+    def this(path: String, angle: Int, arc: Int) = this(SourceImage(path), Rotation(angle), arc)
     export source.bufferImage, rotation.toRadians
 
     def withPath(path: String): Picture   = copy(source = source.withPath(path))
     def withRotation(angle: Int): Picture = copy(rotation = Rotation(angle))
+    def withArc(arc: Int): Picture        = copy(arc = arc)
 
   /** Represent an SVG image with [[SourceImage]] and [[Palette]]. */
   case class SVGIcon(source: SourceImage, rotation: Rotation, palette: Palette) extends Image:
