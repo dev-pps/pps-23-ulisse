@@ -1,23 +1,27 @@
 package ulisse.infrastructures.view.components.ui
 
 import ulisse.infrastructures.view.components.ui.decorators.ImageEffects.{PictureEffect, SVGEffect}
+import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.{FontEffect, ShapeEffect}
 
-import java.awt.{BorderLayout, FlowLayout}
-import javax.swing.{BoxLayout, JLayeredPane}
+import java.awt.FlowLayout
+import javax.swing.JLayeredPane
 import scala.swing.*
 
 object ExtendedSwing:
 
-  case class LayeredPanel() extends BorderPanel with ShapeEffect:
-    private val layeredPane = new JLayeredPane()
-    layeredPane.setLayout(new BorderLayout())
+  case class LayeredPanel private (private val layeredPane: JLayeredPane) extends BorderPanel with ShapeEffect:
+    def this() = this(JLayeredPane())
+    rectPalette = Styles.transparentPalette
     layout(Component.wrap(layeredPane)) = BorderPanel.Position.Center
 
     def add(component: Component): Unit =
       layeredPane.add(component.peer)
       revalidate()
-      repaint()
+
+    override def revalidate(): Unit =
+      layeredPane.getComponents.foreach(_.setBounds(0, 0, layeredPane.getWidth, layeredPane.getHeight))
+      super.revalidate()
 
   case class JBorderPanelItem() extends BorderPanel with ShapeEffect
 

@@ -1,16 +1,12 @@
 package ulisse.infrastructures.view.menu
 
-import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentMixins.UpdatableContainer
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ui.ExtendedSwing.PicturePanel
-import ulisse.infrastructures.view.components.ui.composed.ComposedSwing
-import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.dashboard.Dashboard
 import ulisse.infrastructures.view.simulation.SimulationPage.SimulationPageControlPanel
 
-import java.awt.Color
 import scala.swing.*
 
 final case class Menu(root: UpdatableContainer) extends BorderPanel:

@@ -2,6 +2,7 @@ package ulisse.infrastructures.view.components.ui.decorators
 
 import ulisse.infrastructures.view.components.ui.decorators.Styles.EnhancedLookExtension.*
 
+import java.awt.geom.RoundRectangle2D
 import java.awt.{BasicStroke, RenderingHints}
 import scala.swing.{Component, Graphics2D, Publisher}
 
@@ -15,7 +16,7 @@ object SwingEnhancements:
 
     /** Update the graphic component. */
     def updateGraphics(): Unit =
-      revalidate()
+//      revalidate()
       repaint()
 
     /** Paint the custom appearance of the component. */
@@ -49,6 +50,9 @@ object SwingEnhancements:
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)
       g.setColor(rect.currentColor)
+      val clipShape =
+        new RoundRectangle2D.Float(0, 0, size.width.toFloat, size.height.toFloat, rect.arc.toFloat, rect.arc.toFloat)
+      g.setClip(clipShape)
       g.fillRoundRect(0, 0, size.width, size.height, rect.arc, rect.arc)
 
   /** Trait to enhance the font of swing component and [[_font]] control font params. */

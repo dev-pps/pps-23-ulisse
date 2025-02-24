@@ -4,9 +4,12 @@ import ulisse.applications.ports.RoutePorts.Input
 import ulisse.infrastructures.view.common.CentralController
 import ulisse.infrastructures.view.components.ComponentUtils.*
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
-import ulisse.infrastructures.view.components.ui.composed.{ComposedImage, ComposedSwing}
+import ulisse.infrastructures.view.components.ui.composed.ComposedImage
+import ulisse.infrastructures.view.components.ui.composed.ComposedImage.Direction
+import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.map.MapPanel
 
+import javax.swing.JLayeredPane
 import scala.swing.*
 import scala.swing.BorderPanel.Position.*
 
@@ -20,14 +23,16 @@ object GUIView:
     visible = true
     preferredSize = new Dimension(1000, 1000)
 
-    private val mainLayeredPane = ExtendedSwing.LayeredPanel()
-    private val pageLayeredPane = ExtendedSwing.LayeredPanel()
+    private val mainLayeredPane = new ExtendedSwing.LayeredPanel()
+    private val pageLayeredPane = new ExtendedSwing.LayeredPanel()
 
     /** Menu panel, contains primary actions (new, import, ...). */
     private val menuPanel = ExtendedSwing.JBorderPanelItem()
+    menuPanel.rectPalette = Styles.transparentPalette
 
     /** Dashboard panel, contains simulation, map, ... */
     private val dashboardPanel = ExtendedSwing.JBorderPanelItem()
+    dashboardPanel.rectPalette = Styles.transparentPalette
 
     /** Map controller, contains map and route form. */
     private val mapController = CentralController.createMap()
@@ -35,20 +40,21 @@ object GUIView:
     /** Map panel, contains elements graphic. */
     private val mapPanel = MapPanel.empty()
 
-    pageLayeredPane.add(mapPanel)
-    pageLayeredPane.add(mapController.component)
+//    pageLayeredPane.add(mapPanel, JLayeredPane.DEFAULT_LAYER)
+//    pageLayeredPane.add(mapController.component, JLayeredPane.DEFAULT_LAYER)
 
-    mainLayeredPane.add(pageLayeredPane)
+//    mainLayeredPane.add(pageLayeredPane, JLayeredPane.DEFAULT_LAYER)
     mainLayeredPane.add(dashboardPanel)
-//    mainLayeredPane.add(menuPanel)
+    mainLayeredPane.add(menuPanel)
 
     mapPanel.attach(mapController.stationForm.mapObserver)
     mapPanel.attachItem(mapController.routeForm.mapObserver)
 
     // Menu panel
-    private val newIcon  = ComposedImage.createIconLabel("icons/add.svg", "new")
-    private val boxPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
-    private val panel    = ExtendedSwing.JFlowPanelItem()
+    given directionMenu: Direction = Direction.Vertical
+    private val newIcon            = ComposedImage.createIconLabel("icons/add.svg", "new")
+    private val boxPanel           = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
+    private val panel              = ExtendedSwing.JFlowPanelItem()
     panel.contents += newIcon.component
     boxPanel.contents += Swing.VGlue
     boxPanel.contents += panel
@@ -78,4 +84,7 @@ object GUIView:
     dashboardPanel.layout(borderPanel) = West
     // ---------------
 
+//    dashboardPanel.visible = false
+//    dashboardPanel.revalidate()
     contents = mainLayeredPane
+    mainLayeredPane.revalidate()
