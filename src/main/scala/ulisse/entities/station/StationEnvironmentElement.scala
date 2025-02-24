@@ -10,6 +10,8 @@ trait StationEnvironmentElement extends Station with TrainAgentEEWrapper:
   def firstAvailablePlatform: Option[TrainAgentsContainer] = containers.find(_.isAvailable)
   override def contains(train: TrainAgent): Boolean        = containers.exists(_.contains(train))
 
+  override def putTrain(container: TrainAgentsContainer, train: TrainAgent): Option[StationEnvironmentElement]
+
 object StationEnvironmentElement:
   def apply(station: Station): StationEnvironmentElement =
     StationEnvironmentElementImpl(station, Platform.generateSequentialPlatforms(station.numberOfTracks))
@@ -23,17 +25,17 @@ object StationEnvironmentElement:
     export station.*
 
     override def containersIDs: Seq[Int] = containers.map(_.id)
-    def putTrain(trainContainer: TrainAgentsContainer, train: TrainAgent): Option[StationEnvironmentElement] =
+    override def putTrain(trainContainer: TrainAgentsContainer, train: TrainAgent): Option[StationEnvironmentElement] =
       containers.find(_ == trainContainer)
         .flatMap(_.putTrain(train))
         .map(updatedPlatform =>
           copy(containers = containers.updateWhen(_ == trainContainer)(_ => updatedPlatform))
         ) when !contains(train)
-    def updateTrain(train: TrainAgent): Option[StationEnvironmentElement] =
+    override def updateTrain(train: TrainAgent): Option[StationEnvironmentElement] =
       containers.updateWhenWithEffects(_.contains(train))(_.updateTrain(train)).map(pfs =>
         copy(containers = pfs)
       ) when contains(train)
-    def removeTrain(train: TrainAgent): Option[StationEnvironmentElement] =
+    override def removeTrain(train: TrainAgent): Option[StationEnvironmentElement] =
       containers.updateWhenWithEffects(_.contains(train))(_.removeTrain(train)).map(pfs =>
         copy(containers = pfs)
       ) when contains(train)
