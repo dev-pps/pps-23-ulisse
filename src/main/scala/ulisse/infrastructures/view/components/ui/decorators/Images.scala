@@ -16,6 +16,7 @@ object Images:
   /** Represent a generic image. */
   trait Image:
     val source: SourceImage
+    val rotation: Rotation
 
   /** Represent a source image with [[path]]. */
   case class SourceImage(path: String):

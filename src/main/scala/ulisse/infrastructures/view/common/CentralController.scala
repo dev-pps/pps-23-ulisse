@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.common
 
-import ulisse.infrastructures.view.components.ui.ComposedSwing
+import ulisse.infrastructures.view.components.ui.composed.{ComposedImage, ComposedSwing}
+
 import scala.swing.Component
 
 trait CentralController:
@@ -12,19 +13,19 @@ trait CentralController:
 object CentralController:
   def createMap(): MapController = MapController()
 
-  private case class BaseCentralController(iconLabels: ComposedSwing.JIconLabel*)(forms: Form*):
-    private val page: Map[ComposedSwing.JIconLabel, Form] = iconLabels.zip(forms).toMap
-    private val tabbedPane: ComposedSwing.JTabbedPane     = ComposedSwing.createTabbedPane(iconLabels: _*)
+  private case class BaseCentralController(iconLabels: ComposedImage.SVGIconLabel*)(forms: Form*):
+    private val page: Map[ComposedImage.SVGIconLabel, Form] = iconLabels.zip(forms).toMap
+    private val tabbedPane: ComposedSwing.JTabbedPane       = ComposedSwing.createTabbedPane(iconLabels: _*)
 
     page.foreach(tabbedPane.paneOf(_).contents += _.component)
 
-    def pageOf(label: ComposedSwing.JIconLabel): Form = page(label)
-    def component[T >: Component]: T                  = tabbedPane.component
+    def pageOf(label: ComposedImage.SVGIconLabel): Form = page(label)
+    def component[T >: Component]: T                    = tabbedPane.component
 
   case class MapController() extends CentralController:
-    private val station: ComposedSwing.JIconLabel  = ComposedSwing.createIconLabel("icons/station.svg", "station")
-    private val route: ComposedSwing.JIconLabel    = ComposedSwing.createIconLabel("icons/route.svg", "route")
-    private val schedule: ComposedSwing.JIconLabel = ComposedSwing.createIconLabel("icons/train.svg", "schedule")
+    private val station  = ComposedImage.createIconLabel("icons/station.svg", "station")
+    private val route    = ComposedImage.createIconLabel("icons/route.svg", "route")
+    private val schedule = ComposedImage.createIconLabel("icons/train.svg", "schedule")
 
     private val menu: BaseCentralController =
       BaseCentralController(station, route, schedule)(Form.createStation(), Form.createRoute(), Form.createSchedule())

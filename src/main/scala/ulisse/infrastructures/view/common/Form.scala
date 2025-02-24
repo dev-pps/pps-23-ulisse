@@ -2,7 +2,8 @@ package ulisse.infrastructures.view.common
 
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ui.decorators.Styles
-import ulisse.infrastructures.view.components.ui.{ComposedSwing, ExtendedSwing}
+import ulisse.infrastructures.view.components.ui.ExtendedSwing
+import ulisse.infrastructures.view.components.ui.composed.ComposedSwing
 import ulisse.infrastructures.view.map.ViewObservers.ViewObserver
 
 import scala.swing.Font.Style

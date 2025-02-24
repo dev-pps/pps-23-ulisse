@@ -1,22 +1,23 @@
-package ulisse.infrastructures.view.components.ui
+package ulisse.infrastructures.view.components.ui.composed
 
 import ulisse.infrastructures.view.common.Themes.*
+import ulisse.infrastructures.view.components.ui.ExtendedSwing
 import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
+import ulisse.infrastructures.view.components.ui.composed.ComposedImage.SVGIconLabel
+import ulisse.infrastructures.view.components.ui.decorators.ImageEffects.ImageEffect
 import ulisse.infrastructures.view.components.ui.decorators.Styles
 
 import java.awt
 import java.awt.Dimension
 import scala.swing.*
-import scala.swing.MenuBar.NoMenuBar.mouse
 
 trait ComposedSwing:
   def component[T >: Component]: T
 
 object ComposedSwing:
-  def createInfoTextField(text: String): JInfoTextField           = JInfoTextField(text)
-  def createIconLabel(iconPath: String, text: String): JIconLabel = JIconLabel(iconPath, text)
-  def createNavbar(JIconLabel: JIconLabel*): JNavBar              = JNavBar(JIconLabel: _*)
-  def createTabbedPane(JIconLabel: JIconLabel*): JTabbedPane      = JTabbedPane(JIconLabel: _*)
+  def createInfoTextField(text: String): JInfoTextField        = JInfoTextField(text)
+  def createNavbar(JIconLabel: SVGIconLabel*): JNavBar         = JNavBar(JIconLabel: _*)
+  def createTabbedPane(JIconLabel: SVGIconLabel*): JTabbedPane = JTabbedPane(JIconLabel: _*)
 
   def createInsertForm(title: String, JInfoTextField: JInfoTextField*): JInsertForm =
     JInsertForm(title, JInfoTextField: _*)
@@ -44,53 +45,7 @@ object ComposedSwing:
     export textField.text_=
     override def component[T >: Component]: T = mainPanel
 
-  case class JIconLabel(iconPath: String, text: String) extends ComposedSwing:
-    private val width  = 100
-    private val height = 40
-
-    private val rectClosePalette = Styles.createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
-    private val rectOpenPalette  = rectClosePalette.withBackground(Theme.light.background.withAlpha(50))
-
-    private val iconClosePalette =
-      Styles.createPalette(Theme.light.background, Theme.light.background, Theme.light.background)
-    private val iconOpenPalette = iconClosePalette.withBackground(Theme.light.overlay)
-
-    private val mainPanel  = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
-    private val labelPanel = ExtendedSwing.JFlowPanelItem()
-    private val icon       = ExtendedSwing.createSVGPanel(iconPath)
-    private val label      = ExtendedSwing.JLabelItem(text)
-
-    icon.preferredSize = Dimension(height, height)
-    label.preferredSize = Dimension(width, height)
-
-    icon.svgIconPalette = iconOpenPalette
-    mainPanel.rectPalette = rectOpenPalette
-    label.rectPalette = Styles.transparentPalette
-    labelPanel.rectPalette = Styles.transparentPalette
-
-    labelPanel.contents += label
-    mainPanel.contents += icon
-    mainPanel.contents += labelPanel
-
-    icon.listenTo(labelPanel.mouseEvents ++ mainPanel.mouseEvents ++ label.mouseEvents: _*)
-    mainPanel.listenTo(labelPanel.mouseEvents ++ label.mouseEvents ++ icon.mouseEvents: _*)
-    mainPanel.reactions += {
-      case _: event.MousePressed => if (label.visible) showIcon() else showIconAndText()
-    }
-
-    def showIconAndText(): Unit =
-      label.visible = true
-      icon.svgIconPalette = iconOpenPalette
-      mainPanel.rectPalette = rectOpenPalette
-
-    def showIcon(): Unit =
-      label.visible = false
-      icon.svgIconPalette = iconClosePalette
-      mainPanel.rectPalette = rectClosePalette
-
-    override def component[T >: Component]: T = mainPanel
-
-  case class JNavBar(iconLabels: JIconLabel*) extends ComposedSwing:
+  case class JNavBar(iconLabels: SVGIconLabel*) extends ComposedSwing:
     private val padding = Styles.createPadding(40, 20)
 
     private val mainPanel = ExtendedSwing.JFlowPanelItem()
@@ -111,7 +66,7 @@ object ComposedSwing:
     private def closeAll(): Unit              = iconLabels.foreach(_.showIcon())
     override def component[T >: Component]: T = mainPanel
 
-  case class JTabbedPane(iconLabels: JIconLabel*) extends ComposedSwing:
+  case class JTabbedPane(iconLabels: SVGIconLabel*) extends ComposedSwing:
     private val mainPanel  = ExtendedSwing.JBorderPanelItem()
     private val pagesPanel = ExtendedSwing.JFlowPanelItem()
 
@@ -134,8 +89,8 @@ object ComposedSwing:
 
     iconLabels.headOption.foreach(iconLabel => paneOf(iconLabel).visible = true)
 
-    def paneOf(label: JIconLabel): ExtendedSwing.JFlowPanelItem = pages(label)
-    override def component[T >: Component]: T                   = mainPanel
+    def paneOf(label: SVGIconLabel): ExtendedSwing.JFlowPanelItem = pages(label)
+    override def component[T >: Component]: T                     = mainPanel
 
   case class JInsertForm(title: String, infoTextField: JInfoTextField*) extends ComposedSwing:
     private val mainPanel = ExtendedSwing.JBorderPanelItem()
