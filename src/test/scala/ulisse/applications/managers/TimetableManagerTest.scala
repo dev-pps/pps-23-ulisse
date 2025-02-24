@@ -27,23 +27,40 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
   private val railAV_10     = RailInfo(length = 10, typeRoute = AV)
   private val departTime9_0 = h(9).m(0).getOrDefault
 
-  val timetableTest: Timetable =
+  val timetableABC: Timetable =
     TimetableBuilder(trainRV_3905, startStation = stationA, departTime9_0)
       .transitIn(stationB)(railAV_10)
       .arrivesTo(stationC)(railAV_10)
+  val timetableAB: Timetable = TimetableBuilder(trainRV_3905, startStation = stationA, h(12).m(0).getOrDefault)
+    .arrivesTo(stationB)(railAV_10)
+  val timetableBC: Timetable = TimetableBuilder(trainRV_3905, startStation = stationB, h(20).m(30).getOrDefault)
+    .arrivesTo(stationC)(railAV_10)
+
+  Feature("User can init manager giving timetables. Timetables are validated."):
+    Scenario("Init manager with a list of timetable"):
+      Given("List of timetables for the same train, with one overlapped timetable")
+      val overlappedTime = timetableAB.departureTime ++ h(0).m(2)
+      val overlappedTable =
+        TimetableBuilder(trainRV_3905, stationA, overlappedTime.getOrDefault).arrivesTo(stationB)(railAV_10)
+      val timetablesInit = List(timetableAB, overlappedTable)
+      When("New TimetableManager is initialized with the list of timetables")
+      val manager = TimetableManagers.TimetableManager(timetablesInit)
+      Then("TimetableManager should contains timetables without the overlapped on")
+      val actualSavedShort = manager.tables.map(t => (t.startStation.name, t.departureTime.asTime))
+      actualSavedShort should be(List((stationA.name, Time(12, 0, 0))))
 
   Feature("Users can save train timetables"):
     Scenario("Save new train timetable"):
-      val managerWithSimpleTimetable = TimetableManagers.TimetableManager(List(timetableTest))
+      val managerWithSimpleTimetable = TimetableManagers.TimetableManager(List(timetableABC))
 
       Given("a Timetable and a new brand TimetableManager")
       val emptyManager = TimetableManagers.emptyManager()
       When("I request to save timetable built on a sequence of connected stations (exist route between station)")
       Then("timetable should be saved")
-      val res = emptyManager.save(timetableTest)
+      val res = emptyManager.save(timetableABC)
       res match
         case Left(e)  => fail(s"Error in saving timetable: $e")
-        case Right(m) => m.tablesOf(trainName = trainRV_3905.name) should be(Right(List(timetableTest)))
+        case Right(m) => m.tablesOf(trainName = trainRV_3905.name) should be(Right(List(timetableABC)))
 
       Given("Timetable manager with some train's timetable saved")
       When("I save new train timetable that overlaps on existing ones")
@@ -69,17 +86,12 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
         Then("Should be returned ah updated manager with new timetable")
         val result = managerWithSimpleTimetable.save(newValidTimetable)
         result should be(Right(TimetableManagers.TimetableManager(List(
-          timetableTest,
+          timetableABC,
           newValidTimetable
         ))))
 
   Feature("Users can retrieve timetables saved"):
-    val timetableA = TimetableBuilder(trainRV_3905, startStation = stationA, h(12).m(0).getOrDefault)
-      .arrivesTo(stationB)(railAV_10)
-    val timetableB = TimetableBuilder(trainRV_3905, startStation = stationB, h(20).m(30).getOrDefault)
-      .arrivesTo(stationC)(railAV_10)
-    val timetableManager = TimetableManagers.TimetableManager(List(timetableA, timetableB, timetableTest))
-
+    val timetableManager = TimetableManagers.TimetableManager(List(timetableAB, timetableBC, timetableABC))
     Scenario("Request not existing timetables of a train"):
       Given("A timetable manager without any timetables")
       val timetableManager = TimetableManagers.emptyManager()
@@ -106,17 +118,17 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
   Feature("Users can remove a timetable"):
     Scenario("Remove a train timetable"):
       Given("A timetable manager with one timetable for a train")
-      val manager = TimetableManagers.TimetableManager(List(timetableTest))
+      val manager = TimetableManagers.TimetableManager(List(timetableABC))
       When("I request to remove that timetable")
       val requestResult =
-        manager.remove(trainName = timetableTest.train.name, departureTime = timetableTest.departureTime)
+        manager.remove(trainName = timetableABC.train.name, departureTime = timetableABC.departureTime)
       Then("new empty manager should be returned")
       requestResult should be(Right(TimetableManagers.emptyManager()))
       Then("no timetable should be available for the train if requested (error TimetableNotFound)")
       requestResult match
         case Right(m) =>
-          m.tablesOf(timetableTest.train.name) should be(
-            Left(TimetableNotFound(timetableTest.train.name))
+          m.tablesOf(timetableABC.train.name) should be(
+            Left(TimetableNotFound(timetableABC.train.name))
           )
         case Left(e) => fail(s"Unexpected result: $e")
 
@@ -124,6 +136,6 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
       Given("A timetable manager empty")
       val manager = TimetableManagers.emptyManager()
       When("I request to remove that timetable")
-      val requestResult = manager.remove(timetableTest.train.name, timetableTest.departureTime)
+      val requestResult = manager.remove(timetableABC.train.name, timetableABC.departureTime)
       Then("should be returned an error")
-      requestResult should be(Left(TimetableNotFound(timetableTest.train.name)))
+      requestResult should be(Left(TimetableNotFound(timetableABC.train.name)))

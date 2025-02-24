@@ -9,7 +9,7 @@ import ulisse.utils.Times.FluentDeclaration.h
 
 import scala.collection.immutable.ListMap
 
-/** Object containing traits and utility method for creation and use of TrainTimetable */
+/** Object containing traits and utility method for creation and use of Timetable */
 object Timetables:
 
   private type Length      = Double
@@ -133,10 +133,10 @@ object Timetables:
         export builder.{departureTime, startStation, table, train}
 
     private case class TimetableImpl(
-        private val partialTrainTimetable: PartialTimetable,
+        private val partialTimetable: PartialTimetable,
         arrivingStation: Station
     ) extends Timetable:
-      export partialTrainTimetable.{departureTime, startStation, table, train}
+      export partialTimetable.{departureTime, startStation, table, train}
       override def arrivingTime: Option[ClockTime] =
         for
           t  <- table.lastOption

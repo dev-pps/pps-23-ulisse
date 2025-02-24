@@ -25,9 +25,7 @@ import scala.concurrent.{Future, Promise}
 final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateTimetable => AppStateTimetable])
     extends TimetablePorts.Input:
   extension (toCheck: List[(StationId, WaitingTime)])
-    /** @param existingRoutes
-      *   Route and technology actually saved
-      * Returns a list of pair `(Route, WaitingTime)` starting from `toCheck` list.
+    /** Returns a list of pair `(Route, WaitingTime)` starting from `toCheck` list.
       * If some route does not exist `InvalidStation` error is returned.
       */
     private def toRoutes(existingRoutes: List[Route]): Either[InvalidStation, List[(Route, WaitingTime)]] =
@@ -57,7 +55,7 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
         timetables.filter(t => t.startStation.name == station.name && t.departureTime == departureTime)
       Either.cond(occupiedTracks.sizeIs < station.numberOfTracks, routesWaiting, UnavailableTracks(station.name))
 
-  /** Given `trainName`, `departureTime` and stations with its waitingTime a new TrainTimetable should be saved.
+  /** Given `trainName`, `departureTime` and stations with its waitingTime a new Timetable should be saved.
     * Returns a `TimetableServiceErrors` in case of error during creation.
     */
   def createTimetable(
@@ -107,7 +105,7 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
         promise.success(Right(tablesList))
         newManager
 
-  /** Returns list of all TrainTimetable saved for a given `trainName` */
+  /** Returns list of all Timetable saved for a given `trainName` */
   def timetablesOf(trainName: String): Future[RequestResult] =
     stateEventQueue.updateWith: (state, promise) =>
       for
