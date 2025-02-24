@@ -24,6 +24,7 @@ final case class SimulationInfoService(
       state
     })
     p.future
+
   override def routeInfo(r: Route): Future[Option[RouteEnvironmentElement]] =
     val p = Promise[Option[RouteEnvironmentElement]]
     simulationEvents.add((state: SimulationState) => {
