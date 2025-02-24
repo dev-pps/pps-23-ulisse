@@ -1,8 +1,10 @@
 package ulisse.adapters.input
 
 import cats.data.{Chain, NonEmptyChain}
+import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
 import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.AppState
@@ -25,13 +27,8 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
   private val numberOfTrack = 1
   private val station       = Station(stationName, Coordinate(x, y), numberOfTrack)
 
-  private val initialState = AppState.default()
-  private val eventStream  = LinkedBlockingQueue[AppState => AppState]()
-  private val inputPort    = StationService(eventStream)
-  private val mockedService = mock[StationService]
-  private val controller   = StationEditorAdapter(inputPort)
-  private val updateState  = () => runAll(initialState, eventStream)
-
+  private val mockedPort = mock[StationPorts.Input]
+  private val controller = StationEditorAdapter(mockedPort)
   private type addStationFuture  = Future[Either[NonEmptyChain[BaseError], StationPorts.Input#SM]]
   private type findStationFuture = Future[Option[Station]]
   private def addStation(): (addStationFuture, findStationFuture) =
@@ -49,15 +46,15 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
   "StationEditorController" when:
     "onOkClick is invoked" should:
       "add a new station when inputs are valid and oldStation is None" in:
+        when(mockedPort.addStation(station)).thenReturn(Future.successful(Right(List(station))))
+        when(mockedPort.findStationAt(Coordinate(x, y))).thenReturn(Future.successful(Some(station)))
         val (addStationResult, findStationResult) = addStation()
-        updateState()
         Await.result(addStationResult, Duration.Inf) shouldBe Right(List(station))
         Await.result(findStationResult, Duration.Inf) shouldBe Some(station)
 
       "replace the station when inputs are valid and oldStation is Some(station)" in:
-        val (addStationResult, findStationResult) = addStation()
-        val newStation                            = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
-
+        val newStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
+        when(mockedPort.updateStation(station, newStation)).thenReturn(Future.successful(Right(List(newStation))))
         val addNewStationResult =
           controller.onOkClick(
             stationName,
@@ -67,18 +64,20 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
             Some(station)
           )
 
-        val findNewStationResult                = controller.findStationAt(Coordinate(x + 1, y + 1))
+        when(mockedPort.findStationAt(Coordinate(x + 1, y + 1))).thenReturn(Future.successful(Some(newStation)))
+        val findNewStationResult = controller.findStationAt(Coordinate(x + 1, y + 1))
+        when(mockedPort.findStationAt(Coordinate(x, y))).thenReturn(Future.successful(None))
         val findStationAfterAddNewStationResult = controller.findStationAt(Coordinate(x, y))
 
-        updateState()
-        Await.result(addStationResult, Duration.Inf) shouldBe Right(List(station))
-        Await.result(findStationResult, Duration.Inf) shouldBe Some(station)
         Await.result(addNewStationResult, Duration.Inf) shouldBe Right(List(newStation))
         Await.result(findNewStationResult, Duration.Inf) shouldBe Some(newStation)
         Await.result(findStationAfterAddNewStationResult, Duration.Inf) shouldBe None
 
       "chain error when inputs are valid and oldStation is not" in:
         val oldStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
+        when(mockedPort.updateStation(oldStation, station)).thenReturn(
+          Future.successful(Left(Chain(StationManager.Error.StationNotFound)))
+        )
         val updateStationResult =
           controller.onOkClick(
             stationName,
@@ -88,21 +87,19 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
             Some(oldStation)
           )
 
+        when(mockedPort.findStationAt(Coordinate(x, y))).thenReturn(Future.successful(None))
         val findStationResult = controller.findStationAt(Coordinate(x, y))
 
-        updateState()
-        Await.result(updateStationResult, Duration.Inf) shouldBe Left(
-          Chain(StationManager.Error.StationNotFound)
-        )
+        Await.result(updateStationResult, Duration.Inf) shouldBe Left(Chain(StationManager.Error.StationNotFound))
         Await.result(findStationResult, Duration.Inf) shouldBe None
 
       "chain error when same station is added" in:
-        val (addStationResult, findStationResult)         = addStation()
+        when(mockedPort.addStation(station)).thenReturn(Future.successful(Left(Chain(
+          StationManager.Error.DuplicateStationName,
+          StationManager.Error.DuplicateStationLocation
+        ))))
+        when(mockedPort.findStationAt(Coordinate(x, y))).thenReturn(Future.successful(Some(station)))
         val (addSameStationResult, findSameStationResult) = addStation()
-
-        updateState()
-        Await.result(addStationResult, Duration.Inf) shouldBe Right(List(station))
-        Await.result(findStationResult, Duration.Inf) shouldBe Some(station)
         Await.result(addSameStationResult, Duration.Inf) shouldBe Left(Chain(
           StationManager.Error.DuplicateStationName,
           StationManager.Error.DuplicateStationLocation
