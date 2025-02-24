@@ -11,7 +11,6 @@ import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 import ulisse.infrastructures.utilty.{SimulationNotificationAdapterRequirements, SimulationNotificationBridge}
-import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.simulation.SimulationPage
 import ulisse.infrastructures.view.station.StationEditorView
 
@@ -35,8 +34,8 @@ def runEngines(): Unit =
 
 @main def launchApp(): Unit =
   val app = AppFrame()
-  app.contents = Menu(app)
-  app.open()
+//  app.contents = Menu(app)
+//  app.open()
 
   runEngines()
 

@@ -1,17 +1,16 @@
-package ulisse.infrastructures.view.common
+package ulisse.infrastructures.view.page
 
 import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
 import ulisse.infrastructures.view.components.ui.composed.ComposedSwing
+import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.map.ViewObservers.ViewObserver
 
 import scala.swing.Font.Style
 import scala.swing.{Component, Orientation, Point}
 
-trait Form:
+trait Form extends ComposedSwing:
   def mapObserver: ViewObserver[Point]
-  def component[T >: Component]: T
 
 object Form:
 
