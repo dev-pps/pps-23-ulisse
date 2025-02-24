@@ -22,43 +22,40 @@ class TrackTest extends AnyWordSpec with Matchers:
   "A track" when:
     "created" should:
       "be created empty by default" in:
-        val track = Track()
+        val track = Track(1)
         track.isEmpty shouldBe true
         track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
       "be created with a list of trains" in:
-        val track = Track(train3905, train3906, train3907)
+        val track = Track(1, train3905, train3906, train3907)
         track.trains.size shouldBe 3
         track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
       "contain distinct trains" in:
-        val track = Track(train3905, train3905, train3905)
+        val track = Track(1, train3905, train3905, train3905)
         track.trains.size shouldBe 1
         track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
       "contain distinct trains considering the name" in:
-        val track = Track(train3905, train3905.updateDistanceTravelled(10))
+        val track = Track(1, train3905, train3905.updateDistanceTravelled(10))
         track.trains.size shouldBe 1
         track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
     "created checked" should:
       "be created if contains distinct trains" in:
-        Track.createCheckedTrack(
+        Track.createCheckedTrack(1, train3905, train3906, train3907) shouldBe Right(Track(
+          1,
           train3905,
           train3906,
           train3907
-        ) shouldBe Right(Track(train3905, train3906, train3907))
+        ))
 
       "return errors when not contains distinct trains" in:
-        Track.createCheckedTrack(
-          train3905,
-          train3905,
-          train3905
-        ) shouldBe Left(Chain(Track.Errors.DuplicateTrains))
+        Track.createCheckedTrack(1, train3905, train3905, train3905) shouldBe Left(Chain(Track.Errors.DuplicateTrains))
 
     "a new train is added" should:
       "be updated with the new train" in:
-        val track = Track(train3905, train3906)
+        val track = Track(1, train3905, train3906)
         track :+ train3907 match
           case Left(_) => fail()
           case Right(ut) =>
@@ -66,42 +63,46 @@ class TrackTest extends AnyWordSpec with Matchers:
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
       "not be updated if the train is already moved" in:
-        Track(train3905) :+ train3906.updateDistanceTravelled(10) shouldBe Left(Chain(Track.Errors.TrainAlreadyMoved))
+        Track(1, train3905) :+ train3906.updateDistanceTravelled(10) shouldBe Left(
+          Chain(Track.Errors.TrainAlreadyMoved)
+        )
 
       "not be updated if the train is already present" in:
-        Track(train3905) :+ train3905 shouldBe Left(Chain(Track.Errors.DuplicateTrains))
+        Track(1, train3905) :+ train3905 shouldBe Left(Chain(Track.Errors.DuplicateTrains))
 
       "not be updated if the train is already present with the same name" in:
-        Track(train3905) :+ train3905.updateDistanceTravelled(10) shouldBe Left(Chain(
+        Track(1, train3905) :+ train3905.updateDistanceTravelled(10) shouldBe Left(Chain(
           Track.Errors.TrainAlreadyMoved,
           Track.Errors.DuplicateTrains
         ))
 
     "a train is updated with a new train" should:
       "be updated with the new train" in:
-        Track(train3905, train3906).updateTrain(train3905) match
+        Track(1, train3905, train3906).updateTrain(train3905) match
           case Some(ut) =>
             ut.trains shouldBe Seq(train3905, train3906)
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
           case None => fail()
 
-        Track(train3905, train3906).updateTrain(train3905.updateDistanceTravelled(10)) match
+        Track(1, train3905, train3906).updateTrain(train3905.updateDistanceTravelled(10)) match
           case Some(ut) =>
             ut.trains shouldBe Seq(train3905.updateDistanceTravelled(10), train3906)
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
           case None => fail()
 
       "not be updated if the train is not present" in:
-        Track(train3905, train3906).updateTrain(train3907) shouldBe None
+        Track(1, train3905, train3906).updateTrain(train3907) shouldBe None
 
       "be available" in:
-        Track().isAvailable shouldBe true
+        Track(1).isAvailable shouldBe true
         Track(
+          1,
           train3905.updateDistanceTravelled(minPermittedDistanceBetweenTrains + train3905.length)
         ).isAvailable shouldBe true
 
       "not be available" in:
-        Track(train3905).isAvailable shouldBe false
+        Track(1, train3905).isAvailable shouldBe false
         Track(
+          1,
           train3905.updateDistanceTravelled(minPermittedDistanceBetweenTrains / 2)
         ).isAvailable shouldBe false

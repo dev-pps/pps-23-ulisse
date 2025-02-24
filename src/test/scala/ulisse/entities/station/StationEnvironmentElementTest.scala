@@ -27,20 +27,20 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
         stationEnvironmentElement.numberOfTracks shouldBe station.numberOfTracks
 
       "have 'numberOfTracks' empty tracks" in:
-        stationEnvironmentElement.platforms.size shouldBe numberOfTracks
-        stationEnvironmentElement.platforms.forall(_.train.isEmpty) shouldBe true
+        stationEnvironmentElement.containers.size shouldBe numberOfTracks
+        stationEnvironmentElement.containers.forall(_.trains.isEmpty) shouldBe true
 
       "have a first available track" in:
-        stationEnvironmentElement.firstAvailablePlatform shouldBe Some(Platform(1))
+        stationEnvironmentElement.firstAvailableContainer shouldBe Some(Platform(1))
 
   "A train" when:
     "arrive to a stationEnvironmentElement" should:
       "be place in a track if available" in:
-        stationEnvironmentElement.firstAvailablePlatform shouldBe Some(Platform(1))
+        stationEnvironmentElement.firstAvailableContainer shouldBe Some(Platform(1))
         train3905.arriveAt(stationEnvironmentElement) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe Some(train3905)
-            updatedStation.firstAvailablePlatform shouldBe Some(Platform(2))
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905)
+            updatedStation.firstAvailableContainer shouldBe Some(Platform(2))
           case None => fail()
 
       "not be place in a track if it's already in the stationEnvironmentElement" in:
@@ -58,8 +58,8 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
       "be place in a track if available" in:
         stationEnvironmentElement.putTrain(Platform(1), train3905) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe Some(train3905)
-            updatedStation.firstAvailablePlatform shouldBe Some(Platform(2))
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905)
+            updatedStation.firstAvailableContainer shouldBe Some(Platform(2))
           case None => fail()
 
       "not be place in a track if it's already occupied" in:
@@ -87,16 +87,16 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
           _.updateTrain(train3905)
         ) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe Some(train3905)
-            updatedStation.firstAvailablePlatform shouldBe Some(Platform(2))
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905)
+            updatedStation.firstAvailableContainer shouldBe Some(Platform(2))
           case None => fail()
 
         stationEnvironmentElement.putTrain(Platform(1), train3905).flatMap(
           _.updateTrain(train3905.updateDistanceTravelled(10))
         ) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe Some(train3905.updateDistanceTravelled(10))
-            updatedStation.firstAvailablePlatform shouldBe Some(Platform(2))
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905.updateDistanceTravelled(10))
+            updatedStation.firstAvailableContainer shouldBe Some(Platform(2))
           case None => fail()
 
       "not be updated if is not present in the track" in:
@@ -108,15 +108,15 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
       "be removed from the track if it's present" in:
         train3905.arriveAt(stationEnvironmentElement).flatMap(_.removeTrain(train3905)) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe None
-            updatedStation.firstAvailablePlatform shouldBe Some(Platform(1))
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq()
+            updatedStation.firstAvailableContainer shouldBe Some(Platform(1))
           case None => fail()
         train3905.arriveAt(stationEnvironmentElement).flatMap(
           _.removeTrain(train3905.updateDistanceTravelled(10))
         ) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe None
-            updatedStation.firstAvailablePlatform shouldBe Some(Platform(1))
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq()
+            updatedStation.firstAvailableContainer shouldBe Some(Platform(1))
           case None => fail()
 
       "not be removed from the track if it's not present" in:
