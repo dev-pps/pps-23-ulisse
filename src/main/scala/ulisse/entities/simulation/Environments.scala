@@ -1,6 +1,7 @@
 package ulisse.entities.simulation
 
 import ulisse.entities.route.RouteEnvironmentElement
+import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.StationEnvironmentElement
@@ -14,10 +15,9 @@ object Environments:
     def doStep(dt: Int): RailwayEnvironment
     def stations: Seq[StationEnvironmentElement]
     def routes: Seq[RouteEnvironmentElement]
-    def agents: Seq[SimulationAgent] =
-      (stations.flatMap(_.platforms.flatMap(_.train)) ++ routes.flatMap(_.tracks.flatMap(_.trains))).distinct
-    def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment
-    def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment
+    def agents: Seq[SimulationAgent] = (stations.flatMap(_.trains) ++ routes.flatMap(_.trains)).distinct
+//    def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment
+//    def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment
 
   object RailwayEnvironment:
     // TODO evaluate where to do the initial placement of the trains
@@ -26,15 +26,18 @@ object Environments:
         routes: Seq[RouteEnvironmentElement],
         agents: Seq[SimulationAgent]
     ): RailwayEnvironment =
-      SimulationEnvironmentImpl(stations, routes)
+      SimulationEnvironmentImpl(stations ++ routes)
 
     def empty(): RailwayEnvironment =
       apply(Seq[StationEnvironmentElement](), Seq[RouteEnvironmentElement](), Seq[SimulationAgent]())
 
     private final case class SimulationEnvironmentImpl(
-        stations: Seq[StationEnvironmentElement],
-        routes: Seq[RouteEnvironmentElement]
+        ee: Seq[TrainAgentEEWrapper]
     ) extends RailwayEnvironment:
+      val stations: Seq[StationEnvironmentElement] = ee.collect({ case p: StationEnvironmentElement => p })
+      val routes: Seq[RouteEnvironmentElement]     = ee.collect({ case r: RouteEnvironmentElement => r })
+      val agents: Seq[SimulationAgent]             = ee.flatMap(_.trains).distinct
+
       def doStep(dt: Int): RailwayEnvironment =
         // Allow agents to be at the same time in more than an environment element
         // that because an agent when enters a station doesn't leave immediately the route and vice versa
@@ -58,44 +61,51 @@ object Environments:
         }
 
       private def updateEnvironmentWith(agent: TrainAgent): SimulationEnvironmentImpl =
-        updateAgentOnRoute(agent).updateAgentInStation(agent)
-      private def updateAgentOnRoute(agent: TrainAgent): SimulationEnvironmentImpl =
-        agent.findIn(routes).fold(this)(ree => routeUpdateFunction(ree, agent))
-      private def updateAgentInStation(agent: TrainAgent): SimulationEnvironmentImpl =
-        agent.findIn(stations).fold(this)(see => copy(stations = stations.updateWhen(_ == see)(s => s)))
+        agent.findIn(stations).foldLeft(this)((e, ee) => updateFunction(ee, agent))
+//      private def updateAgentOnRoute(agent: TrainAgent): SimulationEnvironmentImpl =
+//        agent.findIn(routes).fold(this)(ree => routeUpdateFunction(ree, agent))
+//      private def updateAgentInStation(agent: TrainAgent): SimulationEnvironmentImpl =
+//        agent.findIn(stations).fold(this)(see => copy(stations = stations.updateWhen(_ == see)(s => s)))
+
+      private def updateFunction(ee: TrainAgentEEWrapper, agent: TrainAgent): SimulationEnvironmentImpl =
+        ee match
+          case ree: RouteEnvironmentElement => routeUpdateFunction(ree, agent)
+//          case see: StationEnvironmentElement => stationUpdateFunction(see, agent)
 
       private def routeUpdateFunction(route: RouteEnvironmentElement, agent: TrainAgent): SimulationEnvironmentImpl =
         agent.distanceTravelled match
           case d if d >= route.length + agent.length =>
             route.removeTrain(agent) match
-              case Some(ree) => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree))
-              case _         => this
+              case Some(ree: RouteEnvironmentElement) => copy(stations ++ routes.updateWhen(_.id == ree.id)(_ => ree))
+              case _                                  => this
           case d if d >= route.length =>
             (
-              stations.find(_.name == route.arrival.name).flatMap(destination => agent.arriveAt(destination)),
+              stations.collect({ case p: StationEnvironmentElement => p }).find(_.name == route.arrival.name).flatMap(
+                destination => agent.arriveAt(destination)
+              ),
               route.updateTrain(agent)
             ) match
-              case (Some(see), Some(ree)) =>
-                copy(stations.updateWhen(_.name == see.name)(_ => see), routes.updateWhen(_.id == ree.id)(_ => ree))
+              case (Some(see), Some(ree: RouteEnvironmentElement)) =>
+                copy(stations.updateWhen(_.name == see.name)(_ => see) ++ routes.updateWhen(_.id == ree.id)(_ => ree))
               case _ => this
           case _ => route.updateTrain(agent) match
-              case Some(ree) => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree))
-              case _         => this
+              case Some(ree: RouteEnvironmentElement) => copy(stations ++ routes.updateWhen(_.id == ree.id)(_ => ree))
+              case _                                  => this
 
-      private def stationUpdateFunction(
-          station: StationEnvironmentElement,
-          agent: TrainAgent
-      ): SimulationEnvironmentImpl =
-        agent.distanceTravelled match
-          case d if d >= agent.length =>
-            station.removeTrain(agent) match
-              case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
-              case _         => this
-          case _ => station.updateTrain(agent) match
-              case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
-              case _         => this
-
-      def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment =
-        copy(stations = newStations)
-      def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment =
-        copy(routes = newRoutes)
+//      private def stationUpdateFunction(
+//          station: StationEnvironmentElement,
+//          agent: TrainAgent
+//      ): SimulationEnvironmentImpl =
+//        agent.distanceTravelled match
+//          case d if d >= agent.length =>
+//            station.removeTrain(agent) match
+//              case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
+//              case _         => this
+//          case _ => station.updateTrain(agent) match
+//              case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
+//              case _         => this
+//
+//      def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment =
+//        copy(stations = newStations)
+//      def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment =
+//        copy(routes = newRoutes)

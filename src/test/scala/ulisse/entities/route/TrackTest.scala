@@ -28,17 +28,17 @@ class TrackTest extends AnyWordSpec with Matchers:
 
       "be created with a list of trains" in:
         val track = Track(train3905, train3906, train3907)
-        track.trains.size shouldBe 3
+        track.container.size shouldBe 3
         track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
       "contain distinct trains" in:
         val track = Track(train3905, train3905, train3905)
-        track.trains.size shouldBe 1
+        track.container.size shouldBe 1
         track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
       "contain distinct trains considering the name" in:
         val track = Track(train3905, train3905.updateDistanceTravelled(10))
-        track.trains.size shouldBe 1
+        track.container.size shouldBe 1
         track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
     "created checked" should:
@@ -62,7 +62,7 @@ class TrackTest extends AnyWordSpec with Matchers:
         track :+ train3907 match
           case Left(_) => fail()
           case Right(ut) =>
-            ut.trains.size shouldBe 3
+            ut.container.size shouldBe 3
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
       "not be updated if the train is already moved" in:

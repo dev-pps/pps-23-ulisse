@@ -3,6 +3,7 @@ package ulisse.entities.station
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
+import ulisse.entities.route.Track
 import ulisse.entities.station.StationEnvironmentElement.*
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
@@ -27,8 +28,8 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
         stationEnvironmentElement.numberOfTracks shouldBe station.numberOfTracks
 
       "have 'numberOfTracks' empty tracks" in:
-        stationEnvironmentElement.platforms.size shouldBe numberOfTracks
-        stationEnvironmentElement.platforms.forall(_.train.isEmpty) shouldBe true
+        stationEnvironmentElement.containers.size shouldBe numberOfTracks
+        stationEnvironmentElement.containers.forall(_.trains.isEmpty) shouldBe true
 
       "have a first available track" in:
         stationEnvironmentElement.firstAvailablePlatform shouldBe Some(Platform(1))
@@ -39,7 +40,7 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
         stationEnvironmentElement.firstAvailablePlatform shouldBe Some(Platform(1))
         train3905.arriveAt(stationEnvironmentElement) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe Some(train3905)
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905)
             updatedStation.firstAvailablePlatform shouldBe Some(Platform(2))
           case None => fail()
 
@@ -58,7 +59,7 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
       "be place in a track if available" in:
         stationEnvironmentElement.putTrain(Platform(1), train3905) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe Some(train3905)
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905)
             updatedStation.firstAvailablePlatform shouldBe Some(Platform(2))
           case None => fail()
 
@@ -87,7 +88,7 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
           _.updateTrain(train3905)
         ) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe Some(train3905)
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905)
             updatedStation.firstAvailablePlatform shouldBe Some(Platform(2))
           case None => fail()
 
@@ -95,7 +96,7 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
           _.updateTrain(train3905.updateDistanceTravelled(10))
         ) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe Some(train3905.updateDistanceTravelled(10))
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905.updateDistanceTravelled(10))
             updatedStation.firstAvailablePlatform shouldBe Some(Platform(2))
           case None => fail()
 
@@ -108,14 +109,14 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
       "be removed from the track if it's present" in:
         train3905.arriveAt(stationEnvironmentElement).flatMap(_.removeTrain(train3905)) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe None
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq()
             updatedStation.firstAvailablePlatform shouldBe Some(Platform(1))
           case None => fail()
         train3905.arriveAt(stationEnvironmentElement).flatMap(
           _.removeTrain(train3905.updateDistanceTravelled(10))
         ) match
           case Some(updatedStation) =>
-            updatedStation.platforms.headOption.flatMap(_.train) shouldBe None
+            updatedStation.containers.flatMap(_.trains) shouldBe Seq()
             updatedStation.firstAvailablePlatform shouldBe Some(Platform(1))
           case None => fail()
 

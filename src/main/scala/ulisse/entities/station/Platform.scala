@@ -11,12 +11,13 @@ import ulisse.utils.ValidationUtils.validatePositive
 trait Platform2 extends Platform
 
 /** Defines a track in a station. */
-trait Platform extends TrainAgentsContainer[Platform]:
+trait Platform extends TrainAgentsContainer:
   // TODO evaluate if is needed a value for length of the platform track
-  val platformNumber: Int
-  val train: Option[TrainAgent]
-  override def isAvailable: Boolean                 = train.isEmpty
-  override def contains(train: TrainAgent): Boolean = this.train.exists(train.matchId)
+  val container: Option[TrainAgent]
+  override def trains: Seq[TrainAgent]                   = container.toList
+  override def isAvailable: Boolean                      = container.isEmpty
+  override def contains(train: TrainAgent): Boolean      = container.exists(train.matchId)
+  override def minPermittedDistanceBetweenTrains: Double = if !isAvailable then 0.0 else Double.MaxValue
 
 /** Factory for [[Platform]] instances. */
 object Platform:
@@ -37,11 +38,11 @@ object Platform:
   enum Errors extends BaseError:
     case InvalidPlatformNumber
 
-  private final case class PlatformImpl(platformNumber: Int, train: Option[TrainAgent]) extends Platform:
+  private final case class PlatformImpl(id: Int, container: Option[TrainAgent]) extends Platform:
     // TODO evaluate if could be nice to introduce a control to check if the train is entering the station or is already moved
     override def putTrain(train: TrainAgent): Option[Platform] =
-      copy(train = Some(train)) when isAvailable
+      copy(container = Some(train)) when isAvailable
     override def updateTrain(train: TrainAgent): Option[Platform] =
-      copy(train = Some(train)) when contains(train)
+      copy(container = Some(train)) when contains(train)
     override def removeTrain(train: TrainAgent): Option[Platform] =
-      copy(train = None) when contains(train)
+      copy(container = None) when contains(train)
