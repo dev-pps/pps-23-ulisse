@@ -3,7 +3,8 @@ package ulisse.infrastructures.view
 import ulisse.applications.ports.RoutePorts.Input
 import ulisse.infrastructures.view.common.CentralController
 import ulisse.infrastructures.view.components.ComponentUtils.*
-import ulisse.infrastructures.view.components.ui.{ComposedSwing, ExtendedSwing}
+import ulisse.infrastructures.view.components.ui.ExtendedSwing
+import ulisse.infrastructures.view.components.ui.composed.{ComposedImage, ComposedSwing}
 import ulisse.infrastructures.view.map.MapPanel
 
 import scala.swing.*
@@ -39,13 +40,13 @@ object GUIView:
 
     mainLayeredPane.add(pageLayeredPane)
     mainLayeredPane.add(dashboardPanel)
-    mainLayeredPane.add(menuPanel)
+//    mainLayeredPane.add(menuPanel)
 
     mapPanel.attach(mapController.stationForm.mapObserver)
     mapPanel.attachItem(mapController.routeForm.mapObserver)
 
     // Menu panel
-    private val newIcon  = ComposedSwing.JIconLabel("icons/add.svg", "new")
+    private val newIcon  = ComposedImage.createIconLabel("icons/add.svg", "new")
     private val boxPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
     private val panel    = ExtendedSwing.JFlowPanelItem()
     panel.contents += newIcon.component
@@ -59,9 +60,11 @@ object GUIView:
     private val boxDashboardPanelNorth = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
     private val boxDashboardPanelSouth = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
 
-    private val dashboardIconsNorth = for _ <- 1 to 4 yield ComposedSwing.JIconLabel("icons/add.svg", "new")
-    private val dashboardIconsSouth = for _ <- 1 to 2 yield ComposedSwing.JIconLabel("icons/add.svg", "new")
+    private val iconApp             = ComposedImage.createPictureLabel("icons/logo.jpg", "ulisse")
+    private val dashboardIconsNorth = for _ <- 1 to 4 yield ComposedImage.createIconLabel("icons/add.svg", "new")
+    private val dashboardIconsSouth = for _ <- 1 to 2 yield ComposedImage.createIconLabel("icons/add.svg", "new")
 
+    boxDashboardPanelNorth.contents += ExtendedSwing.createFlowPanel(iconApp.component)
     dashboardIconsNorth.map(icon => ExtendedSwing.createFlowPanel(icon.component))
       .map(panel => { panel.vGap = 10; panel })
       .foreach(boxDashboardPanelNorth.contents += _)

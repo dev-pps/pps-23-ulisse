@@ -128,7 +128,8 @@ object Styles:
 
       /** Initialize the color reactions of the component with the given [[palette]]. */
       def initColorReactions(palette: () => Palette): Reactions.Reaction =
-        case _: event.MousePressed  => { palette().clickAction(); component.updateGraphics() }
+        case _: event.MousePressed | _: event.MouseClicked => { palette().clickAction(); component.updateGraphics() }
+//        case _: event.MouseClicked  => { palette().clickAction(); component.updateGraphics() }
         case _: event.MouseReleased => { palette().releaseAction(); component.updateGraphics() }
         case _: event.MouseEntered  => { palette().hoverAction(); component.updateGraphics() }
         case _: event.MouseExited   => { palette().exitAction(); component.updateGraphics() }

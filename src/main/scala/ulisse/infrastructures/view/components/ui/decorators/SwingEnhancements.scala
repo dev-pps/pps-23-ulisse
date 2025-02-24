@@ -24,6 +24,7 @@ object SwingEnhancements:
     /** Paint the component with antialiasing, then paint the custom appearance and finally paint the component. */
     override protected def paintComponent(g: Graphics2D): Unit =
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+      g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
       paintLook(g)
       super.paintComponent(g)
 
