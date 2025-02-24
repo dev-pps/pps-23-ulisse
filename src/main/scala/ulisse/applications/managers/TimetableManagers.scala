@@ -70,15 +70,25 @@ object TimetableManagers:
     def tablesOf(trainName: String): Either[TimetableNotFound, List[Timetable]]
 
   object TimetableManager:
-    /** Returns TimetableManager initialized with given list of `timetables`. The `timetables` are not checked by the
+    /** Returns TimetableManager initialized with given list of `timetables`. The `timetables` are checked by the
       * [[AcceptanceTimetablePolicy]].
       */
     def apply(timetables: List[Timetable]): TimetableManager =
-      TimetableManagerImpl(timetables.groupBy(_.train))
+      fromMap(timetables.groupBy(_.train))
 
-    /** Returns new TimetableManager initialized with a given `timetables` map. */
+    /** Returns new TimetableManager initialized with a given `timetables` map.
+      *
+      * If one Timetable overlaps with another one (according to the departure time), the last computed one is discarded.
+      * Given timetables are checked by the [[AcceptanceTimetablePolicy]].
+      */
     def fromMap(timetables: Map[Train, List[Timetable]]): TimetableManager =
-      TimetableManagerImpl(timetables)
+      val validatedTimetables =
+        timetables.map: (train, tableList) =>
+          train -> tableList.sortBy(_.departureTime).foldLeft(List.empty[Timetable]): (validated, t) =>
+            defaultAcceptancePolicy.accept(t, validated) match
+              case Left(_)  => validated
+              case Right(t) => t :: validated
+      TimetableManagerImpl(validatedTimetables)
 
     private case class TimetableManagerImpl(timetables: Map[Train, List[Timetable]]) extends TimetableManager:
 
