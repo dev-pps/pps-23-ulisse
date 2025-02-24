@@ -4,6 +4,7 @@ import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
+import ulisse.applications.ports.SimulationInfoPorts
 import ulisse.applications.useCases.SimulationInfoService
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
@@ -16,7 +17,7 @@ import scala.concurrent.duration.Duration
 
 class SimulationInfoAdapterTest extends AnyWordSpec with Matchers:
 
-  private val mockedPort         = mock[SimulationInfoPorts.Input]
+  private val mockedPort            = mock[SimulationInfoPorts.Input]
   private val simulationInfoAdapter = SimulationInfoAdapter(mockedPort)
 
   "SimulationInfoAdapter" when:
