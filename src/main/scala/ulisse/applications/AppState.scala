@@ -25,4 +25,12 @@ final case class AppState(
     trainManager: TrainManager,
     technologyManager: TechnologyManager[TrainTechnology],
     simulationManager: SimulationManager
-)
+):
+  def swap(f: AppState => StationManager | RouteManager | TrainManager | TechnologyManager[
+    TrainTechnology
+  ] | SimulationManager): AppState = f(this) match
+    case s: StationManager                     => copy(stationManager = s)
+    case r: RouteManager                       => copy(routeManager = r)
+    case t: TrainManager                       => copy(trainManager = t)
+    case t: TechnologyManager[TrainTechnology] => copy(technologyManager = t)
+    case s: SimulationManager                  => copy(simulationManager = s)

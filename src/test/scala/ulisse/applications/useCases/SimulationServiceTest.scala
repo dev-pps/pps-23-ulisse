@@ -37,22 +37,30 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
       val startSimulationResult = simulationService.start()
       updateState()
       Await.result(startSimulationResult, Duration.Inf).running shouldBe true
-      eventQueue.clear()
 
     "when started start to enqueue step handlers" in:
-      simulationService.start()
+      eventQueue.clear()
       for i <- 0 until 10 do
+        simulationService.start()
         eventQueue.size() shouldBe 1
         doSteps(i, updateState().lastOption).simulationManager.simulationData.step shouldBe i
         eventQueue.size() shouldBe 1
-      eventQueue.clear()
+        eventQueue.clear()
 
     "stop simulation" in:
       simulationService.start()
       val stopSimulationResult = simulationService.stop()
       updateState()
       Await.result(stopSimulationResult, Duration.Inf).running shouldBe false
+
+    "when stopped the enqueued step handler doesn't have effects" in:
       eventQueue.clear()
+      for i <- 1 until 10 do // starts from 1 because if not the first step handler remains in the queue
+        simulationService.start()
+        simulationService.stop()
+        eventQueue.size() shouldBe 2
+        doSteps(i, updateState().lastOption).simulationManager.simulationData.step shouldBe 0
+        eventQueue.size() shouldBe 0
 
     "restart simulation" in:
       simulationService.start()
@@ -60,11 +68,9 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
       val restartSimulationResult = simulationService.start()
       updateState()
       Await.result(restartSimulationResult, Duration.Inf).running shouldBe true
-      eventQueue.clear()
 
     "reset simulation" in:
       simulationService.start()
       val resetSimulationResult = simulationService.reset()
       updateState()
       Await.result(resetSimulationResult, Duration.Inf).running shouldBe false
-      eventQueue.clear()

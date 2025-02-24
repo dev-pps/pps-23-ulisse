@@ -13,7 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 final case class SimulationInfoService(
-    eventQueue: LinkedBlockingQueue[AppState => AppState]
+    private val eventQueue: LinkedBlockingQueue[AppState => AppState]
 ) extends SimulationInfoPorts.Input:
   // TODO is best a future that fails or a future that return an option?
   override def stationInfo(s: Station): Future[Option[StationEnvironmentElement]] =
