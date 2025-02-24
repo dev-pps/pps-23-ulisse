@@ -22,20 +22,19 @@ object EnvironmentElements:
     def minPermittedDistanceBetweenTrains: Double
 
   object TrainAgentsContainer:
-    /** Creates a List of `TrainAgentContainer[TAC]` instance. If the specified numberOfTracks is not positive an empty List is returned */
+    /** Creates a List of `TrainAgentContainer[TAC]` instance. If the specified numberOfContainers is not positive an empty List is returned */
     def generateSequentialContainers[TAC <: TrainAgentsContainer](
         constructor: Int => TAC,
-        numberOfTracks: Int
+        numberOfContainers: Int
     ): List[TAC] =
       val step: Int => Int = _ + 1
-      List.tabulate(numberOfTracks)(i => constructor(step(i)))
+      List.tabulate(numberOfContainers)(i => constructor(step(i)))
 
   // TODO make sense to have only one TrainAgentContainer type per Wrapper? (so using a type TAC <: TrainAgentsContainer)
   trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE]]:
     self: EE =>
     def containers: Seq[TrainAgentsContainer]
-    def firstAvailableContainer: Option[TrainAgentsContainer] = containers.find(_.isAvailable)
-    def putTrain(container: TrainAgentsContainer, train: TrainAgent): Option[EE]
+    def putTrain(train: TrainAgent): Option[EE]
     def updateTrain(train: TrainAgent): Option[EE] =
       updaterTemplate(train, _.updateTrain(train), contains(train))
     def removeTrain(train: TrainAgent): Option[EE] =
