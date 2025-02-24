@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 final case class StationService(
-    eventQueue: LinkedBlockingQueue[AppState => AppState]
+    private val eventQueue: LinkedBlockingQueue[AppState => AppState]
 ) extends StationPorts.Input:
 
   override def stationMap: Future[SM] =
