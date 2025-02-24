@@ -6,8 +6,6 @@ import ulisse.utils.OptionUtils.when
 import ulisse.utils.CollectionUtils.updateWhenWithEffects
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option
 
-import java.util.concurrent.locks.Condition
-
 object EnvironmentElements:
   trait TrainAgentsContainer:
     def id: Int
@@ -30,17 +28,13 @@ object EnvironmentElements:
       val step: Int => Int = _ + 1
       List.tabulate(numberOfContainers)(i => constructor(step(i)))
 
-  // TODO make sense to have only one TrainAgentContainer type per Wrapper? (so using a type TAC <: TrainAgentsContainer)
   trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE]]:
     self: EE =>
     def containers: Seq[TrainAgentsContainer]
     def putTrain(train: TrainAgent): Option[EE]
-    def updateTrain(train: TrainAgent): Option[EE] =
-      updaterTemplate(train, _.updateTrain(train), contains(train))
-    def removeTrain(train: TrainAgent): Option[EE] =
-      updaterTemplate(train, _.removeTrain(train), contains(train))
-
-    def contains(train: TrainAgent): Boolean = containers.exists(_.contains(train))
+    def updateTrain(train: TrainAgent): Option[EE] = updaterTemplate(train, _.updateTrain(train), contains(train))
+    def removeTrain(train: TrainAgent): Option[EE] = updaterTemplate(train, _.removeTrain(train), contains(train))
+    def contains(train: TrainAgent): Boolean       = containers.exists(_.contains(train))
 
     private def updaterTemplate(
         trainAgent: TrainAgent,
