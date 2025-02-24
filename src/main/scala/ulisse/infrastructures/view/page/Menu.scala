@@ -2,8 +2,7 @@ package ulisse.infrastructures.view.page
 
 import ulisse.infrastructures.view.common.ImagePath
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
-import ulisse.infrastructures.view.components.ui.composed.ComposedImage.Direction
-import ulisse.infrastructures.view.components.ui.composed.{ComposedImage, ComposedSwing}
+import ulisse.infrastructures.view.components.ui.composed.{ComposedLabel, ComposedSwing}
 
 import scala.swing.BorderPanel.Position
 import scala.swing.{BorderPanel, Component, Orientation}
@@ -11,34 +10,38 @@ import scala.swing.{BorderPanel, Component, Orientation}
 trait Menu extends ComposedSwing
 
 object Menu:
-  given directionMenu: Direction = Direction.Horizontal
+  given orientationMenu: Orientation.Value = Orientation.Horizontal
 
   def apply(): Menu = MenuImpl()
 
   private case class MenuImpl() extends Menu:
+    private val mainPanel  = ExtendedSwing.JBorderPanelItem()
+    private val northPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
+    private val southPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
 
-    private val mainPanel              = ExtendedSwing.JBorderPanelItem()
-    private val boxDashboardPanelNorth = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
-    private val boxDashboardPanelSouth = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
+    private val iconApp = ComposedLabel.createPictureLabel(ImagePath.logo, "ulisse")
+    private val mainIcons =
+      List((ImagePath.simulation, "simulation"), (ImagePath.map, "map"), (ImagePath.train, "train")).toMap
+    private val controlIcons = List((ImagePath.settings, "settings")).toMap
 
-    private val iconApp      = ComposedImage.createPictureLabel(ImagePath.logo, "ulisse")
-    private val mainIcons    = List(ImagePath.simulation, ImagePath.map, ImagePath.train)
-    private val controlIcons = List(ImagePath.settings)
+    private val mainLabels    = mainIcons.map(ComposedLabel.createIconLabel)
+    private val controlLabels = controlIcons.map(ComposedLabel.createIconLabel)
 
-    private val mainLabels    = mainIcons.map(icon => ComposedImage.createIconLabel(icon, icon))
-    private val controlLabels = controlIcons.map(icon => ComposedImage.createIconLabel(icon, icon))
+    iconApp.withDimension(160, 60)
+    mainLabels.foreach(_.withDimension(160, 60))
+    controlLabels.foreach(_.withDimension(160, 60))
 
-    boxDashboardPanelNorth.contents += ExtendedSwing.createFlowPanel(iconApp.component)
+    northPanel.contents += ExtendedSwing.createFlowPanel(iconApp.component)
 
     mainLabels.map(icon => ExtendedSwing.createFlowPanel(icon.component))
       .map(panel => { panel.vGap = 10; panel })
-      .foreach(boxDashboardPanelNorth.contents += _)
+      .foreach(northPanel.contents += _)
 
     controlLabels.map(icon => ExtendedSwing.createFlowPanel(icon.component))
       .map(panel => { panel.vGap = 10; panel })
-      .foreach(boxDashboardPanelSouth.contents += _)
+      .foreach(southPanel.contents += _)
 
-    mainPanel.layout(boxDashboardPanelNorth) = Position.North
-    mainPanel.layout(boxDashboardPanelSouth) = Position.South
+    mainPanel.layout(northPanel) = Position.North
+    mainPanel.layout(southPanel) = Position.South
 
     override def component[T >: Component]: T = mainPanel

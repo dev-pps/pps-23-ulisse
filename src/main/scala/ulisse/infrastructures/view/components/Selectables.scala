@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.components
 
-import ulisse.infrastructures.view.components.ComponentUtils.*
+import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.Component
 
