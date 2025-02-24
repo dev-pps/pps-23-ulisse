@@ -5,7 +5,7 @@ import ulisse.infrastructures.view.components.ui.decorators.Images.{Picture, SVG
 import ulisse.infrastructures.view.components.ui.decorators.Styles.EnhancedLookExtension.*
 import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.EnhancedLook
 
-import java.awt.geom.AffineTransform
+import java.awt.geom.{AffineTransform, RoundRectangle2D}
 import scala.swing.{Component, Graphics2D}
 
 object ImageEffects:
@@ -24,14 +24,19 @@ object ImageEffects:
 
     def picture: Picture               = _picture
     def angle: Int                     = picture.rotation.angle
+    def arc: Int                       = picture.arc
     def picture_=(path: String): Unit  = { _picture = picture.withPath(path); updateGraphics() }
     def withRotation(angle: Int): Unit = { _picture = picture.withRotation(angle); updateGraphics() }
+    def withArc(arc: Int): Unit        = { _picture = picture.withArc(arc); updateGraphics() }
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)
       picture.bufferImage.foreach(image =>
         val imgSize = math.min(size.width, size.height)
         g.rotate(picture.toRadians, size.width / 2, size.height / 2)
+        val clipShape =
+          new RoundRectangle2D.Float(0, 0, size.width.toFloat, size.height.toFloat, arc.toFloat, arc.toFloat)
+        g.setClip(clipShape)
         g.drawImage(image, (size.width - imgSize) / 2, (size.height - imgSize) / 2, imgSize, imgSize, peer)
         g.setTransform(identityTransform)
       )
