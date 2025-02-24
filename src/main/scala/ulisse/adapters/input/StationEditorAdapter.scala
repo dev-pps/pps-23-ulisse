@@ -18,7 +18,7 @@ object StationEditorAdapter:
 
 /** Controller for the `StationEditorView`, managing interactions between the view and the application. */
 final case class StationEditorAdapter(
-    appPort: StationPorts.Input
+    private val appPort: StationPorts.Input
 ):
 
   /** Handles the click event when the "OK" button is pressed.

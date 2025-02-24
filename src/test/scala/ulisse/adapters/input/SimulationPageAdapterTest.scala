@@ -12,19 +12,19 @@ import scala.concurrent.duration.Duration
 
 class SimulationPageAdapterTest extends AnyWordSpec with Matchers:
 
-  private val mockedService         = mock[SimulationService]
-  private val simulationPageAdapter = SimulationPageAdapter(mockedService)
+  private val mockedPort         = mock[SimulationPorts.Input]
+  private val simulationPageAdapter = SimulationPageAdapter(mockedPort)
   private val defaultEngineState    = EngineState(false, None, None, 0, 0)
 
   "SimulationPageAdapter" should:
     "start simulation" in:
-      when(mockedService.start()).thenReturn(Future.successful(defaultEngineState))
+      when(mockedPort.start()).thenReturn(Future.successful(defaultEngineState))
       Await.result(simulationPageAdapter.start(), Duration.Inf) shouldBe defaultEngineState
 
     "stop simulation" in:
-      when(mockedService.stop()).thenReturn(Future.successful(defaultEngineState))
+      when(mockedPort.stop()).thenReturn(Future.successful(defaultEngineState))
       Await.result(simulationPageAdapter.stop(), Duration.Inf) shouldBe defaultEngineState
 
     "reset simulation" in:
-      when(mockedService.reset()).thenReturn(Future.successful(defaultEngineState))
+      when(mockedPort.reset()).thenReturn(Future.successful(defaultEngineState))
       Await.result(simulationPageAdapter.reset(), Duration.Inf) shouldBe defaultEngineState
