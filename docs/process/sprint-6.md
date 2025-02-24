@@ -3,13 +3,12 @@
 [Link to backlog](./backlogs/6-backlog)
 
 ## Sprint Goal
-Integrazione della dashboard con il core dell'applicazione e setup dell'engine della simulazione.
+Raffinamento delle varie entità, engine della simulazione e del codice.
 
 ## Deadline
 La scadenza dello sprint è il 21/02/2025
 
 ## Sprint Review
-TODO
+
 
 ## Sprint Retrospective
-TODO
