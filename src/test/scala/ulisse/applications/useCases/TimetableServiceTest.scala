@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers.shouldBe
 import ulisse.TestUtility.{and, in}
 import ulisse.applications.ports.TimetablePorts
 import ulisse.applications.ports.TimetablePorts.RequestResult
-import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.GenericError
+import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{GenericError, InvalidStation, UnavailableTracks}
 import ulisse.entities.Routes
 import ulisse.entities.timetable.Timetables
 import ulisse.entities.timetable.Timetables.Timetable
@@ -18,7 +18,7 @@ import scala.concurrent.duration.Duration
 import scala.language.postfixOps
 
 class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
-  import ulisse.entities.timetable.TestMockedEntities.{stationA, stationB, stationC, stationD, AV1000Train}
+  import ulisse.entities.timetable.TestMockedEntities.{stationA, stationB, stationC, stationD, AV1000Train, AV800Train}
   def TestEnvironment(): Either[NonEmptyChain[Routes.Errors], TimetableTestEnvironment.TestEnvConfig] =
     TimetableTestEnvironment()
 
@@ -60,7 +60,9 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
         val requestResult = env.inputPort.createTimetable(AV1000Train.name, departureTime, invalidStations)
         env.updateState()
         Then("should be returned an invalid station error")
-        Await.result(requestResult, Duration.Inf) shouldBe Left(GenericError("some route not exists"))
+        Await.result(requestResult, Duration.Inf) shouldBe Left(
+          InvalidStation(s"Invalid station sequence: some route not exists")
+        )
 
     Scenario("User tries to create timetable with invalid order of station names"):
       (TestEnvironment() and h(8).m(30)): (env, departureTime) =>
@@ -70,7 +72,24 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
         val requestResult = env.inputPort.createTimetable(AV1000Train.name, departureTime, invalidOrderStations)
         env.updateState()
         Then("should be returned an invalid route error")
-        Await.result(requestResult, Duration.Inf) shouldBe Left(GenericError("some route not exists"))
+        Await.result(requestResult, Duration.Inf) shouldBe Left(
+          InvalidStation(s"Invalid station sequence: some route not exists")
+        )
+
+    Scenario(
+      "User can create as much as many Timetable (same departure time and station) as there are the tracks in the station"
+    ):
+      (TestEnvironment() and h(8).m(30)): (env, departureTime) =>
+        Given("A departure time and a departing station that has one track")
+        val departingStation = stationA
+        val stationsSeq      = List(departingStation, stationB).map(s => (s.name, None))
+        val doneRes          = env.inputPort.createTimetable(AV1000Train.name, departureTime, stationsSeq)
+        When("User save two timetable (one per train) with same departure time and station")
+        val failRes = env.inputPort.createTimetable(AV800Train.name, departureTime, stationsSeq)
+        env.updateState()
+        Then("The second timetable should not be saved due to error UnavailableTracks")
+//        Await.result(doneRes, Duration.Inf) shouldBe Right
+        Await.result(failRes, Duration.Inf) shouldBe Left(UnavailableTracks(departingStation.name))
 
   Feature("User can get timetables of a train"):
     Scenario("User request all timetables of a train"):

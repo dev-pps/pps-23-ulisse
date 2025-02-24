@@ -24,7 +24,7 @@ object TimetableTestEnvironment:
       routeBC <- Route(stationB, stationC, TypeRoute.AV, railsCount = 1, length = 15)
       routeCD <- Route(stationC, stationD, TypeRoute.AV, railsCount = 1, length = 30)
     yield AppStateMocked(
-      trainManager = TrainManager(List(AV1000Train)),
+      trainManager = TrainManager(List(AV1000Train, AV800Train)),
       timetableManager = TimetableManager(List.empty),
       routeManager = RouteManager.createOf(List(routeAB, routeBC, routeCD))
     )
