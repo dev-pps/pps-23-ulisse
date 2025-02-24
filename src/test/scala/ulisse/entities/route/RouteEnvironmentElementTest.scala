@@ -29,43 +29,39 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
 
   "RouteEnvironmentElement" should:
     "have two empty tracks" in:
-      route.tracks.size shouldBe 2
-      route.tracks.forall(_.isEmpty) shouldBe true
+      route.containers.size shouldBe 2
+      route.containers.forall(_.isEmpty) shouldBe true
 
     "have a default minPermittedDistanceBetweenTrains of 100.0" in:
-      route.tracks.forall(_.minPermittedDistanceBetweenTrains == 100.0) shouldBe true
+      route.containers.forall(_.minPermittedDistanceBetweenTrains == 100.0) shouldBe true
 
     "have a length greater or equal than minPermittedDistanceBetweenTrains + train3905 length" in:
-      route.tracks.forall(
+      route.containers.forall(
         route.length >= _.minPermittedDistanceBetweenTrains + train3905.length
       ) shouldBe true
 
   "A trainAgent" when:
     "take a route" should:
       "be place in a track if it empty" in:
-        route.firstAvailableTrack shouldBe Some(Track())
+        route.firstAvailableContainer shouldBe Some(Track(1))
         train3905.take(route) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks.find(_.contains(train3905)) shouldBe Some(Track(
-              train3905
-            ))
-            updatedRoute.firstAvailableTrack shouldBe Some(Track())
-            updatedRoute.tracks shouldBe Seq(
-              Track(train3905),
-              Track()
+            updatedRoute.containers.find(_.contains(train3905)) shouldBe Some(Track(1, train3905))
+            updatedRoute.firstAvailableContainer shouldBe Some(Track(2))
+            updatedRoute.containers shouldBe Seq(
+              Track(1, train3905),
+              Track(2)
             )
           case None => fail()
 
       "not be place in a track if not available" in:
         train3905.take(route).flatMap(train3906.take) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks.find(_.contains(train3906)) shouldBe Some(Track(
-              train3906
-            ))
-            updatedRoute.firstAvailableTrack shouldBe None
-            updatedRoute.tracks shouldBe Seq(
-              Track(train3905),
-              Track(train3906)
+            updatedRoute.containers.find(_.contains(train3906)) shouldBe Some(Track(2, train3906))
+            updatedRoute.firstAvailableContainer shouldBe None
+            updatedRoute.containers shouldBe Seq(
+              Track(1, train3905),
+              Track(2, train3906)
             )
             train3907.take(updatedRoute) shouldBe None
           case None => fail()
@@ -80,65 +76,62 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
         train3905.take(route).flatMap(_.updateTrain(train3905Updated)) match
           case Some(updatedRoute) =>
-            updatedRoute.firstAvailableTrack shouldBe Some(Track(train3905Updated))
+            updatedRoute.firstAvailableContainer shouldBe Some(Track(1, train3905Updated))
             train3906.take(updatedRoute) match
               case Some(updatedRoute) =>
-                updatedRoute.tracks.find(_.contains(train3906)) shouldBe Some(Track(
-                  train3905Updated,
-                  train3906
-                ))
+                updatedRoute.containers.find(_.contains(train3906)) shouldBe Some(Track(1, train3905Updated, train3906))
               case None => fail()
           case None => fail()
 
     "put in a route" should:
       "be placed in the first matching track" in:
-        route.putTrain(Track(), train3905) match
+        route.putTrain(Track(1), train3905) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks shouldBe Seq(
-              Track(train3905),
-              Track()
+            updatedRoute.containers shouldBe Seq(
+              Track(1, train3905),
+              Track(2)
             )
-            updatedRoute.firstAvailableTrack shouldBe Some(Track())
+            updatedRoute.firstAvailableContainer shouldBe Some(Track(2))
           case None => fail()
 
-        route.putTrain(Track(), train3905).flatMap(_.putTrain(
-          Track(),
+        route.putTrain(Track(1), train3905).flatMap(_.putTrain(
+          Track(2),
           train3906
         )) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks shouldBe Seq(
-              Track(train3905),
-              Track(train3906)
+            updatedRoute.containers shouldBe Seq(
+              Track(1, train3905),
+              Track(2, train3906)
             )
-            updatedRoute.firstAvailableTrack shouldBe None
+            updatedRoute.firstAvailableContainer shouldBe None
           case None => fail()
 
       "not be placed if it's already in the route" in:
-        route.putTrain(Track(), train3905).flatMap(_.putTrain(
-          Track(),
+        route.putTrain(Track(1), train3905).flatMap(_.putTrain(
+          Track(1),
           train3905
         )) shouldBe None
 
       "not be placed if it's not available" in:
-        route.putTrain(Track(), train3905).flatMap(_.putTrain(
-          Track(train3905),
+        route.putTrain(Track(1), train3905).flatMap(_.putTrain(
+          Track(1, train3905),
           train3906
         )) shouldBe None
 
       "be place behind if it is possible" in:
         val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
-        route.putTrain(Track(), train3905).flatMap(_.updateTrain(train3905Updated)).flatMap(
+        route.putTrain(Track(1), train3905).flatMap(_.updateTrain(train3905Updated)).flatMap(
           _.putTrain(
-            Track(train3905Updated),
+            Track(1, train3905Updated),
             train3906
           )
         ) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks shouldBe Seq(
-              Track(train3905Updated, train3906),
-              Track()
+            updatedRoute.containers shouldBe Seq(
+              Track(1, train3905Updated, train3906),
+              Track(2)
             )
-            updatedRoute.firstAvailableTrack shouldBe Some(Track())
+            updatedRoute.firstAvailableContainer shouldBe Some(Track(2))
           case None => fail()
 
     "update in a route" should:
@@ -146,12 +139,10 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         val updatedTrain3905 = train3905.updateDistanceTravelled(1)
         train3905.take(route).flatMap(_.updateTrain(updatedTrain3905)) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks.find(_.contains(train3905)) shouldBe Some(Track(
-              updatedTrain3905
-            ))
-            updatedRoute.tracks shouldBe Seq(
-              Track(updatedTrain3905),
-              Track()
+            updatedRoute.containers.find(_.contains(train3905)) shouldBe Some(Track(1, updatedTrain3905))
+            updatedRoute.containers shouldBe Seq(
+              Track(1, updatedTrain3905),
+              Track(2)
             )
           case None => fail()
 
@@ -162,10 +153,10 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
       "be removed if present" in:
         train3905.take(route).flatMap(_.removeTrain(train3905)) match
           case Some(updatedRoute) =>
-            updatedRoute.tracks.find(_.contains(train3905)) shouldBe None
-            updatedRoute.tracks shouldBe Seq(
-              Track(),
-              Track()
+            updatedRoute.containers.find(_.contains(train3905)) shouldBe None
+            updatedRoute.containers shouldBe Seq(
+              Track(1),
+              Track(2)
             )
           case None => fail()
 
