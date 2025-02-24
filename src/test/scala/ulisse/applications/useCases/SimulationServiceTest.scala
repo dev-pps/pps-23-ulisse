@@ -6,7 +6,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
-import ulisse.applications.{AppState, SimulationState}
+import ulisse.applications.AppState
 import ulisse.entities.simulation.Simulations.EngineState
 import ulisse.entities.station.Station
 
@@ -17,24 +17,17 @@ import scala.concurrent.duration.Duration
 
 class SimulationServiceTest extends AnyWordSpec with Matchers:
 
-  private val notificationService     = mock[SimulationPorts.Output]
-  private val timeProviderService     = mock[UtilityPorts.Output.TimeProviderPort]
-  private val initialState            = AppState.default()
-  private val eventQueue              = LinkedBlockingQueue[AppState => AppState]()
-  private val initialSimulationState  = SimulationState(SimulationManager.emptyBatchManager(timeProviderService))
-  private val simulationQueue         = LinkedBlockingQueue[SimulationState => SimulationState]()
-  private val simulationService       = SimulationService(eventQueue, simulationQueue, notificationService)
-  private def updateAppState()        = runAll(initialState, eventQueue)
-  private def updateSimulationState() = runAll(initialSimulationState, simulationQueue)
-  private def updateState() =
-    updateAppState()
-    updateSimulationState()
+  private val notificationService = mock[SimulationPorts.Output]
+  private val initialState        = AppState.default()
+  private val eventQueue          = LinkedBlockingQueue[AppState => AppState]()
+  private val simulationService   = SimulationService(eventQueue, notificationService)
+  private def updateState()       = runAll(initialState, eventQueue)
 
   @tailrec
-  private def doSteps(n: Int, currentState: Option[SimulationState]): SimulationState =
+  private def doSteps(n: Int, currentState: Option[AppState]): AppState =
     (n, currentState) match
       case (0, Some(finalState)) => finalState
-      case (_, Some(state))      => doSteps(n - 1, runAll(state, simulationQueue).lastOption)
+      case (_, Some(state))      => doSteps(n - 1, runAll(state, eventQueue).lastOption)
       case _                     => fail()
 
   "SimulationService" should:
@@ -47,12 +40,12 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
       eventQueue.clear()
 
     "when started start to enqueue step handlers" in:
+      simulationService.start()
       for i <- 0 until 10 do
-        simulationService.start()
-        simulationQueue.size() shouldBe 1
+        eventQueue.size() shouldBe 1
         doSteps(i, updateState().lastOption).simulationManager.simulationData.step shouldBe i
-        simulationQueue.size() shouldBe 1
-        eventQueue.clear()
+        eventQueue.size() shouldBe 1
+      eventQueue.clear()
 
     "stop simulation" in:
       simulationService.start()

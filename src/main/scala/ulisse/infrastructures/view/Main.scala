@@ -8,7 +8,7 @@ import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.useCases.{RouteService, SimulationService, StationService}
-import ulisse.applications.{AppState, SimulationState}
+import ulisse.applications.AppState
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.TrainTechnology
@@ -19,20 +19,19 @@ import ulisse.infrastructures.view.station.StationEditorView
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
 
-val eventStream           = LinkedBlockingQueue[AppState => AppState]()
-val simulationEventStream = LinkedBlockingQueue[SimulationState => SimulationState]()
+val eventStream = LinkedBlockingQueue[AppState => AppState]()
 
-def runEngines(): Unit =
-  val simulationInitialState =
-    SimulationState(SimulationManager.emptyBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider())))
-  Executors.newSingleThreadExecutor().execute(() =>
-    LazyList.continually(simulationEventStream.take()).foldLeft(simulationInitialState)((state, event) =>
-      event(state)
-    )
-  )
-  val technologies = List(TrainTechnology("AV", 300, 2.0, 1.0), TrainTechnology("Normal", 160, 1.0, 0.5))
+def runEngine(): Unit =
+  val timeProviderAdapter = TimeProviderAdapter(TimeProvider.systemTimeProvider())
+  val technologies        = List(TrainTechnology("AV", 300, 2.0, 1.0), TrainTechnology("Normal", 160, 1.0, 0.5))
   val initialState =
-    AppState(StationManager(), RouteManager.empty(), TrainManager(List.empty), TechnologyManager(technologies))
+    AppState(
+      StationManager(),
+      RouteManager.empty(),
+      TrainManager(List.empty),
+      TechnologyManager(technologies),
+      SimulationManager.emptyBatchManager(timeProviderAdapter)
+    )
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
     event(state)
   )
@@ -42,14 +41,14 @@ def runEngines(): Unit =
 //  app.contents = Menu(app)
 //  app.open()
 
-  runEngines()
+  runEngine()
 
 @main def stationEditor(): Unit =
   val app      = AppFrame()
   val settings = StationSettings()
   app.contents = settings.stationEditorView
   app.open()
-  runEngines()
+  runEngine()
 
 final case class SimulationSettings():
   val simulationNoficationBridge = SimulationNotificationBridge(() => simulationPage)
@@ -59,7 +58,6 @@ final case class SimulationSettings():
 
   val inputAdapter: SimulationService = SimulationService(
     eventStream,
-    simulationEventStream,
     simulationNotificationAdapter
   )
 
