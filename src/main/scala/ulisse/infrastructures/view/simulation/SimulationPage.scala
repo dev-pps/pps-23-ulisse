@@ -3,10 +3,10 @@ package ulisse.infrastructures.view.simulation
 import ulisse.adapters.input.SimulationPageAdapter
 import ulisse.entities.simulation.Simulations.SimulationData
 import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.LayeredContainers.JLayeredPane
 
 import scala.swing.{ BorderPanel, BoxPanel, Component, Label, Orientation, Swing }
 import ulisse.infrastructures.view.components.ComponentUtils.*
+import ulisse.infrastructures.view.components.container.LayeredContainers.JLayeredPane
 import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
 
 import java.awt.{ BorderLayout, Color }

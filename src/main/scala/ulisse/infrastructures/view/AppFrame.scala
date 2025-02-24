@@ -1,7 +1,6 @@
 package ulisse.infrastructures.view
 
 import ulisse.infrastructures.view.components.ComponentMixins.UpdatableContainer
-import ulisse.infrastructures.view.menu.Menu
 
 import scala.swing.*
 

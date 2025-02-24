@@ -1,16 +1,16 @@
-package ulisse.infrastructures.view.common
+package ulisse.infrastructures.view.page
 
 import ulisse.infrastructures.view.components.ui.composed.ComposedImage.Direction
 import ulisse.infrastructures.view.components.ui.composed.ComposedImage.Direction.{Horizontal, Vertical}
 import ulisse.infrastructures.view.components.ui.composed.{ComposedImage, ComposedSwing}
+import ulisse.infrastructures.view.page.Form
 
 import scala.swing.Component
 
-trait CentralController:
+trait CentralController extends ComposedSwing:
   def stationForm: Form
   def routeForm: Form
   def scheduleForm: Form
-  def component[T >: Component]: T
 
 object CentralController:
   def createMap(): MapController = MapController()
@@ -28,7 +28,7 @@ object CentralController:
     given direction: Direction = Horizontal
     private val station        = ComposedImage.createIconLabel("icons/station.svg", "station")
     private val route          = ComposedImage.createIconLabel("icons/route.svg", "route")
-    private val schedule       = ComposedImage.createIconLabel("icons/train.svg", "schedule")
+    private val schedule       = ComposedImage.createIconLabel("icons/menu/train.svg", "schedule")
 
     private val menu: BaseCentralController =
       BaseCentralController(station, route, schedule)(Form.createStation(), Form.createRoute(), Form.createSchedule())

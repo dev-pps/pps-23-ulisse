@@ -1,9 +1,7 @@
 package ulisse.infrastructures.view.map
 
-import ulisse.infrastructures.view.common.CentralController
 import ulisse.infrastructures.view.components.container.LayeredContainers.JLayeredPane
-import ulisse.infrastructures.view.map.MapPanel
-import ulisse.infrastructures.view.menu.Menu
+import ulisse.infrastructures.view.page.CentralController
 
 import java.awt.BorderLayout
 import scala.swing.{BorderPanel, Component, Dimension}
