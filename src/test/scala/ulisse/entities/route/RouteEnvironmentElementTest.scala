@@ -43,59 +43,44 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
   "A trainAgent" when:
     "take a route" should:
       "be place in a track if it empty" in:
-        route.firstAvailableContainer shouldBe Some(Track(1))
-        train3905.take(route) match
+        route.putTrain(train3905) match
           case Some(updatedRoute) =>
             updatedRoute.containers.find(_.contains(train3905)) shouldBe Some(Track(1, train3905))
-            updatedRoute.firstAvailableContainer shouldBe Some(Track(2))
-            updatedRoute.containers shouldBe Seq(
-              Track(1, train3905),
-              Track(2)
-            )
+            updatedRoute.containers shouldBe Seq(Track(1, train3905), Track(2))
           case None => fail()
 
       "not be place in a track if not available" in:
-        train3905.take(route).flatMap(train3906.take) match
+        route.putTrain(train3905).flatMap(_.putTrain(train3906)) match
           case Some(updatedRoute) =>
             updatedRoute.containers.find(_.contains(train3906)) shouldBe Some(Track(2, train3906))
-            updatedRoute.firstAvailableContainer shouldBe None
-            updatedRoute.containers shouldBe Seq(
-              Track(1, train3905),
-              Track(2, train3906)
-            )
-            train3907.take(updatedRoute) shouldBe None
+            updatedRoute.containers shouldBe Seq(Track(1, train3905), Track(2, train3906))
+            updatedRoute.putTrain(train3907) shouldBe None
           case None => fail()
 
       "not be place if it's already in the route" in:
-        train3905.take(route).flatMap(train3905.take) shouldBe None
-        train3905.take(route).flatMap(
+        route.putTrain(train3905).flatMap(_.putTrain(train3905)) shouldBe None
+        route.putTrain(train3905).flatMap(
           _.updateTrain(train3905.updateDistanceTravelled(100.0 + train3905.length))
-        ).flatMap(train3905.take) shouldBe None
+        ).flatMap(_.putTrain(train3905)) shouldBe None
 
       "be place in a track if available" in:
         val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
-        train3905.take(route).flatMap(_.updateTrain(train3905Updated)) match
+        route.putTrain(train3905).flatMap(_.updateTrain(train3905Updated)).flatMap(_.putTrain(train3906)) match
           case Some(updatedRoute) =>
-            updatedRoute.firstAvailableContainer shouldBe Some(Track(1, train3905Updated))
-            train3906.take(updatedRoute) match
-              case Some(updatedRoute) =>
-                updatedRoute.containers.find(_.contains(train3906)) shouldBe Some(Track(1, train3905Updated, train3906))
-              case None => fail()
+            updatedRoute.containers.find(_.contains(train3906)) shouldBe Some(Track(1, train3905Updated, train3906))
           case None => fail()
 
     "put in a route" should:
-      "be placed in the first matching track" in:
-        route.putTrain(Track(1), train3905) match
+      "be placed in the first available track" in:
+        route.putTrain(train3905) match
           case Some(updatedRoute) =>
             updatedRoute.containers shouldBe Seq(
               Track(1, train3905),
               Track(2)
             )
-            updatedRoute.firstAvailableContainer shouldBe Some(Track(2))
           case None => fail()
 
-        route.putTrain(Track(1), train3905).flatMap(_.putTrain(
-          Track(2),
+        route.putTrain(train3905).flatMap(_.putTrain(
           train3906
         )) match
           case Some(updatedRoute) =>
@@ -103,41 +88,34 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
               Track(1, train3905),
               Track(2, train3906)
             )
-            updatedRoute.firstAvailableContainer shouldBe None
           case None => fail()
 
       "not be placed if it's already in the route" in:
-        route.putTrain(Track(1), train3905).flatMap(_.putTrain(
-          Track(1),
+        route.putTrain(train3905).flatMap(_.putTrain(
           train3905
         )) shouldBe None
 
       "not be placed if it's not available" in:
-        route.putTrain(Track(1), train3905).flatMap(_.putTrain(
-          Track(1, train3905),
+        route.putTrain(train3905).flatMap(_.putTrain(
           train3906
-        )) shouldBe None
+        )).flatMap(_.putTrain(train3907)) shouldBe None
 
       "be place behind if it is possible" in:
         val train3905Updated = train3905.updateDistanceTravelled(100.0 + train3905.length)
-        route.putTrain(Track(1), train3905).flatMap(_.updateTrain(train3905Updated)).flatMap(
-          _.putTrain(
-            Track(1, train3905Updated),
-            train3906
-          )
+        route.putTrain(train3905).flatMap(_.updateTrain(train3905Updated)).flatMap(
+          _.putTrain(train3906)
         ) match
           case Some(updatedRoute) =>
             updatedRoute.containers shouldBe Seq(
               Track(1, train3905Updated, train3906),
               Track(2)
             )
-            updatedRoute.firstAvailableContainer shouldBe Some(Track(2))
           case None => fail()
 
     "update in a route" should:
       "be updated if present" in:
         val updatedTrain3905 = train3905.updateDistanceTravelled(1)
-        train3905.take(route).flatMap(_.updateTrain(updatedTrain3905)) match
+        route.putTrain(train3905).flatMap(_.updateTrain(updatedTrain3905)) match
           case Some(updatedRoute) =>
             updatedRoute.containers.find(_.contains(train3905)) shouldBe Some(Track(1, updatedTrain3905))
             updatedRoute.containers shouldBe Seq(
@@ -151,7 +129,7 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
 
     "remove from a route" should:
       "be removed if present" in:
-        train3905.take(route).flatMap(_.removeTrain(train3905)) match
+        route.putTrain(train3905).flatMap(_.removeTrain(train3905)) match
           case Some(updatedRoute) =>
             updatedRoute.containers.find(_.contains(train3905)) shouldBe None
             updatedRoute.containers shouldBe Seq(
