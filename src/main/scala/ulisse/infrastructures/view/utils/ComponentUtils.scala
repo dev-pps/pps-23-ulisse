@@ -1,34 +1,18 @@
-package ulisse.infrastructures.view.components
+package ulisse.infrastructures.view.utils
 
 import ulisse.infrastructures.view.components.ComponentConfigurations.Alignment
-import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.EnhancedLook
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
 import ulisse.infrastructures.view.components.ui.decorators.Styles
+import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.EnhancedLook
 
 import java.awt
 import java.awt.{BorderLayout, Color, Graphics}
-import javax.swing.{DefaultButtonModel, Icon, JToggleButton}
 import javax.swing.JToggleButton.ToggleButtonModel
 import javax.swing.border.LineBorder
 import javax.swing.plaf.basic.BasicRadioButtonUI
+import javax.swing.{DefaultButtonModel, Icon, JToggleButton}
 import scala.swing.event.MouseClicked
-import scala.swing.{
-  AbstractButton,
-  BoxPanel,
-  ButtonGroup,
-  Component,
-  Container,
-  Dimension,
-  Graphics2D,
-  Orientation,
-  Panel,
-  Publisher,
-  RadioButton,
-  SequentialContainer,
-  Swing,
-  ToggleButton,
-  UIElement
-}
+import scala.swing.*
 
 object ComponentUtils:
   extension [E <: UIElement](element: E)

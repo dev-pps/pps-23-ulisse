@@ -3,7 +3,7 @@ package ulisse.infrastructures.view.components.ui.composed
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
 import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
-import ulisse.infrastructures.view.components.ui.composed.ComposedImage.SVGIconLabel
+import ulisse.infrastructures.view.components.ui.composed.ComposedLabel.SVGIconLabel
 import ulisse.infrastructures.view.components.ui.decorators.Styles
 
 import java.awt
