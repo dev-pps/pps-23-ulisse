@@ -31,7 +31,6 @@ import scala.swing.{
 }
 
 object ComponentUtils:
-
   extension [E <: UIElement](element: E)
     def fixedSize(width: Int, height: Int): E =
       element.preferredSize = new Dimension(width, height)

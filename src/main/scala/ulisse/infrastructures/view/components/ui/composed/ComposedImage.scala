@@ -2,6 +2,7 @@ package ulisse.infrastructures.view.components.ui.composed
 
 import ulisse.infrastructures.view.common.Themes.{withAlpha, Theme}
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
+import ulisse.infrastructures.view.components.ui.composed.ComposedImage.Direction.{Horizontal, Vertical}
 import ulisse.infrastructures.view.components.ui.decorators.ImageEffects.{ImageEffect, PictureEffect, SVGEffect}
 import ulisse.infrastructures.view.components.ui.decorators.Styles
 
@@ -9,23 +10,27 @@ import java.awt.Dimension
 import scala.swing.{Component, Orientation}
 
 object ComposedImage:
-  def createPictureLabel(path: String, text: String): PictureLabel  = new PictureLabel(path, text)
-  def createIconLabel(iconPath: String, text: String): SVGIconLabel = new SVGIconLabel(iconPath, text)
+  enum Direction(val orientation: Orientation.Value, val width: Int, val height: Int):
+    case Horizontal extends Direction(Orientation.Horizontal, 100, 40)
+    case Vertical   extends Direction(Orientation.Vertical, 100, 100)
+
+  def createPictureLabel(path: String, text: String)(using direction: Direction): PictureLabel =
+    new PictureLabel(path, text, direction)
+  def createIconLabel(iconPath: String, text: String)(using direction: Direction): SVGIconLabel =
+    new SVGIconLabel(iconPath, text, direction)
 
   /** Represents a label with an image and text */
-  private case class ImageLabel[I <: ImageEffect](image: I, text: String) extends ComposedSwing:
-    private val width  = 100
-    private val height = 40
-
+  private case class ImageLabel[I <: ImageEffect](image: I, text: String, direction: Direction) extends ComposedSwing:
     private val rectClosePalette = Styles.createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
     private val rectOpenPalette  = rectClosePalette.withBackground(Theme.light.background.withAlpha(50))
 
-    private val mainPanel  = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
+    private val mainPanel  = ExtendedSwing.JBoxPanelItem(direction.orientation)
     private val labelPanel = ExtendedSwing.JFlowPanelItem()
     private val label      = ExtendedSwing.JLabelItem(text)
 
-    image.preferredSize = Dimension(height, height)
-    label.preferredSize = Dimension(width, height)
+    mainPanel.preferredSize = Dimension(direction.width, direction.height)
+    image.preferredSize = Dimension(direction.height, direction.height)
+    if direction == Horizontal then label.preferredSize = Dimension(direction.height, direction.height)
 
     mainPanel.rectPalette = rectOpenPalette
     label.rectPalette = Styles.transparentPalette
@@ -50,12 +55,16 @@ object ComposedImage:
 
   /** Represents a label with a picture and text */
   case class PictureLabel private (private val pictureLabel: ImageLabel[PictureEffect]) extends ComposedSwing:
-    def this(path: String, text: String) = this(ImageLabel(ExtendedSwing.createPicturePanel(path), text))
+    def this(path: String, text: String, direction: Direction) =
+      this(ImageLabel(ExtendedSwing.createPicturePanel(path), text, direction))
+
     export pictureLabel.component
 
   /** Represents a label with an icon and text */
   case class SVGIconLabel private (private val svgIconLabel: ImageLabel[SVGEffect]) extends ComposedSwing:
-    def this(path: String, text: String) = this(ImageLabel(ExtendedSwing.createSVGPanel(path), text))
+    def this(path: String, text: String, direction: Direction) =
+      this(ImageLabel(ExtendedSwing.createSVGPanel(path), text, direction))
+
     private val iconClosePalette =
       Styles.createPalette(Theme.light.background, Theme.light.background, Theme.light.background)
     private val iconOpenPalette = iconClosePalette.withBackground(Theme.light.overlay)

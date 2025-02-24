@@ -1,5 +1,7 @@
 package ulisse.infrastructures.view.common
 
+import ulisse.infrastructures.view.components.ui.composed.ComposedImage.Direction
+import ulisse.infrastructures.view.components.ui.composed.ComposedImage.Direction.{Horizontal, Vertical}
 import ulisse.infrastructures.view.components.ui.composed.{ComposedImage, ComposedSwing}
 
 import scala.swing.Component
@@ -23,9 +25,10 @@ object CentralController:
     def component[T >: Component]: T                    = tabbedPane.component
 
   case class MapController() extends CentralController:
-    private val station  = ComposedImage.createIconLabel("icons/station.svg", "station")
-    private val route    = ComposedImage.createIconLabel("icons/route.svg", "route")
-    private val schedule = ComposedImage.createIconLabel("icons/train.svg", "schedule")
+    given direction: Direction = Horizontal
+    private val station        = ComposedImage.createIconLabel("icons/station.svg", "station")
+    private val route          = ComposedImage.createIconLabel("icons/route.svg", "route")
+    private val schedule       = ComposedImage.createIconLabel("icons/train.svg", "schedule")
 
     private val menu: BaseCentralController =
       BaseCentralController(station, route, schedule)(Form.createStation(), Form.createRoute(), Form.createSchedule())
