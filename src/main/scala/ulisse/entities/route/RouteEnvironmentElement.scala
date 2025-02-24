@@ -20,18 +20,15 @@ object RouteEnvironmentElement:
       TrainAgentsContainer.generateSequentialContainers(i => Track(i), route.railsCount)
     )
 
-  extension (train: TrainAgent)
-    def take(route: RouteEnvironmentElement): Option[RouteEnvironmentElement] =
-      route.firstAvailableContainer.flatMap(track => route.putTrain(track, train))
-
   private final case class RouteEnvironmentElementImpl(route: Route, containers: Seq[TrainAgentsContainer])
       extends RouteEnvironmentElement:
     export route.*
 
-    def putTrain(track: TrainAgentsContainer, train: TrainAgent): Option[RouteEnvironmentElement] =
-      containers.updateFirstWhenWithEffects(_ == track)(_.putTrain(train)).map(tracks =>
-        copy(containers = tracks)
-      ) when track.isAvailable && !contains(train)
+    def putTrain(train: TrainAgent): Option[RouteEnvironmentElement] =
+      (for
+        firstAvailableContainer <- containers.find(_.isAvailable)
+        updatedContainer        <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train))
+      yield copy(containers = updatedContainer)) when !contains(train) // firstAvailableContainer.isEmpty &&
 
     override def buildNewEnvironmentElement(containers: Seq[TrainAgentsContainer]): RouteEnvironmentElement =
       copy(containers = containers)

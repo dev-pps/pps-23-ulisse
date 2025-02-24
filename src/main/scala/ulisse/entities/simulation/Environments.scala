@@ -70,7 +70,7 @@ object Environments:
               case _         => this
           case d if d >= route.length =>
             (
-              stations.find(_.name == route.arrival.name).flatMap(destination => agent.arriveAt(destination)),
+              stations.find(_.name == route.arrival.name).flatMap(_.putTrain(agent)),
               route.updateTrain(agent)
             ) match
               case (Some(see), Some(ree)) =>
