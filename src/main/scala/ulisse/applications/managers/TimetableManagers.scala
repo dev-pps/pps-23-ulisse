@@ -61,6 +61,9 @@ object TimetableManagers:
       */
     def remove(trainName: String, departureTime: ClockTime): Either[TimetableNotFound, TimetableManager]
 
+    /** Returns sequence of timetables. */
+    def tables: Seq[Timetable]
+
     /** Gets all timetables of a given `trainName`
       * If al least one timetable is saved returns List of TrainTimetables, otherwise a Left of `TimetableNotFound`
       */
@@ -103,5 +106,6 @@ object TimetableManagers:
           })
         yield TimetableManagerImpl(updatedTimetables)
 
+      override def tables: Seq[Timetable] = timetables.values.toList.flatten
       override def tablesOf(trainName: String): Either[TimetableNotFound, List[Timetable]] =
         timetables.find((k, _) => k.name.contentEquals(trainName)).map(_._2).toRight(TimetableNotFound(trainName))

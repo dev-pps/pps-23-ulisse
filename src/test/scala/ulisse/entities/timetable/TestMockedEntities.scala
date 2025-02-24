@@ -11,6 +11,7 @@ object TestMockedEntities:
   val trainTechnology: TrainTechnology = TrainTechnology("AV", maxSpeed = 300, acceleration = 1.5, deceleration = 1.0)
   val wagonInfo: Wagons.Wagon          = Wagons.PassengerWagon(300)
   val AV1000Train: Train               = Train(name = "AV1000", trainTechnology, wagonInfo, length = 4)
+  val AV800Train: Train                = Train(name = "AV800", trainTechnology, wagonInfo, length = 12)
   val railAV_10: RailInfo              = RailInfo(length = 10, typeRoute = AV)
 
   val stationA: Station = Station("Station A", Coordinate(0, 0), 1)

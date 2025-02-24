@@ -20,8 +20,10 @@ object TimetablePorts:
     final case class OverlapError(reason: String)
         extends ErrorValidation(s"train timetable not saved: $reason")
         with TimetableServiceErrors
-    final case class InvalidStationSelection(reason: String) extends ErrorValidation(reason) with TimetableServiceErrors
-    final case class GenericError(reason: String)            extends ErrorMessage(reason) with TimetableServiceErrors
+    final case class UnavailableTracks(stationName: String)
+        extends ErrorMessage(s"$stationName is full: no available tracks") with TimetableServiceErrors
+    final case class InvalidStation(reason: String) extends ErrorValidation(reason) with TimetableServiceErrors
+    final case class GenericError(reason: String)   extends ErrorMessage(reason) with TimetableServiceErrors
 
   trait Input:
     /**   Returns updated list of timetables when `trainName`, `departureTime` and `stations`

@@ -2,9 +2,16 @@ package ulisse.applications.useCases
 
 import ulisse.applications.managers.TimetableManagers.{TimetableManager, TimetableManagerErrors}
 import ulisse.applications.ports.TimetablePorts
-import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{GenericError, OverlapError, TrainTablesNotExist}
+import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{
+  GenericError,
+  InvalidStation,
+  OverlapError,
+  TrainTablesNotExist,
+  UnavailableTracks
+}
 import ulisse.applications.ports.TimetablePorts.{RequestResult, StationId, TimetableServiceErrors, WaitingTime}
 import ulisse.entities.Routes.Route
+import ulisse.entities.station.Station
 import ulisse.entities.timetable.MockedEntities.AppStateTimetable
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.entities.train.Trains.Train
@@ -20,9 +27,10 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
   extension (toCheck: List[(StationId, WaitingTime)])
     /** @param existingRoutes
       *   Route and technology actually saved
-      * Returns a list of pair `(Route, WaitingTime)` starting from `toCheck` list. If some route does not exist `None` is returned.
+      * Returns a list of pair `(Route, WaitingTime)` starting from `toCheck` list.
+      * If some route does not exist `InvalidStation` error is returned.
       */
-    private def validateStations(existingRoutes: List[Route]): Option[List[(Route, WaitingTime)]] =
+    private def toRoutes(existingRoutes: List[Route]): Either[InvalidStation, List[(Route, WaitingTime)]] =
       extension (route: Route)
         private def hasStationNames(a: String, b: String): Boolean =
           val arrivalName   = route.arrival.name
@@ -35,9 +43,19 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
         userStationsPair.flatMap((departure, arriving) =>
           existingRoutes.find(_ hasStationNames (departure._1, arriving._1)).map(r => (r, arriving._2))
         )
+      if routesFound.sizeIs == userStationsPair.size then
+        Right(routesFound)
+      else Left(InvalidStation(s"Invalid station sequence: some route not exists"))
 
-      Option.when(routesFound.sizeIs == userStationsPair.size):
-        routesFound
+  extension (routesWaiting: List[(Route, WaitingTime)])
+    private def checkAvailableTracks(
+        station: Station,
+        departureTime: ClockTime,
+        timetables: Seq[Timetable]
+    ): Either[UnavailableTracks, List[(Route, WaitingTime)]] =
+      val occupiedTracks =
+        timetables.filter(t => t.startStation.name == station.name && t.departureTime == departureTime)
+      Either.cond(occupiedTracks.sizeIs < station.numberOfTracks, routesWaiting, UnavailableTracks(station.name))
 
   /** Given `trainName`, `departureTime` and stations with its waitingTime a new TrainTimetable should be saved.
     * Returns a `TimetableServiceErrors` in case of error during creation.
@@ -49,8 +67,9 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
   ): Future[RequestResult] = stateEventQueue.updateWith: (state, promise) =>
     val savedRoutes: List[Route] = state.routeManager.routes
     val savedTrains              = state.trainManager.trains
+    val savedTimetables          = state.timetableManager.tables
     for
-      timetable     <- buildTimetable(trainName, departureTime, stations)(savedTrains, savedRoutes)
+      timetable     <- buildTimetable(trainName, departureTime, stations)(savedTrains, savedRoutes, savedTimetables)
       newManager    <- state.timetableManager.save(timetable)
       updatedTables <- newManager.tablesOf(trainName)
     yield
@@ -63,14 +82,16 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
       usrStations: List[(StationId, WaitingTime)]
   )(
       trains: List[Train],
-      routes: List[Route]
+      routes: List[Route],
+      timetables: Seq[Timetable]
   ): Either[BaseError, Timetable] =
     for
-      train           <- trains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
-      stationEntities <- usrStations.validateStations(routes).toRight(GenericError(s"some route not exists"))
-      startFrom       <- stationEntities.headOption.toRight(GenericError(s"start station not found"))
-      arriveTo        <- stationEntities.lastOption.toRight(GenericError(s"arriving station not found"))
-    yield stationEntities.foldLeft(TimetableBuilder(train, startFrom._1.departure, departureTime)) {
+      train         <- trains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
+      routesWaiting <- usrStations.toRoutes(routes)
+      startFrom     <- routesWaiting.headOption.toRight(InvalidStation("start station not found"))
+      _             <- routesWaiting.checkAvailableTracks(startFrom._1.departure, departureTime, timetables)
+      arriveTo      <- routesWaiting.lastOption.toRight(InvalidStation("arriving station not found"))
+    yield routesWaiting.foldLeft(TimetableBuilder(train, startFrom._1.departure, departureTime)) {
       case (timetable, (route, Some(waitTime))) =>
         timetable.stopsIn(route.arrival, waitTime)(RailInfo(route.length, route.typology))
       case (timetable, (route, None)) => timetable.transitIn(route.arrival)(RailInfo(route.length, route.typology))
@@ -101,7 +122,7 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
       error match
         case TimetableManagerErrors.AcceptanceError(reason)      => OverlapError(reason)
         case TimetableManagerErrors.TimetableNotFound(trainName) => TrainTablesNotExist(trainName)
-        case GenericError(msg)                                   => GenericError(msg)
+        case e: TimetableServiceErrors                           => e
         case _                                                   => GenericError("Unknown error")
 
   extension (queue: LinkedBlockingQueue[AppStateTimetable => AppStateTimetable])
