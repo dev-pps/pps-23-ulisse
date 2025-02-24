@@ -15,9 +15,7 @@ object Environments:
     def stations: Seq[StationEnvironmentElement]
     def routes: Seq[RouteEnvironmentElement]
     def agents: Seq[SimulationAgent] =
-      (stations.flatMap(_.platforms.flatMap(_.train)) ++ routes.flatMap(_.tracks.flatMap(_.trains))).distinct
-    def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment
-    def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment
+      (stations.flatMap(_.containers.flatMap(_.trains)) ++ routes.flatMap(_.containers.flatMap(_.trains))).distinct
 
   object RailwayEnvironment:
     // TODO evaluate where to do the initial placement of the trains
