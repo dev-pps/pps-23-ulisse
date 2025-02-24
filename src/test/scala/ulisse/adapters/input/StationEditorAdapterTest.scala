@@ -28,6 +28,7 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
   private val initialState = AppState.default()
   private val eventStream  = LinkedBlockingQueue[AppState => AppState]()
   private val inputPort    = StationService(eventStream)
+  private val mockedService = mock[StationService]
   private val controller   = StationEditorAdapter(inputPort)
   private val updateState  = () => runAll(initialState, eventStream)
 
