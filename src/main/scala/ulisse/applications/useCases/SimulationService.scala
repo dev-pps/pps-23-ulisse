@@ -14,8 +14,8 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 final case class SimulationService(
-    eventQueue: LinkedBlockingQueue[AppState => AppState],
-    notificationService: SimulationPorts.Output
+    private val eventQueue: LinkedBlockingQueue[AppState => AppState],
+    private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
   eventQueue.add((appState: AppState) => {
     appState.copy(simulationManager =
@@ -29,9 +29,10 @@ final case class SimulationService(
 
   def start(): Future[EngineState] =
     val p = Promise[EngineState]()
-    eventQueue.add((appState: AppState) => {
+    eventQueue.offer((appState: AppState) => {
       val newSimulationManager = appState.simulationManager.start()
       p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engineState })
+      println("Start1")
       doStep()
       appState.copy(simulationManager = newSimulationManager)
     })
@@ -58,9 +59,12 @@ final case class SimulationService(
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   private def doStep(): Unit =
     eventQueue.offer((appState: AppState) => {
+      println("Start2")
       if appState.simulationManager.engineState.running then
+        println("Start3")
         doStep()
         appState.copy(simulationManager = appState.simulationManager.doStep())
       else
+        println("Start4")
         appState
     })
