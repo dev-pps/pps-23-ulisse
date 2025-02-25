@@ -1,6 +1,6 @@
 package ulisse.entities.station
 
-import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
+import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer, TrainAgentsDirection}
 import ulisse.entities.simulation.Environments
 import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.*
@@ -19,10 +19,10 @@ object StationEnvironmentElement:
       extends StationEnvironmentElement:
     export station.*
 
-    def putTrain(train: TrainAgent): Option[StationEnvironmentElement] =
+    def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[StationEnvironmentElement] =
       (for
         firstAvailableContainer <- containers.find(_.isAvailable)
-        updatedContainer        <- firstAvailableContainer.putTrain(train)
+        updatedContainer        <- firstAvailableContainer.putTrain(train, direction)
       yield copy(containers =
         containers.updateWhen(_ == firstAvailableContainer)(_ => updatedContainer)
       )) when !contains(train)

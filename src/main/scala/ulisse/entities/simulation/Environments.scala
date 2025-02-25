@@ -2,6 +2,7 @@ package ulisse.entities.simulation
 
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.findIn
+import ulisse.entities.simulation.EnvironmentElements.TrainAgentsDirection.Forward
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.station.StationEnvironmentElement.*
@@ -70,7 +71,7 @@ object Environments:
               case _         => this
           case d if d >= route.length =>
             (
-              stations.find(_.name == route.arrival.name).flatMap(_.putTrain(agent)),
+              stations.find(_.name == route.arrival.name).flatMap(_.putTrain(agent, Forward)),
               route.updateTrain(agent)
             ) match
               case (Some(see), Some(ree)) =>

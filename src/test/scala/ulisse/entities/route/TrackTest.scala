@@ -3,6 +3,7 @@ package ulisse.entities.route
 import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import ulisse.entities.simulation.EnvironmentElements.TrainAgentsDirection.Forward
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
@@ -56,22 +57,22 @@ class TrackTest extends AnyWordSpec with Matchers:
     "a new train is added" should:
       "be updated with the new train" in:
         val track = Track(1, train3905, train3906)
-        track :+ train3907 match
+        track :+ (train3907, Forward) match
           case Left(_) => fail()
           case Right(ut) =>
             ut.trains.size shouldBe 3
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
       "not be updated if the train is already moved" in:
-        Track(1, train3905) :+ train3906.updateDistanceTravelled(10) shouldBe Left(
+        Track(1, train3905) :+ (train3906.updateDistanceTravelled(10), Forward) shouldBe Left(
           Chain(Track.Errors.TrainAlreadyMoved)
         )
 
       "not be updated if the train is already present" in:
-        Track(1, train3905) :+ train3905 shouldBe Left(Chain(Track.Errors.DuplicateTrains))
+        Track(1, train3905) :+ (train3905, Forward) shouldBe Left(Chain(Track.Errors.DuplicateTrains))
 
       "not be updated if the train is already present with the same name" in:
-        Track(1, train3905) :+ train3905.updateDistanceTravelled(10) shouldBe Left(Chain(
+        Track(1, train3905) :+ (train3905.updateDistanceTravelled(10), Forward) shouldBe Left(Chain(
           Track.Errors.TrainAlreadyMoved,
           Track.Errors.DuplicateTrains
         ))
