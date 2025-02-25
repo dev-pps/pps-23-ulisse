@@ -4,7 +4,7 @@ import ulisse.entities
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer, TrainAgentsDirection}
 import ulisse.entities.simulation.Environments
-import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.*
 import ulisse.utils.OptionUtils.given

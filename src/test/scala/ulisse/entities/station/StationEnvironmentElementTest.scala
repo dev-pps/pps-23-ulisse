@@ -5,7 +5,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentsDirection.Forward
 import ulisse.entities.station.StationEnvironmentElement.*
-import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 
