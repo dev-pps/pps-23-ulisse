@@ -11,8 +11,20 @@ object SimulationPorts:
     def stepNotification(data: SimulationData): Unit
 
   trait Input:
+    /** Setup simulation manager with AppState data,
+      * should be called every time simulation page is opened
+      * to retrieve also engine initial setup information
+      */
     def initSimulation(): Future[EngineState]
+
+    /** Setup engine with step size and cycles per second, if cyclesPerSecond are none works in batch mode */
     def setupEngine(stepSize: Time, cyclesPerSecond: Option[Int]): Future[EngineState]
+
+    /** Start simulation. Note: the simulation must be initialized first */
     def start(): Future[EngineState]
+
+    /** Stop simulation */
     def stop(): Future[EngineState]
+
+    /** Reset simulation environment to the initialized state maintaining the engine configuration */
     def reset(): Future[EngineState]

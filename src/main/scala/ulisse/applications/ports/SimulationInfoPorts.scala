@@ -12,4 +12,5 @@ object SimulationInfoPorts:
   trait Input:
     def stationInfo(s: Station): Future[Option[StationEnvironmentElement]]
     def routeInfo(r: Route): Future[Option[RouteEnvironmentElement]]
+    // TODO timetables are not really implemented => default empty list
     def trainInfo(t: Train): Future[Option[TrainAgentInfo]]

@@ -8,15 +8,16 @@ import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.Trains
-import ulisse.entities.train.TrainAgents.TrainAgent
+import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentInfo}
 import ulisse.applications.AppState
+
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 final case class SimulationInfoService(
     private val eventQueue: LinkedBlockingQueue[AppState => AppState]
 ) extends SimulationInfoPorts.Input:
-  // TODO is best a future that fails or a future that return an option?
+
   override def stationInfo(s: Station): Future[Option[StationEnvironmentElement]] =
     val p = Promise[Option[StationEnvironmentElement]]
     eventQueue.add((state: AppState) => {
@@ -33,11 +34,12 @@ final case class SimulationInfoService(
     })
     p.future
 
-  override def trainInfo(t: Train): Future[Option[TrainAgent]] =
-    val p = Promise[Option[TrainAgent]]
+  override def trainInfo(t: Train): Future[Option[TrainAgentInfo]] =
+    val p = Promise[Option[TrainAgentInfo]]
+    // TODO find timetables
     eventQueue.add((state: AppState) => {
       p.success(state.simulationManager.simulationData.simulationEnvironment.agents.collect({ case t: TrainAgent => t }
-      ).find(_.name == t.name))
+      ).find(_.name == t.name).map(TrainAgentInfo(_, List.empty)))
       state
     })
     p.future
