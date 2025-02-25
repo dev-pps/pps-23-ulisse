@@ -20,6 +20,10 @@ import ulisse.utils.Times.Time
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
 
+object Main:
+  def main(args: Array[String]): Unit =
+    launchApp()
+
 val eventStream = LinkedBlockingQueue[AppState => AppState]()
 
 def runEngine(): Unit =
