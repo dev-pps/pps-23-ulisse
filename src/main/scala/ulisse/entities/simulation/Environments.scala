@@ -6,7 +6,7 @@ import ulisse.entities.simulation.EnvironmentElements.TrainAgentsDirection.Forwa
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.station.StationEnvironmentElement.*
-import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.*
 
 object Environments:

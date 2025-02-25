@@ -1,7 +1,7 @@
 package ulisse.entities.simulation
 
 import ulisse.entities.station.{Platform, Platform2}
-import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.OptionUtils.when
 import ulisse.utils.CollectionUtils.updateWhenWithEffects
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option

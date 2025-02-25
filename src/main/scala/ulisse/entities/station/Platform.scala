@@ -3,7 +3,7 @@ package ulisse.entities.station
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
 import ulisse.entities.simulation.EnvironmentElements.{TrainAgentsContainer, TrainAgentsDirection}
-import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.OptionUtils.when
 import ulisse.utils.ValidationUtils.validatePositive

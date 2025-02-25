@@ -3,7 +3,7 @@ package ulisse.entities.route
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
 import ulisse.entities.simulation.EnvironmentElements.{TrainAgentsContainer, TrainAgentsDirection}
-import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.{validateRange, validateUniqueItems}

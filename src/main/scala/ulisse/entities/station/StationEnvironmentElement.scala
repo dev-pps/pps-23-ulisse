@@ -2,7 +2,7 @@ package ulisse.entities.station
 
 import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer, TrainAgentsDirection}
 import ulisse.entities.simulation.Environments
-import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.{given_Conversion_Option_Option, when}
 
