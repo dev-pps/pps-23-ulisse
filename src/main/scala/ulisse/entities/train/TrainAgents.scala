@@ -5,6 +5,8 @@ import ulisse.entities.simulation.Environments.{Perception, RailwayEnvironment}
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.simulation.{Environments, SimulationAgent}
 import ulisse.entities.train.Trains.Train
+import ulisse.entities.simulation.Environments.RailwayEnvironment.*
+import ulisse.entities.simulation.Environments.RailwayEnvironment.given
 
 object TrainAgents:
   trait TrainAgentPerceptionData
@@ -23,6 +25,7 @@ object TrainAgents:
     def perceptionData: TrainAgentPerceptionData
 
   trait TrainAgent extends Train with SimulationAgent:
+    type P = TrainAgentPerception
     def distanceTravelled: Double
     def distanceTravelled_=(newDistanceTravelled: Double): TrainAgent
     def resetDistanceTravelled(): TrainAgent                       = distanceTravelled = (0)
@@ -38,4 +41,6 @@ object TrainAgents:
       def distanceTravelled_=(newDistanceTravelled: Double): TrainAgent =
         val minDistanceTravelled = 0.0
         copy(distanceTravelled = math.max(minDistanceTravelled, newDistanceTravelled))
-      override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[Actions.SimulationAction] = None
+      override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[Actions.SimulationAction] =
+        val perception: Option[TrainAgentPerception] = simulationEnvironment.perceptionFor[TrainAgent](this)
+        None
