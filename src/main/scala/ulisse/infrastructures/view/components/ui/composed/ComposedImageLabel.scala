@@ -56,16 +56,17 @@ object ComposedImageLabel:
     override def showIconAndText(): Unit =
       label.visible = true
       mainPanel.rectPalette = rectOpenPalette
+      withDimension(mainPanel.preferredSize.width, mainPanel.preferredSize.height)
 
     override def showIcon(): Unit =
       label.visible = false
       mainPanel.rectPalette = rectClosePalette
+      withDimension(mainPanel.preferredSize.height, mainPanel.preferredSize.height)
 
     override def withDimension(width: Int, height: Int): Unit =
       mainPanel.preferredSize = Dimension(width, height)
       image.preferredSize = Dimension(height, height)
-      if orientation == Orientation.Horizontal then label.preferredSize = Dimension(width, height)
-      mainPanel.revalidate()
+      if orientation == Orientation.Horizontal then label.preferredSize = Dimension(width - height, height)
 
     override def component[T >: Component]: T = mainPanel
 
@@ -94,4 +95,4 @@ object ComposedImageLabel:
 
     override def showIcon(): Unit =
       svgIconLabel.image.svgIconPalette = iconClosePalette
-      svgIconLabel.showIconAndText()
+      svgIconLabel.showIcon()

@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.map
 
-import ulisse.infrastructures.view.map.ViewObservers.{ViewObservable, ViewObserver}
+import ulisse.infrastructures.view.common.ViewObservers
+import ulisse.infrastructures.view.common.ViewObservers.{ViewObservable, ViewObserver}
 
 import java.awt.image.ImageObserver
 import scala.swing.{Graphics2D, Point}

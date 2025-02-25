@@ -17,7 +17,9 @@ object SwingEnhancements:
     def mouseEvents: List[Publisher] = List(mouse.moves, mouse.clicks)
 
     /** Update the graphic component. */
-    def updateGraphics(): Unit = repaint()
+    def updateGraphics(): Unit =
+      revalidate()
+      repaint()
 
     /** Paint the custom appearance of the component. */
     protected def paintLook(g: Graphics2D): Unit = ()

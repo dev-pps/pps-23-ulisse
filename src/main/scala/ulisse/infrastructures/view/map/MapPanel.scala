@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.map
 
 import ulisse.entities.Coordinate
+import ulisse.infrastructures.view.common.ViewObservers
 
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
