@@ -10,7 +10,7 @@ import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{
   UnavailableTracks
 }
 import ulisse.applications.ports.TimetablePorts.{RequestResult, StationId, TimetableServiceErrors, WaitingTime}
-import ulisse.entities.Routes.Route
+import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.MockedEntities.AppStateTimetable
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}

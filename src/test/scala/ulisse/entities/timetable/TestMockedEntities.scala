@@ -1,7 +1,7 @@
 package ulisse.entities.timetable
 
 import ulisse.entities.Coordinate
-import ulisse.entities.Routes.TypeRoute.AV
+import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.Timetables.RailInfo
 import ulisse.entities.train.Trains.{Train, TrainTechnology}

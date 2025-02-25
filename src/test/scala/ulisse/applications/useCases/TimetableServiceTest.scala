@@ -8,7 +8,7 @@ import ulisse.TestUtility.{and, in}
 import ulisse.applications.ports.TimetablePorts
 import ulisse.applications.ports.TimetablePorts.RequestResult
 import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{GenericError, InvalidStation, UnavailableTracks}
-import ulisse.entities.Routes
+import ulisse.entities.route.Routes
 import ulisse.entities.timetable.Timetables
 import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.utils.Times.FluentDeclaration.h
