@@ -1,6 +1,7 @@
 package ulisse.entities.simulation
 
 import ulisse.entities.simulation.Environments.RailwayEnvironment
+import ulisse.utils.Times.{ClockTime, Time}
 
 object Simulations:
   object Actions:
@@ -8,7 +9,7 @@ object Simulations:
     final case class MoveBy(distance: Double) extends SimulationAction
 
   object EngineState:
-    def empty(): EngineState = EngineState(false, None, None, 0, 0)
+    def empty(): EngineState = EngineState(false, None, Time(0, 0, 1), None, 0, 0)
 
     enum Field:
       case Running, CyclesPerSecond, LastUpdate, LastDelta, ElapsedCycleTime
@@ -50,11 +51,12 @@ object Simulations:
   final case class EngineState(
       running: Boolean,
       cyclesPerSecond: Option[Int],
+      stepSize: Time,
       lastUpdate: Option[Double],
       lastDelta: Double,
       elapsedCycleTime: Double
   ):
-    def reset(): EngineState = EngineState(false, cyclesPerSecond, None, 0, 0)
+    def reset(): EngineState = EngineState(false, cyclesPerSecond, stepSize, None, 0, 0)
     def update(currentUpdate: Double): EngineState =
       lastUpdate match
         case Some(lastUpdate) =>
@@ -69,7 +71,7 @@ object Simulations:
           copy(lastUpdate = Some(currentUpdate))
 
   object SimulationData:
-    def empty(): SimulationData = SimulationData(0, 0, RailwayEnvironment.empty())
+    def empty(): SimulationData = SimulationData(0, 0, RailwayEnvironment.empty(), RailwayEnvironment.empty())
     extension (simulationData: SimulationData)
       def increaseStepByOne(): SimulationData = simulationData.copy(step = simulationData.step + 1)
       def increaseSecondElapsedBy(delta: Double): SimulationData =
@@ -78,7 +80,10 @@ object Simulations:
   final case class SimulationData(
       step: Int,
       secondElapsed: Double,
+      private val initialSimulationEnvironment: RailwayEnvironment,
       simulationEnvironment: RailwayEnvironment
   ):
+    def withEnvironment(environment: RailwayEnvironment): SimulationData =
+      copy(initialSimulationEnvironment = environment, simulationEnvironment = environment)
     def reset(): SimulationData =
-      copy(step = 0, secondElapsed = 0, simulationEnvironment = RailwayEnvironment.empty())
+      copy(step = 0, secondElapsed = 0, simulationEnvironment = initialSimulationEnvironment)

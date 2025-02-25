@@ -16,6 +16,7 @@ import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 import ulisse.infrastructures.utilty.{SimulationNotificationAdapterRequirements, SimulationNotificationBridge}
 import ulisse.infrastructures.view.simulation.SimulationPage
 import ulisse.infrastructures.view.station.StationEditorView
+import ulisse.utils.Times.Time
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
 
