@@ -1,25 +1,30 @@
-package ulisse.infrastructures.view
+package ulisse.infrastructures
 
 import ulisse.adapters.input.{SimulationPageAdapter, StationEditorAdapter}
-import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.adapters.output.SimulationNotificationAdapter
+import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
+import ulisse.applications.AppState
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.useCases.{RouteService, SimulationService, StationService}
-import ulisse.applications.AppState
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 import ulisse.infrastructures.utilty.{SimulationNotificationAdapterRequirements, SimulationNotificationBridge}
+import ulisse.infrastructures.view.{AppFrame, GUIView}
 import ulisse.infrastructures.view.menu.Menu
 import ulisse.infrastructures.view.simulation.SimulationPage
 import ulisse.infrastructures.view.station.StationEditorView
 import ulisse.utils.Times.Time
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
+
+object Main:
+  def main(args: Array[String]): Unit =
+    launchApp()
 
 val eventStream = LinkedBlockingQueue[AppState => AppState]()
 
@@ -42,7 +47,6 @@ def runEngine(): Unit =
   val app = AppFrame()
   app.contents = Menu(app)
   app.open()
-
   runEngine()
 
 @main def stationEditor(): Unit =

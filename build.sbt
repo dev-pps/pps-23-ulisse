@@ -28,13 +28,20 @@ Test / javaOptions ++= Seq(
   "-Xmx2G"
 )
 
+enablePlugins(AssemblyPlugin)
+Compile / mainClass := Some("ulisse.infrastructures.view.Main")
+assembly / assemblyMergeStrategy := {
+  case PathList("META-INF", _*) => MergeStrategy.discard
+  case _ => MergeStrategy.first
+}
+assembly / assemblyJarName := "ulisse.jar"
+
 lazy val root = (project in file("."))
   .settings(
     name := "pps-23-ulisse",
     libraryDependencies ++= Seq(
       "com.formdev"             % "flatlaf"           % "3.5.4",
       "com.formdev"             % "flatlaf-extras"    % "3.5.4",
-      "com.miglayout" % "miglayout" % "3.7.4",
       "org.typelevel"          %% "cats-core"         % "2.12.0",
       "org.typelevel"          %% "cats-effect"       % "3.5.4",
       "org.scala-lang.modules" %% "scala-swing"       % "3.0.0",

@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.dashboard
 
-import ulisse.infrastructures.view.{SimulationSettings, StationSettings}
+import ulisse.infrastructures.{SimulationSettings, StationSettings}
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.Cards.*
 import ulisse.infrastructures.view.components.ComponentConfigurations.{
