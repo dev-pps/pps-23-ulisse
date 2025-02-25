@@ -2,7 +2,7 @@ package ulisse.entities.route
 
 import ulisse.entities
 import ulisse.entities.route.Routes.Route
-import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
+import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer, TrainAgentsDirection}
 import ulisse.entities.simulation.Environments
 import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.*
@@ -24,10 +24,10 @@ object RouteEnvironmentElement:
       extends RouteEnvironmentElement:
     export route.*
 
-    def putTrain(train: TrainAgent): Option[RouteEnvironmentElement] =
+    override def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[RouteEnvironmentElement] =
       (for
         firstAvailableContainer <- containers.find(_.isAvailable)
-        updatedContainer        <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train))
+        updatedContainer <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
       yield copy(containers = updatedContainer)) when !contains(train) // firstAvailableContainer.isEmpty &&
 
     override def buildNewEnvironmentElement(containers: Seq[TrainAgentsContainer]): RouteEnvironmentElement =
