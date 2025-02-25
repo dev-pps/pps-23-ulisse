@@ -3,6 +3,7 @@ package ulisse.entities.station
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
+import ulisse.entities.simulation.EnvironmentElements.TrainAgentsDirection.Forward
 import ulisse.entities.station.StationEnvironmentElement.*
 import ulisse.entities.train.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
@@ -33,58 +34,58 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
   "A train" when:
     "arrive to a stationEnvironmentElement" should:
       "be place in a track if available" in:
-        stationEnvironmentElement.putTrain(train3905) match
+        stationEnvironmentElement.putTrain(train3905, Forward) match
           case Some(updatedStation) =>
             updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905)
           case None => fail()
 
       "not be place in a track if it's already in the stationEnvironmentElement" in:
-        stationEnvironmentElement.putTrain(train3905).flatMap(_.putTrain(train3905)) shouldBe None
-        stationEnvironmentElement.putTrain(train3905).flatMap(
-          _.putTrain(train3905.updateDistanceTravelled(10))
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(_.putTrain(train3905, Forward)) shouldBe None
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(
+          _.putTrain(train3905.updateDistanceTravelled(10), Forward)
         ) shouldBe None
 
       "not be place in a track if not available" in:
-        stationEnvironmentElement.putTrain(train3905).flatMap(_.putTrain(train3906)).flatMap(
-          _.putTrain(train3907)
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(_.putTrain(train3906, Forward)).flatMap(
+          _.putTrain(train3907, Forward)
         ) shouldBe None
 
     "put in a platform" should:
       "be place in a track if available" in:
-        stationEnvironmentElement.putTrain(train3905) match
+        stationEnvironmentElement.putTrain(train3905, Forward) match
           case Some(updatedStation) =>
             updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905)
           case None => fail()
 
       "not be place in a track if it's already occupied" in:
-        stationEnvironmentElement.putTrain(train3905).flatMap(
-          _.putTrain(train3905)
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(
+          _.putTrain(train3905, Forward)
         ) shouldBe None
-        stationEnvironmentElement.putTrain(train3905).flatMap(
-          _.putTrain(train3905.updateDistanceTravelled(10))
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(
+          _.putTrain(train3905.updateDistanceTravelled(10), Forward)
         ) shouldBe None
-        stationEnvironmentElement.putTrain(train3905).flatMap(
-          _.putTrain(train3906)
-        ).flatMap(_.putTrain(train3907)) shouldBe None
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(
+          _.putTrain(train3906, Forward)
+        ).flatMap(_.putTrain(train3907, Forward)) shouldBe None
 
       "not be place in a track if it's already in the stationEnvironmentElement" in:
-        stationEnvironmentElement.putTrain(train3905).flatMap(
-          _.putTrain(train3905)
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(
+          _.putTrain(train3905, Forward)
         ) shouldBe None
-        stationEnvironmentElement.putTrain(train3905).flatMap(
-          _.putTrain(train3905.updateDistanceTravelled(10))
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(
+          _.putTrain(train3905.updateDistanceTravelled(10), Forward)
         ) shouldBe None
 
     "update in a platform" should:
       "be updated if is present in the track" in:
-        stationEnvironmentElement.putTrain(train3905).flatMap(
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(
           _.updateTrain(train3905)
         ) match
           case Some(updatedStation) =>
             updatedStation.containers.flatMap(_.trains) shouldBe Seq(train3905)
           case None => fail()
 
-        stationEnvironmentElement.putTrain(train3905).flatMap(
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(
           _.updateTrain(train3905.updateDistanceTravelled(10))
         ) match
           case Some(updatedStation) =>
@@ -92,17 +93,17 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
           case None => fail()
 
       "not be updated if is not present in the track" in:
-        stationEnvironmentElement.putTrain(train3905).flatMap(
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(
           _.updateTrain(train3906)
         ) shouldBe None
 
     "removed form a stationEnvironmentElement" should:
       "be removed from the track if it's present" in:
-        stationEnvironmentElement.putTrain(train3905).flatMap(_.removeTrain(train3905)) match
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(_.removeTrain(train3905)) match
           case Some(updatedStation) =>
             updatedStation.containers.flatMap(_.trains) shouldBe Seq()
           case None => fail()
-        stationEnvironmentElement.putTrain(train3905).flatMap(
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(
           _.removeTrain(train3905.updateDistanceTravelled(10))
         ) match
           case Some(updatedStation) =>
@@ -110,7 +111,7 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
           case None => fail()
 
       "not be removed from the track if it's not present" in:
-        stationEnvironmentElement.putTrain(train3905).flatMap(_.removeTrain(train3906)) shouldBe None
-        stationEnvironmentElement.putTrain(train3905).flatMap(_.removeTrain(train3905)).flatMap(
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(_.removeTrain(train3906)) shouldBe None
+        stationEnvironmentElement.putTrain(train3905, Forward).flatMap(_.removeTrain(train3905)).flatMap(
           _.removeTrain(train3905)
         ) shouldBe None

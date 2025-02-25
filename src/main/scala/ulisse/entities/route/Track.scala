@@ -2,7 +2,7 @@ package ulisse.entities.route
 
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
-import ulisse.entities.simulation.EnvironmentElements.TrainAgentsContainer
+import ulisse.entities.simulation.EnvironmentElements.{TrainAgentsContainer, TrainAgentsDirection}
 import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
 import ulisse.utils.Errors.BaseError
@@ -12,14 +12,15 @@ import scala.annotation.targetName
 
 trait Track extends TrainAgentsContainer:
   val trains: Seq[TrainAgent]
-  override def putTrain(train: TrainAgent): Option[Track] = :+(train).toOption
+  override def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[Track] =
+    :+(train, direction).toOption
   @targetName("appendedTrain")
-  def :+(train: TrainAgent): Either[NonEmptyChain[Track.Errors], Track]
+  def :+(train: TrainAgent, direction: TrainAgentsDirection): Either[NonEmptyChain[Track.Errors], Track]
 
 object Track:
   // TODO evaluate if leave there minPermittedDistanceBetweenTrains or pass as parameter for isAvailable
   def apply(id: Int, trains: TrainAgent*)(using minPermittedDistanceBetweenTrains: Double): Track =
-    TrackImpl(math.max(1, id), trains.distinctBy(_.name))
+    TrackImpl(math.max(1, id), trains.distinctBy(_.name), None)
   def createCheckedTrack(
       id: Int,
       trains: TrainAgent*
@@ -29,11 +30,11 @@ object Track:
       .map(_ => Track(id, trains*))
       .toEither
 
-  private final case class TrackImpl(id: Int, trains: Seq[TrainAgent])(using
-      val minPermittedDistanceBetweenTrains: Double
+  private final case class TrackImpl(id: Int, trains: Seq[TrainAgent], currentDirection: Option[TrainAgentsDirection])(
+      using val minPermittedDistanceBetweenTrains: Double
   ) extends Track:
     @targetName("appendedTrain")
-    override def :+(train: TrainAgent): Either[NonEmptyChain[Track.Errors], Track] =
+    override def :+(train: TrainAgent, direction: TrainAgentsDirection): Either[NonEmptyChain[Track.Errors], Track] =
       // TODO evaluate if is needed and in case improve validate function
       (
         validateRange(train.distanceTravelled, 0.0, 0.0, Errors.TrainAlreadyMoved).toValidatedNec,

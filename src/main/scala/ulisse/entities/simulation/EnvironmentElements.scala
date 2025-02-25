@@ -7,16 +7,19 @@ import ulisse.utils.CollectionUtils.updateWhenWithEffects
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option
 
 object EnvironmentElements:
+  enum TrainAgentsDirection:
+    case Forward, Backward
   trait TrainAgentsContainer:
     def id: Int
     def trains: Seq[TrainAgent]
     def isAvailable: Boolean =
       isEmpty || trains.forall(t => t.distanceTravelled - t.length >= minPermittedDistanceBetweenTrains)
-    def putTrain(train: TrainAgent): Option[TrainAgentsContainer]
+    def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[TrainAgentsContainer]
     def updateTrain(train: TrainAgent): Option[TrainAgentsContainer]
     def removeTrain(train: TrainAgent): Option[TrainAgentsContainer]
     def contains(train: TrainAgent): Boolean = trains.exists(train.matchId)
     def isEmpty: Boolean                     = trains.isEmpty
+    def currentDirection: Option[TrainAgentsDirection]
     def minPermittedDistanceBetweenTrains: Double
 
   object TrainAgentsContainer:
@@ -31,7 +34,7 @@ object EnvironmentElements:
   trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE]]:
     self: EE =>
     def containers: Seq[TrainAgentsContainer]
-    def putTrain(train: TrainAgent): Option[EE]
+    def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[EE]
     def updateTrain(train: TrainAgent): Option[EE] = updaterTemplate(train, _.updateTrain(train), contains(train))
     def removeTrain(train: TrainAgent): Option[EE] = updaterTemplate(train, _.removeTrain(train), contains(train))
     def contains(train: TrainAgent): Boolean       = containers.exists(_.contains(train))
