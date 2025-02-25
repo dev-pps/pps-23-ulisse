@@ -1,8 +1,9 @@
 package ulisse.infrastructures.view.page
 
-import ulisse.infrastructures.view.common.ImagePath
+import ulisse.infrastructures.view.common.ImagePath as ImgPath
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
 import ulisse.infrastructures.view.components.ui.composed.{ComposedLabel, ComposedSwing}
+import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.BorderPanel.Position
 import scala.swing.{BorderPanel, Component, Orientation}
@@ -15,31 +16,30 @@ object Menu:
   def apply(): Menu = MenuImpl()
 
   private case class MenuImpl() extends Menu:
+    private val verticalGap = 10
+    private val widthLabel  = 160
+    private val heightLabel = 60
+
     private val mainPanel  = ExtendedSwing.JBorderPanelItem()
     private val northPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
     private val southPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
 
-    private val iconApp = ComposedLabel.createPictureLabel(ImagePath.logo, "ulisse")
-    private val mainIcons =
-      List((ImagePath.simulation, "simulation"), (ImagePath.map, "map"), (ImagePath.train, "train")).toMap
-    private val controlIcons = List((ImagePath.settings, "settings")).toMap
+    private val iconApp      = ComposedLabel.createPictureLabel(ImgPath.logo, "ulisse")
+    private val mainIcons    = Map(ImgPath.simulation -> "simulation", ImgPath.map -> "map", ImgPath.train -> "train")
+    private val controlIcons = Map(ImgPath.settings -> "settings")
 
     private val mainLabels    = mainIcons.map(ComposedLabel.createIconLabel)
     private val controlLabels = controlIcons.map(ComposedLabel.createIconLabel)
 
-    iconApp.withDimension(160, 60)
-    mainLabels.foreach(_.withDimension(160, 60))
-    controlLabels.foreach(_.withDimension(160, 60))
+    iconApp.withDimension(widthLabel, heightLabel)
+    mainLabels.foreach(_.withDimension(widthLabel, heightLabel))
+    controlLabels.foreach(_.withDimension(widthLabel, heightLabel))
 
-    northPanel.contents += ExtendedSwing.createFlowPanel(iconApp.component)
+    northPanel.contents += iconApp.centerHorizontally()
 
-    mainLabels.map(icon => ExtendedSwing.createFlowPanel(icon.component))
-      .map(panel => { panel.vGap = 10; panel })
-      .foreach(northPanel.contents += _)
-
-    controlLabels.map(icon => ExtendedSwing.createFlowPanel(icon.component))
-      .map(panel => { panel.vGap = 10; panel })
-      .foreach(southPanel.contents += _)
+    private val addVerticalGap = (panel: ExtendedSwing.JFlowPanelItem) => { panel.vGap = verticalGap; panel }
+    northPanel.contents ++= mainLabels.map(_.centerHorizontally()).map(addVerticalGap)
+    southPanel.contents ++= controlLabels.map(_.centerHorizontally()).map(addVerticalGap)
 
     mainPanel.layout(northPanel) = Position.North
     mainPanel.layout(southPanel) = Position.South
