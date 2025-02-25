@@ -1,3 +1,22 @@
+## [1.12.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.11.0...v1.12.0) (2025-02-25)
+
+### Features
+
+* added capacity to compare ClockTime ([7bd6cbc](https://github.com/dev-pps/pps-23-ulisse/commit/7bd6cbcdf2f2be87dc148fe61fe1660186cd658b))
+* added check on track availability in departing station ([bdcf589](https://github.com/dev-pps/pps-23-ulisse/commit/bdcf589f1cd8026e9993f269909eadafc098096b))
+* added lenght (metric unit) to train and to wagon UseType ([b0f9c80](https://github.com/dev-pps/pps-23-ulisse/commit/b0f9c805d36475b702d945249fd3aa7a6ec0ea42))
+* added overalap timetable check in Timetablemanager constructors ([00ce76c](https://github.com/dev-pps/pps-23-ulisse/commit/00ce76c705265fdfad6876bacdf0ee231a7bf4c6))
+* added remove method to TimetableManager TDD ([9f18f13](https://github.com/dev-pps/pps-23-ulisse/commit/9f18f139340ae1b5093c624533aa90d334c0cb43))
+* added seconds to Time ([161a029](https://github.com/dev-pps/pps-23-ulisse/commit/161a029a5716ab0d8aecaa5726ca4d334a338715))
+* init train TimetableManager ([62ab7e1](https://github.com/dev-pps/pps-23-ulisse/commit/62ab7e19006b85dcfd4f13164c3b39c3af6c01b0))
+* new entity ClockTime (TDD), adapting TrainTimetable ([3c20c99](https://github.com/dev-pps/pps-23-ulisse/commit/3c20c991d9b9708ac4da216794d156154f1ad115))
+* TrainTimetable entity (TDD) ([f96d603](https://github.com/dev-pps/pps-23-ulisse/commit/f96d603f50ba7ba706c1c25d9673f1364c1d938f))
+
+### Bug Fixes
+
+* fixed overlapping time during timetable creation ([8d6c620](https://github.com/dev-pps/pps-23-ulisse/commit/8d6c620862fe9e069c6a190f8b75e6923be5835b))
+* NoOverlappingTimePolicy now cover case of no train tables saved ([801420f](https://github.com/dev-pps/pps-23-ulisse/commit/801420f5458713d8618e284f13c516e4dddef184))
+
 ## [1.11.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.10.2...v1.11.0) (2025-02-22)
 
 ### Features
