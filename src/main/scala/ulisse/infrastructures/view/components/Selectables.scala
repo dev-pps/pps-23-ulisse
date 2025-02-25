@@ -16,11 +16,11 @@ object Selectables:
       repaint()
 
   final case class SelectableGroup(group: Selectable*):
-    group.foreach(comp =>
-      comp.genericClickReaction(() => {
-        deselectAll(); select(comp); comp.repaint()
-      })
-    )
+//    group.foreach(comp =>
+//      comp.genericClickReaction(() => {
+//        deselectAll(); select(comp); comp.repaint()
+//      })
+//    )
     deselectAll()
     for h <- group.headOption do select(h)
 

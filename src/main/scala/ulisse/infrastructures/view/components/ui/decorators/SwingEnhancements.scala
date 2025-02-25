@@ -10,6 +10,7 @@ object SwingEnhancements:
   /** Base trait decorator to enhanced look of swing [[Component]] */
   trait EnhancedLook extends Component:
     opaque = false
+    listenTo(mouseEvents: _*)
 
     /** Read-only property to get the mouse events of the component. */
     def mouseEvents: List[Publisher] = List(mouse.moves, mouse.clicks)
@@ -35,7 +36,6 @@ object SwingEnhancements:
     private var _rect: Styles.Rect = Styles.defaultRect
 
     this.updateRect(rect)
-    listenTo(mouseEvents: _*)
     reactions += this.initColorReactions(() => rectPalette)
 
     /** Read-only property to get the shape of the component. */
@@ -61,7 +61,6 @@ object SwingEnhancements:
     private var _font: Styles.Font = Styles.defaultFont
 
     this.updateFont(fontEffect)
-    listenTo(mouseEvents: _*)
     reactions += this.initColorReactions(() => fontPalette)
 
     /** Read-only property to get the font effect of the component. */
@@ -84,7 +83,6 @@ object SwingEnhancements:
     private var _border: Styles.Border = Styles.defaultBorder
 
     this.updateBorder(rect, Styles.defaultBorder)
-    listenTo(mouseEvents: _*)
     reactions += this.initColorReactions(() => rectPalette)
 
     /** Read-only property to get the border of the component. */
