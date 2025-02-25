@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.page
 
 import ulisse.infrastructures.view.common.ImagePath
-import ulisse.infrastructures.view.components.ui.composed.{ComposedLabel, ComposedSwing}
+import ulisse.infrastructures.view.components.ui.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.{Component, Orientation}
@@ -16,7 +16,7 @@ object Dashboard:
   private case class DashboardImpl() extends Dashboard:
     private val width = 100
 
-    private val newIcon    = ComposedLabel.createIconLabel(ImagePath.addSvgIcon, "new")
+    private val newIcon    = ComposedImageLabel.createIconLabel(ImagePath.addSvgIcon, "new")
     private val iconsPanel = newIcon.centerHorizontally()
     private val mainPanel  = iconsPanel.centerVertically()
 

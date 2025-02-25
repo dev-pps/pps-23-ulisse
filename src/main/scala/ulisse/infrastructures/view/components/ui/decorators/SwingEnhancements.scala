@@ -6,6 +6,7 @@ import java.awt.geom.RoundRectangle2D
 import java.awt.{BasicStroke, RenderingHints}
 import scala.swing.{Component, Graphics2D, Publisher}
 
+@SuppressWarnings(Array("org.wartremover.warts.Var"))
 object SwingEnhancements:
   /** Base trait decorator to enhanced look of swing [[Component]] */
   trait EnhancedLook extends Component:
@@ -16,9 +17,7 @@ object SwingEnhancements:
     def mouseEvents: List[Publisher] = List(mouse.moves, mouse.clicks)
 
     /** Update the graphic component. */
-    def updateGraphics(): Unit =
-//      revalidate()
-      repaint()
+    def updateGraphics(): Unit = repaint()
 
     /** Paint the custom appearance of the component. */
     protected def paintLook(g: Graphics2D): Unit = ()
@@ -32,7 +31,6 @@ object SwingEnhancements:
 
   /** Trait to enhance the shape of swing component and [[_rect]] control shape params. */
   trait ShapeEffect extends EnhancedLook:
-    @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _rect: Styles.Rect = Styles.defaultRect
 
     this.updateRect(rect)
@@ -44,7 +42,10 @@ object SwingEnhancements:
     /** Change the shape of the component. */
     def rect_=(newRect: Styles.Rect): Unit = { _rect = newRect; this.updateRect(rect) }
 
-    def rectPalette: Styles.Palette                  = rect.palette
+    /** Read-only property to get the shape palette of the component. */
+    def rectPalette: Styles.Palette = rect.palette
+
+    /** Change the shape palette of the component. */
     def rectPalette_=(palette: Styles.Palette): Unit = rect = rect.withPalette(palette)
 
     override protected def paintLook(g: Graphics2D): Unit =
@@ -69,7 +70,10 @@ object SwingEnhancements:
     /** Change the font effect of the component. */
     def fontEffect_=(newFont: Styles.Font): Unit = { (_font = newFont); this.updateFont(fontEffect) }
 
-    def fontPalette: Styles.Palette                  = fontEffect.palette
+    /** Read-only property to get the font palette of the component. */
+    def fontPalette: Styles.Palette = fontEffect.palette
+
+    /** Change the font palette of the component. */
     def fontPalette_=(palette: Styles.Palette): Unit = fontEffect = fontEffect.withPalette(palette)
 
     override protected def paintLook(g: Graphics2D): Unit =
@@ -79,7 +83,6 @@ object SwingEnhancements:
   /** Trait to enhance the border of swing component and [[_border]] control border params. */
   trait BorderEffect extends EnhancedLook:
     self: ShapeEffect =>
-    @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _border: Styles.Border = Styles.defaultBorder
 
     this.updateBorder(rect, Styles.defaultBorder)
@@ -91,7 +94,10 @@ object SwingEnhancements:
     /** Change the border of the component. */
     def borderEffect_=(border: Styles.Border): Unit = { (_border = border); this.updateBorder(rect, borderEffect) }
 
-    def borderPalette: Styles.Palette                  = borderEffect.palette
+    /** Read-only property to get the border palette of the component. */
+    def borderPalette: Styles.Palette = borderEffect.palette
+
+    /** Change the border palette of the component. */
     def borderPalette_=(palette: Styles.Palette): Unit = borderEffect = borderEffect.withPalette(palette)
 
     override protected def paintLook(g: Graphics2D): Unit =

@@ -8,26 +8,38 @@ import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.En
 import java.awt.geom.{AffineTransform, RoundRectangle2D}
 import scala.swing.{Component, Graphics2D}
 
+@SuppressWarnings(Array("org.wartremover.warts.Var"))
 object ImageEffects:
   private val identityTransform: AffineTransform = new AffineTransform()
 
+  /** Represent an image effect. */
   trait ImageEffect extends EnhancedLook:
+    /** Represent angle of the image. */
     def angle: Int
+
+    /** Represent a picture effect. */
     def withRotation(angle: Int): Unit
 
   /** Represent a picture effect. */
   trait PictureEffect() extends ImageEffect:
-    @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _picture: Picture = Images.defaultPicture
 
     updateGraphics()
 
-    def picture: Picture               = _picture
-    def angle: Int                     = picture.rotation.angle
-    def arc: Int                       = picture.arc
-    def picture_=(path: String): Unit  = { _picture = picture.withPath(path); updateGraphics() }
-    def withRotation(angle: Int): Unit = { _picture = picture.withRotation(angle); updateGraphics() }
-    def withArc(arc: Int): Unit        = { _picture = picture.withArc(arc); updateGraphics() }
+    override def angle: Int                     = picture.rotation.angle
+    override def withRotation(angle: Int): Unit = { _picture = picture.withRotation(angle); updateGraphics() }
+
+    /** Represent a picture. */
+    def picture: Picture = _picture
+
+    /** Represent the arc of the picture. */
+    def arc: Int = picture.arc
+
+    /** Set the path of the picture. */
+    def picture_=(path: String): Unit = { _picture = picture.withPath(path); updateGraphics() }
+
+    /** Set the arc of the picture. */
+    def withArc(arc: Int): Unit = { _picture = picture.withArc(arc); updateGraphics() }
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)
@@ -43,19 +55,25 @@ object ImageEffects:
 
   /** Represent an SVG effect. */
   trait SVGEffect extends ImageEffect:
-    @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _svgIcon: SVGIcon = Images.defaultSVGIcon
 
     updateGraphics()
     listenTo(mouse.moves, mouse.clicks)
     reactions += this.initColorReactions(() => svgIconPalette)
 
-    def svgIcon: SVGIcon               = _svgIcon
-    def angle: Int                     = svgIcon.rotation.angle
-    def svgIcon_=(path: String): Unit  = { _svgIcon = svgIcon.withPath(path); updateGraphics() }
-    def withRotation(angle: Int): Unit = { _svgIcon = svgIcon.withRotation(angle); updateGraphics() }
+    override def angle: Int                     = svgIcon.rotation.angle
+    override def withRotation(angle: Int): Unit = { _svgIcon = svgIcon.withRotation(angle); updateGraphics() }
 
-    def svgIconPalette: Styles.Palette                  = svgIcon.palette
+    /** Represent an SVG icon. */
+    def svgIcon: SVGIcon = _svgIcon
+
+    /** Set the path of the SVG icon. */
+    def svgIcon_=(path: String): Unit = { _svgIcon = svgIcon.withPath(path); updateGraphics() }
+
+    /** Represent the palette of the SVG icon. */
+    def svgIconPalette: Styles.Palette = svgIcon.palette
+
+    /** Set the palette of the SVG icon. */
     def svgIconPalette_=(palette: Styles.Palette): Unit = _svgIcon = svgIcon.withPalette(palette)
 
     override protected def paintLook(g: Graphics2D): Unit =
