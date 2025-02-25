@@ -6,7 +6,7 @@ import ulisse.applications.managers.RouteManagerTest.validateRoute
 import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentsDirection.Forward
-import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 

@@ -10,7 +10,7 @@ import ulisse.entities.route.{RouteEnvironmentElement, Track}
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.entities.station.{Platform, Station, StationEnvironmentElement}
-import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.Train
 
 import java.util.concurrent.LinkedBlockingQueue

@@ -6,7 +6,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.{findIn, leave}
-import ulisse.entities.train.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 

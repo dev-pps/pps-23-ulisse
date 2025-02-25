@@ -7,7 +7,8 @@ import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.train.Trains.Train
-import ulisse.entities.train.{TrainAgent, Trains}
+import ulisse.entities.train.Trains
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.applications.AppState
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
