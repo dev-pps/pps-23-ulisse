@@ -6,14 +6,14 @@ import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.TimetablePorts
-import ulisse.entities.Routes
+import ulisse.entities.route.Routes
 import ulisse.entities.timetable.MockedEntities.AppStateMocked
 
 import java.util.concurrent.LinkedBlockingQueue
 
 /** Configuration of test environment. Initialization of manager needed in tests */
 object TimetableTestEnvironment:
-  import ulisse.entities.Routes.{Route, TypeRoute}
+  import ulisse.entities.route.Routes.{Route, TypeRoute}
   import ulisse.entities.timetable.TestMockedEntities.*
   import ulisse.entities.timetable.MockedEntities.AppStateTimetable
 

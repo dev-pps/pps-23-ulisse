@@ -1,7 +1,7 @@
 package ulisse.entities.train
 
 import ulisse.entities.route.Routes.TypeRoute
-import ulisse.entities.simulation.Environments.{Perception, RailwayEnvironment}
+import ulisse.entities.simulation.Environments.{Perception, PerceptionData, RailwayEnvironment}
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.simulation.{Environments, SimulationAgent}
 import ulisse.entities.train.Trains.Train
@@ -9,30 +9,48 @@ import ulisse.entities.simulation.Environments.RailwayEnvironment.*
 import ulisse.entities.simulation.Environments.RailwayEnvironment.given
 
 object TrainAgents:
-  trait TrainAgentPerceptionData
+  sealed trait TrainAgentPerceptionData extends PerceptionData
 
-  trait TrainStationInfo extends TrainAgentPerceptionData:
+  sealed trait TrainStationInfo extends TrainAgentPerceptionData:
     def hasToMove: Boolean
     def routeTrackIsFree: Boolean
 
-  trait TrainRouteInfo extends TrainAgentPerceptionData:
+  object TrainStationInfo:
+    def apply(hasToMove: Boolean, routeTrackIsFree: Boolean): TrainStationInfo =
+      TrainStationInfoImpl(hasToMove, routeTrackIsFree)
+
+    private final case class TrainStationInfoImpl(hasToMove: Boolean, routeTrackIsFree: Boolean)
+        extends TrainStationInfo
+
+  sealed trait TrainRouteInfo extends TrainAgentPerceptionData:
     def routeTypology: TypeRoute
     def routeLength: Double
     def trainAheadDistance: Option[Double]
     def arrivalStationIsFree: Boolean
 
-  trait TrainAgentPerception extends Perception:
-    def perceptionData: TrainAgentPerceptionData
+  object TrainRouteInfo:
+    def apply(
+        routeTypology: TypeRoute,
+        routeLength: Double,
+        trainAheadDistance: Option[Double],
+        arrivalStationIsFree: Boolean
+    ): TrainRouteInfo = TrainRouteInfoImpl(routeTypology, routeLength, trainAheadDistance, arrivalStationIsFree)
+
+    private final case class TrainRouteInfoImpl(
+        routeTypology: TypeRoute,
+        routeLength: Double,
+        trainAheadDistance: Option[Double],
+        arrivalStationIsFree: Boolean
+    ) extends TrainRouteInfo
+  trait TrainAgentPerception extends Perception[TrainAgentPerceptionData]
 
   trait TrainAgent extends Train with SimulationAgent:
-    type P = TrainAgentPerception
     def distanceTravelled: Double
     def distanceTravelled_=(newDistanceTravelled: Double): TrainAgent
     def resetDistanceTravelled(): TrainAgent                       = distanceTravelled = (0)
     def updateDistanceTravelled(distanceDelta: Double): TrainAgent = distanceTravelled += distanceDelta
-    // TODO evaluate remove this method
-    def isOnRoute: Boolean                       = distanceTravelled > 0
-    def matchId(otherTrain: TrainAgent): Boolean = name == otherTrain.name
+    def matchId(otherTrain: TrainAgent): Boolean                   = name == otherTrain.name
+
   object TrainAgent:
     def apply(train: Train): TrainAgent = TrainAgentImpl(train, 0.0)
 
