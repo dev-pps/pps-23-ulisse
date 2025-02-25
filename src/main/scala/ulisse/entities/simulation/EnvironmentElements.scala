@@ -7,6 +7,8 @@ import ulisse.utils.CollectionUtils.updateWhenWithEffects
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option
 
 object EnvironmentElements:
+  trait EnvironmentElement
+
   enum TrainAgentsDirection:
     case Forward, Backward
   trait TrainAgentsContainer:
@@ -31,7 +33,7 @@ object EnvironmentElements:
       val step: Int => Int = _ + 1
       List.tabulate(numberOfContainers)(i => constructor(step(i)))
 
-  trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE]]:
+  trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE]] extends EnvironmentElement:
     self: EE =>
     def containers: Seq[TrainAgentsContainer]
     def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[EE]

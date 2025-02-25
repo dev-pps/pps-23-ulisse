@@ -10,7 +10,7 @@ import ulisse.entities.route.{RouteEnvironmentElement, Track}
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.entities.station.{Platform, Station, StationEnvironmentElement}
-import ulisse.entities.train.TrainAgents.TrainAgent
+import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentInfo}
 import ulisse.entities.train.Trains.Train
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -84,7 +84,7 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
     "return train info" in:
       val trainInfoResult = simulationInfoService.trainInfo(mockedTrain)
       updateState()
-      Await.result(trainInfoResult, Duration.Inf) shouldBe Some(mockedTrainAgent)
+      Await.result(trainInfoResult, Duration.Inf) shouldBe Some(TrainAgentInfo(mockedTrainAgent, List()))
 
     "return None if train is not in the manager" in:
       val trainInfoResult = simulationInfoService.trainInfo(otherMockedTrain)
