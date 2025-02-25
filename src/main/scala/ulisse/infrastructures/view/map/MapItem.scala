@@ -1,9 +1,10 @@
 package ulisse.infrastructures.view.map
 
 import ulisse.infrastructures.view.common.Themes.Theme
+import ulisse.infrastructures.view.common.ViewObservers
 import ulisse.infrastructures.view.components.draw.JImages.*
 import ulisse.infrastructures.view.components.ui.decorators.Styles
-import ulisse.infrastructures.view.map.ViewObservers.ViewObservable
+import ulisse.infrastructures.view.common.ViewObservers.ViewObservable
 import ulisse.utils.Pair
 
 import java.awt

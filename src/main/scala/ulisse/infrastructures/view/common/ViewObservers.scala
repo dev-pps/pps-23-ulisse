@@ -1,4 +1,4 @@
-package ulisse.infrastructures.view.map
+package ulisse.infrastructures.view.common
 
 object ViewObservers:
 

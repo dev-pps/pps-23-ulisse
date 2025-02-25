@@ -7,6 +7,10 @@ object ImagePath:
   /** Icon to add a new element */
   val addSvgIcon: String = iconsPath + "add.svg"
 
+  /** Icons to control panel */
+  val expand: String  = iconsPath + "expand.svg"
+  val compact: String = iconsPath + "compact.svg"
+
   /** Logo for the application */
   val logo: String = "logo.jpg"
 
