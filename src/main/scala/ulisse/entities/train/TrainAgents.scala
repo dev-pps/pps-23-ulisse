@@ -7,8 +7,10 @@ import ulisse.entities.simulation.{Environments, SimulationAgent}
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.simulation.Environments.RailwayEnvironment.*
 import ulisse.entities.simulation.Environments.RailwayEnvironment.given
+import ulisse.entities.timetable.Timetables.Timetable
 
 object TrainAgents:
+  case class TrainAgentInfo(train: TrainAgent, timetables: List[Timetable])
   sealed trait TrainAgentPerceptionData extends PerceptionData
 
   sealed trait TrainStationInfo extends TrainAgentPerceptionData:

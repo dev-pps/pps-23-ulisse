@@ -9,6 +9,8 @@ import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.simulation.Simulations.EngineState
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.infrastructures.commons.TimeProviders.*
+import ulisse.utils.Times
+import ulisse.utils.Times.Time
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
@@ -17,15 +19,29 @@ final case class SimulationService(
     private val eventQueue: LinkedBlockingQueue[AppState => AppState],
     private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
-  eventQueue.add((appState: AppState) => {
-    appState.copy(simulationManager =
-      appState.simulationManager.withNotificationService(notificationService).setup(RailwayEnvironment(
+
+  override def initSimulation(): Future[EngineState] =
+    val p = Promise[EngineState]()
+    eventQueue.add((appState: AppState) => {
+      val newSimulationManager = appState.simulationManager.setupEnvironment(RailwayEnvironment(
         appState.stationManager.stations.map(StationEnvironmentElement.apply),
         Seq[RouteEnvironmentElement](),
         Seq[SimulationAgent]()
       ))
-    )
-  })
+      p.success(newSimulationManager.engineState)
+      appState.copy(simulationManager = newSimulationManager)
+    })
+    p.future
+
+  override def setupEngine(stepSize: Time, cyclesPerSecond: Option[Int]): Future[EngineState] = {
+    val p = Promise[EngineState]()
+    eventQueue.add((appState: AppState) => {
+      val newSimulationManager = appState.simulationManager.setupEngine(stepSize, cyclesPerSecond)
+      p.success(newSimulationManager.engineState)
+      appState.copy(simulationManager = newSimulationManager)
+    })
+    p.future
+  }
 
   def start(): Future[EngineState] =
     val p = Promise[EngineState]()

@@ -15,7 +15,7 @@ class SimulationPageAdapterTest extends AnyWordSpec with Matchers:
 
   private val mockedPort            = mock[SimulationPorts.Input]
   private val simulationPageAdapter = SimulationPageAdapter(mockedPort)
-  private val defaultEngineState    = EngineState(false, None, None, 0, 0)
+  private val defaultEngineState    = EngineState.empty()
 
   "SimulationPageAdapter" should:
     "start simulation" in:

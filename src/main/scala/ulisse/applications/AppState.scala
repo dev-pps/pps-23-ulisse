@@ -8,6 +8,7 @@ import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
+import ulisse.utils.Times.Time
 
 object AppState:
   def default(): AppState =
