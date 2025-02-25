@@ -14,6 +14,10 @@ import ulisse.infrastructures.view.station.StationEditorView
 
 import java.util.concurrent.LinkedBlockingQueue
 
+object Main:
+  def main(args: Array[String]): Unit =
+    launchApp()
+
 val eventQueue   = EventQueue()
 val initialState = AppState()
 
