@@ -56,6 +56,9 @@ object Styles:
   /** Create a [[Palette]] with the given [[background]]. */
   def createBackgroundPalette(background: Color): Palette = Palette(background, withOutColor, withOutColor)
 
+  /** Create a [[Palette]] with the given [[color]] for all the colors. */
+  def createEqualPalette(color: Color): Palette = Palette(color, Some(color), Some(color))
+
   /** Create a [[Font]] with the given [[name]], [[style]] and [[size]]. */
   def createFont(name: String, style: StyleFont, color: Color, size: Int): Font = Font(name, style, size)
 
@@ -82,44 +85,94 @@ object Styles:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _currentColor: Color = background
 
-    def currentColor: Color                        = _currentColor
     private def currentColor_=(color: Color): Unit = _currentColor = color
-    def withBackground(color: Color): Palette      = copy(background = color)
-    def withClick(color: Color): Palette           = copy(clickColor = Some(color))
-    def withHover(color: Color): Palette           = copy(hoverColor = Some(color))
-    def hoverAction(): Unit                        = hoverColor.foreach(currentColor = _)
-    def clickAction(): Unit                        = clickColor.foreach(currentColor = _)
-    def exitAction(): Unit                         = hoverColor.foreach(_ => currentColor = background)
-    def releaseAction(): Unit                      = clickColor.foreach(_ => currentColor = background)
+
+    /** Current color of the palette. */
+    def currentColor: Color = _currentColor
+
+    /** Return a new [[Palette]] with the given [[background]]. */
+    def withBackground(color: Color): Palette = copy(background = color)
+
+    /** Return a new [[Palette]] with the given [[clickColor]]. */
+    def withClick(color: Color): Palette = copy(clickColor = Some(color))
+
+    /** Return a new [[Palette]] with the given [[hoverColor]]. */
+    def withHover(color: Color): Palette = copy(hoverColor = Some(color))
+
+    /** Set the [[currentColor]] to the [[background]] color. */
+    def hoverAction(): Unit = hoverColor.foreach(currentColor = _)
+
+    /** Set the [[currentColor]] to the [[clickColor]] color. */
+    def clickAction(): Unit = clickColor.foreach(currentColor = _)
+
+    /** Set the [[currentColor]] to the [[background]] color. */
+    def exitAction(): Unit = hoverColor.foreach(_ => currentColor = background)
+
+    /** Set the [[currentColor]] to the [[background]] color. */
+    def releaseAction(): Unit = clickColor.foreach(_ => currentColor = background)
 
   /** Create a [[Rect]] to represent a rounded rectangle with the given [[size]], [[padding]], [[arc]] and [[palette]]. */
   case class Rect(size: Size, padding: Padding, arc: Int, palette: Palette = defaultPalette) extends Style:
     export size.{a as width, b as height}, padding.{withA as withWidthPadding, withB as withHeightPadding}, palette._
-    val swingPadding: SwingBorder                                = Swings.createEmptyBorder(padding.a, padding.b)
-    def withSize(size: Size): Rect                               = copy(size = size)
-    def withWidthAndHeight(width: Int, height: Int): Rect        = withSize(createSize(width, height))
-    def withWidth(width: Int): Rect                              = copy(size = Pair(Some(width), size.b))
-    def withHeight(height: Int): Rect                            = copy(size = Pair(size.a, Some(height)))
-    def withPadding(padding: Padding): Rect                      = copy(padding = padding)
+
+    /** Swing padding of the rect. */
+    val swingPadding: SwingBorder = Swings.createEmptyBorder(padding.a, padding.b)
+
+    /** Set the [[size]] of the rect with the given [[size]]. */
+    def withSize(size: Size): Rect = copy(size = size)
+
+    /** Set the [[size]] of the rect with the given [[width]] and [[height]]. */
+    def withWidthAndHeight(width: Int, height: Int): Rect = withSize(createSize(width, height))
+
+    /** Set the [[size]] of the rect with the given [[width]] and maintain the [[height]]. */
+    def withWidth(width: Int): Rect = copy(size = Pair(Some(width), size.b))
+
+    /** Set the [[size]] of the rect with the given [[height]] and maintain the [[width]]. */
+    def withHeight(height: Int): Rect = copy(size = Pair(size.a, Some(height)))
+
+    /** Set the [[padding]] of the rect with the given [[padding]]. */
+    def withPadding(padding: Padding): Rect = copy(padding = padding)
+
+    /** Set the [[padding]] of the rect with the given [[width]] and [[height]]. */
     def withPaddingWidthAndHeight(width: Int, height: Int): Rect = withPadding(createPadding(width, height))
-    def withArc(arc: Int): Rect                                  = copy(arc = arc)
-    def withPalette(palette: Palette): Rect                      = copy(palette = palette)
+
+    /** Set the [[arc]] of the rect with the given [[arc]]. */
+    def withArc(arc: Int): Rect = copy(arc = arc)
+
+    /** Set the [[palette]] of the rect with the given [[palette]]. */
+    def withPalette(palette: Palette): Rect = copy(palette = palette)
 
   /** Create a [[Font]] to represent a font with the given [[name]], [[style]], [[size]] and [[palette]]. */
   case class Font(name: String, style: StyleFont, size: Int, palette: Palette = defaultPalette) extends Style:
     export palette._
-    val swingFont: SwingFont                = new SwingFont(name, style.id, size)
-    def withName(name: String): Font        = copy(name = name)
-    def withStyle(style: StyleFont): Font   = copy(style = style)
-    def withSize(size: Int): Font           = copy(size = size)
+
+    /** Swing font of the font. */
+    val swingFont: SwingFont = new SwingFont(name, style.id, size)
+
+    /** Set the [[name]] of the font with the given [[name]]. */
+    def withName(name: String): Font = copy(name = name)
+
+    /** Set the [[style]] of the font with the given [[style]]. */
+    def withStyle(style: StyleFont): Font = copy(style = style)
+
+    /** Set the [[size]] of the font with the given [[size]]. */
+    def withSize(size: Int): Font = copy(size = size)
+
+    /** Set the [[palette]] of the font with the given [[palette]]. */
     def withPalette(palette: Palette): Font = copy(palette = palette)
 
   /** Create a [[Border]] to represent a border with the given [[stroke]] and [[palette]]. */
   case class Border(stroke: Int, palette: Palette = defaultPalette) extends Style:
     export palette._
+
+    /** Swing border of the border. */
     val swingBorder: Rect => SwingBorder =
       rect => Swings.createEmptyBorder(rect.padding.a + stroke, rect.padding.b + stroke)
-    def withStroke(stroke: Int): Border       = copy(stroke = stroke)
+
+    /** Set the [[stroke]] of the border with the given [[stroke]]. */
+    def withStroke(stroke: Int): Border = copy(stroke = stroke)
+
+    /** Set the [[palette]] of the border with the given [[palette]]. */
     def withPalette(palette: Palette): Border = copy(palette = palette)
 
   /** Utility object to set up [[EnhancedLook]] from [[Style]] values. */

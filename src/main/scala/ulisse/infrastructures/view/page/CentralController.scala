@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.page
 
-import ulisse.infrastructures.view.components.ui.composed.{ComposedLabel, ComposedSwing}
+import ulisse.infrastructures.view.components.ui.composed.{ComposedImageLabel, ComposedSwing}
 
 import scala.swing.{Component, Orientation}
 
@@ -12,20 +12,20 @@ trait CentralController extends ComposedSwing:
 object CentralController:
   def createMap(): MapController = MapController()
 
-  private case class BaseCentralController(iconLabels: ComposedLabel.SVGIconLabel*)(forms: Form*):
-    private val page: Map[ComposedLabel.SVGIconLabel, Form] = iconLabels.zip(forms).toMap
-    private val tabbedPane: ComposedSwing.JTabbedPane       = ComposedSwing.createTabbedPane(iconLabels: _*)
+  private case class BaseCentralController(iconLabels: ComposedImageLabel.SVGIconLabel*)(forms: Form*):
+    private val page: Map[ComposedImageLabel.SVGIconLabel, Form] = iconLabels.zip(forms).toMap
+    private val tabbedPane: ComposedSwing.JTabbedPane            = ComposedSwing.createTabbedPane(iconLabels: _*)
 
     page.foreach(tabbedPane.paneOf(_).contents += _.component)
 
-    def pageOf(label: ComposedLabel.SVGIconLabel): Form = page(label)
-    def component[T >: Component]: T                    = tabbedPane.component
+    def pageOf(label: ComposedImageLabel.SVGIconLabel): Form = page(label)
+    def component[T >: Component]: T                         = tabbedPane.component
 
   case class MapController() extends CentralController:
     given orientation: Orientation.Value = Orientation.Horizontal
-    private val station                  = ComposedLabel.createIconLabel("icons/station.svg", "station")
-    private val route                    = ComposedLabel.createIconLabel("icons/route.svg", "route")
-    private val schedule                 = ComposedLabel.createIconLabel("icons/menu/train.svg", "schedule")
+    private val station                  = ComposedImageLabel.createIconLabel("icons/station.svg", "station")
+    private val route                    = ComposedImageLabel.createIconLabel("icons/route.svg", "route")
+    private val schedule                 = ComposedImageLabel.createIconLabel("icons/menu/train.svg", "schedule")
 
     private val menu: BaseCentralController =
       BaseCentralController(station, route, schedule)(Form.createStation(), Form.createRoute(), Form.createSchedule())

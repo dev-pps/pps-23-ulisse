@@ -3,23 +3,33 @@ package ulisse.infrastructures.view.components.ui.composed
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
 import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
-import ulisse.infrastructures.view.components.ui.composed.ComposedLabel.SVGIconLabel
+import ulisse.infrastructures.view.components.ui.composed.ComposedImageLabel.SVGIconLabel
 import ulisse.infrastructures.view.components.ui.decorators.Styles
 
 import java.awt
 import java.awt.Dimension
 import scala.swing.*
 
+/** Represents a composed swing component. */
 trait ComposedSwing:
+  /** Returns the main component. */
   def component[T >: Component]: T
 
 object ComposedSwing:
-  def createInfoTextField(text: String): JInfoTextField        = JInfoTextField(text)
-  def createNavbar(JIconLabel: SVGIconLabel*): JNavBar         = JNavBar(JIconLabel: _*)
+  /** Creates a [[JInfoTextField]] from a [[title]]. */
+  def createInfoTextField(text: String): JInfoTextField = JInfoTextField(text)
+
+  /** Creates a [[JNavBar]] from a list of [[SVGIconLabel]]. */
+  def createNavbar(JIconLabel: SVGIconLabel*): JNavBar = JNavBar(JIconLabel: _*)
+
+  /** Creates a [[JTabbedPane]] from a list of [[SVGIconLabel]]. */
   def createTabbedPane(JIconLabel: SVGIconLabel*): JTabbedPane = JTabbedPane(JIconLabel: _*)
 
+  /** Creates a [[JInsertForm]] from a [[title]] and a list of [[JInfoTextField]]. */
   def createInsertForm(title: String, JInfoTextField: JInfoTextField*): JInsertForm =
     JInsertForm(title, JInfoTextField: _*)
+
+  /** Creates a [[JToggleIconButton]] from an on and off icon path. */
   def createToggleIconButton(onIconPath: String, offIconPath: String): JToggleIconButton =
     JToggleIconButton(onIconPath, offIconPath)
 
