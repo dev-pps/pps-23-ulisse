@@ -6,17 +6,28 @@ import ulisse.entities.simulation.EnvironmentElements.TrainAgentsDirection.Forwa
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.station.StationEnvironmentElement.*
-import ulisse.entities.train.TrainAgents.TrainAgent
+import ulisse.entities.train.TrainAgents
+import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentPerception, TrainAgentPerceptionData, TrainStationInfo}
 import ulisse.utils.CollectionUtils.*
 
 object Environments:
+  trait Environment
   trait Perception
-  trait RailwayEnvironment:
+
+  trait PerceptionProvider[E <: Environment, A <: SimulationAgent]:
+    type P <: Perception
+    def perceptionFor(environment: E, agent: A): Option[P]
+
+  trait RailwayEnvironment extends Environment:
     def doStep(dt: Int): RailwayEnvironment
     def stations: Seq[StationEnvironmentElement]
     def routes: Seq[RouteEnvironmentElement]
     def agents: Seq[SimulationAgent] =
       (stations.flatMap(_.containers.flatMap(_.trains)) ++ routes.flatMap(_.containers.flatMap(_.trains))).distinct
+    def perceptionFor[A <: SimulationAgent](agent: A)(using
+        provider: PerceptionProvider[RailwayEnvironment, A]
+    ): Option[provider.P] =
+      provider.perceptionFor(this, agent)
 
   object RailwayEnvironment:
     // TODO evaluate where to do the initial placement of the trains
@@ -30,10 +41,30 @@ object Environments:
     def empty(): RailwayEnvironment =
       apply(Seq[StationEnvironmentElement](), Seq[RouteEnvironmentElement](), Seq[SimulationAgent]())
 
+    given PerceptionProvider[RailwayEnvironment, TrainAgent] with
+      type P = TrainAgentPerception
+      def perceptionFor(railwayEnvironment: RailwayEnvironment, agent: TrainAgent): Option[P] =
+        agent.findIn(railwayEnvironment.stations) match
+          case Some(station) => Some(new TrainAgentPerception {
+              override def perceptionData: TrainAgentPerceptionData = new TrainStationInfo {
+                override def hasToMove: Boolean        = true
+                override def routeTrackIsFree: Boolean = true
+              }
+            })
+          case _ => agent.findIn(railwayEnvironment.routes) match
+              case Some(route) => Some(new TrainAgentPerception {
+                  override def perceptionData: TrainAgentPerceptionData = new TrainStationInfo {
+                    override def hasToMove: Boolean        = true
+                    override def routeTrackIsFree: Boolean = true
+                  }
+                })
+              case _ => None
+
     private final case class SimulationEnvironmentImpl(
         stations: Seq[StationEnvironmentElement],
         routes: Seq[RouteEnvironmentElement]
     ) extends RailwayEnvironment:
+
       def doStep(dt: Int): RailwayEnvironment =
         // Allow agents to be at the same time in more than an environment element
         // that because an agent when enters a station doesn't leave immediately the route and vice versa
