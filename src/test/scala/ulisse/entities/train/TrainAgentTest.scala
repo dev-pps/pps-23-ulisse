@@ -36,10 +36,3 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
       "be at least 0" in:
         (trainAgent.distanceTravelled = -10).distanceTravelled shouldBe 0
         trainAgent.updateDistanceTravelled(10).updateDistanceTravelled(-15).distanceTravelled shouldBe 0
-
-    "on route" should:
-      "be true when distance travelled is greater than 0" in:
-        trainAgent.updateDistanceTravelled(1).isOnRoute shouldBe true
-
-      "be false when distance travelled is 0" in:
-        trainAgent.isOnRoute shouldBe false

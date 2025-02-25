@@ -1,6 +1,6 @@
 package ulisse.entities.timetable
 
-import ulisse.entities.Routes.TypeRoute
+import ulisse.entities.route.Routes.TypeRoute
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.TrainStationTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
 import ulisse.entities.train.Trains.Train

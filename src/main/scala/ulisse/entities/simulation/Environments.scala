@@ -7,15 +7,23 @@ import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.station.StationEnvironmentElement.*
 import ulisse.entities.train.TrainAgents
-import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentPerception, TrainAgentPerceptionData, TrainStationInfo}
+import ulisse.entities.train.TrainAgents.{
+  TrainAgent,
+  TrainAgentPerception,
+  TrainAgentPerceptionData,
+  TrainRouteInfo,
+  TrainStationInfo
+}
 import ulisse.utils.CollectionUtils.*
 
 object Environments:
   trait Environment
-  trait Perception
+  trait Perception[PD <: PerceptionData]:
+    def perceptionData: PD
+  trait PerceptionData
 
   trait PerceptionProvider[E <: Environment, A <: SimulationAgent]:
-    type P <: Perception
+    type P <: Perception[?]
     def perceptionFor(environment: E, agent: A): Option[P]
 
   trait RailwayEnvironment extends Environment:
@@ -46,17 +54,12 @@ object Environments:
       def perceptionFor(railwayEnvironment: RailwayEnvironment, agent: TrainAgent): Option[P] =
         agent.findIn(railwayEnvironment.stations) match
           case Some(station) => Some(new TrainAgentPerception {
-              override def perceptionData: TrainAgentPerceptionData = new TrainStationInfo {
-                override def hasToMove: Boolean        = true
-                override def routeTrackIsFree: Boolean = true
-              }
+              override def perceptionData: TrainAgentPerceptionData = TrainStationInfo(true, true)
             })
           case _ => agent.findIn(railwayEnvironment.routes) match
               case Some(route) => Some(new TrainAgentPerception {
-                  override def perceptionData: TrainAgentPerceptionData = new TrainStationInfo {
-                    override def hasToMove: Boolean        = true
-                    override def routeTrackIsFree: Boolean = true
-                  }
+                  override def perceptionData: TrainAgentPerceptionData =
+                    TrainRouteInfo(route.typology, route.length, None, true)
                 })
               case _ => None
 
@@ -124,8 +127,3 @@ object Environments:
           case _ => station.updateTrain(agent) match
               case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
               case _         => this
-
-      def stations_=(newStations: Seq[StationEnvironmentElement]): RailwayEnvironment =
-        copy(stations = newStations)
-      def routes_=(newRoutes: Seq[RouteEnvironmentElement]): RailwayEnvironment =
-        copy(routes = newRoutes)
