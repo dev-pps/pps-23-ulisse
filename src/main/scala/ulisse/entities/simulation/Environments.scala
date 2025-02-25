@@ -10,7 +10,7 @@ import ulisse.entities.train.TrainAgent
 import ulisse.utils.CollectionUtils.*
 
 object Environments:
-
+  trait Perception
   trait RailwayEnvironment:
     def doStep(dt: Int): RailwayEnvironment
     def stations: Seq[StationEnvironmentElement]
