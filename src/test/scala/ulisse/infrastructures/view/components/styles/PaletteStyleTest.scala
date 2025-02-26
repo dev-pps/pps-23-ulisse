@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components.styles
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.ui.decorators.Styles.*
+import Styles.*
 
 import java.awt.Color
 

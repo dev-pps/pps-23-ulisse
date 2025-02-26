@@ -1,7 +1,8 @@
-package ulisse.infrastructures.view.components.ui.decorators
+package ulisse.infrastructures.view.components.decorators
 
-import ulisse.infrastructures.view.components.ui.decorators.Styles.EnhancedLookExtensions.*
-import ulisse.infrastructures.view.components.ui.decorators.Styles.Palette
+import ulisse.infrastructures.view.components.styles.Styles
+import ulisse.infrastructures.view.components.styles.Styles.EnhancedLookExtensions.*
+import ulisse.infrastructures.view.components.styles.Styles.Palette
 
 import java.awt.geom.RoundRectangle2D
 import java.awt.{BasicStroke, Color, RenderingHints}

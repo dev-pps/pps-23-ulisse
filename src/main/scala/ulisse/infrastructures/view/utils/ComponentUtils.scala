@@ -1,8 +1,8 @@
 package ulisse.infrastructures.view.utils
 
-import ulisse.infrastructures.view.components.ui.ExtendedSwing
-import ulisse.infrastructures.view.components.ui.composed.ComposedSwing
-import ulisse.infrastructures.view.components.ui.decorators.Styles
+import ulisse.infrastructures.view.components.ExtendedSwing
+import ulisse.infrastructures.view.components.composed.ComposedSwing
+import ulisse.infrastructures.view.components.styles.Styles
 
 import scala.swing.*
 

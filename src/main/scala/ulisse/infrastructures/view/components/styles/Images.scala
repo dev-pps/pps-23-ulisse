@@ -1,8 +1,8 @@
-package ulisse.infrastructures.view.components.ui.decorators
+package ulisse.infrastructures.view.components.styles
 
 import com.formdev.flatlaf.extras.FlatSVGIcon
 import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
-import ulisse.infrastructures.view.components.ui.decorators.Styles.{Colorable, Palette}
+import Styles.{Colorable, Palette}
 
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO

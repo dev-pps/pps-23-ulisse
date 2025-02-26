@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.page
 
-import ulisse.infrastructures.view.components.ui.composed.{ComposedImageLabel, ComposedSwing}
+import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 
 import scala.swing.{Component, Orientation}
 
