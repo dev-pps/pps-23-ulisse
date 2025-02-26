@@ -1,6 +1,5 @@
 package ulisse.infrastructures.view.components.ui.composed
 
-import ulisse.infrastructures.view.common.Themes.{withAlpha, Theme}
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
 import ulisse.infrastructures.view.components.ui.decorators.ImageEffects.{ImageEffect, PictureEffect, SVGEffect}
 import ulisse.infrastructures.view.components.ui.decorators.Styles
@@ -31,10 +30,8 @@ object ComposedImageLabel:
   /** Represents a label with an image and text. */
   private case class ImageLabel[I <: ImageEffect](image: I, text: String, orientation: Orientation.Value)
       extends ComposedImageLabel:
-    private val defaultWidth     = 100
-    private val defaultHeight    = 40
-    private val rectClosePalette = Styles.createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
-    private val rectOpenPalette  = rectClosePalette.withBackground(Theme.light.background.withAlpha(50))
+    private val defaultWidth  = 100
+    private val defaultHeight = 40
 
     private val mainPanel  = ExtendedSwing.JBoxPanelItem(orientation)
     private val labelPanel = ExtendedSwing.JFlowPanelItem()
@@ -42,7 +39,7 @@ object ComposedImageLabel:
 
     withDimension(defaultWidth, defaultHeight)
 
-    mainPanel.rectPalette = rectOpenPalette
+    mainPanel.rectPalette = Styles.imageLabelOpenPalette
     label.rectPalette = Styles.transparentPalette
     labelPanel.rectPalette = Styles.transparentPalette
 
@@ -55,12 +52,12 @@ object ComposedImageLabel:
 
     override def showIconAndText(): Unit =
       label.visible = true
-      mainPanel.rectPalette = rectOpenPalette
+      mainPanel.rectPalette = Styles.imageLabelOpenPalette
       withDimension(mainPanel.preferredSize.width, mainPanel.preferredSize.height)
 
     override def showIcon(): Unit =
       label.visible = false
-      mainPanel.rectPalette = rectClosePalette
+      mainPanel.rectPalette = Styles.imageLabelClosePalette
       withDimension(mainPanel.preferredSize.height, mainPanel.preferredSize.height)
 
     override def withDimension(width: Int, height: Int): Unit =
@@ -81,18 +78,14 @@ object ComposedImageLabel:
   case class SVGIconLabel private (private val svgIconLabel: ImageLabel[SVGEffect]) extends ComposedImageLabel:
     def this(path: String, text: String, orientation: Orientation.Value) =
       this(ImageLabel(ExtendedSwing.createSVGPanel(path), text, orientation))
-
-    private val iconClosePalette = Styles.defaultPalette.withBackground(Theme.light.background)
-    private val iconOpenPalette  = Styles.createEqualPalette(Theme.light.background).withBackground(Theme.light.overlay)
-
-    svgIconLabel.image.svgIconPalette = iconOpenPalette
+    svgIconLabel.image.svgIconPalette = Styles.iconOpenPalette
 
     export svgIconLabel.component, svgIconLabel.withDimension
 
     override def showIconAndText(): Unit =
-      svgIconLabel.image.svgIconPalette = iconOpenPalette
+      svgIconLabel.image.svgIconPalette = Styles.iconOpenPalette
       svgIconLabel.showIconAndText()
 
     override def showIcon(): Unit =
-      svgIconLabel.image.svgIconPalette = iconClosePalette
+      svgIconLabel.image.svgIconPalette = Styles.iconClosePalette
       svgIconLabel.showIcon()
