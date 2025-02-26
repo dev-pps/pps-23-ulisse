@@ -2,8 +2,8 @@ package ulisse.infrastructures.view.components.ui.decorators
 
 import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
 import ulisse.infrastructures.view.components.ui.decorators.Images.{Picture, SVGIcon}
-import ulisse.infrastructures.view.components.ui.decorators.Styles.EnhancedLookExtension.*
-import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.components.ui.decorators.Styles.EnhancedLookExtensions.*
+import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.{CurrentColor, EnhancedLook}
 
 import java.awt.geom.{AffineTransform, RoundRectangle2D}
 import scala.swing.{Component, Graphics2D}
@@ -55,11 +55,12 @@ object ImageEffects:
 
   /** Represent an SVG effect. */
   trait SVGEffect extends ImageEffect:
-    private var _svgIcon: SVGIcon = Images.defaultSVGIcon
+    private var _svgIcon: SVGIcon       = Images.defaultSVGIcon
+    private val colorable: CurrentColor = CurrentColor(svgIconPalette.background)
 
     updateGraphics()
     listenTo(mouse.moves, mouse.clicks)
-    reactions += this.initColorReactions(() => svgIconPalette)
+    reactions += colorable.initColorReactions(this, () => svgIconPalette)
 
     override def angle: Int                     = svgIcon.rotation.angle
     override def withRotation(angle: Int): Unit = { _svgIcon = svgIcon.withRotation(angle); updateGraphics() }
@@ -74,12 +75,14 @@ object ImageEffects:
     def svgIconPalette: Styles.Palette = svgIcon.palette
 
     /** Set the palette of the SVG icon. */
-    def svgIconPalette_=(palette: Styles.Palette): Unit = _svgIcon = svgIcon.withPalette(palette)
+    def svgIconPalette_=(palette: Styles.Palette): Unit =
+      _svgIcon = svgIcon.withPalette(palette)
+      this.updateCurrentColor(svgIcon, colorable)
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)
       svgIcon.icon.foreach(svg =>
-        svg.setColorFilter(ColorFilter(_ => svgIconPalette.currentColor))
+        svg.setColorFilter(ColorFilter(_ => colorable.current))
         val imgSize = math.min(size.width, size.height)
         val icon    = svg.derive(imgSize, imgSize)
         g.rotate(svgIcon.toRadians, size.width / 2, size.height / 2)

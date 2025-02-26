@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components.ui.decorators
 
 import com.formdev.flatlaf.extras.FlatSVGIcon
 import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
-import ulisse.infrastructures.view.components.ui.decorators.Styles.Palette
+import ulisse.infrastructures.view.components.ui.decorators.Styles.{Colorable, Palette}
 
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
@@ -57,12 +57,12 @@ object Images:
     def withArc(arc: Int): Picture = copy(arc = arc)
 
   /** Represent an SVG image with [[SourceImage]], [[Rotation]] and [[Palette]]. */
-  case class SVGIcon(source: SourceImage, rotation: Rotation, palette: Palette) extends Image:
+  case class SVGIcon(source: SourceImage, rotation: Rotation, palette: Palette) extends Image with Colorable:
     def this(path: String, angle: Int, palette: Palette) = this(SourceImage(path), Rotation(angle), palette)
 
     /** Icon of the svg image. */
     val icon: Option[FlatSVGIcon] = source.bufferImage.map(_ => new FlatSVGIcon(source.path))
-    icon.foreach(_.setColorFilter(ColorFilter(_ => palette.currentColor)))
+    icon.foreach(_.setColorFilter(ColorFilter(_ => palette.background)))
 
     export source.bufferImage, rotation.toRadians
 

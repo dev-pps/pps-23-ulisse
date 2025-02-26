@@ -1,13 +1,33 @@
 package ulisse.infrastructures.view.components.ui.decorators
 
-import ulisse.infrastructures.view.components.ui.decorators.Styles.EnhancedLookExtension.*
+import ulisse.infrastructures.view.components.ui.decorators.Styles.EnhancedLookExtensions.*
+import ulisse.infrastructures.view.components.ui.decorators.Styles.Palette
 
 import java.awt.geom.RoundRectangle2D
-import java.awt.{BasicStroke, RenderingHints}
-import scala.swing.{Component, Graphics2D, Publisher}
+import java.awt.{BasicStroke, Color, RenderingHints}
+import scala.swing.*
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
 object SwingEnhancements:
+
+  /** Represent the current color of the component. */
+  final case class CurrentColor(private var _current: Color):
+    def current: Color                                    = _current
+    def current_=(color: Color): Unit                     = _current = color
+    private def hoverColor(palette: Styles.Palette): Unit = palette.hoverColor.foreach(current = _)
+    private def clickColor(palette: Styles.Palette): Unit = palette.clickColor.foreach(current = _)
+    private def exitColor(palette: Styles.Palette): Unit =
+      palette.hoverColor.foreach(_ => current = palette.background)
+    private def releaseColor(palette: Styles.Palette): Unit =
+      palette.clickColor.foreach(_ => current = palette.background)
+
+    /** Initialize the color reactions of the component. */
+    def initColorReactions(component: EnhancedLook, palette: () => Palette): Reactions.Reaction =
+      case _: event.MousePressed  => clickColor(palette()); component.updateGraphics()
+      case _: event.MouseReleased => releaseColor(palette()); component.updateGraphics()
+      case _: event.MouseEntered  => hoverColor(palette()); component.updateGraphics()
+      case _: event.MouseExited   => exitColor(palette()); component.updateGraphics()
+
   /** Base trait decorator to enhanced look of swing [[Component]] */
   trait EnhancedLook extends Component:
     opaque = false
@@ -33,10 +53,11 @@ object SwingEnhancements:
 
   /** Trait to enhance the shape of swing component and [[_rect]] control shape params. */
   trait ShapeEffect extends EnhancedLook:
-    private var _rect: Styles.Rect = Styles.defaultRect
+    private var _rect: Styles.Rect         = Styles.defaultRect
+    private val currentColor: CurrentColor = CurrentColor(rectPalette.background)
 
     this.updateRect(rect)
-    reactions += this.initColorReactions(() => rectPalette)
+    reactions += currentColor.initColorReactions(this, () => rectPalette)
 
     /** Read-only property to get the shape of the component. */
     def rect: Styles.Rect = _rect
@@ -48,7 +69,9 @@ object SwingEnhancements:
     def rectPalette: Styles.Palette = rect.palette
 
     /** Change the shape palette of the component. */
-    def rectPalette_=(palette: Styles.Palette): Unit = rect = rect.withPalette(palette)
+    def rectPalette_=(palette: Styles.Palette): Unit =
+      rect = rect.withPalette(palette)
+      this.updateCurrentColor(rect, currentColor)
 
     /** Read-only property to get the shape padding of the component. */
     def rectPadding: Styles.Padding = rect.padding
@@ -58,7 +81,7 @@ object SwingEnhancements:
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)
-      g.setColor(rect.currentColor)
+      g.setColor(currentColor.current)
       val clipShape =
         new RoundRectangle2D.Float(0, 0, size.width.toFloat, size.height.toFloat, rect.arc.toFloat, rect.arc.toFloat)
       g.setClip(clipShape)
@@ -66,11 +89,11 @@ object SwingEnhancements:
 
   /** Trait to enhance the font of swing component and [[_font]] control font params. */
   trait FontEffect extends EnhancedLook:
-    @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var _font: Styles.Font = Styles.defaultFont
+    private var _font: Styles.Font         = Styles.defaultFont
+    private val currentColor: CurrentColor = CurrentColor(fontEffect.background)
 
     this.updateFont(fontEffect)
-    reactions += this.initColorReactions(() => fontPalette)
+    reactions += currentColor.initColorReactions(this, () => fontPalette)
 
     /** Read-only property to get the font effect of the component. */
     def fontEffect: Styles.Font = _font
@@ -82,36 +105,41 @@ object SwingEnhancements:
     def fontPalette: Styles.Palette = fontEffect.palette
 
     /** Change the font palette of the component. */
-    def fontPalette_=(palette: Styles.Palette): Unit = fontEffect = fontEffect.withPalette(palette)
+    def fontPalette_=(palette: Styles.Palette): Unit =
+      fontEffect = fontEffect.withPalette(palette)
+      this.updateCurrentColor(fontEffect, currentColor)
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)
-      foreground = fontEffect.currentColor
+      foreground = currentColor.current
 
   /** Trait to enhance the border of swing component and [[_border]] control border params. */
   trait BorderEffect extends EnhancedLook:
     self: ShapeEffect =>
-    private var _border: Styles.Border = Styles.defaultBorder
+    private var _border: Styles.Border     = Styles.defaultBorder
+    private val currentColor: CurrentColor = CurrentColor(borderEffect.background)
 
     this.updateBorder(rect, Styles.defaultBorder)
-    reactions += this.initColorReactions(() => rectPalette)
+    reactions += currentColor.initColorReactions(this, () => borderPalette)
 
     /** Read-only property to get the border of the component. */
     def borderEffect: Styles.Border = _border
 
     /** Change the border of the component. */
-    def borderEffect_=(border: Styles.Border): Unit = { (_border = border); this.updateBorder(rect, borderEffect) }
+    def borderEffect_=(border: Styles.Border): Unit = { _border = border; this.updateBorder(rect, borderEffect) }
 
     /** Read-only property to get the border palette of the component. */
     def borderPalette: Styles.Palette = borderEffect.palette
 
     /** Change the border palette of the component. */
-    def borderPalette_=(palette: Styles.Palette): Unit = borderEffect = borderEffect.withPalette(palette)
+    def borderPalette_=(palette: Styles.Palette): Unit =
+      borderEffect = borderEffect.withPalette(palette)
+      this.updateCurrentColor(borderEffect, currentColor)
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)
       val position   = borderEffect.stroke / 2
       val borderSize = (size.width - borderEffect.stroke, size.height - borderEffect.stroke)
-      g.setColor(borderEffect.currentColor)
+      g.setColor(currentColor.current)
       g.setStroke(BasicStroke(borderEffect.stroke.toFloat))
       g.drawRoundRect(position, position, borderSize._1, borderSize._2, rect.arc, rect.arc)

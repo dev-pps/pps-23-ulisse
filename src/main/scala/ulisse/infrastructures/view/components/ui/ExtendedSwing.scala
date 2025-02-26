@@ -10,9 +10,8 @@ import scala.swing.*
 
 object ExtendedSwing:
 
-  case class LayeredPanel private (private val layeredPane: JLayeredPane) extends BorderPanel with ShapeEffect:
+  case class LayeredPanel private (private val layeredPane: JLayeredPane) extends BorderPanel:
     def this() = this(JLayeredPane())
-    rectPalette = Styles.transparentPalette
     layout(Component.wrap(layeredPane)) = BorderPanel.Position.Center
 
     def add(component: Component): Unit =
