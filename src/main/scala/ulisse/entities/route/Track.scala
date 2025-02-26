@@ -2,7 +2,8 @@ package ulisse.entities.route
 
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
-import ulisse.entities.simulation.EnvironmentElements.{TrainAgentsContainer, TrainAgentsDirection}
+import ulisse.entities.route.Track.TrainAgentsDirection
+import ulisse.entities.simulation.EnvironmentElements.TrainAgentsContainer
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
 import ulisse.utils.Errors.BaseError
@@ -10,14 +11,19 @@ import ulisse.utils.ValidationUtils.{validateRange, validateUniqueItems}
 
 import scala.annotation.targetName
 
-trait Track extends TrainAgentsContainer:
+trait Track extends TrainAgentsContainer[Track]:
   val trains: Seq[TrainAgent]
-  override def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[Track] =
+  def currentDirection: Option[TrainAgentsDirection]
+  def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[Track] =
     :+(train, direction).toOption
   @targetName("appendedTrain")
   def :+(train: TrainAgent, direction: TrainAgentsDirection): Either[NonEmptyChain[Track.Errors], Track]
+  def minPermittedDistanceBetweenTrains: Double
+
 
 object Track:
+  enum TrainAgentsDirection:
+    case Forward, Backward
   // TODO evaluate if leave there minPermittedDistanceBetweenTrains or pass as parameter for isAvailable
   def apply(id: Int, trains: TrainAgent*)(using minPermittedDistanceBetweenTrains: Double): Track =
     TrackImpl(math.max(1, id), trains.distinctBy(_.name), None)

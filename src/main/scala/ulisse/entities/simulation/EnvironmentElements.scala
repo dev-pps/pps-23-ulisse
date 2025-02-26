@@ -1,6 +1,6 @@
 package ulisse.entities.simulation
 
-import ulisse.entities.station.{Platform, Platform2}
+import ulisse.entities.station.Platform
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.OptionUtils.when
 import ulisse.utils.CollectionUtils.updateWhenWithEffects
@@ -9,24 +9,20 @@ import ulisse.utils.OptionUtils.given_Conversion_Option_Option
 object EnvironmentElements:
   trait EnvironmentElement
 
-  enum TrainAgentsDirection:
-    case Forward, Backward
-  trait TrainAgentsContainer:
+  trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
+    self: TAC =>
     def id: Int
     def trains: Seq[TrainAgent]
-    def isAvailable: Boolean =
-      isEmpty || trains.forall(t => t.distanceTravelled - t.length >= minPermittedDistanceBetweenTrains)
-    def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[TrainAgentsContainer]
-    def updateTrain(train: TrainAgent): Option[TrainAgentsContainer]
-    def removeTrain(train: TrainAgent): Option[TrainAgentsContainer]
+    def isAvailable: Boolean
+      //isEmpty || trains.forall(t => t.distanceTravelled - t.length >= minPermittedDistanceBetweenTrains)
+    def updateTrain(train: TrainAgent): Option[TAC]
+    def removeTrain(train: TrainAgent): Option[TAC]
     def contains(train: TrainAgent): Boolean = trains.exists(train.matchId)
     def isEmpty: Boolean                     = trains.isEmpty
-    def currentDirection: Option[TrainAgentsDirection]
-    def minPermittedDistanceBetweenTrains: Double
 
   object TrainAgentsContainer:
     /** Creates a List of `TrainAgentContainer[TAC]` instance. If the specified numberOfContainers is not positive an empty List is returned */
-    def generateSequentialContainers[TAC <: TrainAgentsContainer](
+    def generateSequentialContainers[TAC <: TrainAgentsContainer[TAC]](
         constructor: Int => TAC,
         numberOfContainers: Int
     ): List[TAC] =
@@ -35,22 +31,23 @@ object EnvironmentElements:
 
   trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE]] extends EnvironmentElement:
     self: EE =>
-    def containers: Seq[TrainAgentsContainer]
-    def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[EE]
+    // TODO evaluate if make sense to make it stricter putting at generic level
+    type TAC <: TrainAgentsContainer[TAC]
+    def containers: Seq[TAC]
     def updateTrain(train: TrainAgent): Option[EE] = updaterTemplate(train, _.updateTrain(train), contains(train))
     def removeTrain(train: TrainAgent): Option[EE] = updaterTemplate(train, _.removeTrain(train), contains(train))
     def contains(train: TrainAgent): Boolean       = containers.exists(_.contains(train))
 
     private def updaterTemplate(
         trainAgent: TrainAgent,
-        updateFunction: TrainAgentsContainer => Option[TrainAgentsContainer],
+        updateFunction: TAC => Option[TAC],
         condition: Boolean
     ): Option[EE] =
       containers.updateWhenWithEffects(_.contains(trainAgent))(updateFunction).map(tracks =>
         buildNewEnvironmentElement(tracks)
       ) when condition
 
-    protected def buildNewEnvironmentElement(containers: Seq[TrainAgentsContainer]): EE
+    protected def buildNewEnvironmentElement(containers: Seq[TAC]): EE
 
   object TrainAgentEEWrapper:
     extension [EE <: TrainAgentEEWrapper[EE]](train: TrainAgent)
