@@ -42,7 +42,8 @@ object Styles:
   val iconOpenPalette: Palette    = defaultPalette.withBackground(Theme.light.overlay)
 
   /** Default [[Rect]]. */
-  val defaultRect: Rect = Rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)
+  val defaultRect: Rect    = Rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)
+  val iconButtonRect: Rect = defaultRect.withPaddingWidthAndHeight(5, 5)
 
   /** Default [[Font]]. */
   val defaultFont: Font = Font(defaultNameFont, defaultStyleFont, defaultSizeFont, defaultPaletteFont)

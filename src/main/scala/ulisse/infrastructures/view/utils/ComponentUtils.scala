@@ -30,6 +30,15 @@ object ComponentUtils:
     /** Center the component */
     def center(): Panel = centerHorizontally().centerVertically()
 
+    /** Create a component with a left and right component */
+    def createLeftRight(right: Component): ExtendedSwing.JBoxPanelItem =
+      val panel = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
+      panel.rectPalette = Styles.transparentPalette
+      panel.contents += component.centerVertically()
+      panel.contents += Swing.HGlue
+      panel.contents += right.centerVertically()
+      panel
+
   /** Utils method to center a composed component */
   extension (composed: ComposedSwing)
 
@@ -41,3 +50,7 @@ object ComponentUtils:
 
     /** Center the component */
     def center(): Panel = centerHorizontally().centerVertically()
+
+    /** Create a component with a left and right component */
+    def createLeftRight(right: ComposedSwing): ExtendedSwing.JBoxPanelItem =
+      composed.component.createLeftRight(right.component)
