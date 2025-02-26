@@ -50,6 +50,12 @@ object SwingEnhancements:
     /** Change the shape palette of the component. */
     def rectPalette_=(palette: Styles.Palette): Unit = rect = rect.withPalette(palette)
 
+    /** Read-only property to get the shape padding of the component. */
+    def rectPadding: Styles.Padding = rect.padding
+
+    /** Change the shape padding of the component. */
+    def rectPadding_=(padding: Styles.Padding): Unit = rect = rect.withPadding(padding)
+
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)
       g.setColor(rect.currentColor)
