@@ -40,3 +40,4 @@ object MapItemsCollection:
     override def notifyOnClick(data: Point): Unit   = mapItems.foreach(_.notifyOnClick(data))
     override def notifyOnHover(data: Point): Unit   = mapItems.foreach(_.notifyOnHover(data))
     override def notifyOnRelease(data: Point): Unit = mapItems.foreach(_.notifyOnRelease(data))
+    override def notifyOnExit(data: Point): Unit    = mapItems.foreach(_.notifyOnExit(data))

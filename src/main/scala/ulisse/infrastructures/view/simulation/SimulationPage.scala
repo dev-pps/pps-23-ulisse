@@ -3,14 +3,13 @@ package ulisse.infrastructures.view.simulation
 import ulisse.adapters.input.SimulationPageAdapter
 import ulisse.entities.simulation.Simulations.SimulationData
 import ulisse.infrastructures.view.common.Themes.*
-
-import scala.swing.{BorderPanel, BoxPanel, Component, Label, Orientation, Swing}
+import ulisse.infrastructures.view.components.ExtendedSwing
+import ulisse.infrastructures.view.components.ExtendedSwing.SVGPanel
 import ulisse.infrastructures.view.utils.ComponentUtils.*
-import ulisse.infrastructures.view.components.container.LayeredContainers.JLayeredPane
-import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
 
-import java.awt.{BorderLayout, Color}
 import scala.concurrent.ExecutionContext
+import scala.swing.*
+import scala.swing.BorderPanel.Position
 
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
   Swing.onEDT(runnable.run())
@@ -21,9 +20,10 @@ trait SimulationPage extends Component:
 object SimulationPage:
   def apply(controller: SimulationPageAdapter): SimulationPage = SimulationPageImpl(controller)
 
-  private final case class SimulationPageImpl(controller: SimulationPageAdapter) extends SimulationPage
-      with JLayeredPane:
+  private final case class SimulationPageImpl(controller: SimulationPageAdapter) extends SimulationPage:
+    private val mainPane       = new ExtendedSwing.LayeredPanel()
     private val map: Component = Label("Simulation Map")
+    private val menuPanel      = ExtendedSwing.JBorderPanelItem()
     private val mapControlPane = SimulationPageControlPanel(controller)
 
     def updateData(data: SimulationData): Unit = mapControlPane.notificationLabel.text =
@@ -31,8 +31,10 @@ object SimulationPage:
           ""
         )((acc, agent) => s"$acc $agent")}"
 
-    mainPane.peer.add(map.center().peer)
-    glassPane.peer.add(mapControlPane.center().peer, BorderLayout.EAST)
+    menuPanel.layout(mapControlPane) = Position.East
+
+    mainPane.add(map.center())
+    mainPane.add(menuPanel)
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   final case class SimulationPageControlPanel(controller: SimulationPageAdapter)

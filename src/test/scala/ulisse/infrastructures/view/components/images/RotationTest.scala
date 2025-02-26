@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components.images
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import ulisse.infrastructures.view.components.ui.decorators.Images.Rotation
+import ulisse.infrastructures.view.components.styles.Images.Rotation
 
 class RotationTest extends AnyFlatSpec with Matchers:
   val zeroAngle    = 0

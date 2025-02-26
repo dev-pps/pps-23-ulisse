@@ -1,8 +1,8 @@
-package ulisse.infrastructures.view.components.ui
+package ulisse.infrastructures.view.components
 
-import ulisse.infrastructures.view.components.ui.decorators.ImageEffects.{PictureEffect, SVGEffect}
-import ulisse.infrastructures.view.components.ui.decorators.Styles
-import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.{FontEffect, ShapeEffect}
+import ulisse.infrastructures.view.components.decorators.ImageEffects.{PictureEffect, SVGEffect}
+import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{FontEffect, ShapeEffect}
+import ulisse.infrastructures.view.components.styles.Styles
 
 import java.awt.FlowLayout
 import javax.swing.JLayeredPane

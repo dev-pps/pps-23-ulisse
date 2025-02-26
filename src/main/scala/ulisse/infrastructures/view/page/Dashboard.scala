@@ -1,8 +1,8 @@
 package ulisse.infrastructures.view.page
 
 import ulisse.infrastructures.view.common.ImagePath
-import ulisse.infrastructures.view.components.ui.ExtendedSwing
-import ulisse.infrastructures.view.components.ui.composed.{ComposedImageLabel, ComposedSwing}
+import ulisse.infrastructures.view.components.ExtendedSwing
+import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.{Component, Orientation}

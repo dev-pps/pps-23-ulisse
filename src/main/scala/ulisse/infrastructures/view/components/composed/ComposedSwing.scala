@@ -1,10 +1,10 @@
-package ulisse.infrastructures.view.components.ui.composed
+package ulisse.infrastructures.view.components.composed
 
 import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.ui.ExtendedSwing
-import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
-import ulisse.infrastructures.view.components.ui.composed.ComposedImageLabel.SVGIconLabel
-import ulisse.infrastructures.view.components.ui.decorators.Styles
+import ulisse.infrastructures.view.components.ExtendedSwing.SVGPanel
+import ComposedImageLabel.SVGIconLabel
+import ulisse.infrastructures.view.components.ExtendedSwing
+import ulisse.infrastructures.view.components.styles.Styles
 
 import java.awt
 import java.awt.Dimension

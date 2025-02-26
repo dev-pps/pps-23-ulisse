@@ -3,8 +3,8 @@ package ulisse.infrastructures.view.map
 import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.components.draw.JImages.*
-import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.common.Observers.Observable
+import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.utils.Pair
 
 import java.awt

@@ -1,9 +1,9 @@
 package ulisse.infrastructures.view
 
 import ulisse.applications.ports.RoutePorts.Input
+import ulisse.infrastructures.view.components.ExtendedSwing
+import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.utils.ComponentUtils.*
-import ulisse.infrastructures.view.components.ui.ExtendedSwing
-import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.map.MapPanel
 import ulisse.infrastructures.view.page.{CentralController, Dashboard}
 import ulisse.infrastructures.view.page.Menu

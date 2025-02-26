@@ -6,8 +6,9 @@ object Observers:
 
   trait Observer[T]:
     def onClick(data: T): Unit
-    def onHover(data: T): Unit
     def onRelease(data: T): Unit
+    def onHover(data: T): Unit
+    def onExit(data: T): Unit
 
   trait Observable[T]:
     def observers: List[Observer[T]]
@@ -15,6 +16,7 @@ object Observers:
     def detach(observer: Observer[T]): Unit
 
     def notifyOnClick(data: T): Unit
+    def notifyOnExit(data: T): Unit
     def notifyOnHover(data: T): Unit
     def notifyOnRelease(data: T): Unit
 
@@ -28,3 +30,4 @@ object Observers:
     override def notifyOnClick(data: T): Unit   = observers.foreach(_.onClick(data))
     override def notifyOnHover(data: T): Unit   = observers.foreach(_.onHover(data))
     override def notifyOnRelease(data: T): Unit = observers.foreach(_.onRelease(data))
+    override def notifyOnExit(data: T): Unit    = observers.foreach(_.onExit(data))

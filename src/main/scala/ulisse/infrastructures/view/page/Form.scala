@@ -1,10 +1,10 @@
 package ulisse.infrastructures.view.page
 
-import ulisse.infrastructures.view.common.Themes.*
-import ulisse.infrastructures.view.components.ui.ExtendedSwing
-import ulisse.infrastructures.view.components.ui.composed.ComposedSwing
-import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.common.Observers.Observer
+import ulisse.infrastructures.view.common.Themes.*
+import ulisse.infrastructures.view.components.ExtendedSwing
+import ulisse.infrastructures.view.components.composed.ComposedSwing
+import ulisse.infrastructures.view.components.styles.Styles
 
 import scala.swing.Font.Style
 import scala.swing.{Component, Orientation, Point}
@@ -79,6 +79,7 @@ object Form:
         case true  => arrivalStation.text_=(s"position: ${data.x} - ${data.y}"); lastClick = false
     override def onHover(data: Point): Unit   = ()
     override def onRelease(data: Point): Unit = ()
+    override def onExit(data: Point): Unit    = ()
 
   case class StationForm() extends Form with Observer[Point]:
     private val name      = ComposedSwing.createInfoTextField("Name")
@@ -109,6 +110,7 @@ object Form:
 
     override def onHover(data: Point): Unit   = ()
     override def onRelease(data: Point): Unit = ()
+    override def onExit(data: Point): Unit    = ()
 
   case class ScheduleForm() extends Form with Observer[Point]:
     private val field  = ComposedSwing.createInfoTextField("Field")
@@ -134,3 +136,4 @@ object Form:
     override def onClick(data: Point): Unit   = ()
     override def onHover(data: Point): Unit   = ()
     override def onRelease(data: Point): Unit = ()
+    override def onExit(data: Point): Unit    = ()

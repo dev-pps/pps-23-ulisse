@@ -1,9 +1,10 @@
-package ulisse.infrastructures.view.components.ui.decorators
+package ulisse.infrastructures.view.components.decorators
 
 import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter
-import ulisse.infrastructures.view.components.ui.decorators.Images.{Picture, SVGIcon}
-import ulisse.infrastructures.view.components.ui.decorators.Styles.EnhancedLookExtensions.*
-import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.{CurrentColor, EnhancedLook}
+import ulisse.infrastructures.view.components.styles.Styles.EnhancedLookExtensions._
+import ulisse.infrastructures.view.components.styles.Images.{Picture, SVGIcon}
+import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{CurrentColor, EnhancedLook}
+import ulisse.infrastructures.view.components.styles.{Images, Styles}
 
 import java.awt.geom.{AffineTransform, RoundRectangle2D}
 import scala.swing.{Component, Graphics2D}

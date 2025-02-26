@@ -1,9 +1,9 @@
-package ulisse.infrastructures.view.components.ui.composed
+package ulisse.infrastructures.view.components.composed
 
-import ulisse.infrastructures.view.components.ui.ExtendedSwing
-import ulisse.infrastructures.view.components.ui.decorators.ImageEffects.{ImageEffect, PictureEffect, SVGEffect}
-import ulisse.infrastructures.view.components.ui.decorators.Styles
-import ulisse.infrastructures.view.components.ui.decorators.Styles.Palette
+import ulisse.infrastructures.view.components.ExtendedSwing
+import ulisse.infrastructures.view.components.styles.Styles
+import ulisse.infrastructures.view.components.decorators.ImageEffects.{ImageEffect, PictureEffect, SVGEffect}
+import Styles.Palette
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import java.awt.Dimension
