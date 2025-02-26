@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.page
 
-import ulisse.infrastructures.view.common.ImagePath as ImgPath
+import ulisse.infrastructures.view.common.{ImagePath as ImgPath, Observers}
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.components.styles.Styles
@@ -8,6 +8,7 @@ import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.*
 import scala.swing.BorderPanel.Position
+import scala.swing.event.MouseEvent
 
 trait Menu extends ComposedSwing
 
@@ -16,7 +17,7 @@ object Menu:
 
   def apply(): Menu = MenuImpl()
 
-  private case class MenuImpl() extends Menu:
+  private case class MenuImpl() extends Menu with Observers.Observer[MouseEvent]:
     private val mainIcons     = Map(ImgPath.simulation -> "simulation", ImgPath.map -> "map", ImgPath.train -> "train")
     private val controlIcons  = Map(ImgPath.settings -> "settings")
     private val mainPadding   = Styles.createPadding(15, 15)
@@ -46,6 +47,8 @@ object Menu:
     northPanel.contents ++= mainLabels.flatten(label => List(Swing.VStrut(verticalGap), label.component))
     southPanel.contents ++= controlLabels.flatten(label => List(Swing.VStrut(verticalGap), label.component))
 
+    iconApp.attach(this)
+
     mainPanel.layout(northPanel) = Position.North
     mainPanel.layout(southPanel) = Position.South
 
@@ -56,3 +59,5 @@ object Menu:
     private def expand(): Unit = { labels.foreach(_.showIconAndText()); expandButton.component.visible = true }
 
     override def component[T >: Component]: T = mainPanel
+
+    override def onClick(data: MouseEvent): Unit = println("CIAOOOO")

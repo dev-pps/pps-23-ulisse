@@ -4,13 +4,15 @@ import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.components.decorators.ImageEffects.{ImageEffect, PictureEffect, SVGEffect}
 import Styles.Palette
+import ulisse.infrastructures.view.common.Observers.Observable
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import java.awt.Dimension
+import scala.swing.event.MouseEvent
 import scala.swing.{Alignment, Component, Orientation}
 
 /** Represents a label composed by an image and text. */
-trait ComposedImageLabel extends ComposedSwing:
+trait ComposedImageLabel extends ComposedSwing with Observable[MouseEvent]:
   /** Shows the icon and text. */
   def showIconAndText(): Unit
 
@@ -82,6 +84,8 @@ object ComposedImageLabel:
 
     image.listenTo(labelPanel.mouseEvents ++ mainPanel.mouseEvents ++ label.mouseEvents: _*)
     mainPanel.listenTo(labelPanel.mouseEvents ++ label.mouseEvents ++ image.mouseEvents: _*)
+
+    export mainPanel.observable._
 
     private def refreshGap(): Unit = orientation match
       case Orientation.Horizontal => labelPanel.vGap = zeroGap; labelPanel.hGap = gap
