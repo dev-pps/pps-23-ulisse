@@ -42,7 +42,7 @@ object GUIView:
 //    pageLayeredPane.add(mapController.component, JLayeredPane.DEFAULT_LAYER)
 
 //    mainLayeredPane.add(pageLayeredPane, JLayeredPane.DEFAULT_LAYER)
-    mainLayeredPane.add(dashboardPanel)
+//    mainLayeredPane.add(dashboardPanel)
     mainLayeredPane.add(menuPanel)
 
     mapPanel.attach(mapController.stationForm.mapObserver)

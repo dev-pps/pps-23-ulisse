@@ -33,13 +33,13 @@ object Styles:
   val defaultSizeFont: Int        = 18
 
   /** Default [[Palette]]. */
-  val defaultPalette: Palette         = Palette(defaultColor, withOutColor, withOutColor)
-  val transparentPalette: Palette     = Palette(transparentColor, withOutColor, withOutColor)
-  val defaultPaletteFont: Palette     = defaultPalette.withBackground(Themes.Theme.light.text)
-  val imageLabelClosePalette: Palette = Styles.createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
-  val imageLabelOpenPalette: Palette  = imageLabelClosePalette.withBackground(Theme.light.background.withAlpha(50))
-  val iconClosePalette                = Styles.defaultPalette.withBackground(Theme.light.background)
-  val iconOpenPalette = Styles.createEqualPalette(Theme.light.background).withBackground(Theme.light.overlay)
+  val defaultPalette: Palette     = Palette(defaultColor, withOutColor, withOutColor)
+  val transparentPalette: Palette = defaultPalette.withBackground(transparentColor)
+  val defaultPaletteFont: Palette = defaultPalette.withBackground(Themes.Theme.light.text)
+  val closeLabelPalette: Palette  = Styles.createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
+  val openLabelPalette: Palette   = closeLabelPalette.withBackground(Theme.light.background.withAlpha(50))
+  val iconClosePalette: Palette   = defaultPalette.withBackground(Theme.light.background)
+  val iconOpenPalette: Palette    = defaultPalette.withBackground(Theme.light.overlay)
 
   /** Default [[Rect]]. */
   val defaultRect: Rect = Rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)

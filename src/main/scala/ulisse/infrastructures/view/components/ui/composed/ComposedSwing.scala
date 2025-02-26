@@ -124,27 +124,28 @@ object ComposedSwing:
   case class JToggleIconButton(onIconPath: String, offIconPath: String) extends ComposedSwing:
     private val mainPanel = ExtendedSwing.JFlowPanelItem()
     private val onIcon    = SVGPanel()
-    onIcon.svgIcon = onIconPath
-    onIcon.svgIconPalette = onIcon.svgIconPalette.withBackground(Theme.light.background)
-    private val offIcon = SVGPanel()
-    offIcon.svgIcon = offIconPath
-    offIcon.svgIconPalette = offIcon.svgIconPalette.withBackground(Theme.light.background)
-    private val size = 40
+    private val offIcon   = SVGPanel()
+    private val size      = 40
 
-    onIcon.preferredSize = Dimension(size, size)
-    offIcon.preferredSize = Dimension(size, size)
     offIcon.visible = false
-
-    mainPanel.listenTo(mainPanel.mouse.clicks)
-    mainPanel.reactions += {
-      case event.MousePressed(_, _, _, _, _) => toggle()
-    }
+    onIcon.svgIcon = onIconPath
+    offIcon.svgIcon = offIconPath
+    onIcon.svgIconPalette = Styles.iconOpenPalette
+    offIcon.svgIconPalette = Styles.iconOpenPalette
 
     mainPanel.contents += onIcon
     mainPanel.contents += offIcon
 
-    private def toggle(): Unit =
+    withDimension(size, size)
+
+    mainPanel.reactions += { case _: event.MousePressed => toggle() }
+
+    def toggle(): Unit =
       onIcon.visible = !onIcon.visible
       offIcon.visible = !offIcon.visible
+
+    def withDimension(width: Int, height: Int): Unit =
+      onIcon.preferredSize = Dimension(width, height)
+      offIcon.preferredSize = Dimension(width, height)
 
     override def component[T >: Component]: T = mainPanel

@@ -20,22 +20,28 @@ trait ComposedImageLabel extends ComposedSwing:
   def withDimension(width: Int, height: Int): Unit
 
 object ComposedImageLabel:
+  /** Represents a palette for SVG images. */
   trait SVGPalette(val palette: Palette, val iconPalette: Palette)
 
-  private val defaultSVGOpenPalette: SVGPalette =
-    new SVGPalette(Styles.imageLabelOpenPalette, Styles.iconOpenPalette) {}
-  private val defaultSVGClosePalette: SVGPalette =
-    new SVGPalette(Styles.imageLabelClosePalette, Styles.iconClosePalette) {}
+  /** Default palette when the label is open. */
+  private val defaultSVGOpenPalette: SVGPalette = new SVGPalette(Styles.openLabelPalette, Styles.iconOpenPalette) {}
+
+  /** Default palette when the label is closed. */
+  private val defaultSVGClosePalette: SVGPalette = new SVGPalette(Styles.closeLabelPalette, Styles.iconClosePalette) {}
 
   /** Creates a [[PictureLabel]] from a [[path]], [[text]] and [[orientation]]. */
-  def createPictureLabel(path: String, text: String)(using orientation: Orientation.Value): ComposedImageLabel =
-    new PictureLabel(path, text, orientation)(Styles.imageLabelOpenPalette, Styles.imageLabelClosePalette)
+  def createPicture(path: String, text: String)(using orientation: Orientation.Value): ComposedImageLabel =
+    new PictureLabel(path, text, orientation)(Styles.openLabelPalette, Styles.closeLabelPalette)
+
+  /** Creates a [[PictureLabel]] from a [[path]] and [[text]] with a transparent background. */
+  def createTransparentPicture(path: String, text: String)(using orientation: Orientation.Value): ComposedImageLabel =
+    new PictureLabel(path, text, orientation)(Styles.transparentPalette, Styles.transparentPalette)
 
   /** Creates a [[SVGIconLabel]] from a [[path]], [[text]] and [[orientation]]. */
-  def createIconLabel(iconPath: String, text: String)(using orientation: Orientation.Value): ComposedImageLabel =
+  def createIcon(iconPath: String, text: String)(using orientation: Orientation.Value): ComposedImageLabel =
     new SVGIconLabel(iconPath, text, orientation)(defaultSVGOpenPalette, defaultSVGClosePalette)
 
-  /** Creates a [[SVGIconLabel]] from a [[path]], [[text]] and [[orientation]]. */
+  /** Creates a [[SVGIconLabel]] from a [[path]] and [[text]] to be displayed in the dashboard. */
   def createToDashboard(iconPath: String, text: String)(using orientation: Orientation.Value): ComposedImageLabel =
     new SVGIconLabel(iconPath, text, orientation)(defaultSVGClosePalette, defaultSVGOpenPalette)
 
