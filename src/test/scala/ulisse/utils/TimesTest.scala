@@ -22,6 +22,11 @@ class TimesTest extends AnyWordSpec with Matchers:
       h(0).m(59) + h(0).m(59) should be(h(1).m(58))
       h(23).m(59) + h(0).m(1) should be(h(0).m(0))
 
+    "be subtracted to another ClockTimes" in:
+      h(10).m(45).toOption - h(1).m(25).toOption shouldBe h(9).m(20).toOption
+      h(10).m(0).toOption - h(1).m(10).toOption shouldBe h(8).m(50).toOption
+      h(10).m(0).toOption - h(11).m(0).toOption shouldBe h(-1).m(0).toOption
+
     "comparable to other ClockTime" in:
       h(10).m(45) greaterEqThan h(10).m(45) should be(true)
       h(10).m(45) greaterEqThan h(2).m(30) should be(true)
