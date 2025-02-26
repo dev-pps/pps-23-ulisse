@@ -12,14 +12,14 @@ trait CentralController extends ComposedSwing:
 object CentralController:
   def createMap(): MapController = MapController()
 
-  private case class BaseCentralController(iconLabels: ComposedImageLabel.SVGIconLabel*)(forms: Form*):
-    private val page: Map[ComposedImageLabel.SVGIconLabel, Form] = iconLabels.zip(forms).toMap
-    private val tabbedPane: ComposedSwing.JTabbedPane            = ComposedSwing.createTabbedPane(iconLabels: _*)
+  private case class BaseCentralController(iconLabels: ComposedImageLabel*)(forms: Form*):
+    private val page: Map[ComposedImageLabel, Form]   = iconLabels.zip(forms).toMap
+    private val tabbedPane: ComposedSwing.JTabbedPane = ComposedSwing.createTabbedPane(iconLabels: _*)
 
     page.foreach(tabbedPane.paneOf(_).contents += _.component)
 
-    def pageOf(label: ComposedImageLabel.SVGIconLabel): Form = page(label)
-    def component[T >: Component]: T                         = tabbedPane.component
+    def pageOf(label: ComposedImageLabel): Form = page(label)
+    def component[T >: Component]: T            = tabbedPane.component
 
   case class MapController() extends CentralController:
     given orientation: Orientation.Value = Orientation.Horizontal

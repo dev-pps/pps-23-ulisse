@@ -20,10 +20,10 @@ object ComposedSwing:
   def createInfoTextField(text: String): JInfoTextField = JInfoTextField(text)
 
   /** Creates a [[JNavBar]] from a list of [[SVGIconLabel]]. */
-  def createNavbar(JIconLabel: SVGIconLabel*): JNavBar = JNavBar(JIconLabel: _*)
+  def createNavbar(JIconLabel: ComposedImageLabel*): JNavBar = JNavBar(JIconLabel: _*)
 
   /** Creates a [[JTabbedPane]] from a list of [[SVGIconLabel]]. */
-  def createTabbedPane(JIconLabel: SVGIconLabel*): JTabbedPane = JTabbedPane(JIconLabel: _*)
+  def createTabbedPane(JIconLabel: ComposedImageLabel*): JTabbedPane = JTabbedPane(JIconLabel: _*)
 
   /** Creates a [[JInsertForm]] from a [[title]] and a list of [[JInfoTextField]]. */
   def createInsertForm(title: String, JInfoTextField: JInfoTextField*): JInsertForm =
@@ -54,7 +54,7 @@ object ComposedSwing:
     export textField.text_=
     override def component[T >: Component]: T = mainPanel
 
-  case class JNavBar(iconLabels: SVGIconLabel*) extends ComposedSwing:
+  case class JNavBar(iconLabels: ComposedImageLabel*) extends ComposedSwing:
     private val padding = Styles.createPadding(40, 20)
 
     private val mainPanel = ExtendedSwing.JFlowPanelItem()
@@ -75,7 +75,7 @@ object ComposedSwing:
     private def closeAll(): Unit              = iconLabels.foreach(_.showIcon())
     override def component[T >: Component]: T = mainPanel
 
-  case class JTabbedPane(iconLabels: SVGIconLabel*) extends ComposedSwing:
+  case class JTabbedPane(iconLabels: ComposedImageLabel*) extends ComposedSwing:
     private val mainPanel  = ExtendedSwing.JBorderPanelItem()
     private val pagesPanel = ExtendedSwing.JFlowPanelItem()
 
@@ -98,8 +98,8 @@ object ComposedSwing:
 
     iconLabels.headOption.foreach(iconLabel => paneOf(iconLabel).visible = true)
 
-    def paneOf(label: SVGIconLabel): ExtendedSwing.JFlowPanelItem = pages(label)
-    override def component[T >: Component]: T                     = mainPanel
+    def paneOf(label: ComposedImageLabel): ExtendedSwing.JFlowPanelItem = pages(label)
+    override def component[T >: Component]: T                           = mainPanel
 
   case class JInsertForm(title: String, infoTextField: JInfoTextField*) extends ComposedSwing:
     private val mainPanel = ExtendedSwing.JBorderPanelItem()

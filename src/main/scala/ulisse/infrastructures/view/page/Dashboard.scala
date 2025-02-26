@@ -17,11 +17,10 @@ object Dashboard:
   private case class DashboardImpl() extends Dashboard:
     private val width = 100
 
-    private val newIcon    = ComposedImageLabel.createIconLabel(ImagePath.addSvgIcon, "new")
+    private val newIcon    = ComposedImageLabel.createToDashboard(ImagePath.addSvgIcon, "new")
     private val iconsPanel = newIcon.centerHorizontally()
     private val mainPanel  = iconsPanel.centerVertically()
 
-    // create rect to dashboard panel
     newIcon.withDimension(width, width)
 
     override def component[T >: Component]: T = mainPanel
