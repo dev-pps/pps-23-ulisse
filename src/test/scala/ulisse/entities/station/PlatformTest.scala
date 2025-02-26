@@ -4,7 +4,6 @@ import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentsContainer
-import ulisse.entities.simulation.EnvironmentElements.TrainAgentsDirection.Forward
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
@@ -55,7 +54,7 @@ class PlatformTest extends AnyWordSpec with Matchers:
           TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
         val platformNumber = 1
         val platform       = Platform(platformNumber)
-        platform.putTrain(train, Forward).map(p => (p.id, p.trains)) shouldBe Some(platformNumber, Seq(train))
+        platform.putTrain(train).map(p => (p.id, p.trains)) shouldBe Some(platformNumber, Seq(train))
 
       // TODO fix
       "return none if the platform already contains a train" in:
@@ -64,9 +63,9 @@ class PlatformTest extends AnyWordSpec with Matchers:
         val otherTrain =
           TrainAgent(Train("3906", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
         val platformNumber = 1
-        val platform       = Platform(platformNumber).putTrain(train, Forward)
-        platform.flatMap(_.putTrain(train, Forward)) shouldBe None
-        platform.flatMap(_.putTrain(otherTrain, Forward)) shouldBe None
+        val platform       = Platform(platformNumber).putTrain(train)
+        platform.flatMap(_.putTrain(train)) shouldBe None
+        platform.flatMap(_.putTrain(otherTrain)) shouldBe None
 
     "a train is updated" should:
       "return a new platform with the specified train if it's present" in:
@@ -74,7 +73,7 @@ class PlatformTest extends AnyWordSpec with Matchers:
           TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
         val updatedTrain   = train.updateDistanceTravelled(10)
         val platformNumber = 1
-        val platform       = Platform(platformNumber).putTrain(train, Forward)
+        val platform       = Platform(platformNumber).putTrain(train)
         platform.flatMap(_.updateTrain(train)).map(p => (p.id, p.trains)) shouldBe Some(
           platformNumber,
           List(train)
@@ -90,7 +89,7 @@ class PlatformTest extends AnyWordSpec with Matchers:
         val otherTrain =
           TrainAgent(Train("3906", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
         val platformNumber = 1
-        val platform       = Platform(platformNumber).putTrain(train, Forward)
+        val platform       = Platform(platformNumber).putTrain(train)
         platform.flatMap(_.updateTrain(otherTrain)) shouldBe None
 
     "a train is removed" should:
@@ -99,7 +98,7 @@ class PlatformTest extends AnyWordSpec with Matchers:
           TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
         val updatedTrain   = train.updateDistanceTravelled(10)
         val platformNumber = 1
-        val platform       = Platform(platformNumber).putTrain(train, Forward)
+        val platform       = Platform(platformNumber).putTrain(train)
         platform.flatMap(_.removeTrain(train)).map(p => (p.id, p.trains)) shouldBe Some((
           platformNumber,
           Seq()
@@ -115,5 +114,5 @@ class PlatformTest extends AnyWordSpec with Matchers:
         val otherTrain =
           TrainAgent(Train("3906", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
         val platformNumber = 1
-        val platform       = Platform(platformNumber).putTrain(train, Forward)
+        val platform       = Platform(platformNumber).putTrain(train)
         platform.flatMap(_.removeTrain(otherTrain)) shouldBe None

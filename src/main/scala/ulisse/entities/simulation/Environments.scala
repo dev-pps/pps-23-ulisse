@@ -4,7 +4,6 @@ import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.findIn
-import ulisse.entities.simulation.EnvironmentElements.TrainAgentsDirection.Forward
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.station.StationEnvironmentElement.*
@@ -69,10 +68,9 @@ object Environments:
       def putTrainsInInitialStations(stationsEE: Seq[StationEnvironmentElement]): Seq[StationEnvironmentElement] =
         schedulesMap.foldLeft(stationsEE)((stationsEE, tt) =>
           tt._2.headOption.flatMap(firstTimeTable =>
-            stationsEE.updateWhenWithEffects(station => station.name == firstTimeTable.startStation.name)(_.putTrain(
-              tt._1,
-              Forward
-            ))
+            stationsEE.updateWhenWithEffects(station => station.name == firstTimeTable.startStation.name)(
+              _.putTrain(tt._1)
+            )
           ).getOrElse(stationsEE)
         )
 
@@ -136,7 +134,7 @@ object Environments:
               case _         => this
           case d if d >= route.length =>
             (
-              stations.find(_.name == route.arrival.name).flatMap(_.putTrain(agent, Forward)),
+              stations.find(_.name == route.arrival.name).flatMap(_.putTrain(agent)),
               route.updateTrain(agent)
             ) match
               case (Some(see), Some(ree)) =>
