@@ -1,11 +1,15 @@
 package ulisse.entities.simulation
 
+import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
+import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentsDirection.Forward
 import ulisse.entities.simulation.Simulations.Actions
-import ulisse.entities.station.StationEnvironmentElement
+import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.station.StationEnvironmentElement.*
+import ulisse.entities.timetable.{Timetables, TrainStationTime}
+import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.entities.train.TrainAgents
 import ulisse.entities.train.TrainAgents.{
   TrainAgent,
@@ -14,7 +18,11 @@ import ulisse.entities.train.TrainAgents.{
   TrainRouteInfo,
   TrainStationInfo
 }
+import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
+import ulisse.utils.Times
+
+import scala.collection.immutable.ListMap
 
 object Environments:
   trait Environment
@@ -40,14 +48,44 @@ object Environments:
   object RailwayEnvironment:
     // TODO evaluate where to do the initial placement of the trains
     def apply(
-        stations: Seq[StationEnvironmentElement],
-        routes: Seq[RouteEnvironmentElement],
-        agents: Seq[SimulationAgent]
+        stations: Seq[Station],
+        routes: Seq[Route],
+        agents: Seq[Train],
+        timetables: Seq[Timetable]
     ): RailwayEnvironment =
-      SimulationEnvironmentImpl(stations, routes)
+      val stationsEE = stations.map(StationEnvironmentElement(_))
+      val routesEE   = routes.map(RouteEnvironmentElement(_, 0.0))
+      val orderedScheduleByTrain =
+        timetables.map(tt => TrainAgent(tt.train) -> tt.table).groupBy(_._1).view.mapValues(_.map(_._2)).toMap.map(t =>
+          (t._1, t._2.orderSchedule())
+        )
+      val stationEEInitialState = orderedScheduleByTrain.foldLeft(stationsEE)((stationsEE, e) =>
+        stationsEE.updateWhenWithEffects(_.name == e._2.firstDepartureStation.name)(
+          _.putTrain(e._1, Forward)
+        ).getOrElse(stationsEE)
+      )
+      SimulationEnvironmentImpl(stationEEInitialState, routesEE)
+
+    extension (timeTables: Seq[ListMap[Station, TrainStationTime]])
+      def orderSchedule(): Seq[List[(Station, TrainStationTime)]] =
+        timeTables.map(t =>
+          t.toList.map(e => (e, e._2.departure)).flatMap(e =>
+            e match
+              case (el, Some(value)) => Some((el, value))
+              case _                 => None
+          ).sortBy(_._2).map(_._1)
+        )
+
+    extension (timeTables: Seq[List[(Station, TrainStationTime)]])
+      @SuppressWarnings(Array("org.wartremover.warts.IterableOps"))
+      def firstDepartureStation: Station =
+        timeTables.flatMap(_.headOption.map(e => (e._1, e._2.departure))).flatMap {
+          case (station, Some(clockTime)) => Some((station, clockTime))
+          case (_, None)                  => None
+        }.minBy(_._2)._1
 
     def empty(): RailwayEnvironment =
-      apply(Seq[StationEnvironmentElement](), Seq[RouteEnvironmentElement](), Seq[SimulationAgent]())
+      apply(Seq[Station](), Seq[Route](), Seq[Train](), Seq[Timetable]())
 
     given PerceptionProvider[RailwayEnvironment, TrainAgent] with
       type P = TrainAgentPerception

@@ -19,11 +19,11 @@ final case class SimulationService(
 
   override def initSimulation(): Future[(EngineState, SimulationData)] =
     val p = Promise[(EngineState, SimulationData)]()
-    eventQueue.addUpdateSimulationEvent((simulationManager, stationManager) => {
-      val newSimulationManager = simulationManager.setupEnvironment(RailwayEnvironment(
-        stationManager.stations.map(StationEnvironmentElement.apply),
-        Seq[RouteEnvironmentElement](),
-        Seq[SimulationAgent]()
+    eventQueue.addUpdateSimulationEvent((simulationManager, stationManager) => {      val newSimulationManager = appState.simulationManager.setupEnvironment(RailwayEnvironment(
+        appState.stationManager.stations,
+        appState.routeManager.routes,
+        appState.trainManager.trains,
+        appState.timetableManager.tables
       ))
       p.success((newSimulationManager.engineState, newSimulationManager.simulationData))
       newSimulationManager
@@ -79,9 +79,8 @@ final case class SimulationService(
       println("Start2")
       if simulationManager.engineState.running then
         println("Start3")
-        val newSimulationManager = simulationManager.doStep()
         doStep()
-        newSimulationManager
+        simulationManager.doStep()
       else
         println("Start4")
         simulationManager
