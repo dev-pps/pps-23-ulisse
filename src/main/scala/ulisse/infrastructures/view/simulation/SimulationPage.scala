@@ -16,6 +16,7 @@ given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
 
 trait SimulationPage extends Component:
   def updateData(data: SimulationData): Unit
+  def endSimulation(data: SimulationData): Unit
 
 object SimulationPage:
   def apply(controller: SimulationPageAdapter): SimulationPage = SimulationPageImpl(controller)
@@ -35,6 +36,7 @@ object SimulationPage:
 
     mainPane.add(map.center())
     mainPane.add(menuPanel)
+    def endSimulation(data: SimulationData): Unit = mapControlPane.notificationLabel.text = "Simulation Ended"
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   final case class SimulationPageControlPanel(controller: SimulationPageAdapter)

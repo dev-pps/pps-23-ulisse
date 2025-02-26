@@ -8,7 +8,7 @@ import ulisse.utils.Times.{ClockTime, Time}
 trait SimulationManager:
   def engineState: EngineState
   def simulationData: SimulationData
-  def setupEngine(stepSize: Time, cyclesPerSecond: Option[Int]): SimulationManager
+  def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): SimulationManager
   def setupEnvironment(environment: RailwayEnvironment): SimulationManager
   def start(): SimulationManager
   def stop(): SimulationManager
@@ -60,7 +60,7 @@ object SimulationManager:
       notificationService: Option[SimulationPorts.Output],
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ) extends SimulationManager:
-    override def setupEngine(stepSize: Time, cyclesPerSecond: Option[Int]): SimulationManager =
+    override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): SimulationManager =
       copy(engineState.copy(cyclesPerSecond = cyclesPerSecond, stepSize = stepSize))
     override def setupEnvironment(environment: RailwayEnvironment): SimulationManager =
       copy(simulationData = simulationData.withEnvironment(environment))
