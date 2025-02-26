@@ -1,5 +1,6 @@
 package ulisse.infrastructures.view.components.decorators
 
+import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.components.styles.Styles.EnhancedLookExtensions.*
 import ulisse.infrastructures.view.components.styles.Styles.Palette
@@ -7,6 +8,7 @@ import ulisse.infrastructures.view.components.styles.Styles.Palette
 import java.awt.geom.RoundRectangle2D
 import java.awt.{BasicStroke, Color, RenderingHints}
 import scala.swing.*
+import scala.swing.event.MouseEvent
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
 object SwingEnhancements:
@@ -31,8 +33,19 @@ object SwingEnhancements:
 
   /** Base trait decorator to enhanced look of swing [[Component]] */
   trait EnhancedLook extends Component:
+    self: Component =>
+    val observable: Observers.Observable[MouseEvent] = Observers.createObservable[MouseEvent]
     opaque = false
-    listenTo(mouseEvents: _*)
+    self.listenTo(mouseEvents: _*)
+
+    export observable._
+
+    reactions += {
+      case e: event.MousePressed  => observable.notifyClick(e)
+      case e: event.MouseReleased => observable.notifyRelease(e)
+      case e: event.MouseEntered  => observable.notifyHover(e)
+      case e: event.MouseExited   => observable.notifyExit(e)
+    }
 
     /** Read-only property to get the mouse events of the component. */
     def mouseEvents: List[Publisher] = List(mouse.moves, mouse.clicks)

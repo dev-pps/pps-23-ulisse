@@ -23,15 +23,15 @@ object MapPanel:
     listenTo(mouse.clicks, mouse.moves)
     reactions += {
       case event.MouseMoved(_, point, _) =>
-        mapObservable.notifyOnHover(point)
+        mapObservable.notifyHover(point)
         itemCollection.onHover(point)
         repaint()
       case event.MousePressed(_, point, _, _, _) =>
-        mapObservable.notifyOnClick(point)
+        mapObservable.notifyClick(point)
         itemCollection.onClick(point)
         repaint()
       case event.MouseReleased(_, point, _, _, _) =>
-        mapObservable.notifyOnRelease(point)
+        mapObservable.notifyRelease(point)
         itemCollection.onRelease(point);
         repaint()
     }

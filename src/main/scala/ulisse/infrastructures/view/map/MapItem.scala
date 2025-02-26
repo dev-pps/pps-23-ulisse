@@ -55,7 +55,7 @@ object MapItem:
       if hasCollided(mousePoint) then
         isSilhouetteShown = true
         currentColorSilhouette = Theme.light.click
-        itemObservable.notifyOnClick(mousePoint)
+        itemObservable.notifyClick(mousePoint)
 
     override def onRelease(mousePoint: Point): Unit =
       if hasCollided(mousePoint) then isSilhouetteShown = false
