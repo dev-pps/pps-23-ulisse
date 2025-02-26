@@ -6,7 +6,7 @@ import ulisse.applications.AppState
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.entities.simulation.SimulationAgent
-import ulisse.entities.simulation.Simulations.EngineState
+import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.infrastructures.commons.TimeProviders.*
 import ulisse.utils.Times
@@ -20,21 +20,21 @@ final case class SimulationService(
     private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
 
-  override def initSimulation(): Future[EngineState] =
-    val p = Promise[EngineState]()
+  override def initSimulation(): Future[(EngineState, SimulationData)] =
+    val p = Promise[(EngineState, SimulationData)]()
     eventQueue.add((appState: AppState) => {
       val newSimulationManager = appState.simulationManager.setupEnvironment(RailwayEnvironment(
         appState.stationManager.stations.map(StationEnvironmentElement.apply),
         Seq[RouteEnvironmentElement](),
         Seq[SimulationAgent]()
       ))
-      p.success(newSimulationManager.engineState)
+      p.success((newSimulationManager.engineState, newSimulationManager.simulationData))
       appState.copy(simulationManager = newSimulationManager)
     })
     p.future
 
-  override def setupEngine(stepSize: Time, cyclesPerSecond: Option[Int]): Future[EngineState] = {
-    val p = Promise[EngineState]()
+  override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Future[Option[EngineState]] = {
+    val p = Promise[Option[EngineState]()
     eventQueue.add((appState: AppState) => {
       val newSimulationManager = appState.simulationManager.setupEngine(stepSize, cyclesPerSecond)
       p.success(newSimulationManager.engineState)

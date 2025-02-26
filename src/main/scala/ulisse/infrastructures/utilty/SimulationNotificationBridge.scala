@@ -8,4 +8,5 @@ trait SimulationNotificationAdapterRequirements:
 
 final case class SimulationNotificationBridge(requirements: SimulationNotificationAdapterRequirements)
     extends SimulationPage:
-  override def updateData(data: SimulationData): Unit = requirements.simulationPageComponent().updateData(data)
+  override def updateData(data: SimulationData): Unit    = requirements.simulationPageComponent().updateData(data)
+  override def endSimulation(data: SimulationData): Unit = requirements.simulationPageComponent().endSimulation(data)

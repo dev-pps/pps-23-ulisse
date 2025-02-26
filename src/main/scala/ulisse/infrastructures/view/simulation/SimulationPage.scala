@@ -17,6 +17,7 @@ given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
 
 trait SimulationPage extends Component:
   def updateData(data: SimulationData): Unit
+  def endSimulation(data: SimulationData): Unit
 
 object SimulationPage:
   def apply(controller: SimulationPageAdapter): SimulationPage = SimulationPageImpl(controller)
@@ -30,6 +31,8 @@ object SimulationPage:
       s"Step: ${data.step}, Time: ${data.secondElapsed / 1000.0}, Agent: ${data.simulationEnvironment.agents.foldLeft(
           ""
         )((acc, agent) => s"$acc $agent")}"
+
+    def endSimulation(data: SimulationData): Unit = mapControlPane.notificationLabel.text = "Simulation Ended"
 
     mainPane.peer.add(map.center().peer)
     glassPane.peer.add(mapControlPane.center().peer, BorderLayout.EAST)
