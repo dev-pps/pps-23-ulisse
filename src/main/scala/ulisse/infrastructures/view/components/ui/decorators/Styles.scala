@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.components.ui.decorators
 
 import ulisse.infrastructures.view.common.Themes
+import ulisse.infrastructures.view.common.Themes.{withAlpha, Theme}
 import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.EnhancedLook
 import ulisse.utils.{Pair, Swings}
 
@@ -29,12 +30,16 @@ object Styles:
   /** Default [[Font]] values. */
   val defaultNameFont: String     = "Lucida Grande"
   val defaultStyleFont: StyleFont = SwingFont.Plain
-  val defaultSizeFont: Int        = 13
+  val defaultSizeFont: Int        = 18
 
   /** Default [[Palette]]. */
-  val defaultPalette: Palette     = Palette(defaultColor, withOutColor, withOutColor)
-  val transparentPalette: Palette = Palette(transparentColor, withOutColor, withOutColor)
-  val defaultPaletteFont: Palette = defaultPalette.withBackground(Themes.Theme.light.text)
+  val defaultPalette: Palette         = Palette(defaultColor, withOutColor, withOutColor)
+  val transparentPalette: Palette     = Palette(transparentColor, withOutColor, withOutColor)
+  val defaultPaletteFont: Palette     = defaultPalette.withBackground(Themes.Theme.light.text)
+  val imageLabelClosePalette: Palette = Styles.createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
+  val imageLabelOpenPalette: Palette  = imageLabelClosePalette.withBackground(Theme.light.background.withAlpha(50))
+  val iconClosePalette                = Styles.defaultPalette.withBackground(Theme.light.background)
+  val iconOpenPalette = Styles.createEqualPalette(Theme.light.background).withBackground(Theme.light.overlay)
 
   /** Default [[Rect]]. */
   val defaultRect: Rect = Rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)

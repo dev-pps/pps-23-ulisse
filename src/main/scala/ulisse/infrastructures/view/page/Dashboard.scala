@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.page
 
 import ulisse.infrastructures.view.common.ImagePath
+import ulisse.infrastructures.view.components.ui.ExtendedSwing
 import ulisse.infrastructures.view.components.ui.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
@@ -20,6 +21,7 @@ object Dashboard:
     private val iconsPanel = newIcon.centerHorizontally()
     private val mainPanel  = iconsPanel.centerVertically()
 
+    // create rect to dashboard panel
     newIcon.withDimension(width, width)
 
     override def component[T >: Component]: T = mainPanel
