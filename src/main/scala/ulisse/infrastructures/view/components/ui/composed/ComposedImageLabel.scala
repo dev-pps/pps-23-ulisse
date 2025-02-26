@@ -59,6 +59,8 @@ object ComposedImageLabel:
   ) extends ComposedImageLabel:
     private val defaultWidth  = 100
     private val defaultHeight = 40
+    private val zeroGap       = 0
+    private val gap           = 5
 
     private val mainPanel  = ExtendedSwing.JBoxPanelItem(orientation)
     private val labelPanel = ExtendedSwing.JFlowPanelItem()
@@ -77,6 +79,11 @@ object ComposedImageLabel:
     image.listenTo(labelPanel.mouseEvents ++ mainPanel.mouseEvents ++ label.mouseEvents: _*)
     mainPanel.listenTo(labelPanel.mouseEvents ++ label.mouseEvents ++ image.mouseEvents: _*)
 
+    private def setGap(): Unit = orientation match
+      case Orientation.Horizontal => labelPanel.vGap = zeroGap; labelPanel.hGap = gap
+      case Orientation.Vertical   => labelPanel.hGap = zeroGap; labelPanel.vGap = gap
+      case _                      => ()
+
     export mainPanel.rectPadding_= as withPadding, label.fontEffect_= as withFont
 
     override def showIconAndText(): Unit =
@@ -93,6 +100,7 @@ object ComposedImageLabel:
       mainPanel.preferredSize = Dimension(width, height)
       image.preferredSize = Dimension(height, height)
       if orientation == Orientation.Horizontal then label.preferredSize = Dimension(width - height, height)
+      setGap()
 
     override def component[T >: Component]: T = mainPanel
 
