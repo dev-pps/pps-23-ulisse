@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.map
 
-import ulisse.infrastructures.view.common.ViewObservers
-import ulisse.infrastructures.view.common.ViewObservers.{ViewObservable, ViewObserver}
+import ulisse.infrastructures.view.common.Observers
+import ulisse.infrastructures.view.common.Observers.{Observable, Observer}
 
 import java.awt.image.ImageObserver
 import scala.swing.{Graphics2D, Point}
@@ -11,9 +11,9 @@ object MapItemsCollection:
   def apply(): MapItemsCollection = MapItemsCollection(List.empty)
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  case class MapItemsCollection(var mapItems: List[MapItem]) extends ViewObservable[Point]:
-    private val observable                            = ViewObservers.createObservable[Point]
-    override val observers: List[ViewObserver[Point]] = observable.observers
+  case class MapItemsCollection(var mapItems: List[MapItem]) extends Observable[Point]:
+    private val observable                        = Observers.createObservable[Point]
+    override val observers: List[Observer[Point]] = observable.observers
 
     def onClick(mousePoint: Point): Unit =
       if mapItems.exists(_.hasCollided(mousePoint)) then
@@ -30,10 +30,10 @@ object MapItemsCollection:
 
     def refreshObserver(): Unit = ()
 
-    override def attach(observer: ViewObserver[Point]): Unit =
+    override def attach(observer: Observer[Point]): Unit =
       observable.attach(observer)
       mapItems.foreach(_.attach(observer))
-    override def detach(observer: ViewObserver[Point]): Unit =
+    override def detach(observer: Observer[Point]): Unit =
       observable.detach(observer)
       mapItems.foreach(_.detach(observer))
 

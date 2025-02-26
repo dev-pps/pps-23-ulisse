@@ -4,13 +4,13 @@ import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ui.ExtendedSwing
 import ulisse.infrastructures.view.components.ui.composed.ComposedSwing
 import ulisse.infrastructures.view.components.ui.decorators.Styles
-import ulisse.infrastructures.view.common.ViewObservers.ViewObserver
+import ulisse.infrastructures.view.common.Observers.Observer
 
 import scala.swing.Font.Style
 import scala.swing.{Component, Orientation, Point}
 
 trait Form extends ComposedSwing:
-  def mapObserver: ViewObserver[Point]
+  def mapObserver: Observer[Point]
 
 object Form:
 
@@ -48,7 +48,7 @@ object Form:
 
     def component[T >: Component]: T = mainPanel
 
-  case class RouteForm() extends Form with ViewObserver[Point]:
+  case class RouteForm() extends Form with Observer[Point]:
     private val departureStation = ComposedSwing.createInfoTextField("Departure Station")
     private val arrivalStation   = ComposedSwing.createInfoTextField("Arrival Station")
     private val routeType        = ComposedSwing.createInfoTextField("Type")
@@ -69,7 +69,7 @@ object Form:
     buttonPanel.contents += deleteButton
 
     export form._
-    override def mapObserver: ViewObserver[Point] = this
+    override def mapObserver: Observer[Point] = this
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var lastClick = false
@@ -80,7 +80,7 @@ object Form:
     override def onHover(data: Point): Unit   = ()
     override def onRelease(data: Point): Unit = ()
 
-  case class StationForm() extends Form with ViewObserver[Point]:
+  case class StationForm() extends Form with Observer[Point]:
     private val name      = ComposedSwing.createInfoTextField("Name")
     private val latitude  = ComposedSwing.createInfoTextField("Latitude")
     private val longitude = ComposedSwing.createInfoTextField("Longitude")
@@ -101,7 +101,7 @@ object Form:
     buttonPanel.contents += deleteButton
 
     export form._
-    override def mapObserver: ViewObserver[Point] = this
+    override def mapObserver: Observer[Point] = this
 
     override def onClick(data: Point): Unit =
       latitude.text_=(data.x.toString)
@@ -110,7 +110,7 @@ object Form:
     override def onHover(data: Point): Unit   = ()
     override def onRelease(data: Point): Unit = ()
 
-  case class ScheduleForm() extends Form with ViewObserver[Point]:
+  case class ScheduleForm() extends Form with Observer[Point]:
     private val field  = ComposedSwing.createInfoTextField("Field")
     private val field1 = ComposedSwing.createInfoTextField("Field1")
     private val field2 = ComposedSwing.createInfoTextField("Field2")
@@ -130,7 +130,7 @@ object Form:
     buttonPanel.contents += deleteButton
 
     export form._
-    override def mapObserver: ViewObserver[Point] = this
-    override def onClick(data: Point): Unit       = ()
-    override def onHover(data: Point): Unit       = ()
-    override def onRelease(data: Point): Unit     = ()
+    override def mapObserver: Observer[Point] = this
+    override def onClick(data: Point): Unit   = ()
+    override def onHover(data: Point): Unit   = ()
+    override def onRelease(data: Point): Unit = ()

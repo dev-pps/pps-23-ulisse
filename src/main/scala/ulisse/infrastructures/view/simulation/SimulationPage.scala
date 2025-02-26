@@ -4,12 +4,12 @@ import ulisse.adapters.input.SimulationPageAdapter
 import ulisse.entities.simulation.Simulations.SimulationData
 import ulisse.infrastructures.view.common.Themes.*
 
-import scala.swing.{ BorderPanel, BoxPanel, Component, Label, Orientation, Swing }
-import ulisse.infrastructures.view.components.ComponentUtils.*
+import scala.swing.{BorderPanel, BoxPanel, Component, Label, Orientation, Swing}
+import ulisse.infrastructures.view.utils.ComponentUtils.*
 import ulisse.infrastructures.view.components.container.LayeredContainers.JLayeredPane
 import ulisse.infrastructures.view.components.ui.ExtendedSwing.SVGPanel
 
-import java.awt.{ BorderLayout, Color }
+import java.awt.{BorderLayout, Color}
 import scala.concurrent.ExecutionContext
 
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>

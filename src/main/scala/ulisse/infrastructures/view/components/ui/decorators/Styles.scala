@@ -2,13 +2,13 @@ package ulisse.infrastructures.view.components.ui.decorators
 
 import ulisse.infrastructures.view.common.Themes
 import ulisse.infrastructures.view.common.Themes.{withAlpha, Theme}
-import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.components.ui.decorators.SwingEnhancements.{CurrentColor, EnhancedLook}
 import ulisse.utils.{Pair, Swings}
 
 import java.awt.Color
 import javax.swing.border.Border as SwingBorder
+import scala.swing.Font as SwingFont
 import scala.swing.Font.Style.Value as StyleFont
-import scala.swing.{event, Font as SwingFont, Reactions}
 
 @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 object Styles:
@@ -36,10 +36,10 @@ object Styles:
   val defaultPalette: Palette     = Palette(defaultColor, withOutColor, withOutColor)
   val transparentPalette: Palette = defaultPalette.withBackground(transparentColor)
   val defaultPaletteFont: Palette = defaultPalette.withBackground(Themes.Theme.light.text)
-  val closeLabelPalette: Palette  = Styles.createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
+  val closeLabelPalette: Palette  = createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
   val openLabelPalette: Palette   = closeLabelPalette.withBackground(Theme.light.background.withAlpha(50))
   val iconClosePalette: Palette   = defaultPalette.withBackground(Theme.light.background)
-  val iconOpenPalette: Palette    = defaultPalette.withBackground(Theme.light.overlay)
+  val iconOpenPalette: Palette    = createEqualPalette(Theme.light.background).withBackground(Theme.light.overlay)
 
   /** Default [[Rect]]. */
   val defaultRect: Rect    = Rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)
@@ -72,6 +72,10 @@ object Styles:
   /** Create a [[Border]] with the given [[color]] and [[stroke]]. */
   def createBorder(stroke: Int): Border = Border(stroke)
 
+  /** Common trait to represent a colorable style. */
+  trait Colorable:
+    val palette: Palette
+
   /** Common trait to represent a style. */
   trait Style
 
@@ -89,14 +93,6 @@ object Styles:
 
   /** Create a [[Palette]] to represent a color with the given [[background]], [[clickColor]] and [[hoverColor]]. */
   case class Palette(background: Color, clickColor: Option[Color], hoverColor: Option[Color]) extends Style:
-    @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var _currentColor: Color = background
-
-    private def currentColor_=(color: Color): Unit = _currentColor = color
-
-    /** Current color of the palette. */
-    def currentColor: Color = _currentColor
-
     /** Return a new [[Palette]] with the given [[background]]. */
     def withBackground(color: Color): Palette = copy(background = color)
 
@@ -106,20 +102,9 @@ object Styles:
     /** Return a new [[Palette]] with the given [[hoverColor]]. */
     def withHover(color: Color): Palette = copy(hoverColor = Some(color))
 
-    /** Set the [[currentColor]] to the [[background]] color. */
-    def hoverAction(): Unit = hoverColor.foreach(currentColor = _)
-
-    /** Set the [[currentColor]] to the [[clickColor]] color. */
-    def clickAction(): Unit = clickColor.foreach(currentColor = _)
-
-    /** Set the [[currentColor]] to the [[background]] color. */
-    def exitAction(): Unit = hoverColor.foreach(_ => currentColor = background)
-
-    /** Set the [[currentColor]] to the [[background]] color. */
-    def releaseAction(): Unit = clickColor.foreach(_ => currentColor = background)
-
   /** Create a [[Rect]] to represent a rounded rectangle with the given [[size]], [[padding]], [[arc]] and [[palette]]. */
-  case class Rect(size: Size, padding: Padding, arc: Int, palette: Palette = defaultPalette) extends Style:
+  case class Rect(size: Size, padding: Padding, arc: Int, palette: Palette = defaultPalette) extends Style
+      with Colorable:
     export size.{a as width, b as height}, padding.{withA as withWidthPadding, withB as withHeightPadding}, palette._
 
     /** Swing padding of the rect. */
@@ -150,7 +135,8 @@ object Styles:
     def withPalette(palette: Palette): Rect = copy(palette = palette)
 
   /** Create a [[Font]] to represent a font with the given [[name]], [[style]], [[size]] and [[palette]]. */
-  case class Font(name: String, style: StyleFont, size: Int, palette: Palette = defaultPalette) extends Style:
+  case class Font(name: String, style: StyleFont, size: Int, palette: Palette = defaultPalette) extends Style
+      with Colorable:
     export palette._
 
     /** Swing font of the font. */
@@ -169,7 +155,7 @@ object Styles:
     def withPalette(palette: Palette): Font = copy(palette = palette)
 
   /** Create a [[Border]] to represent a border with the given [[stroke]] and [[palette]]. */
-  case class Border(stroke: Int, palette: Palette = defaultPalette) extends Style:
+  case class Border(stroke: Int, palette: Palette = defaultPalette) extends Style with Colorable:
     export palette._
 
     /** Swing border of the border. */
@@ -183,15 +169,15 @@ object Styles:
     def withPalette(palette: Palette): Border = copy(palette = palette)
 
   /** Utility object to set up [[EnhancedLook]] from [[Style]] values. */
-  object EnhancedLookExtension:
+  object EnhancedLookExtensions:
+
+    /** Extension methods for [[EnhancedLook]] to update the style with the given [[style]]. */
     extension (component: EnhancedLook)
 
-      /** Initialize the color reactions of the component with the given [[palette]]. */
-      def initColorReactions(palette: () => Palette): Reactions.Reaction =
-        case _: event.MousePressed  => { palette().clickAction(); component.updateGraphics() }
-        case _: event.MouseReleased => { palette().releaseAction(); component.updateGraphics() }
-        case _: event.MouseEntered  => { palette().hoverAction(); component.updateGraphics() }
-        case _: event.MouseExited   => { palette().exitAction(); component.updateGraphics() }
+      /** Update the current color of the component with the given [[colorable]]. */
+      def updateCurrentColor(colorable: Colorable, current: CurrentColor): Unit =
+        current.current = colorable.palette.background
+        component.updateGraphics()
 
       /** Update the shape of the component with the given [[rect]]. */
       def updateRect(rect: Rect): Unit =

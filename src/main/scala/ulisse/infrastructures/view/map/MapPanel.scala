@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.map
 
 import ulisse.entities.Coordinate
-import ulisse.infrastructures.view.common.ViewObservers
+import ulisse.infrastructures.view.common.Observers
 
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
@@ -16,7 +16,7 @@ object MapPanel:
     opaque = false
 
     private val itemCollection = MapItemsCollection()
-    private val mapObservable  = ViewObservers.createObservable[Point]
+    private val mapObservable  = Observers.createObservable[Point]
 
     export mapObservable._, itemCollection.{attach as attachItem, detach as detachItem}
 
