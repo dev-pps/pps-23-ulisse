@@ -119,6 +119,15 @@ object Times:
     def sameAs(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
       checkCondition(time, time2)(_ == 0)
 
+  extension (time: Option[ClockTime])
+    @targetName("sub")
+    def -(time2: Option[ClockTime]): Option[ClockTime] =
+      for
+        t   <- time
+        t2  <- time2
+        sub <- calculateSub(t, t2)
+      yield sub
+
   /** Returns true if predicate on the two provided `ClockTime` is satisfied */
   private def checkCondition(
       t: Either[ClockTimeErrors, ClockTime],
@@ -156,3 +165,11 @@ object Times:
     val minutes       = totalMinutes              % minutesInHour
     val hours         = (t.h + t2.h + extraHours) % hoursInDay
     ClockTime(hours, minutes)
+
+  private def calculateSub(t: ClockTime, t2: ClockTime): Option[ClockTime] =
+    val minutesInHour = 60
+    val hoursInDay    = 24
+    ((t.h, t2.h), (t.m, t2.m)) match
+      case ((h1, h2), (m1, m2)) if m1 < m2 && h1 < 1 => None
+      case ((h1, h2), (m1, m2)) if m1 < m2           => ClockTime(h1 - 1 - h2, m1 + minutesInHour - m2).toOption
+      case ((h1, h2), (m1, m2))                      => ClockTime(h1 - h2, m1 - m2).toOption
