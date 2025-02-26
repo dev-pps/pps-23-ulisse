@@ -32,10 +32,10 @@ object Menu:
     private val mainIcons    = Map(ImgPath.simulation -> "simulation", ImgPath.map -> "map", ImgPath.train -> "train")
     private val controlIcons = Map(ImgPath.settings -> "settings")
 
-    private val iconApp       = ComposedImageLabel.createPictureLabel(ImgPath.logo, "ulisse")
-    private val expandButton  = ComposedSwing.JToggleIconButton(ImgPath.expand, ImgPath.compact)
-    private val mainLabels    = mainIcons.map(ComposedImageLabel.createIconLabel).toList
-    private val controlLabels = controlIcons.map(ComposedImageLabel.createIconLabel).toList
+    private val iconApp       = ComposedImageLabel.createTransparentPicture(ImgPath.logo, "ulisse")
+    private val expandButton  = ComposedSwing.JToggleIconButton(ImgPath.rightCompact, ImgPath.rightExpand)
+    private val mainLabels    = mainIcons.map(ComposedImageLabel.createIcon).toList
+    private val controlLabels = controlIcons.map(ComposedImageLabel.createIcon).toList
 
     (mainLabels ++ controlLabels).foreach(_.withDimension(widthLabels, heightLabels))
     mainPanel.rect = mainPanel.rect.withPadding(mainPadding)
@@ -44,6 +44,8 @@ object Menu:
 
     iconAppPanel.contents += iconApp.component
     iconAppPanel.contents += expandButton.component
+
+    expandButton.toggle()
 
     northPanel.contents += addVerticalGap(iconAppPanel)
     northPanel.contents ++= mainLabels.map(_.centerHorizontally()).map(addVerticalGap)

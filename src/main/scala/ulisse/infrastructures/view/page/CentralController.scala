@@ -23,9 +23,9 @@ object CentralController:
 
   case class MapController() extends CentralController:
     given orientation: Orientation.Value = Orientation.Horizontal
-    private val station                  = ComposedImageLabel.createIconLabel("icons/station.svg", "station")
-    private val route                    = ComposedImageLabel.createIconLabel("icons/route.svg", "route")
-    private val schedule                 = ComposedImageLabel.createIconLabel("icons/menu/train.svg", "schedule")
+    private val station                  = ComposedImageLabel.createIcon("icons/station.svg", "station")
+    private val route                    = ComposedImageLabel.createIcon("icons/route.svg", "route")
+    private val schedule                 = ComposedImageLabel.createIcon("icons/menu/train.svg", "schedule")
 
     private val menu: BaseCentralController =
       BaseCentralController(station, route, schedule)(Form.createStation(), Form.createRoute(), Form.createSchedule())
