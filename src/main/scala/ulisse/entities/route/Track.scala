@@ -19,7 +19,8 @@ trait Track extends TrainAgentsContainer[Track]:
   @targetName("appendedTrain")
   def :+(train: TrainAgent, direction: TrainAgentsDirection): Either[NonEmptyChain[Track.Errors], Track]
   def minPermittedDistanceBetweenTrains: Double
-
+  override def isAvailable: Boolean =
+    isEmpty || trains.forall(t => t.distanceTravelled - t.length >= minPermittedDistanceBetweenTrains)
 
 object Track:
   enum TrainAgentsDirection:
