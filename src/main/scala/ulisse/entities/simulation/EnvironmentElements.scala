@@ -13,8 +13,7 @@ object EnvironmentElements:
     self: TAC =>
     def id: Int
     def trains: Seq[TrainAgent]
-    def isAvailable: Boolean
-      //isEmpty || trains.forall(t => t.distanceTravelled - t.length >= minPermittedDistanceBetweenTrains)
+    def isAvailable: Boolean = isEmpty
     def updateTrain(train: TrainAgent): Option[TAC]
     def removeTrain(train: TrainAgent): Option[TAC]
     def contains(train: TrainAgent): Boolean = trains.exists(train.matchId)
