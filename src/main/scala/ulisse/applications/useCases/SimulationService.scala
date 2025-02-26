@@ -24,9 +24,10 @@ final case class SimulationService(
     val p = Promise[(EngineState, SimulationData)]()
     eventQueue.add((appState: AppState) => {
       val newSimulationManager = appState.simulationManager.setupEnvironment(RailwayEnvironment(
-        appState.stationManager.stations.map(StationEnvironmentElement.apply),
-        Seq[RouteEnvironmentElement](),
-        Seq[SimulationAgent]()
+        appState.stationManager.stations,
+        appState.routeManager.routes,
+        appState.trainManager.trains,
+        appState.timetableManager.tables
       ))
       p.success((newSimulationManager.engineState, newSimulationManager.simulationData))
       appState.copy(simulationManager = newSimulationManager)
