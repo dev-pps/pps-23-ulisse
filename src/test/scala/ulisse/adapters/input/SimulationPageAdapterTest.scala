@@ -36,6 +36,15 @@ class SimulationPageAdapterTest extends AnyWordSpec with Matchers:
         Duration.Inf
       ) shouldBe updatedEngineState
 
+    "not setup engine" in:
+      val stepSize        = -1
+      val cyclesPerSecond = None
+      when(mockedPort.setupEngine(stepSize, cyclesPerSecond)).thenReturn(Future.successful(None))
+      Await.result(
+        simulationPageAdapter.setupEngine(stepSize, cyclesPerSecond),
+        Duration.Inf
+      ) shouldBe None
+
     "start simulation" in:
       when(mockedPort.start()).thenReturn(Future.successful(defaultEngineState))
       Await.result(simulationPageAdapter.start(), Duration.Inf) shouldBe defaultEngineState
