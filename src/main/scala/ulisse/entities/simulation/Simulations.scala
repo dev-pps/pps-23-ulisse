@@ -9,7 +9,7 @@ object Simulations:
     final case class MoveBy(distance: Double) extends SimulationAction
 
   object EngineState:
-    def empty(): EngineState = EngineState(false, None, Time(0, 0, 1), None, 0, 0)
+    def empty(): EngineState = EngineState(false, None, 0, None, 0, 0)
 
     enum Field:
       case Running, CyclesPerSecond, LastUpdate, LastDelta, ElapsedCycleTime
@@ -51,7 +51,7 @@ object Simulations:
   final case class EngineState(
       running: Boolean,
       cyclesPerSecond: Option[Int],
-      stepSize: Time,
+      stepSize: Int, // TODO check positive (non-negative?)
       lastUpdate: Option[Double],
       lastDelta: Double,
       elapsedCycleTime: Double

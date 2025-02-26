@@ -17,3 +17,7 @@ class SimulationNotificationAdapterTest extends AnyWordSpec with Matchers:
     "call updateData on SimulationPage when stepNotification is triggered" in:
       simulationNotificationAdapter.stepNotification(simulationData)
       verify(mockedSimulationPage).updateData(simulationData)
+
+    "call endSimulation on SimulationPage when simulationEnded is triggered" in:
+      simulationNotificationAdapter.simulationEnded(simulationData)
+      verify(mockedSimulationPage).endSimulation(simulationData)
