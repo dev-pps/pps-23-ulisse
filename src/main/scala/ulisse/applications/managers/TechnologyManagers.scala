@@ -21,32 +21,20 @@ object TechnologyManagers:
       */
     def add(technology: T): Either[TechErrors, TechnologyManager[T]]
 
-    /** Remove technology if exist
+    /** Removes technology given its `name` if exists.
       *
-      * @param name
-      *   Name of technology
-      * @return
-      *   Returns [[Right]] of updated `TechnologyManager` if technology is removed else [[Left]] of
-      *   [[TechnologyNotExists]] error
+      * Returns [[Right]] of updated `TechnologyManager` if technology is removed else [[Left]] of [[TechnologyNotExists]] error
       */
     def remove(name: String): Either[TechErrors, TechnologyManager[T]]
 
-    /** @return
-      *   List of saved technologies
-      */
+    /** Returns List of saved technologies */
     def technologiesList: List[T]
 
-    /** @param name
-      *   name of technology
-      */
+    /** Returns technology given its `name` */
     def getBy(name: String): Either[TechErrors, T]
 
   object TechnologyManager:
-    /** @param technologies
-      *   Technologies saved
-      * @return
-      *   `TechnologyManager`
-      */
+    /** Returns `TechnologyManager` initialized with `technologies` */
     def apply[T <: Technology](technologies: List[T]): TechnologyManager[T] =
       TechnologyManagerImpl(technologies.map(t => (t.name, t)).toMap)
 

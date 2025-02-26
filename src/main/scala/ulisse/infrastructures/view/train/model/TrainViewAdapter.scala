@@ -34,7 +34,7 @@ object TrainViewAdapter:
 
     override def addTrain(trainData: TrainData): Unit =
       trainData.extractThenPerform: (name, tkName, wType, wCap, tLen) =>
-        trainService.addTrain(name, tkName, wType, wCap, tLen)
+        trainService.createTrain(name, tkName, wType, wCap, tLen)
 
     override def deleteTrain(name: String): Unit =
       trainService.removeTrain(name).handleOnComplete(t => showNewTrainList(t))

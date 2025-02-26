@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.timetable
 
+import ulisse.infrastructures.view.components.Images.ImagePanel.createSVGPanel
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.TimetableEntry
-import ulisse.infrastructures.view.components.ImagePanels.ImagePanel.createSVGPanel
 import ulisse.infrastructures.view.train.SwingUtils
 import ulisse.infrastructures.view.train.SwingUtils.headerLabel
 

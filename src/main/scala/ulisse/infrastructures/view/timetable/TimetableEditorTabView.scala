@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.timetable
 
-import ulisse.infrastructures.view.components.JComponent.createInfoTextField
-import ulisse.infrastructures.view.components.JComponent
+import ulisse.infrastructures.view.components.ComposedSwing.createInfoTextField
+import ulisse.infrastructures.view.components.ComposedSwing
 import ulisse.infrastructures.view.timetable.TimetableEditorTabView.EditorTab
 
 import javax.swing.border.Border

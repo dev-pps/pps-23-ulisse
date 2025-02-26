@@ -25,7 +25,7 @@ final case class TrainService(stateEventQueue: LinkedBlockingQueue[AppState => A
     })
     promise.future
 
-  def addTrain(
+  def createTrain(
       name: String,
       technologyName: String,
       wagonUseTypeName: String,
