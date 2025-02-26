@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
-import ulisse.applications.{AppState, EventQueue}
+import ulisse.applications.AppState
 import ulisse.entities.route.{RouteEnvironmentElement, Track}
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.Environments.RailwayEnvironment
