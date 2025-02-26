@@ -34,11 +34,15 @@ final case class SimulationService(
     p.future
 
   override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Future[Option[EngineState]] = {
-    val p = Promise[Option[EngineState]()
+    val p = Promise[Option[EngineState]]()
     eventQueue.add((appState: AppState) => {
-      val newSimulationManager = appState.simulationManager.setupEngine(stepSize, cyclesPerSecond)
-      p.success(newSimulationManager.engineState)
-      appState.copy(simulationManager = newSimulationManager)
+      appState.simulationManager.setupEngine(stepSize, cyclesPerSecond) match
+        case Some(newSimulationManager) =>
+          p.success(Some(newSimulationManager.engineState))
+          appState.copy(simulationManager = newSimulationManager)
+        case _ =>
+          p.success(None)
+          appState
     })
     p.future
   }
