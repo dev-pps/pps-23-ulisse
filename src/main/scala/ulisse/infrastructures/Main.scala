@@ -5,6 +5,7 @@ import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.adapters.output.SimulationNotificationAdapter
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.useCases.{RouteService, SimulationService, StationService}
@@ -35,6 +36,7 @@ def runEngine(): Unit =
       RouteManager.empty(),
       TrainManager(List.empty),
       TechnologyManager(technologies),
+      TimetableManager(List.empty),
       SimulationManager.emptyBatchManager(timeProviderAdapter)
     )
   LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>

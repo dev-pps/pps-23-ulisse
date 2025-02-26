@@ -3,6 +3,7 @@ package ulisse.applications
 import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.entities.station.Station
@@ -17,6 +18,7 @@ object AppState:
       RouteManager.empty(),
       TrainManager(List.empty),
       TechnologyManager(List.empty),
+      TimetableManager(List.empty),
       SimulationManager.emptyBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
     )
 
@@ -25,6 +27,7 @@ final case class AppState(
     routeManager: RouteManager,
     trainManager: TrainManager,
     technologyManager: TechnologyManager[TrainTechnology],
+    timetableManager: TimetableManager,
     simulationManager: SimulationManager
 ):
   def swap(f: AppState => StationManager | RouteManager | TrainManager | TechnologyManager[
