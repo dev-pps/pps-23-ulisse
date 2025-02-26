@@ -130,6 +130,7 @@ object ComposedSwing:
     offIcon.visible = false
     onIcon.svgIcon = onIconPath
     offIcon.svgIcon = offIconPath
+    mainPanel.rect = Styles.iconButtonRect
     onIcon.svgIconPalette = Styles.iconOpenPalette
     offIcon.svgIconPalette = Styles.iconOpenPalette
 
@@ -147,5 +148,7 @@ object ComposedSwing:
     def withDimension(width: Int, height: Int): Unit =
       onIcon.preferredSize = Dimension(width, height)
       offIcon.preferredSize = Dimension(width, height)
+
+    def withPadding(padding: Styles.Padding): Unit = mainPanel.rect = mainPanel.rect.withPadding(padding)
 
     override def component[T >: Component]: T = mainPanel

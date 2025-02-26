@@ -50,7 +50,8 @@ object ExtendedSwing:
     panel
 
   case class PicturePanel() extends Panel with PictureEffect
-  case class SVGPanel()     extends Panel with SVGEffect
+
+  case class SVGPanel() extends Panel with SVGEffect
 
   case class JButtonItem(label: String) extends Button(label) with ShapeEffect with FontEffect
 

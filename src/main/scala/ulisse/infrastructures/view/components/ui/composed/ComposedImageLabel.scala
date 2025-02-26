@@ -4,9 +4,10 @@ import ulisse.infrastructures.view.components.ui.ExtendedSwing
 import ulisse.infrastructures.view.components.ui.decorators.ImageEffects.{ImageEffect, PictureEffect, SVGEffect}
 import ulisse.infrastructures.view.components.ui.decorators.Styles
 import ulisse.infrastructures.view.components.ui.decorators.Styles.Palette
+import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import java.awt.Dimension
-import scala.swing.{Component, Orientation}
+import scala.swing.{Alignment, Component, Orientation}
 
 /** Represents a label composed by an image and text. */
 trait ComposedImageLabel extends ComposedSwing:
@@ -24,6 +25,9 @@ trait ComposedImageLabel extends ComposedSwing:
 
   /** Sets the padding of the label. */
   def withPadding(padding: Styles.Padding): Unit
+
+  /** Sets the alignment of the label text. */
+  def horizontalAlignment(alignment: Alignment.Value): Unit
 
 object ComposedImageLabel:
   /** Represents a palette for SVG images. */
@@ -59,8 +63,8 @@ object ComposedImageLabel:
   ) extends ComposedImageLabel:
     private val defaultWidth  = 100
     private val defaultHeight = 40
-    private val zeroGap       = 0
     private val gap           = 5
+    private val zeroGap       = 0
 
     private val mainPanel  = ExtendedSwing.JBoxPanelItem(orientation)
     private val labelPanel = ExtendedSwing.JFlowPanelItem()
@@ -79,20 +83,21 @@ object ComposedImageLabel:
     image.listenTo(labelPanel.mouseEvents ++ mainPanel.mouseEvents ++ label.mouseEvents: _*)
     mainPanel.listenTo(labelPanel.mouseEvents ++ label.mouseEvents ++ image.mouseEvents: _*)
 
-    private def setGap(): Unit = orientation match
+    private def refreshGap(): Unit = orientation match
       case Orientation.Horizontal => labelPanel.vGap = zeroGap; labelPanel.hGap = gap
       case Orientation.Vertical   => labelPanel.hGap = zeroGap; labelPanel.vGap = gap
       case _                      => ()
 
-    export mainPanel.rectPadding_= as withPadding, label.fontEffect_= as withFont
+    export mainPanel.rectPadding_= as withPadding, label.fontEffect_= as withFont,
+      label.horizontalAlignment_= as horizontalAlignment
 
     override def showIconAndText(): Unit =
-      label.visible = true
+      labelPanel.visible = true
       mainPanel.rectPalette = openPalette
       withDimension(mainPanel.preferredSize.width, mainPanel.preferredSize.height)
 
     override def showIcon(): Unit =
-      label.visible = false
+      labelPanel.visible = false
       mainPanel.rectPalette = closePalette
       withDimension(mainPanel.preferredSize.height, mainPanel.preferredSize.height)
 
@@ -100,7 +105,7 @@ object ComposedImageLabel:
       mainPanel.preferredSize = Dimension(width, height)
       image.preferredSize = Dimension(height, height)
       if orientation == Orientation.Horizontal then label.preferredSize = Dimension(width - height, height)
-      setGap()
+      refreshGap()
 
     override def component[T >: Component]: T = mainPanel
 
