@@ -1,3 +1,21 @@
+## [1.13.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.12.0...v1.13.0) (2025-02-26)
+
+### Features
+
+* **SimulationManager:** control simulation speed ([121013d](https://github.com/dev-pps/pps-23-ulisse/commit/121013d53458ff8f603e108eea1b0471996fe22e))
+* **SimulationManager:** wire time provider ([3a82c02](https://github.com/dev-pps/pps-23-ulisse/commit/3a82c0268bf990a6009daf3fd0b226995f3ea616))
+* **SimulationManager:** working simulation loop ([3a16dd3](https://github.com/dev-pps/pps-23-ulisse/commit/3a16dd3a21a2aac78d7f5f74c848abff8cd8637c))
+* **SimulationPage:** running simulation engine demo ([937aff1](https://github.com/dev-pps/pps-23-ulisse/commit/937aff1ec3b4c65873986bf9ab2a5056f122add7))
+* **SimulationPage:** setup basic control panel ([94af46a](https://github.com/dev-pps/pps-23-ulisse/commit/94af46a76472c33b57a78f29f5230a3956dbb04e))
+* **SimulationPage:** setup port templates ([54aba21](https://github.com/dev-pps/pps-23-ulisse/commit/54aba21a4eab192e3ab265c5cc2f0ca0a41bd598))
+* **TimeProvider:** setup time provider system ([9871793](https://github.com/dev-pps/pps-23-ulisse/commit/98717937536513d25a472e2963d44492cfdcb1cd))
+
+### Bug Fixes
+
+* **Coordinate:** avoid propagation of generics ([4ec7b0f](https://github.com/dev-pps/pps-23-ulisse/commit/4ec7b0f9b08d7ba51f7bd8a6d6e0c89fbc54d2b1))
+* **SimulationManager:** time update in timedManager ([65e2b62](https://github.com/dev-pps/pps-23-ulisse/commit/65e2b628fcfd54dfcb6a96cdc9bc9d08290c489b))
+* **StationManager:** adapt new interface ([20b83c6](https://github.com/dev-pps/pps-23-ulisse/commit/20b83c61e1dbff42af978dcb8be2e8d6a7a98afc))
+
 ## [1.12.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.11.0...v1.12.0) (2025-02-25)
 
 ### Features
