@@ -16,8 +16,14 @@ trait ComposedImageLabel extends ComposedSwing:
   /** Shows only the icon. */
   def showIcon(): Unit
 
+  /** Sets the font of the label. */
+  def withFont(font: Styles.Font): Unit
+
   /** Sets the dimension of the label. */
   def withDimension(width: Int, height: Int): Unit
+
+  /** Sets the padding of the label. */
+  def withPadding(padding: Styles.Padding): Unit
 
 object ComposedImageLabel:
   /** Represents a palette for SVG images. */
@@ -70,6 +76,8 @@ object ComposedImageLabel:
 
     image.listenTo(labelPanel.mouseEvents ++ mainPanel.mouseEvents ++ label.mouseEvents: _*)
     mainPanel.listenTo(labelPanel.mouseEvents ++ label.mouseEvents ++ image.mouseEvents: _*)
+
+    export mainPanel.rectPadding_= as withPadding, label.fontEffect_= as withFont
 
     override def showIconAndText(): Unit =
       label.visible = true

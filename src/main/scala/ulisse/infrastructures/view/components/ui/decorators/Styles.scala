@@ -46,6 +46,7 @@ object Styles:
 
   /** Default [[Font]]. */
   val defaultFont: Font = Font(defaultNameFont, defaultStyleFont, defaultSizeFont, defaultPaletteFont)
+  val titleFont: Font   = defaultFont.withSize(19).withStyle(SwingFont.Bold)
 
   /** Default [[Border]]. */
   val defaultBorder: Border = Border(defaultStroke)
@@ -77,7 +78,7 @@ object Styles:
   private type Size = Pair[Option[Int]]
 
   /** [[Padding]] represent a padding with a width and height. */
-  private type Padding = Pair[Int]
+  type Padding = Pair[Int]
 
   /** Methods to create a [[Size]] with the given [[width]] and [[height]]. */
   def createSize(width: Int, height: Int): Size = Pair(Some(width), Some(height))
