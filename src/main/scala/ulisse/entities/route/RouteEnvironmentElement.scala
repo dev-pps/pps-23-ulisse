@@ -2,14 +2,17 @@ package ulisse.entities.route
 
 import ulisse.entities
 import ulisse.entities.route.Routes.Route
-import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer, TrainAgentsDirection}
+import ulisse.entities.route.Track.TrainAgentsDirection
+import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
 import ulisse.entities.simulation.Environments
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.*
 import ulisse.utils.OptionUtils.given
 
-trait RouteEnvironmentElement extends Route with TrainAgentEEWrapper[RouteEnvironmentElement]
+trait RouteEnvironmentElement extends Route with TrainAgentEEWrapper[RouteEnvironmentElement]:
+  type TAC = Track
+  def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[RouteEnvironmentElement]
 
 object RouteEnvironmentElement:
 
@@ -20,7 +23,7 @@ object RouteEnvironmentElement:
       TrainAgentsContainer.generateSequentialContainers(i => Track(i), route.railsCount)
     )
 
-  private final case class RouteEnvironmentElementImpl(route: Route, containers: Seq[TrainAgentsContainer])
+  private final case class RouteEnvironmentElementImpl(route: Route, containers: Seq[Track])
       extends RouteEnvironmentElement:
     export route.*
 
@@ -30,5 +33,5 @@ object RouteEnvironmentElement:
         updatedContainer <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
       yield copy(containers = updatedContainer)) when !contains(train) // firstAvailableContainer.isEmpty &&
 
-    override def buildNewEnvironmentElement(containers: Seq[TrainAgentsContainer]): RouteEnvironmentElement =
+    override def buildNewEnvironmentElement(containers: Seq[Track]): RouteEnvironmentElement =
       copy(containers = containers)
