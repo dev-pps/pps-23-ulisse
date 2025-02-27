@@ -1,6 +1,6 @@
 package ulisse.entities.station
 
-import cats.data.Chain
+import cats.data.{Chain, NonEmptyChain}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentsContainer
@@ -10,6 +10,12 @@ import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 class PlatformTest extends AnyWordSpec with Matchers:
 
+  private val defaultTechnology  = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
+  private val defaultWagon       = Wagon(UseType.Passenger, 50)
+  private val defaultWagonNumber = 5
+  private val train3905          = TrainAgent.apply(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
+  private val train3906          = TrainAgent.apply(Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber))
+
   "A Platform" when:
     "is created" should:
       "have a positive platform number" in:
@@ -18,101 +24,92 @@ class PlatformTest extends AnyWordSpec with Matchers:
         )
 
       "not contain any train" in:
-        Platform(1).currentTrain shouldBe None
+        Platform(1).trains shouldBe Seq()
+        Platform(1).isEmpty shouldBe true
+        Platform(1).isAvailable shouldBe true
 
-    "is checked" should:
-      "be created if the platform number is greater than 0" in:
+    "created checked" should:
+      "have a positive platform number" in:
         List(1, 2).foreach(platformNumber =>
-          Platform.createCheckedPlatform(platformNumber).map(t => (t.id, t.currentTrain)) shouldBe Right((
-            platformNumber,
-            None
-          ))
+          Platform(platformNumber).id shouldBe math.max(1, platformNumber)
         )
 
-      "return chain of errors if the platform number is lesser or equal than 0" in:
+      "return errors if the platform number is not positive" in:
         List(-1, 0).foreach(platformNumber =>
           Platform.createCheckedPlatform(platformNumber) shouldBe Left(Chain(Platform.Errors.InvalidPlatformNumber))
         )
-    // TODO MOVE
-    "is created sequentially" should:
-      "be a platforms list with sequential number of platform starting from 1" in:
-        List(1, 2, 5, 10).foreach: platformNumber =>
-          TrainAgentsContainer.generateSequentialContainers(Platform.apply, platformNumber).zip(
-            1 to platformNumber
-          ).foreach:
-            case (track, expectedPlatformNumber) =>
-              (track.id, track.currentTrain) shouldBe (expectedPlatformNumber, None)
 
-      "be a empty platforms list if desired number of platform is lesser or equal than 0" in:
-        List(-1, 0).foreach(invalidPlatformNumber =>
-          TrainAgentsContainer.generateSequentialContainers(Platform.apply, invalidPlatformNumber) shouldBe List()
-        )
+      "not contain any train" in:
+        Platform.createCheckedPlatform(1) match
+          case Right(platform) =>
+            platform.trains shouldBe Seq()
+            platform.isEmpty shouldBe true
+            platform.isAvailable shouldBe true
+          case _ => fail()
 
     "a train is put in" should:
-      "return a new platform with the specified train" in:
-        val train =
-          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
-        val platformNumber = 1
-        val platform       = Platform(platformNumber)
-        platform.putTrain(train).map(p => (p.id, p.trains)) shouldBe Some(platformNumber, Seq(train))
+      "be updated with the specified train" in:
+        val id    = 1
+        val train = train3905
+        Platform(id).putTrain(train) match
+          case Some(up) =>
+            up.id shouldBe id
+            up.trains shouldBe Seq(train)
+            up.isEmpty shouldBe false
+            up.isAvailable shouldBe false
+          case _ => fail()
 
-      // TODO fix
-      "return none if the platform already contains a train" in:
-        val train =
-          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
-        val otherTrain =
-          TrainAgent(Train("3906", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
-        val platformNumber = 1
-        val platform       = Platform(platformNumber).putTrain(train)
-        platform.flatMap(_.putTrain(train)) shouldBe None
-        platform.flatMap(_.putTrain(otherTrain)) shouldBe None
+      "not be updated if the platform is not available" in:
+        Platform(1).putTrain(train3905).flatMap(_.putTrain(train3905)) shouldBe None
+        Platform(1).putTrain(train3905).flatMap(_.putTrain(train3906)) shouldBe None
+
+      "not be updated if the train is already moved" in:
+        Platform(1).putTrain(train3905.updateDistanceTravelled(10)) shouldBe None
 
     "a train is updated" should:
-      "return a new platform with the specified train if it's present" in:
-        val train =
-          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
-        val updatedTrain   = train.updateDistanceTravelled(10)
-        val platformNumber = 1
-        val platform       = Platform(platformNumber).putTrain(train)
-        platform.flatMap(_.updateTrain(train)).map(p => (p.id, p.trains)) shouldBe Some(
-          platformNumber,
-          List(train)
-        )
-        platform.flatMap(_.updateTrain(updatedTrain)).map(p => (p.id, p.trains)) shouldBe Some(
-          platformNumber,
-          List(updatedTrain)
-        )
+      "be updated with the specified train if it's present" in:
+        val id           = 1
+        val train        = train3905
+        val updatedTrain = train.updateDistanceTravelled(10)
+        Platform(id).putTrain(train).flatMap(
+          _.updateTrain(updatedTrain)
+        ) match
+          case Some(up) =>
+            up.id shouldBe id
+            up.trains shouldBe Seq(updatedTrain)
+            up.isEmpty shouldBe false
+            up.isAvailable shouldBe false
+          case _ => fail()
 
-      "return none if the platform doesn't contain the specified train" in:
-        val train =
-          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
-        val otherTrain =
-          TrainAgent(Train("3906", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
-        val platformNumber = 1
-        val platform       = Platform(platformNumber).putTrain(train)
-        platform.flatMap(_.updateTrain(otherTrain)) shouldBe None
+      "not be updated if the platform doesn't contain the specified train" in:
+        Platform(1).putTrain(train3905).flatMap(_.updateTrain(train3906)) shouldBe None
 
     "a train is removed" should:
-      "return a new platform without the specified train if it's present" in:
-        val train =
-          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
-        val updatedTrain   = train.updateDistanceTravelled(10)
-        val platformNumber = 1
-        val platform       = Platform(platformNumber).putTrain(train)
-        platform.flatMap(_.removeTrain(train)).map(p => (p.id, p.trains)) shouldBe Some((
-          platformNumber,
-          Seq()
-        ))
-        platform.flatMap(_.removeTrain(updatedTrain)).map(p => (p.id, p.trains)) shouldBe Some((
-          platformNumber,
-          Seq()
-        ))
+      "be updated if the specified train it's present" in:
+        val id    = 1
+        val train = train3905
+        Platform(id).putTrain(train).flatMap(
+          _.removeTrain(train)
+        ) match
+          case Some(up) =>
+            up.id shouldBe id
+            up.trains shouldBe Seq()
+            up.isEmpty shouldBe true
+            up.isAvailable shouldBe true
+          case _ => fail()
 
-      "return none if the platform doesn't contain the specified train" in:
-        val train =
-          TrainAgent(Train("3905", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
-        val otherTrain =
-          TrainAgent(Train("3906", TrainTechnology("HighSpeed", 300, 1.0, 0.5), Wagon(UseType.Passenger, 50), 5))
-        val platformNumber = 1
-        val platform       = Platform(platformNumber).putTrain(train)
-        platform.flatMap(_.removeTrain(otherTrain)) shouldBe None
+      "not be updated if the platform doesn't contain the specified train" in:
+        Platform(1).putTrain(train3905).flatMap(_.removeTrain(train3906)) shouldBe None
+
+    "a train is searched" should:
+      "be found if there is a train with the same name" in:
+        val train        = train3905
+        val updatedTrain = train.updateDistanceTravelled(10)
+        Platform(1).putTrain(train) match
+          case Some(up) =>
+            up.contains(train) shouldBe true
+            up.contains(updatedTrain) shouldBe true
+          case _ => fail()
+
+      "not be found if there isn't a train with the same name" in:
+        Platform(1).putTrain(train3905).map(_.contains(train3906)) shouldBe Some(false)
