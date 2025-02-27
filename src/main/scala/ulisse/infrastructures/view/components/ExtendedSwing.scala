@@ -2,7 +2,6 @@ package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.components.decorators.ImageEffects.{PictureEffect, SVGEffect}
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, FontEffect, ShapeEffect}
-import ulisse.infrastructures.view.components.styles.Styles
 
 import java.awt.FlowLayout
 import javax.swing.JLayeredPane
@@ -52,7 +51,9 @@ object ExtendedSwing:
 
   case class SVGPanel() extends Panel with SVGEffect
 
-  case class SButton(label: String) extends Button(label) with ShapeEffect with FontEffect
+  case class SButton(label: String) extends Button(label) with ShapeEffect with FontEffect:
+    focusPainted = false
+    contentAreaFilled = false
 
   case class SLabel(label: String) extends Label(label) with ShapeEffect with FontEffect
 
