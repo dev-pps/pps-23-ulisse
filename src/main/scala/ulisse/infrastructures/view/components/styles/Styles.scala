@@ -33,21 +33,29 @@ object Styles:
   val defaultSizeFont: Int        = 18
 
   /** Default [[Palette]]. */
-  val defaultPalette: Palette     = Palette(defaultColor, withOutColor, withOutColor)
-  val transparentPalette: Palette = defaultPalette.withBackground(transparentColor)
-  val defaultPaletteFont: Palette = defaultPalette.withBackground(Themes.Theme.light.text)
-  val closeLabelPalette: Palette  = createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
-  val openLabelPalette: Palette   = closeLabelPalette.withBackground(Theme.light.background.withAlpha(50))
-  val iconClosePalette: Palette   = defaultPalette.withBackground(Theme.light.background)
-  val iconOpenPalette: Palette    = createEqualPalette(Theme.light.background).withBackground(Theme.light.overlay)
+  val defaultPalette: Palette         = Palette(defaultColor, withOutColor, withOutColor)
+  val transparentPalette: Palette     = defaultPalette.withBackground(transparentColor)
+  val defaultPaletteFont: Palette     = defaultPalette.withBackground(Themes.Theme.light.text)
+  val closeLabelPalette: Palette      = createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
+  val openLabelPalette: Palette       = closeLabelPalette.withBackground(Theme.light.background.withAlpha(50))
+  val iconClosePalette: Palette       = defaultPalette.withBackground(Theme.light.background)
+  val iconOpenPalette: Palette        = createEqualPalette(Theme.light.background).withBackground(Theme.light.overlay)
+  val formButtonPalette: Palette      = defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.click)
+  val formTrueButtonPalette: Palette  = formButtonPalette.withClick(Theme.light.trueClick)
+  val formFalseButtonPalette: Palette = formButtonPalette.withClick(Theme.light.falseClick)
 
   /** Default [[Rect]]. */
-  val defaultRect: Rect    = Rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)
-  val iconButtonRect: Rect = defaultRect.withPaddingWidthAndHeight(5, 5)
+  val defaultRect: Rect         = Rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)
+  val iconButtonRect: Rect      = defaultRect.withPaddingWidthAndHeight(5, 5)
+  val panelRect: Rect           = defaultRect.withPaddingWidthAndHeight(15, 15)
+  val formTrueButtonRect: Rect  = defaultRect.withPaddingWidthAndHeight(20, 10).withPalette(formTrueButtonPalette)
+  val formFalseButtonRect: Rect = defaultRect.withPaddingWidthAndHeight(20, 10).withPalette(formFalseButtonPalette)
 
   /** Default [[Font]]. */
-  val defaultFont: Font = Font(defaultNameFont, defaultStyleFont, defaultSizeFont, defaultPaletteFont)
-  val titleFont: Font   = defaultFont.withSize(19).withStyle(SwingFont.Bold)
+  val defaultFont: Font        = Font(defaultNameFont, defaultStyleFont, defaultSizeFont, defaultPaletteFont)
+  val titleDashboardFont: Font = defaultFont.withSize(19).withStyle(SwingFont.Bold)
+  val titleFormFont: Font      = titleDashboardFont.withSize(36)
+  val whiteFont: Font          = defaultFont.withPalette(defaultPalette.withBackground(Theme.light.background))
 
   /** Default [[Border]]. */
   val defaultBorder: Border = Border(defaultStroke)
@@ -190,6 +198,7 @@ object Styles:
       /** Update the font of the component with the given [[font]]. */
       def updateFont(font: Font): Unit =
         component.font = font.swingFont
+        component.foreground = font.palette.background
         component.updateGraphics()
 
       /** Update the border of the component with the given [[border]]. */
