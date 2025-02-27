@@ -15,7 +15,7 @@ object GUIView:
   private case class GUIViewImpl(uiPort: Input) extends MainFrame, GUIView:
     title = "Map"
     visible = true
-    preferredSize = new Dimension(1000, 1000)
+    preferredSize = new Dimension(1400, 1000)
 
     private val pageManager = PageManager()
 

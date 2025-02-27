@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.components.decorators.ImageEffects.{PictureEffect, SVGEffect}
-import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{FontEffect, ShapeEffect}
+import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, FontEffect, ShapeEffect}
 import ulisse.infrastructures.view.components.styles.Styles
 
 import java.awt.FlowLayout
@@ -10,12 +10,12 @@ import scala.swing.*
 
 object ExtendedSwing:
 
-  case class LayeredPanel private (private val layeredPane: JLayeredPane) extends BorderPanel:
+  case class LayeredPanel private (private val layeredPane: JLayeredPane) extends BorderPanel with EnhancedLook:
     def this() = this(JLayeredPane())
     layout(Component.wrap(layeredPane)) = BorderPanel.Position.Center
 
-    def add(component: Component, level: Int): Unit =
-      layeredPane.add(component.peer, level)
+    def add(component: Component): Unit =
+      layeredPane.add(component.peer)
       revalidate()
 
     override def revalidate(): Unit =

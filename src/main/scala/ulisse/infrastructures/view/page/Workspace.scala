@@ -3,13 +3,14 @@ package ulisse.infrastructures.view.page
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.manager.FormManager
+import ulisse.infrastructures.view.map.MapPanel
 
-import javax.swing.JLayeredPane
 import scala.swing.BorderPanel.Position
 import scala.swing.{BorderPanel, Component}
 
 /** Represents the workspace of the application. */
-trait Workspace extends ComposedSwing
+trait Workspace extends ComposedSwing:
+  def revalidate(): Unit
 
 object Workspace:
   /** Creates a new instance of simulation workspace. */
@@ -23,14 +24,13 @@ object Workspace:
 
   private case class BaseWorkspace() extends Workspace:
     private val mainPanel = new ExtendedSwing.LayeredPanel()
-    val workPanel         = BorderPanel()
-    val menuPanel         = BorderPanel()
+    val menuPanel         = new BorderPanel() { opaque = false }
+    val workPanel         = new BorderPanel() { opaque = false }
 
-    menuPanel.opaque = false
-    workPanel.opaque = false
+    mainPanel.add(menuPanel)
+    mainPanel.add(workPanel)
 
-    mainPanel.add(workPanel, JLayeredPane.DEFAULT_LAYER)
-    mainPanel.add(menuPanel, JLayeredPane.PALETTE_LAYER)
+    export mainPanel.revalidate
 
     override def component[T >: Component]: T = mainPanel
 
@@ -38,19 +38,22 @@ object Workspace:
   case class SimulationWorkspace() extends Workspace:
     private val workspace = BaseWorkspace()
 
-    export workspace.component
+    export workspace.{component, revalidate}
 
   /** Represents the map workspace of the application. */
   case class MapWorkspace() extends Workspace:
     private val workspace   = BaseWorkspace()
+    private val mapPanel    = MapPanel.empty()
     private val formManager = FormManager.createMap()
 
+    workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(formManager.component) = Position.East
+    workspace.revalidate()
 
-    export workspace.component
+    export workspace.{component, revalidate}
 
   /** Represents the train workspace of the application. */
   case class TrainWorkspace() extends Workspace:
     private val workspace = BaseWorkspace()
 
-    export workspace.component
+    export workspace.{component, revalidate}
