@@ -1,11 +1,12 @@
 package ulisse.infrastructures.view.manager
 
 import ulisse.infrastructures.view.components.composed.ComposedSwing
+import ulisse.infrastructures.view.page.Workspace
 import ulisse.infrastructures.view.page.Workspace.{MapWorkspace, SimulationWorkspace, TrainWorkspace}
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.BorderPanel.Position
-import scala.swing.{BorderPanel, Component, FlowPanel}
+import scala.swing.{BorderPanel, Component}
 
 /** Manages the workspaces of the application. */
 trait WorkspaceManager extends ComposedSwing:
@@ -28,20 +29,17 @@ object WorkspaceManager:
     private val simulation: SimulationWorkspace = SimulationWorkspace()
     private val map: MapWorkspace               = MapWorkspace()
     private val train: TrainWorkspace           = TrainWorkspace()
+    private val workspaces                      = List(simulation, map, train)
 
-    override def showSimulation(): Unit =
-      mainPanel.layout(simulation.component) = Position.Center
+    private def showWorkspace(workspace: Workspace): Unit =
+      mainPanel.layout(workspace.component) = Position.Center
+      workspaces.foreach(_.hide())
+      workspace.show()
+      workspace.revalidate()
       mainPanel.validate()
-      simulation.revalidate()
 
-    override def showMap(): Unit =
-      mainPanel.layout(map.component) = Position.Center
-      mainPanel.validate()
-      map.revalidate()
-
-    override def showTrain(): Unit =
-      mainPanel.layout(train.component) = Position.Center
-      mainPanel.validate()
-      train.revalidate()
+    override def showSimulation(): Unit = showWorkspace(simulation)
+    override def showMap(): Unit        = showWorkspace(map)
+    override def showTrain(): Unit      = showWorkspace(train)
 
     override def component[T >: Component]: T = mainPanel
