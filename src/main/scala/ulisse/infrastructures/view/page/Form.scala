@@ -6,7 +6,6 @@ import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 
-import scala.swing.Font.Style
 import scala.swing.{Component, Orientation, Point}
 
 trait Form extends ComposedSwing:
@@ -18,28 +17,22 @@ object Form:
   def createStation(): StationForm   = StationForm()
   def createSchedule(): ScheduleForm = ScheduleForm()
 
-  private val formRect: Styles.Rect       = Styles.defaultRect.withPaddingWidthAndHeight(40, 0).withArc(15)
-  private val formPalette: Styles.Palette = Styles.defaultPalette.withBackground(Theme.light.element)
-
-  private val titleFont  = Styles.defaultFont.copy(style = Style.Bold, size = 36)
   private val buttonRect = Styles.defaultRect.withPaddingWidthAndHeight(20, 10)
-
   private val buttonPalette =
     Styles.defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.click)
-
   private val trueButtonPalette  = buttonPalette.copy(clickColor = Some(Theme.light.trueClick))
   private val falseButtonPalette = buttonPalette.copy(clickColor = Some(Theme.light.falseClick))
 
   private case class BaseForm(title: String, fields: ComposedSwing.JInfoTextField*):
-    private val mainPanel: ExtendedSwing.SBoxPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
-    mainPanel.rect = formRect
-    mainPanel.rectPalette = formPalette
+    private val mainPanel: ExtendedSwing.SBoxPanel    = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     private val insertForm: ComposedSwing.JInsertForm = ComposedSwing.createInsertForm(title, fields: _*)
     private val space                                 = 10
 
     val buttonPanel: ExtendedSwing.SFlowPanel = ExtendedSwing.SFlowPanel()
 
-    insertForm.titleLabel.fontEffect = titleFont
+    mainPanel.rect = Styles.panelRect
+
+    insertForm.titleLabel.fontEffect = Styles.titleFormFont
 
     buttonPanel.hGap = space
 
@@ -57,13 +50,11 @@ object Form:
 
     private val form       = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
     private val saveButton = ExtendedSwing.SButton("Save")
-    saveButton.rect = buttonRect
-    saveButton.rectPalette = trueButtonPalette
-//    saveButton.fontEffect = buttonFont
+    saveButton.rect = Styles.formTrueButtonRect
+    saveButton.fontEffect = Styles.whiteFont
     private val deleteButton = ExtendedSwing.SButton("Delete")
-    deleteButton.rect = buttonRect
-    deleteButton.rectPalette = falseButtonPalette
-//    deleteButton.fontEffect = buttonFont
+    deleteButton.rect = Styles.formFalseButtonRect
+    deleteButton.fontEffect = Styles.whiteFont
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
@@ -90,13 +81,12 @@ object Form:
     private val form = BaseForm("Station", name, latitude, longitude, tracks)
 
     private val saveButton = ExtendedSwing.SButton("Save")
-    saveButton.rect = buttonRect
-    saveButton.rectPalette = trueButtonPalette
-//    saveButton.fontEffect = buttonFont
+    saveButton.rect = Styles.formTrueButtonRect
+    saveButton.fontEffect = Styles.whiteFont
+
     private val deleteButton = ExtendedSwing.SButton("Delete")
-    deleteButton.rect = buttonRect
-    deleteButton.rectPalette = falseButtonPalette
-//    deleteButton.fontEffect = buttonFont
+    deleteButton.rect = Styles.formFalseButtonRect
+    deleteButton.fontEffect = Styles.whiteFont
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
@@ -120,13 +110,12 @@ object Form:
     private val form = BaseForm("Schedule", field, field1, field2)
 
     private val saveButton = ExtendedSwing.SButton("Save")
-    saveButton.rect = buttonRect
-    saveButton.rectPalette = trueButtonPalette
-//    saveButton.fontColor = buttonFont
+    saveButton.rect = Styles.formTrueButtonRect
+    saveButton.fontEffect = Styles.whiteFont
+
     private val deleteButton = ExtendedSwing.SButton("Delete")
-    deleteButton.rect = buttonRect
-    deleteButton.rectPalette = falseButtonPalette
-//    deleteButton.fontEffect = buttonFont
+    deleteButton.rect = Styles.formFalseButtonRect
+    deleteButton.fontEffect = Styles.whiteFont
 
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton

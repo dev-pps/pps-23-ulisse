@@ -77,15 +77,16 @@ object SwingEnhancements:
     def rect: Styles.Rect = _rect
 
     /** Change the shape of the component. */
-    def rect_=(newRect: Styles.Rect): Unit = { _rect = newRect; this.updateRect(rect) }
+    def rect_=(newRect: Styles.Rect): Unit =
+      _rect = newRect
+      this.updateRect(rect)
+      this.updateCurrentColor(rect, currentColor)
 
     /** Read-only property to get the shape palette of the component. */
     def rectPalette: Styles.Palette = rect.palette
 
     /** Change the shape palette of the component. */
-    def rectPalette_=(palette: Styles.Palette): Unit =
-      rect = rect.withPalette(palette)
-      this.updateCurrentColor(rect, currentColor)
+    def rectPalette_=(palette: Styles.Palette): Unit = rect = rect.withPalette(palette)
 
     /** Read-only property to get the shape padding of the component. */
     def rectPadding: Styles.Padding = rect.padding
@@ -113,15 +114,16 @@ object SwingEnhancements:
     def fontEffect: Styles.Font = _font
 
     /** Change the font effect of the component. */
-    def fontEffect_=(newFont: Styles.Font): Unit = { (_font = newFont); this.updateFont(fontEffect) }
+    def fontEffect_=(newFont: Styles.Font): Unit =
+      _font = newFont;
+      this.updateFont(fontEffect)
+      this.updateCurrentColor(fontEffect, currentColor)
 
     /** Read-only property to get the font palette of the component. */
     def fontPalette: Styles.Palette = fontEffect.palette
 
     /** Change the font palette of the component. */
-    def fontPalette_=(palette: Styles.Palette): Unit =
-      fontEffect = fontEffect.withPalette(palette)
-      this.updateCurrentColor(fontEffect, currentColor)
+    def fontPalette_=(palette: Styles.Palette): Unit = fontEffect = fontEffect.withPalette(palette)
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)
@@ -140,15 +142,16 @@ object SwingEnhancements:
     def borderEffect: Styles.Border = _border
 
     /** Change the border of the component. */
-    def borderEffect_=(border: Styles.Border): Unit = { _border = border; this.updateBorder(rect, borderEffect) }
+    def borderEffect_=(border: Styles.Border): Unit =
+      _border = border
+      this.updateBorder(rect, borderEffect)
+      this.updateCurrentColor(borderEffect, currentColor)
 
     /** Read-only property to get the border palette of the component. */
     def borderPalette: Styles.Palette = borderEffect.palette
 
     /** Change the border palette of the component. */
-    def borderPalette_=(palette: Styles.Palette): Unit =
-      borderEffect = borderEffect.withPalette(palette)
-      this.updateCurrentColor(borderEffect, currentColor)
+    def borderPalette_=(palette: Styles.Palette): Unit = borderEffect = borderEffect.withPalette(palette)
 
     override protected def paintLook(g: Graphics2D): Unit =
       super.paintLook(g)

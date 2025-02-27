@@ -52,9 +52,8 @@ object Dashboard:
     private val train      = "train"
     private val settings   = "settings"
 
-    private val mainPadding       = Styles.createPadding(15, 15)
     private val labelsPadding     = Styles.createPadding(5, 0)
-    private val verticalGap       = mainPadding.b
+    private val verticalGap       = Styles.panelRect.padding.b
     private val widthLabels       = 160
     private val heightLabels      = 50
     private val widthExpandButton = heightLabels / 2
@@ -64,7 +63,6 @@ object Dashboard:
     private val trainLabel      = train      -> ComposedImageLabel.createIcon(ImgPath.train, train)
     private val settingsLabel   = settings   -> ComposedImageLabel.createIcon(ImgPath.settings, settings)
 
-//    private val
     private val mainPanel       = BorderPanel().transparent()
     private val mainLabelPanel  = ExtendedSwing.SBorderPanel()
     private val northLabelPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
@@ -75,8 +73,8 @@ object Dashboard:
     private val mainLabels    = Map(simulationLabel, mapLabel, trainLabel)
     private val controlLabels = Map(settingsLabel)
 
-    mainLabelPanel.rect = mainLabelPanel.rect.withPadding(mainPadding)
-    iconApp.withFont(Styles.titleFont)
+    mainLabelPanel.rect = Styles.panelRect
+    iconApp.withFont(Styles.titleDashboardFont)
     expandButton.withDimension(widthExpandButton, widthExpandButton)
     (mainLabels ++ controlLabels).values.foreach(_.withPadding(labelsPadding))
     labels.foreach(_.horizontalAlignment(Alignment.Left))
