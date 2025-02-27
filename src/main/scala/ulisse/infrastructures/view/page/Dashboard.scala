@@ -4,7 +4,6 @@ import ulisse.infrastructures.view.common.{ImagePath as ImgPath, Observers}
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.infrastructures.view.manager.WorkspaceManager
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.*
@@ -65,27 +64,30 @@ object Dashboard:
     private val trainLabel      = train      -> ComposedImageLabel.createIcon(ImgPath.train, train)
     private val settingsLabel   = settings   -> ComposedImageLabel.createIcon(ImgPath.settings, settings)
 
-    private val mainPanel  = ExtendedSwing.JBorderPanelItem()
-    private val northPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
-    private val southPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
+//    private val
+    private val mainPanel       = BorderPanel().transparent()
+    private val mainLabelPanel  = ExtendedSwing.JBorderPanelItem()
+    private val northLabelPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
+    private val southLabelPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
 
     private val iconApp       = ComposedImageLabel.createTransparentPicture(ImgPath.logo, ulisse)
     private val expandButton  = ComposedSwing.JToggleIconButton(ImgPath.rightCompact, ImgPath.rightCompact)
     private val mainLabels    = Map(simulationLabel, mapLabel, trainLabel)
     private val controlLabels = Map(settingsLabel)
 
-    mainPanel.rect = mainPanel.rect.withPadding(mainPadding)
+    mainLabelPanel.rect = mainLabelPanel.rect.withPadding(mainPadding)
     iconApp.withFont(Styles.titleFont)
     expandButton.withDimension(widthExpandButton, widthExpandButton)
     (mainLabels ++ controlLabels).values.foreach(_.withPadding(labelsPadding))
     labels.foreach(_.horizontalAlignment(Alignment.Left))
 
-    northPanel.contents += iconApp.createLeftRight(expandButton)
-    northPanel.contents ++= mainLabels.values.flatten(label => List(Swing.VStrut(verticalGap), label.component))
-    southPanel.contents ++= controlLabels.values.flatten(label => List(Swing.VStrut(verticalGap), label.component))
+    northLabelPanel.contents += iconApp.createLeftRight(expandButton)
+    northLabelPanel.contents ++= mainLabels.values.flatten(label => List(Swing.VStrut(verticalGap), label.component))
+    southLabelPanel.contents ++= controlLabels.values.flatten(label => List(Swing.VStrut(verticalGap), label.component))
 
-    mainPanel.layout(northPanel) = Position.North
-    mainPanel.layout(southPanel) = Position.South
+    mainLabelPanel.layout(northLabelPanel) = Position.North
+    mainLabelPanel.layout(southLabelPanel) = Position.South
+    mainPanel.layout(mainLabelPanel) = Position.West
 
     expand()
     iconApp.attach(UlisseIconEvents(this))
