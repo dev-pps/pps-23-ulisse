@@ -9,17 +9,12 @@ import java.awt.Color
 import scala.swing.Swing.{EmptyBorder, HGlue}
 import scala.swing.*
 
-object TimetableListViews:
-
-  def tablesListView(timeEntries: List[TimetableEntry], visibleRows: Int): ListView[TimetableEntry] =
-    val listView = new ListView(timeEntries) {
-      import scala.swing.ListView.IntervalMode
-      selection.intervalMode = IntervalMode.Single
-      background = Color.white
-      renderer = new ItemRenderer[TimetableEntry]
-      visibleRowCount = visibleRows
-    }
-    listView
+final case class TimetableListView(timeEntries: List[TimetableEntry]) extends ListView[TimetableEntry]:
+  val listView: ListView[TimetableEntry] = ListView(timeEntries)
+  import scala.swing.ListView.IntervalMode
+  listView.selection.intervalMode = IntervalMode.Single
+  background = Color.white
+  renderer = new ItemRenderer[TimetableEntry]
 
   private class ItemRenderer[T] extends ListView.Renderer[TimetableEntry] {
     override def componentFor(
@@ -33,7 +28,7 @@ object TimetableListViews:
     }
   }
 
-  case class StationCard(data: TimetableEntry) extends BoxPanel(Orientation.Vertical):
+  private case class StationCard(data: TimetableEntry) extends BoxPanel(Orientation.Vertical):
     import java.awt.Dimension
     preferredSize = Dimension(180, 110)
     border = EmptyBorder(5, 5, 5, 5)

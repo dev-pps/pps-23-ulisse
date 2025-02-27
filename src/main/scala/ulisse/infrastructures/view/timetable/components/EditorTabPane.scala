@@ -1,15 +1,15 @@
 package ulisse.infrastructures.view.timetable.components
 
+import ulisse.infrastructures.view.components.ComposedSwing.createInfoTextField
+import ulisse.infrastructures.view.components.ExtendedSwing.{JButtonItem, JLabelItem, JTextFieldItem, SButton, SLabel}
+import ulisse.infrastructures.view.components.Styles
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 
 import javax.swing.{JSpinner, SpinnerNumberModel}
 import scala.swing.Swing.EmptyBorder
-import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
-
 import scala.swing.event.ButtonClicked
 import scala.swing.{BoxPanel, ComboBox, Orientation}
-import ulisse.infrastructures.view.components.ExtendedSwing.{SButton, SLabel, STextField}
-import ulisse.infrastructures.view.components.composed.ComposedSwing.JInfoTextField
+import ulisse.infrastructures.view.components.ComponentUtils.{alignLeft, hSpaced}
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.utils.ValidationUtils.validateNonBlankString
 
@@ -27,10 +27,10 @@ class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orient
   minutesSpinnerModel.setStepSize(1)
   private val minutesSpinner               = new JSpinner(minutesSpinnerModel)
   private val trainCombo: ComboBox[String] = ComboBox[String](controller.trainNames)
-  private val stationSelection             = STextField(10)
+  private val stationSelection             = JTextFieldItem(10)
   private val undoBtn                      = StyledButton("undo")
   private val insertBtn                    = StyledButton("insert")
-  private val editButtonsPane              = undoBtn.createLeftRight(insertBtn)
+  private val editButtonsPane              = undoBtn.hSpaced(insertBtn)
   undoBtn.reactions += {
     case ButtonClicked(_) => controller.undoLastInsert()
   }
@@ -64,8 +64,9 @@ class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orient
             case Right(l) => println(l)
   }
 
-  contents += SLabel("Train: ").createLeftRight(trainCombo)
-  contents += SLabel("Selected Time: ").createLeftRight(hoursCombo.createLeftRight(minutesCombo))
-  contents += SLabel("Station: ").createLeftRight(stationSelection)
-  contents += SLabel("Wait minutes: ").createLeftRight(Component.wrap(minutesSpinner))
+  import ulisse.infrastructures.view.components.composed.onLeftOf
+  contents += SLabel("Train: ").onLeftOf(trainCombo)
+  contents += SLabel("Selected Time: ").onLeftOf(hoursCombo.onLeftOf(minutesCombo))
+  contents += SLabel("Station: ").onLeftOf(stationSelection)
+  contents += SLabel("Wait minutes: ").onLeftOf(Component.wrap(minutesSpinner))
   contents += editButtonsPane
