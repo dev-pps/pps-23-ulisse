@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.train
 
 import scala.swing.event.ValueChanged
-import scala.swing.{Component, FlowPanel, Font, Graphics2D, Label, Swing, TextField}
+import scala.swing.{ComboBox, Component, FlowPanel, Font, Graphics2D, Label, Swing, TextField}
 
 object SwingUtils:
 
@@ -30,9 +30,7 @@ object SwingUtils:
         font = valueFont
       }
 
-  class NumberField(cols: Int) extends TextField:
-    columns = cols
-    listenTo(this)
+  class JNumberFieldItem(cols: Int) extends JTextFieldItem(cols):
     reactions += {
       case ValueChanged(_) =>
         Swing.onEDT {
@@ -41,3 +39,10 @@ object SwingUtils:
           }
         }
     }
+
+  class StyledButton(label: String) extends JButtonItem(label):
+    this.rect = Styles.defaultRect.withPaddingWidthAndHeight(20, 10)
+
+  class JComboBoxItem
+
+//  class JComboBoxItem[A](items: Seq[A]) extends ComboBox(items) with ExtendedSwingStyle:

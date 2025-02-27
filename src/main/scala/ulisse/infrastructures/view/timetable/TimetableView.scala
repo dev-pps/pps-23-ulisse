@@ -40,7 +40,6 @@ object TimetableView:
   new MainFrame() {
     title = "timetable preview"
     val mainPanel = FlowPanel()
-    import ulisse.infrastructures.view.timetable.TimetableView.timetableTabbedPane
     mainPanel.contents += TimetableView(TimetableInputPortMocked())
     contents = mainPanel
     visible = true
