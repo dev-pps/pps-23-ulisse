@@ -1,12 +1,13 @@
 package ulisse.infrastructures.view.timetable.components
 
-import ulisse.infrastructures.view.components.ComposedSwing
+import ulisse.infrastructures.view.components.{ComposedSwing, ExtendedSwing}
 import ulisse.infrastructures.view.components.ComposedSwing.createInfoTextField
 import ulisse.infrastructures.view.components.ExtendedSwing.{JButtonItem, JLabelItem, JTextFieldItem}
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 import ulisse.infrastructures.view.timetable.components.EditingTab.EditorTab
-import ulisse.infrastructures.view.timetable.components.{EditorTabPane, TimetableListViews}
+import ulisse.infrastructures.view.timetable.components.{EditorTabPane, TimetableListView}
 import ulisse.infrastructures.view.components.ComponentUtils.hSpaced
+import ulisse.infrastructures.view.train.SwingUtils.StyledButton
 
 import javax.swing.border.Border
 import javax.swing.event.ChangeListener
@@ -18,14 +19,17 @@ import scala.swing.*
 object EditingTab:
 
   class EditorTab(controller: TimetableViewController) extends BoxPanel(Orientation.Vertical):
-    private val formPane      = EditorTabPane(controller)
-    private val previewPane   = ScrollPane(TimetableListViews.tablesListView(controller.insertedStations(), 4))
-    private val clearBtn      = new Button("clear")
-    private val saveBtn       = new Button("Save")
-    private val bottomButtons = clearBtn.hSpaced(saveBtn)
+    private val formPane    = EditorTabPane(controller)
+    private val previewPane = ScrollPane(TimetableListView(controller.insertedStations()))
+    private val saveBtn     = StyledButton("Save")
     contents += formPane.withHeader("Timetable creation")
     contents += previewPane.withHeader("Timetable Preview")
-    contents += bottomButtons
+    import ulisse.infrastructures.view.components.ComponentUtils.centerHorizontally
+    contents += saveBtn.centerHorizontally()
+
+    saveBtn.reactions += {
+      case ButtonClicked(_) => controller.save()
+    }
 
   extension (c: Component)
     private def withHeader(headerText: String): Panel =
