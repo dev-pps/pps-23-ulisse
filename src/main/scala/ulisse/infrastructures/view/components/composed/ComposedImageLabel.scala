@@ -56,8 +56,8 @@ object ComposedImageLabel:
   def createIcon(iconPath: String, text: String)(using orientation: Orientation.Value): ComposedImageLabel =
     new SVGIconLabel(iconPath, text, orientation)(defaultSVGOpenPalette, defaultSVGClosePalette)
 
-  /** Creates a [[SVGIconLabel]] from a [[path]] and [[text]] to be displayed in the dashboard. */
-  def createToDashboard(iconPath: String, text: String)(using orientation: Orientation.Value): ComposedImageLabel =
+  /** Creates a [[SVGIconLabel]] from a [[path]] and [[text]] to be displayed in the menu. */
+  def createToMenu(iconPath: String, text: String)(using orientation: Orientation.Value): ComposedImageLabel =
     new SVGIconLabel(iconPath, text, orientation)(defaultSVGClosePalette, defaultSVGOpenPalette)
 
   /** Represents a label with an image and text. */
