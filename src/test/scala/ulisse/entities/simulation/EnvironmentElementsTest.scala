@@ -4,13 +4,32 @@ import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper
+import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.{findIn, leave}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 
+import scala.swing.Component
+
 class EnvironmentElementsTest extends AnyWordSpec with Matchers:
+
+  trait TestTrainAgentsContainer extends TrainAgentsContainer[TestTrainAgentsContainer]
+  "agent containers" when:
+    "created sequentially" should:
+      val constructor = (id: Int) =>
+        val mockedContainer = mock[TestTrainAgentsContainer]
+        when(mockedContainer.id).thenReturn(id)
+        mockedContainer
+      "have sequential ids starting from 1" in:
+        List(1, 2, 5, 10).foreach(id =>
+          TrainAgentsContainer.generateSequentialContainers(constructor, id).zip(1 to id).foreach(
+            (container, expectedId) => container.id shouldBe expectedId
+          )
+        )
+
+      "be empty if the number of containers is not positive" in:
+        List(-1, 0).foreach(id => TrainAgentsContainer.generateSequentialContainers(constructor, id) shouldBe List())
 
   private val defaultTechnology  = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
   private val defaultWagon       = Wagon(UseType.Passenger, 50)
