@@ -1,10 +1,10 @@
 package ulisse.infrastructures.view.components.composed
 
-import ulisse.infrastructures.view.components.ExtendedSwing
-import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.infrastructures.view.components.decorators.ImageEffects.{ImageEffect, PictureEffect, SVGEffect}
-import Styles.Palette
 import ulisse.infrastructures.view.common.Observers.Observable
+import ulisse.infrastructures.view.components.ExtendedSwing
+import ulisse.infrastructures.view.components.decorators.ImageEffects.{ImageEffect, PictureEffect, SVGEffect}
+import ulisse.infrastructures.view.components.styles.Styles
+import ulisse.infrastructures.view.components.styles.Styles.Palette
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import java.awt.Dimension
@@ -13,6 +13,9 @@ import scala.swing.{Alignment, Component, Orientation}
 
 /** Represents a label composed by an image and text. */
 trait ComposedImageLabel extends ComposedSwing with Observable[MouseEvent]:
+  /** Returns true if the label is expanded. */
+  def isExpanded: Boolean
+
   /** Shows the icon and text. */
   def showIconAndText(): Unit
 
@@ -93,7 +96,7 @@ object ComposedImageLabel:
       case _                      => ()
 
     export mainPanel.rectPadding_= as withPadding, label.fontEffect_= as withFont,
-      label.horizontalAlignment_= as horizontalAlignment
+      label.horizontalAlignment_= as horizontalAlignment, labelPanel.visible as isExpanded
 
     override def showIconAndText(): Unit =
       labelPanel.visible = true
@@ -108,7 +111,9 @@ object ComposedImageLabel:
     override def withDimension(width: Int, height: Int): Unit =
       mainPanel.preferredSize = Dimension(width, height)
       image.preferredSize = Dimension(height, height)
-      if orientation == Orientation.Horizontal then label.preferredSize = Dimension(width - height, height)
+      if orientation == Orientation.Horizontal then
+        label.preferredSize = Dimension(width - height, height)
+        labelPanel.preferredSize = Dimension(width - height, height)
       refreshGap()
 
     override def component[T >: Component]: T = mainPanel
