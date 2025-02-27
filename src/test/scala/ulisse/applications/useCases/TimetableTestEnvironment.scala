@@ -3,11 +3,13 @@ package ulisse.applications.useCases
 import cats.data.NonEmptyChain
 import ulisse.Runner.runAll
 import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.TimetablePorts
 import ulisse.entities.Routes
 import ulisse.entities.timetable.MockedEntities.AppStateMocked
+import ulisse.entities.train.Trains.TrainTechnology
 
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -26,7 +28,8 @@ object TimetableTestEnvironment:
     yield AppStateMocked(
       trainManager = TrainManager(List(AV1000Train, AV800Train)),
       timetableManager = TimetableManager(List.empty),
-      routeManager = RouteManager.createOf(List(routeAB, routeBC, routeCD))
+      routeManager = RouteManager.createOf(List(routeAB, routeBC, routeCD)),
+      technologyManager = TechnologyManager[TrainTechnology](List(AV1000Train.techType, AV800Train.techType))
     )
 
   def apply(): Either[NonEmptyChain[Routes.Errors], TestEnvConfig] =

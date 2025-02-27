@@ -1,6 +1,5 @@
 package ulisse.infrastructures.view.train
 
-import SwingUtils.onLeftOf
 import ulisse.applications.ports.TrainPorts
 import ulisse.infrastructures.view.train.model.TrainViewModel.{emptyTrainData, TechType, TrainData, WagonName}
 import ulisse.infrastructures.view.train.model.{TrainViewAdapter, TrainViewModel}
@@ -69,6 +68,7 @@ object TrainEditorView:
     }
 
     import scala.swing.{BoxPanel, Orientation}
+    import ulisse.infrastructures.view.components.ComponentUtils.onLeftOf
     private val editPane: BoxPanel = new BoxPanel(Orientation.Vertical) {
       contents += new Label("Name:").onLeftOf(nameField)
       contents += new Label("Type:").onLeftOf(trainTechCombo)

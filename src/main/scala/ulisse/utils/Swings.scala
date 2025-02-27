@@ -2,7 +2,7 @@ package ulisse.utils
 
 import javax.swing.BorderFactory
 import javax.swing.border.Border
-import scala.swing.Container
+import scala.swing.{BoxPanel, Component, Container, FlowPanel, Orientation}
 
 object Swings:
 
