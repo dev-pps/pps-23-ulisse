@@ -31,6 +31,10 @@ object WorkspaceManager:
     private val train: TrainWorkspace           = TrainWorkspace()
     private val workspaces                      = List(simulation, map, train)
 
+    showSimulation()
+    showTrain()
+    showMap()
+
     private def showWorkspace(workspace: Workspace): Unit =
       mainPanel.layout(workspace.component) = Position.Center
       workspaces.foreach(_.hide())
