@@ -1,3 +1,40 @@
+## [1.14.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.13.0...v1.14.0) (2025-02-27)
+
+### Features
+
+* activate system to change workspace ([469dcce](https://github.com/dev-pps/pps-23-ulisse/commit/469dccea4afb7f374b924fdab2284257823dd076))
+* added icons to expand and compact menus ([8fbe626](https://github.com/dev-pps/pps-23-ulisse/commit/8fbe6262931af82d9ce21b6ee1ba2f3d99b22a06))
+* create common imageLabel to create picture and svgIcon ([0cce5fc](https://github.com/dev-pps/pps-23-ulisse/commit/0cce5fcb7f8adb74ac3d8b636d821dcdf7e89fa0))
+* create layeredPanel ([b8a89ab](https://github.com/dev-pps/pps-23-ulisse/commit/b8a89ab7c587baba4a0610df72a9c919ecae9c07))
+* create mapWorkspace ([ccb3a22](https://github.com/dev-pps/pps-23-ulisse/commit/ccb3a22915cc0cab041a3bbfe1c73d30642ae943))
+* create pageManager ([5ad3fc2](https://github.com/dev-pps/pps-23-ulisse/commit/5ad3fc2570fca858daf1c0699d86c243764a13f3))
+* create source image ([1e66f3b](https://github.com/dev-pps/pps-23-ulisse/commit/1e66f3bacc2c3586d08dda37e747011dbb59c4f5))
+* create workspace ([7789b4a](https://github.com/dev-pps/pps-23-ulisse/commit/7789b4a62665f14fb3b9e6ca74944d6a63aba4a1))
+* create workspace manager ([11ad02c](https://github.com/dev-pps/pps-23-ulisse/commit/11ad02c28787838ddfaa55267686f5958ff42338))
+* dashboard integration ([d89a3d5](https://github.com/dev-pps/pps-23-ulisse/commit/d89a3d5a91a2c8f235f00a454b65b9932e7dfdff))
+* events to change workspace ([926d9ed](https://github.com/dev-pps/pps-23-ulisse/commit/926d9ed39854345139347ad9b188f33a437a889e))
+* imagePath ([2e46f96](https://github.com/dev-pps/pps-23-ulisse/commit/2e46f96fe7c0f38fca9e14516adc007ccd06c530))
+* images integration ([7e39bd5](https://github.com/dev-pps/pps-23-ulisse/commit/7e39bd553255a92a4700e34ad069819a6f7b869a))
+* improve custom layered pane ([6ff220f](https://github.com/dev-pps/pps-23-ulisse/commit/6ff220f6c79c55ee913081a6801cf151f35f7716))
+* init panel for application ([3816314](https://github.com/dev-pps/pps-23-ulisse/commit/38163146fdc0516afb1545fa1d631311da7368b0))
+* menu click event expand and compact ([0040fe4](https://github.com/dev-pps/pps-23-ulisse/commit/0040fe413976492d6efc36fa93bf1407aabf08ad))
+* menu integration ([088c9c2](https://github.com/dev-pps/pps-23-ulisse/commit/088c9c2d4e6d75f6d0439785bcfca3423140fc6a))
+* menu position ([c4fe674](https://github.com/dev-pps/pps-23-ulisse/commit/c4fe674c75a470c1104e4bc9c736736125ee5f70))
+* padding and gap to label in menu ([b2bfe85](https://github.com/dev-pps/pps-23-ulisse/commit/b2bfe85beb78e97ece847e282ae2f9345d5f2d17))
+* palettes grouped in the styles ([85154c8](https://github.com/dev-pps/pps-23-ulisse/commit/85154c82603fafc75d7d28b56897fbca0d985f25))
+* rotation integration for the image ([e2a9e13](https://github.com/dev-pps/pps-23-ulisse/commit/e2a9e135687ace327a22fca6e058861c6a2f04e5))
+* set round image ([56e04d1](https://github.com/dev-pps/pps-23-ulisse/commit/56e04d1f1f106dbf086cd7dbf5e59eb37f68c6e4))
+* set size of imageLabel ([c7ba15a](https://github.com/dev-pps/pps-23-ulisse/commit/c7ba15a247de583c641bd585b58269b39b5bdcca))
+* title font ([085e74e](https://github.com/dev-pps/pps-23-ulisse/commit/085e74e534f34398f4187b3252968ce6a8b64751))
+* utils to align components ([30914c8](https://github.com/dev-pps/pps-23-ulisse/commit/30914c8a54b25f8906abf1ae38b426d4d2894aa0))
+
+### Bug Fixes
+
+* color system ([fabd37f](https://github.com/dev-pps/pps-23-ulisse/commit/fabd37fc92764ccdbfdc2adb43ff93d84c5479ff))
+* first click of the dashboard buttons ([ddad41c](https://github.com/dev-pps/pps-23-ulisse/commit/ddad41cc521f84ebc20448a0e84739923655a140))
+* form buttons color ([5ba27a3](https://github.com/dev-pps/pps-23-ulisse/commit/5ba27a3667cfe64b7b0773b859a3f70070e0c09a))
+* workspaceManager visibility ([ecda9a9](https://github.com/dev-pps/pps-23-ulisse/commit/ecda9a9397999dbcdf8846dc9ea71a96dcc8a737))
+
 ## [1.13.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.12.0...v1.13.0) (2025-02-26)
 
 ### Features
