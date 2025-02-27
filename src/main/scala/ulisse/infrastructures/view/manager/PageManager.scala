@@ -1,9 +1,10 @@
-package ulisse.infrastructures.view.page
+package ulisse.infrastructures.view.manager
 
 import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.map.MapPanel
+import ulisse.infrastructures.view.page.{Dashboard, Menu}
 
 import javax.swing.JLayeredPane
 import scala.swing.BorderPanel.Position
@@ -35,7 +36,7 @@ object PageManager:
 
     private val menu          = Menu()
     private val dashboard     = Dashboard()
-    private val mapController = CentralController.createMap()
+    private val mapController = FormManager.createMap()
 
     mainPanel.add(menuPanel, JLayeredPane.PALETTE_LAYER)
     mainPanel.add(dashboardPanel, JLayeredPane.DEFAULT_LAYER)
