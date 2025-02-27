@@ -15,6 +15,12 @@ trait ComposedSwing:
   /** Returns the main component. */
   def component[T >: Component]: T
 
+  /** Shows the component. */
+  def show(): Unit = component.visible = true
+
+  /** Hides the component. */
+  def hide(): Unit = component.visible = false
+
 object ComposedSwing:
   /** Creates a [[JInfoTextField]] from a [[title]]. */
   def createInfoTextField(text: String): JInfoTextField = JInfoTextField(text)

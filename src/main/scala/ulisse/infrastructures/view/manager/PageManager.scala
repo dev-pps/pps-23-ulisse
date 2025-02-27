@@ -3,13 +3,11 @@ package ulisse.infrastructures.view.manager
 import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
-import ulisse.infrastructures.view.map.MapPanel
-import ulisse.infrastructures.view.page.Workspace.MapWorkspace
 import ulisse.infrastructures.view.page.{Dashboard, Menu}
+import ulisse.infrastructures.view.utils.ComponentUtils.*
 
-import scala.swing.BorderPanel.Position
+import scala.swing.Component
 import scala.swing.event.MouseEvent
-import scala.swing.{BorderPanel, Component}
 
 /** Represents the page manager of the application. */
 trait PageManager extends ComposedSwing:
@@ -28,35 +26,25 @@ object PageManager:
     override def onClick(data: MouseEvent): Unit = pageManager.showDashboard()
 
   private case class PageManagerImpl() extends PageManager:
-    private val mainPanel = new ExtendedSwing.LayeredPanel()
-
-    private val menuPanel      = BorderPanel()
-    private val dashboardPanel = BorderPanel()
-
+    private val mainPanel        = new ExtendedSwing.LayeredPanel()
     private val menu             = Menu()
     private val dashboard        = Dashboard()
     private val workspaceManager = WorkspaceManager()
 
-    mainPanel.add(menuPanel)
-    mainPanel.add(dashboardPanel)
+    mainPanel.add(menu.component)
+    mainPanel.add(dashboard.component)
     mainPanel.add(workspaceManager.component)
 
-    menuPanel.layout(menu.component) = Position.Center
-    dashboardPanel.layout(dashboard.component) = Position.West
-
-    menuPanel.opaque = false
-    dashboardPanel.opaque = false
-
-    workspaceManager.component.visible = false
-    dashboardPanel.visible = false
+    dashboard.hide()
+    workspaceManager.hide()
 
     menu.attachNewIcon(NewIconEvents(this))
 
     export mainPanel.revalidate
 
     override def showDashboard(): Unit =
-      dashboardPanel.visible = true
-      workspaceManager.component.visible = true
+      dashboard.show()
+      workspaceManager.show()
       workspaceManager.showMap()
 
     override def component[T >: Component]: T = mainPanel
