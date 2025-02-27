@@ -24,7 +24,7 @@ object Workspace:
   def createTrain(): TrainWorkspace = TrainWorkspace()
 
   private case class BaseWorkspace() extends Workspace:
-    private val mainPanel      = new ExtendedSwing.LayeredPanel()
+    private val mainPanel      = new ExtendedSwing.SLayeredPanel()
     val menuPanel: BorderPanel = BorderPanel().transparent()
     val workPanel: BorderPanel = BorderPanel().transparent()
 

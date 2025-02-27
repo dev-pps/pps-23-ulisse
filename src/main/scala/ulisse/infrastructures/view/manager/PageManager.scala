@@ -26,7 +26,7 @@ object PageManager:
     override def onClick(data: MouseEvent): Unit = pageManager.showDashboard()
 
   private case class PageManagerImpl() extends PageManager:
-    private val mainPanel        = new ExtendedSwing.LayeredPanel()
+    private val mainPanel        = new ExtendedSwing.SLayeredPanel()
     private val menu             = Menu()
     private val dashboard        = Dashboard()
     private val workspaceManager = WorkspaceManager()

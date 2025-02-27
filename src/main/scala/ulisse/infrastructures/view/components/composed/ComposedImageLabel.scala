@@ -71,9 +71,9 @@ object ComposedImageLabel:
     private val gap           = 5
     private val zeroGap       = 0
 
-    private val mainPanel  = ExtendedSwing.JBoxPanelItem(orientation)
-    private val labelPanel = ExtendedSwing.JFlowPanelItem()
-    private val label      = ExtendedSwing.JLabelItem(text)
+    private val mainPanel  = ExtendedSwing.SBoxPanel(orientation)
+    private val labelPanel = ExtendedSwing.SFlowPanel()
+    private val label      = ExtendedSwing.SLabel(text)
 
     withDimension(defaultWidth, defaultHeight)
 

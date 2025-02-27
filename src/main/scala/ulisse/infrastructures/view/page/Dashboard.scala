@@ -66,9 +66,9 @@ object Dashboard:
 
 //    private val
     private val mainPanel       = BorderPanel().transparent()
-    private val mainLabelPanel  = ExtendedSwing.JBorderPanelItem()
-    private val northLabelPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
-    private val southLabelPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
+    private val mainLabelPanel  = ExtendedSwing.SBorderPanel()
+    private val northLabelPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
+    private val southLabelPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
 
     private val iconApp       = ComposedImageLabel.createTransparentPicture(ImgPath.logo, ulisse)
     private val expandButton  = ComposedSwing.JToggleIconButton(ImgPath.rightCompact, ImgPath.rightCompact)
