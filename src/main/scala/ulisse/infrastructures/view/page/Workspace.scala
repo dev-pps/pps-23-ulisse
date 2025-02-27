@@ -4,6 +4,7 @@ import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.manager.FormManager
 import ulisse.infrastructures.view.map.MapPanel
+import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.BorderPanel.Position
 import scala.swing.{BorderPanel, Component}
@@ -23,9 +24,9 @@ object Workspace:
   def createTrain(): TrainWorkspace = TrainWorkspace()
 
   private case class BaseWorkspace() extends Workspace:
-    private val mainPanel = new ExtendedSwing.LayeredPanel()
-    val menuPanel         = new BorderPanel() { opaque = false }
-    val workPanel         = new BorderPanel() { opaque = false }
+    private val mainPanel      = new ExtendedSwing.LayeredPanel()
+    val menuPanel: BorderPanel = BorderPanel().transparent()
+    val workPanel: BorderPanel = BorderPanel().transparent()
 
     mainPanel.add(menuPanel)
     mainPanel.add(workPanel)
