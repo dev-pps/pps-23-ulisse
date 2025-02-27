@@ -45,10 +45,10 @@ object ComposedSwing:
     private val textFieldPadding    = Styles.createPadding(10, 5)
     private val textFieldBackground = Theme.light.background.withAlpha(50)
 
-    private val mainPanel  = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
-    private val labelPanel = ExtendedSwing.JFlowPanelItem()
-    private val label      = ExtendedSwing.JLabelItem(title)
-    private val textField  = ExtendedSwing.JTextFieldItem(colum)
+    private val mainPanel  = ExtendedSwing.SBoxPanel(Orientation.Vertical)
+    private val labelPanel = ExtendedSwing.SFlowPanel()
+    private val label      = ExtendedSwing.SLabel(title)
+    private val textField  = ExtendedSwing.STextField(colum)
 
     textField.rect = textField.rect.withPadding(textFieldPadding)
     textField.rectPalette = textField.rectPalette.withBackground(textFieldBackground)
@@ -63,7 +63,7 @@ object ComposedSwing:
   case class JNavBar(iconLabels: ComposedImageLabel*) extends ComposedSwing:
     private val padding = Styles.createPadding(40, 20)
 
-    private val mainPanel = ExtendedSwing.JFlowPanelItem()
+    private val mainPanel = ExtendedSwing.SFlowPanel()
     mainPanel.rect = mainPanel.rect.withPadding(padding)
     mainPanel.hGap = 5
 
@@ -82,11 +82,11 @@ object ComposedSwing:
     override def component[T >: Component]: T = mainPanel
 
   case class JTabbedPane(iconLabels: ComposedImageLabel*) extends ComposedSwing:
-    private val mainPanel  = ExtendedSwing.JBorderPanelItem()
-    private val pagesPanel = ExtendedSwing.JFlowPanelItem()
+    private val mainPanel  = ExtendedSwing.SBorderPanel()
+    private val pagesPanel = ExtendedSwing.SFlowPanel()
 
     private val navBar = createNavbar(iconLabels: _*)
-    private val pages  = iconLabels.map(iconLabel => (iconLabel, ExtendedSwing.JFlowPanelItem())).toMap
+    private val pages  = iconLabels.map(iconLabel => (iconLabel, ExtendedSwing.SFlowPanel())).toMap
 
     pages.values.foreach(_.visible = false)
     pagesPanel.contents ++= pages.values
@@ -104,13 +104,13 @@ object ComposedSwing:
 
     iconLabels.headOption.foreach(iconLabel => paneOf(iconLabel).visible = true)
 
-    def paneOf(label: ComposedImageLabel): ExtendedSwing.JFlowPanelItem = pages(label)
-    override def component[T >: Component]: T                           = mainPanel
+    def paneOf(label: ComposedImageLabel): ExtendedSwing.SFlowPanel = pages(label)
+    override def component[T >: Component]: T                       = mainPanel
 
   case class JInsertForm(title: String, infoTextField: JInfoTextField*) extends ComposedSwing:
-    private val mainPanel = ExtendedSwing.JBorderPanelItem()
-    private val formPanel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
-    val titleLabel        = ExtendedSwing.JLabelItem(title)
+    private val mainPanel = ExtendedSwing.SBorderPanel()
+    private val formPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
+    val titleLabel        = ExtendedSwing.SLabel(title)
 
     private val titleSpace  = 5
     private val fieldsSpace = 15
@@ -128,7 +128,7 @@ object ComposedSwing:
     override def component[T >: Component]: T = mainPanel
 
   case class JToggleIconButton(onIconPath: String, offIconPath: String) extends ComposedSwing:
-    private val mainPanel = ExtendedSwing.JFlowPanelItem()
+    private val mainPanel = ExtendedSwing.SFlowPanel()
     private val onIcon    = SVGPanel()
     private val offIcon   = SVGPanel()
     private val size      = 40

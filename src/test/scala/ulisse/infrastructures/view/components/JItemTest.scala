@@ -7,7 +7,7 @@ import ulisse.infrastructures.view.components.styles.Styles.defaultRect
 class JItemTest extends AnyFlatSpec with Matchers:
   val text: String = "Hello"
 
-  val button = ExtendedSwing.JButtonItem(text)
+  val button = ExtendedSwing.SButton(text)
 
   "create JButton" should "with text" in:
     button.text must be(text)

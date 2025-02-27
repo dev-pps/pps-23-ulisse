@@ -6,10 +6,10 @@ import ulisse.infrastructures.view.manager.FormManager
 import scala.swing.BorderPanel.Position
 
 final case class EditorsView():
-  private val mainPane = new ExtendedSwing.LayeredPanel()
+  private val mainPane = new ExtendedSwing.SLayeredPanel()
 
   private val mapPark       = MapPanel.empty()
-  private val menuPanel     = ExtendedSwing.JBorderPanelItem()
+  private val menuPanel     = ExtendedSwing.SBorderPanel()
   private val mapController = FormManager.createMap()
 
   menuPanel.layout(mapController.component) = Position.East

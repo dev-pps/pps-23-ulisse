@@ -21,9 +21,9 @@ object SimulationPage:
   def apply(controller: SimulationPageAdapter): SimulationPage = SimulationPageImpl(controller)
 
   private final case class SimulationPageImpl(controller: SimulationPageAdapter) extends SimulationPage:
-    private val mainPane       = new ExtendedSwing.LayeredPanel()
+    private val mainPane       = new ExtendedSwing.SLayeredPanel()
     private val map: Component = Label("Simulation Map")
-    private val menuPanel      = ExtendedSwing.JBorderPanelItem()
+    private val menuPanel      = ExtendedSwing.SBorderPanel()
     private val mapControlPane = SimulationPageControlPanel(controller)
 
     def updateData(data: SimulationData): Unit = mapControlPane.notificationLabel.text =

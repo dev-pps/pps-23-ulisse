@@ -22,15 +22,15 @@ object ComponentUtils:
   extension [T <: Component](component: T)
 
     /** Center the component horizontally */
-    def centerHorizontally(): ExtendedSwing.JFlowPanelItem =
-      val panel = ExtendedSwing.JFlowPanelItem()
+    def centerHorizontally(): ExtendedSwing.SFlowPanel =
+      val panel = ExtendedSwing.SFlowPanel()
       panel.rectPalette = Styles.transparentPalette
       panel.contents += component
       panel
 
     /** Center the component vertically */
-    def centerVertically(): ExtendedSwing.JBoxPanelItem =
-      val panel = ExtendedSwing.JBoxPanelItem(Orientation.Vertical)
+    def centerVertically(): ExtendedSwing.SBoxPanel =
+      val panel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
       panel.rectPalette = Styles.transparentPalette
       panel.contents += Swing.VGlue
       panel.contents += component
@@ -40,8 +40,8 @@ object ComponentUtils:
     def center(): Panel = centerHorizontally().centerVertically()
 
     /** Create a component with a left and right component */
-    def createLeftRight(right: Component): ExtendedSwing.JBoxPanelItem =
-      val panel = ExtendedSwing.JBoxPanelItem(Orientation.Horizontal)
+    def createLeftRight(right: Component): ExtendedSwing.SBoxPanel =
+      val panel = ExtendedSwing.SBoxPanel(Orientation.Horizontal)
       panel.rectPalette = Styles.transparentPalette
       panel.contents += component.centerVertically()
       panel.contents += Swing.HGlue
@@ -52,14 +52,14 @@ object ComponentUtils:
   extension (composed: ComposedSwing)
 
     /** Center the component horizontally */
-    def centerHorizontally(): ExtendedSwing.JFlowPanelItem = composed.component.centerHorizontally()
+    def centerHorizontally(): ExtendedSwing.SFlowPanel = composed.component.centerHorizontally()
 
     /** Center the component vertically */
-    def centerVertically(): ExtendedSwing.JBoxPanelItem = composed.component.centerVertically()
+    def centerVertically(): ExtendedSwing.SBoxPanel = composed.component.centerVertically()
 
     /** Center the component */
     def center(): Panel = centerHorizontally().centerVertically()
 
     /** Create a component with a left and right component */
-    def createLeftRight(right: ComposedSwing): ExtendedSwing.JBoxPanelItem =
+    def createLeftRight(right: ComposedSwing): ExtendedSwing.SBoxPanel =
       composed.component.createLeftRight(right.component)
