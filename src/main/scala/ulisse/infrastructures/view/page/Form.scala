@@ -17,12 +17,6 @@ object Form:
   def createStation(): StationForm   = StationForm()
   def createSchedule(): ScheduleForm = ScheduleForm()
 
-  private val buttonRect = Styles.defaultRect.withPaddingWidthAndHeight(20, 10)
-  private val buttonPalette =
-    Styles.defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.click)
-  private val trueButtonPalette  = buttonPalette.copy(clickColor = Some(Theme.light.trueClick))
-  private val falseButtonPalette = buttonPalette.copy(clickColor = Some(Theme.light.falseClick))
-
   private case class BaseForm(title: String, fields: ComposedSwing.JInfoTextField*):
     private val mainPanel: ExtendedSwing.SBoxPanel    = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     private val insertForm: ComposedSwing.JInsertForm = ComposedSwing.createInsertForm(title, fields: _*)
