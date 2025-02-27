@@ -29,29 +29,29 @@ object PageManager:
   private case class PageManagerImpl() extends PageManager:
     private val mainPanel = new ExtendedSwing.LayeredPanel()
 
-    private val dashboardPanel = BorderPanel()
     private val menuPanel      = BorderPanel()
+    private val dashboardPanel = BorderPanel()
     private val mapPanel       = MapPanel.empty()
 
     private val menu          = Menu()
     private val dashboard     = Dashboard()
     private val mapController = CentralController.createMap()
 
-    mainPanel.add(dashboardPanel, JLayeredPane.PALETTE_LAYER)
-    mainPanel.add(menuPanel, JLayeredPane.DEFAULT_LAYER)
+    mainPanel.add(menuPanel, JLayeredPane.PALETTE_LAYER)
+    mainPanel.add(dashboardPanel, JLayeredPane.DEFAULT_LAYER)
 
-    dashboardPanel.layout(dashboard.component) = Position.Center
-    menuPanel.layout(menu.component) = Position.West
+    menuPanel.layout(menu.component) = Position.Center
+    dashboardPanel.layout(dashboard.component) = Position.West
 
-    dashboardPanel.opaque = false
     menuPanel.opaque = false
-    menuPanel.visible = false
+    dashboardPanel.opaque = false
+    dashboardPanel.visible = false
     mainPanel.revalidate()
 
-    dashboard.attachNewIcon(NewIconEvents(this))
+    menu.attachNewIcon(NewIconEvents(this))
 
     export mainPanel.revalidate
 
-    override def showMenu(): Unit = menuPanel.visible = true
+    override def showMenu(): Unit = dashboardPanel.visible = true
 
     override def component[T >: Component]: T = mainPanel
