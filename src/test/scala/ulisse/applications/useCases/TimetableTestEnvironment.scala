@@ -18,9 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue
 object TimetableTestEnvironment:
   import ulisse.entities.route.Routes.{Route, TypeRoute}
   import ulisse.entities.timetable.TestMockedEntities.*
-//  import ulisse.entities.timetable.MockedEntities.AppStateTimetable
 
-//  type AppState = AppStateTimetable
   private val initState: Either[NonEmptyChain[Routes.Errors], AppState] =
     for
       routeAB <- Route(stationA, stationB, TypeRoute.AV, railsCount = 1, length = 10)

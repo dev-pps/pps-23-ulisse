@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.train
 
-import SwingUtils.onLeftOf
 import ulisse.applications.ports.TrainPorts
+import ulisse.infrastructures.view.components.ExtendedSwing.SLabel
 import ulisse.infrastructures.view.train.model.TrainViewModel.{emptyTrainData, TechType, TrainData, WagonName}
 import ulisse.infrastructures.view.train.model.{TrainViewAdapter, TrainViewModel}
 
@@ -69,13 +69,14 @@ object TrainEditorView:
     }
 
     import scala.swing.{BoxPanel, Orientation}
+    import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
     private val editPane: BoxPanel = new BoxPanel(Orientation.Vertical) {
-      contents += new Label("Name:").onLeftOf(nameField)
-      contents += new Label("Type:").onLeftOf(trainTechCombo)
-      contents += new Label("Transport type:").onLeftOf(wagonTypeCombo)
-      contents += new Label("Wagon Capacity:").onLeftOf(wagonCapacity)
-      contents += new Label("wagons amount:").onLeftOf(wagonCountAmount)
-      contents += deleteButton.onLeftOf(clearButton).onLeftOf(updateButton).onLeftOf(saveButton)
+      contents += new Label("Name:").createLeftRight(nameField)
+      contents += new Label("Type:").createLeftRight(trainTechCombo)
+      contents += new Label("Transport type:").createLeftRight(wagonTypeCombo)
+      contents += new Label("Wagon Capacity:").createLeftRight(wagonCapacity)
+      contents += new Label("wagons amount:").createLeftRight(wagonCountAmount)
+      contents += deleteButton.createLeftRight(clearButton).createLeftRight(updateButton).createLeftRight(saveButton)
     }
 
     private val mainPanel = new BorderPanel {
