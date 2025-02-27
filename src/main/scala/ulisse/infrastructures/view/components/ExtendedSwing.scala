@@ -14,8 +14,8 @@ object ExtendedSwing:
     def this() = this(JLayeredPane())
     layout(Component.wrap(layeredPane)) = BorderPanel.Position.Center
 
-    def add(component: Component): Unit =
-      layeredPane.add(component.peer)
+    def add(component: Component, level: Int): Unit =
+      layeredPane.add(component.peer, level)
       revalidate()
 
     override def revalidate(): Unit =

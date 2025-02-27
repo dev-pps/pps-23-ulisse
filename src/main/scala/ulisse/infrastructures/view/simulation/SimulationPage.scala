@@ -7,6 +7,7 @@ import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.ExtendedSwing.SVGPanel
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
+import javax.swing.JLayeredPane
 import scala.concurrent.ExecutionContext
 import scala.swing.*
 import scala.swing.BorderPanel.Position
@@ -33,8 +34,8 @@ object SimulationPage:
 
     menuPanel.layout(mapControlPane) = Position.East
 
-    mainPane.add(map.center())
-    mainPane.add(menuPanel)
+    mainPane.add(map.center(), JLayeredPane.DEFAULT_LAYER)
+    mainPane.add(menuPanel, JLayeredPane.PALETTE_LAYER)
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   final case class SimulationPageControlPanel(controller: SimulationPageAdapter)
