@@ -2,6 +2,7 @@ package ulisse.infrastructures.view.utils
 
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
+import ulisse.infrastructures.view.components.decorators.SwingEnhancements.ShapeEffect
 import ulisse.infrastructures.view.components.styles.Styles
 
 import scala.swing.*
@@ -9,8 +10,16 @@ import scala.swing.*
 @SuppressWarnings(Array("org.wartremover.warts.Overloading"))
 object ComponentUtils:
 
+  /** Utils method to create a panel */
+  extension [T <: Panel](panel: T)
+    /** Make the component transparent */
+    def transparent(): T =
+      panel.opaque = false
+      panel.background = Styles.transparentColor
+      panel
+
   /** Utils method to center a component */
-  extension (component: Component)
+  extension [T <: Component](component: T)
 
     /** Center the component horizontally */
     def centerHorizontally(): ExtendedSwing.JFlowPanelItem =

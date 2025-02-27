@@ -32,29 +32,23 @@ object PageManager:
 
     private val menuPanel      = BorderPanel()
     private val dashboardPanel = BorderPanel()
-    private val workspacePanel = BorderPanel()
 
     private val menu             = Menu()
     private val dashboard        = Dashboard()
     private val workspaceManager = WorkspaceManager()
 
-    private val mapWorkspace = MapWorkspace()
-
     mainPanel.add(menuPanel)
     mainPanel.add(dashboardPanel)
-    mainPanel.add(workspacePanel)
+    mainPanel.add(workspaceManager.component)
 
     menuPanel.layout(menu.component) = Position.Center
     dashboardPanel.layout(dashboard.component) = Position.West
-    workspacePanel.layout(mapWorkspace.component) = Position.Center
 
     menuPanel.opaque = false
     dashboardPanel.opaque = false
-    workspacePanel.opaque = false
 
     workspaceManager.component.visible = false
     dashboardPanel.visible = false
-    workspacePanel.visible = false
 
     menu.attachNewIcon(NewIconEvents(this))
 
@@ -62,7 +56,7 @@ object PageManager:
 
     override def showDashboard(): Unit =
       dashboardPanel.visible = true
-      workspacePanel.visible = true
-      mapWorkspace.revalidate()
+      workspaceManager.component.visible = true
+      workspaceManager.showMap()
 
     override def component[T >: Component]: T = mainPanel
