@@ -4,6 +4,7 @@ import ulisse.infrastructures.view.common.{ImagePath as ImgPath, Observers}
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.components.styles.Styles
+import ulisse.infrastructures.view.manager.WorkspaceManager
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.*

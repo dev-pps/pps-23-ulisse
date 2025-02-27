@@ -34,9 +34,10 @@ object PageManager:
     private val dashboardPanel = BorderPanel()
     private val mapPanel       = MapPanel.empty()
 
-    private val menu          = Menu()
-    private val dashboard     = Dashboard()
-    private val mapController = FormManager.createMap()
+    private val menu             = Menu()
+    private val dashboard        = Dashboard()
+    private val workspaceManager = WorkspaceManager()
+    private val mapController    = FormManager.createMap()
 
     mainPanel.add(menuPanel, JLayeredPane.PALETTE_LAYER)
     mainPanel.add(dashboardPanel, JLayeredPane.DEFAULT_LAYER)
