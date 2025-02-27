@@ -37,6 +37,10 @@ object ValidationUtils:
   /** Validates that all items in a collection are unique. */
   def validateUniqueItems[A, E <: BaseError](items: Seq[A], error: E): Either[E, Seq[A]] =
     Either.cond(items.distinct.size === items.size, items, error)
+  
+  /** Validates that all items in a collection are unique after applying a transformation function. */
+  def validateUniqueItemsBy[A, B, E <: BaseError](items: Seq[A], transform: A => B,  error: E): Either[E, Seq[A]] =
+    Either.cond(items.distinctBy(transform).size === items.size, items, error)  
 
   extension [A, E](value: A)
     def cond(f: A => Boolean, error: E): Either[E, A] = Either.cond(f(value), value, error)

@@ -7,6 +7,7 @@ import ulisse.utils.CollectionUtils.updateWhenWithEffects
 import ulisse.utils.OptionUtils.given_Conversion_Option_Option
 
 object EnvironmentElements:
+  
   trait EnvironmentElement
 
   trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
@@ -17,7 +18,7 @@ object EnvironmentElements:
     def updateTrain(train: TrainAgent): Option[TAC]
     def removeTrain(train: TrainAgent): Option[TAC]
     def contains(train: TrainAgent): Boolean = trains.exists(train.matchId)
-    def isEmpty: Boolean                     = trains.isEmpty
+    def isEmpty: Boolean = trains.isEmpty
 
   object TrainAgentsContainer:
     /** Creates a List of `TrainAgentContainer[TAC]` instance. If the specified numberOfContainers is not positive an empty List is returned */
