@@ -61,9 +61,11 @@ object ComposedSwing:
     override def component[T >: Component]: T = mainPanel
 
   case class JNavBar(iconLabels: ComposedImageLabel*) extends ComposedSwing:
-    private val padding = Styles.createPadding(40, 20)
-
     private val mainPanel = ExtendedSwing.SFlowPanel()
+    private val padding   = Styles.createPadding(40, 20)
+    private val width     = 150
+    private val height    = padding.a
+
     mainPanel.rect = mainPanel.rect.withPadding(padding)
     mainPanel.hGap = 5
 
@@ -71,14 +73,16 @@ object ComposedSwing:
     closeAll()
 
     iconLabels.foreach(icon =>
-      icon.component.reactions += {
-        case _: event.MousePressed =>
-          closeAll()
-          icon.showIconAndText()
-      }
+      icon.component.reactions += { case _: event.MousePressed => showIconAndText(icon) }
     )
 
-    private def closeAll(): Unit              = iconLabels.foreach(_.showIcon())
+    private def closeAll(): Unit = iconLabels.foreach(_.showIcon())
+
+    def showIconAndText(iconLabel: ComposedImageLabel): Unit =
+      closeAll()
+      iconLabel.withDimension(width, height)
+      iconLabel.showIconAndText()
+
     override def component[T >: Component]: T = mainPanel
 
   case class JTabbedPane(iconLabels: ComposedImageLabel*) extends ComposedSwing:
@@ -88,21 +92,24 @@ object ComposedSwing:
     private val navBar = createNavbar(iconLabels: _*)
     private val pages  = iconLabels.map(iconLabel => (iconLabel, ExtendedSwing.SFlowPanel())).toMap
 
-    pages.values.foreach(_.visible = false)
-    pagesPanel.contents ++= pages.values
-
     mainPanel.layout(navBar.component) = BorderPanel.Position.North
     mainPanel.layout(pagesPanel) = BorderPanel.Position.Center
 
+    pages.values.foreach(_.visible = false)
+    pagesPanel.contents ++= pages.values
+
     iconLabels.foreach(iconLabel =>
-      iconLabel.component.reactions += {
-        case _: event.MousePressed =>
-          pages.values.foreach(_.visible = false)
-          paneOf(iconLabel).visible = true
-      }
+      iconLabel.component.reactions += { case _: event.MousePressed => showPaneOf(iconLabel) }
     )
 
-    iconLabels.headOption.foreach(iconLabel => paneOf(iconLabel).visible = true)
+    iconLabels.headOption.foreach(iconLabel =>
+      navBar.showIconAndText(iconLabel)
+      showPaneOf(iconLabel)
+    )
+
+    def showPaneOf(label: ComposedImageLabel): Unit =
+      pages.values.foreach(_.visible = false)
+      paneOf(label).visible = true
 
     def paneOf(label: ComposedImageLabel): ExtendedSwing.SFlowPanel = pages(label)
     override def component[T >: Component]: T                       = mainPanel
