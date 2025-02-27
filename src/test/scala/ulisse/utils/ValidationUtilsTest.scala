@@ -37,7 +37,7 @@ class ValidationUtilsTest extends AnyWordSpec with Matchers:
     "validate unique items correctly" in:
       ValidationUtils.validateUniqueItems(Seq(1, 2, 3), TestError()) shouldBe Right(Seq(1, 2, 3))
       ValidationUtils.validateUniqueItems(Seq(1, 2, 2), TestError()) shouldBe Left(TestError())
-    
+
     "validate unique items by correctly" in:
       val items = Seq((1, "a"), (1, "b"))
       ValidationUtils.validateUniqueItemsBy(items, identity, TestError()) shouldBe Right(items)

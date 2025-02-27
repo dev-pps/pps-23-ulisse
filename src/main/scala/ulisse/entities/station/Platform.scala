@@ -10,8 +10,6 @@ import ulisse.utils.ValidationUtils.validatePositive
 
 /** Defines a track in a station. */
 trait Platform extends TrainAgentsContainer[Platform]:
-  val currentTrain: Option[TrainAgent]
-  override def trains: Seq[TrainAgent] = currentTrain.toList
   def putTrain(train: TrainAgent): Option[Platform]
 
 /** Factory for [[Platform]] instances. */
@@ -32,10 +30,14 @@ object Platform:
       id: Int,
       currentTrain: Option[TrainAgent]
   ) extends Platform:
-    // TODO evaluate if could be nice to introduce a control to check if the train is entering the station or is already moved
+    override def trains: Seq[TrainAgent] = currentTrain.toList
+    // TODO evaluate if could be nice to remove the control for already moved train
     override def putTrain(train: TrainAgent): Option[Platform] =
-      copy(currentTrain = Some(train)) when isAvailable
+      copy(currentTrain = Some(train)) when isAvailable && train.distanceTravelled == 0
+
+    // TODO make sense to not allow train moving? since we consider station as a point
     override def updateTrain(train: TrainAgent): Option[Platform] =
       copy(currentTrain = Some(train)) when contains(train)
+
     override def removeTrain(train: TrainAgent): Option[Platform] =
       copy(currentTrain = None) when contains(train)
