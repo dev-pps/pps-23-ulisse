@@ -1,4 +1,4 @@
-package ulisse.infrastructures.view.timetable
+package ulisse.infrastructures.view.timetable.components
 
 import ulisse.infrastructures.view.components.ExtendedSwing.createSVGPanel
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.TimetableEntry
@@ -7,11 +7,11 @@ import ulisse.infrastructures.view.train.SwingUtils.headerLabel
 
 import java.awt.Color
 import scala.swing.Swing.{EmptyBorder, HGlue}
-import scala.swing.{BoxPanel, Component, GridPanel, Label, ListView, Orientation, ScrollPane}
+import scala.swing.*
 
-object TimetableViewers:
+object TimetableListViews:
 
-  def timetableViewer(timeEntries: List[TimetableEntry], visibleRows: Int): ListView[TimetableEntry] =
+  def tablesListView(timeEntries: List[TimetableEntry], visibleRows: Int): ListView[TimetableEntry] =
     val listView = new ListView(timeEntries) {
       import scala.swing.ListView.IntervalMode
       selection.intervalMode = IntervalMode.Single
@@ -48,11 +48,11 @@ object TimetableViewers:
       background = Color.WHITE
       contents ++= Seq(
         Label("Arrive at:"),
-        Label(data.arrivingTime),
+        Label(data.arrivingTime.getOrElse("-")),
         Label("Waits:"),
         Label(s"${data.waitMinutes.defaultIntString} min"),
         Label("Depart at:"),
-        Label(data.departureTime)
+        Label(data.departureTime.getOrElse("-"))
       )
     }
     contents += heading
