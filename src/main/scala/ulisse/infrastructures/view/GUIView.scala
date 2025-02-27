@@ -42,14 +42,14 @@ object GUIView:
 //    pageLayeredPane.add(mapController.component, JLayeredPane.DEFAULT_LAYER)
 
 //    mainLayeredPane.add(pageLayeredPane, JLayeredPane.DEFAULT_LAYER)
-//    mainLayeredPane.add(dashboardPanel)
     mainLayeredPane.add(menuPanel)
+    mainLayeredPane.add(dashboardPanel)
 
     mapPanel.attach(mapController.stationForm.mapObserver)
     mapPanel.attachItem(mapController.routeForm.mapObserver)
 
     // Menu panel
-    private val menu = Menu()
+    private val menu = Menu(mainLayeredPane)
     menuPanel.layout(menu.component) = West
 
     // Dashboard panel

@@ -139,7 +139,10 @@ object ComposedSwing:
 
     withDimension(size, size)
 
+    mainPanel.listenTo(onIcon.mouseEvents ++ offIcon.mouseEvents: _*)
     mainPanel.reactions += { case _: event.MousePressed => toggle() }
+
+    export mainPanel.observable._
 
     def toggle(): Unit =
       onIcon.visible = !onIcon.visible
