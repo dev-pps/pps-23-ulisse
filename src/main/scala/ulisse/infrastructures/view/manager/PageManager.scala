@@ -11,8 +11,17 @@ import scala.swing.event.MouseEvent
 
 /** Represents the page manager of the application. */
 trait PageManager extends ComposedSwing:
-  /** Shows the menu. */
+  /** Shows the dashboard. */
   def showDashboard(): Unit
+
+  /** Show the simulation workspace. */
+  def showSimulation(): Unit
+
+  /** Show the map workspace. */
+  def showMap(): Unit
+
+  /** Show the train workspace. */
+  def showTrain(): Unit
 
   /** Revalidates the page manager. */
   def revalidate(): Unit
@@ -22,8 +31,17 @@ object PageManager:
   /** Creates a new instance of the page manager. */
   def apply(): PageManager = PageManagerImpl()
 
-  private case class NewIconEvents(pageManager: PageManager) extends Observers.Observer[MouseEvent]:
+  private case class NewButtonEvents(pageManager: PageManager) extends Observers.Observer[MouseEvent]:
     override def onClick(data: MouseEvent): Unit = pageManager.showDashboard()
+
+  private case class SimulationButtonEvents(pageManager: PageManager) extends Observers.Observer[MouseEvent]:
+    override def onClick(data: MouseEvent): Unit = pageManager.showSimulation()
+
+  private case class MapButtonEvents(pageManager: PageManager) extends Observers.Observer[MouseEvent]:
+    override def onClick(data: MouseEvent): Unit = pageManager.showMap()
+
+  private case class TrainButtonEvents(pageManager: PageManager) extends Observers.Observer[MouseEvent]:
+    override def onClick(data: MouseEvent): Unit = pageManager.showTrain()
 
   private case class PageManagerImpl() extends PageManager:
     private val mainPanel        = new ExtendedSwing.SLayeredPanel()
@@ -38,13 +56,19 @@ object PageManager:
     dashboard.hide()
     workspaceManager.hide()
 
-    menu.attachNewIcon(NewIconEvents(this))
+    menu.attachNewIcon(NewButtonEvents(this))
+    dashboard.attachSimulation(SimulationButtonEvents(this))
+    dashboard.attachMap(MapButtonEvents(this))
+    dashboard.attachTrain(TrainButtonEvents(this))
 
     export mainPanel.revalidate
 
     override def showDashboard(): Unit =
       dashboard.show()
       workspaceManager.show()
-      workspaceManager.showMap()
+
+    override def showSimulation(): Unit = workspaceManager.showSimulation()
+    override def showMap(): Unit        = workspaceManager.showMap()
+    override def showTrain(): Unit      = workspaceManager.showTrain()
 
     override def component[T >: Component]: T = mainPanel
