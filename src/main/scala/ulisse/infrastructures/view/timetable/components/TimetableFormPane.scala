@@ -1,23 +1,17 @@
 package ulisse.infrastructures.view.timetable.components
 
-import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SLabel, STextField}
+import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SLabel}
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
-import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.TimetableEntry
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
-
-import scala.swing.Swing.EmptyBorder
-import scala.swing.event.ButtonClicked
-import scala.swing.{ComboBox, Font, Orientation}
-import ulisse.infrastructures.view.utils.SwingUtils.StyledButton
 import ulisse.infrastructures.view.utils.SwingUtils
-import ulisse.utils.ValidationUtils.validateNonBlankString
 
-import java.awt.Color
+import scala.swing.event.ButtonClicked
+import scala.swing.{ComboBox, Orientation}
 import scala.util.Try
 
-class TimetableFormPane(controller: TimetableViewController, tablePreview: TimetableViewer)
+class TimetableFormPane(controller: TimetableViewController)
     extends SBoxPanel(Orientation.Vertical):
   private val waitMinutesField             = SwingUtils.SNumberField(5)
   private val trainCombo: ComboBox[String] = ComboBox[String](controller.trainNames)
@@ -36,14 +30,11 @@ class TimetableFormPane(controller: TimetableViewController, tablePreview: Timet
 
   private val formButtonsPane = resetBtn.createLeftRight(undoBtn.createLeftRight(insertBtn))
   undoBtn.reactions += {
-    case ButtonClicked(_) =>
-      val l = controller.undoLastInsert()
-      tablePreview.update(l)
+    case ButtonClicked(_) => controller.undoLastInsert()
   }
   resetBtn.reactions += {
     case ButtonClicked(_) =>
-      val l = controller.reset()
-      tablePreview.update(l)
+      controller.reset()
       clearFields()
   }
 
@@ -69,12 +60,8 @@ class TimetableFormPane(controller: TimetableViewController, tablePreview: Timet
     case ButtonClicked(_) =>
       val waitMin     = Try(waitMinutesField.text.toInt).toOption
       val stationName = stationField.text
-      val res         = controller.insertStation(stationName, waitMin)
-      res match
-        case Left(e) => println(s"error: $e")
-        case Right(l) =>
-          clearStationFields()
-          tablePreview.update(l)
+      controller.insertStation(stationName, waitMin)
+      clearStationFields()
   }
 
   import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
@@ -88,6 +75,7 @@ class TimetableFormPane(controller: TimetableViewController, tablePreview: Timet
     formButtonsPane
   ).flatMap(field => List(field, Swing.VStrut(fieldsSpace)))
   contents ++= spacedFields
+  clearFields()
 
   private def clearStationFields(): Unit =
     waitMinutesField.text = ""
