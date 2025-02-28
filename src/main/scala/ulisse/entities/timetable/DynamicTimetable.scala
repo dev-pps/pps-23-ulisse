@@ -16,9 +16,9 @@ trait DynamicTimetable extends Timetable with EnvironmentElement:
   def nextRoute: Option[(Station, Station)] =
     effectiveTable.routesWithTimingInfo.findRouteWhere(_.isEmpty, _.isEmpty).stations
   def nextDepartureTime: Option[ClockTime] =
-    table.routesWithTimingInfo2.findRouteWhere(_.isEmpty, _.isEmpty).flatMap((dd, _) => dd._2.departure)
-  def nextWaitingTime: Option[Int] =
-    table.routesWithTimingInfo2.findRouteWhere(_.isEmpty, _.isEmpty).flatMap((dd, _) => dd._2.waitTime)
+    nextRoute.flatMap(nr => table(nr._1).departure)
+  def currentWaitingTime: Option[Int] =
+    table.routesWithTimingInfo2.findRouteWhere(_.isDefined, _.isEmpty).flatMap((dd, _) => dd._2.waitTime)
   def completed: Boolean = nextRoute.isEmpty
   def arrivalUpdate(time: ClockTime): Option[DynamicTimetable]
   def departureUpdate(time: ClockTime): Option[DynamicTimetable]
@@ -37,7 +37,7 @@ object DynamicTimetable:
         arrivalStationArrivingCondition: Option[ClockTime] => Boolean
     ): Option[RouteWithTimingInfo] =
       routesWithTimingInfo.find((dd, aa) =>
-        departureStationDepartureCondition(dd._2.arriving) && arrivalStationArrivingCondition(aa._2.arriving)
+        departureStationDepartureCondition(dd._2.departure) && arrivalStationArrivingCondition(aa._2.arriving)
       )
   extension (rwti: Option[RouteWithTimingInfo])
     def stations: Option[(Station, Station)] = rwti.map((dd, aa) => (dd._1, aa._1))
@@ -49,7 +49,7 @@ object DynamicTimetable:
     export timetable.*
     extension (newEffectiveTimeTable: Option[List[(Station, TrainStationTime)]])
       private def update: Option[DynamicTimetable] = newEffectiveTimeTable.map(nett => copy(effectiveTable = nett))
-    override def arrivalUpdate(time: ClockTime): Option[DynamicTimetable] = currentRoute.map(cr =>
+    override def arrivalUpdate(time: ClockTime): Option[DynamicTimetable] = nextRoute.map(cr =>
       effectiveTable.updateWhen(swti => swti._1.name == cr._2.name)(swti =>
         (swti._1, TrainStationTime(Some(time), swti._2.waitTime, swti._2.departure))
       )
