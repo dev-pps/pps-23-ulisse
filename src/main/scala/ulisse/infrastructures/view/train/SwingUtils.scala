@@ -32,12 +32,7 @@ object SwingUtils:
 
   class JNumberFieldItem(cols: Int) extends JTextFieldItem(cols):
     reactions += {
-      case ValueChanged(_) =>
-        Swing.onEDT {
-          if (!text.matches("^[0-9]*$")) {
-            text = text.filter(_.isDigit)
-          }
-        }
+      case ValueChanged(_) => Swing.onEDT(if (!text.matches("^[0-9]*$")) text = text.filter(_.isDigit))
     }
 
   class StyledButton(label: String) extends JButtonItem(label):

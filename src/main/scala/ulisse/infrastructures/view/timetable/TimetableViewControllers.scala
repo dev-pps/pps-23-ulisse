@@ -14,7 +14,6 @@ import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.{
 }
 import ulisse.utils.Errors.{BaseError, ErrorMessage}
 import ulisse.utils.ValidationUtils.validateNonBlankString
-
 import java.util.concurrent.Executors
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
