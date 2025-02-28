@@ -6,7 +6,6 @@ import ulisse.infrastructures.view.components.ComposedSwing
 import ulisse.infrastructures.view.components.ComposedSwing.{JIconLabel, JTabbedPane}
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 import ulisse.infrastructures.view.timetable.components.EditingTab.EditorTab
-
 import scala.swing.{Component, FlowPanel, Label, MainFrame}
 
 trait TimetableUpdateListener:

@@ -13,6 +13,7 @@ import ulisse.infrastructures.view.train.SwingUtils
 import ulisse.infrastructures.view.train.SwingUtils.StyledButton
 import ulisse.utils.ValidationUtils.validateNonBlankString
 
+import java.awt.Color
 import scala.util.Try
 
 class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orientation.Vertical):
@@ -32,7 +33,7 @@ class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orient
       clearFields()
   }
 
-//  trainCombo.font = new Font("Arial", Font.Bold.id, 20)
+  trainCombo.font = new Font("Arial", Font.Plain.id, 15)
 
   // Hours and Minutes ComboBox
   private val hourValues                     = (0 to 23).map[String](h => "%02d".format(h)).prepended("-")
