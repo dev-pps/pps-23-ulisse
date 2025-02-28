@@ -5,7 +5,7 @@ import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton}
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 import ulisse.infrastructures.view.timetable.components.EditingTab.EditorTab
-import ulisse.infrastructures.view.timetable.components.{EditorTabPane, TimetableListView}
+import ulisse.infrastructures.view.timetable.components.TimetableListView
 import ulisse.infrastructures.view.train.SwingUtils.StyledButton
 
 import javax.swing.border.Border
@@ -18,7 +18,7 @@ import scala.swing.*
 object EditingTab:
 
   class EditorTab(controller: TimetableViewController) extends SBoxPanel(Orientation.Vertical):
-    private val formPane    = EditorTabPane(controller)
+    private val formPane    = TimetableFormPane(controller)
     private val previewPane = ScrollPane(TimetableListView(controller.insertedStations()))
     private val saveBtn     = SButton("Save")
     saveBtn.rect = Styles.formTrueButtonRect
