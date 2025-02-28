@@ -1,8 +1,10 @@
 package ulisse.infrastructures.view.timetable.components
 
+import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 import ulisse.infrastructures.view.timetable.components.EditingTab.EditorTab
-import ulisse.infrastructures.view.timetable.components.{EditorTabPane}
+import ulisse.infrastructures.view.timetable.components.{EditorTabPane, TimetableListView}
+import ulisse.infrastructures.view.train.SwingUtils.StyledButton
 
 import javax.swing.border.Border
 import javax.swing.event.ChangeListener
@@ -16,13 +18,10 @@ object EditingTab:
   class EditorTab(controller: TimetableViewController) extends BoxPanel(Orientation.Vertical):
     private val formPane    = EditorTabPane(controller)
     private val previewPane = ScrollPane(TimetableListView(controller.insertedStations()))
-    import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
-    private val clearBtn      = new Button("clear")
-    private val saveBtn       = new Button("Save")
-    private val bottomButtons = clearBtn.createLeftRight(saveBtn)
+    private val saveBtn     = StyledButton("Save")
     contents += formPane.withHeader("Timetable creation")
     contents += previewPane.withHeader("Timetable Preview")
-    import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
+    import ulisse.infrastructures.view.components.ComponentUtils.centerHorizontally
     contents += saveBtn.centerHorizontally()
 
     saveBtn.reactions += {

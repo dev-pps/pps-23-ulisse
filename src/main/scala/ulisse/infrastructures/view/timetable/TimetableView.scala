@@ -2,12 +2,14 @@ package ulisse.infrastructures.view.timetable
 
 import ulisse.applications.ports.TimetablePorts
 import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
+import ulisse.infrastructures.view.common.ImagePath as ImgPath
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 import ulisse.infrastructures.view.timetable.components.EditingTab.EditorTab
 
 import scala.swing.{Component, FlowPanel, Label, MainFrame, Orientation}
+import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
 
 trait TimetableUpdateListener:
   def showError(errorMessage: String): Unit
