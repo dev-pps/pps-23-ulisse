@@ -1,11 +1,12 @@
 package ulisse.infrastructures.view.timetable.components
 
-import ulisse.infrastructures.view.components.ExtendedSwing.{SLabel, STextField}
+import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SLabel, STextField}
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
+
 import scala.swing.Swing.EmptyBorder
 import scala.swing.event.ButtonClicked
-import scala.swing.{BoxPanel, ComboBox, Font, Orientation}
+import scala.swing.{ComboBox, Font, Orientation}
 import ulisse.infrastructures.view.train.SwingUtils
 import ulisse.infrastructures.view.train.SwingUtils.StyledButton
 import ulisse.utils.ValidationUtils.validateNonBlankString
@@ -13,8 +14,8 @@ import ulisse.utils.ValidationUtils.validateNonBlankString
 import java.awt.Color
 import scala.util.Try
 
-class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orientation.Vertical):
-  private val waitMinutesField             = SwingUtils.JNumberFieldItem(5)
+class EditorTabPane(controller: TimetableViewController) extends SBoxPanel(Orientation.Vertical):
+  private val waitMinutesField             = SwingUtils.SNumberField(5)
   private val trainCombo: ComboBox[String] = ComboBox[String](controller.trainNames)
   private val stationSelection             = STextField(10)
   private val clearBtn                     = StyledButton("reset")
@@ -27,6 +28,7 @@ class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orient
   clearBtn.reactions += {
     case ButtonClicked(_) =>
       // Todo: reset also temporary timetable data
+      controller.reset()
       clearFields()
   }
 

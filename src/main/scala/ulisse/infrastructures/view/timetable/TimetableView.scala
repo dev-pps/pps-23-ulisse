@@ -3,6 +3,7 @@ package ulisse.infrastructures.view.timetable
 import ulisse.applications.ports.TimetablePorts
 import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
 import ulisse.infrastructures.view.common.ImagePath as ImgPath
+import ulisse.infrastructures.view.components.ExtendedSwing.SFlowPanel
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 import ulisse.infrastructures.view.timetable.components.EditingTab.EditorTab
@@ -29,19 +30,17 @@ object TimetableView:
     given orientation: Orientation.Value = Orientation.Horizontal
     val formIcon                         = ComposedImageLabel.createIcon("icons/calendar_add_on.svg", "Create")
     import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
-    val formPane  = EditorTab(controller)
     val savedIcon = ComposedImageLabel.createIcon("icons/calendar_clock.svg", "Saved")
-    val savedPane = FlowPanel(Label("Create timetable form"))
 
     Map(
-      formIcon  -> formPane,
-      savedIcon -> savedPane
+      formIcon  -> EditorTab(controller),
+      savedIcon -> FlowPanel(Label("Create timetable form"))
     ).toTabbedPane
 
 @main def timetableViewDemoGUI(): Unit =
   new MainFrame() {
     title = "timetable preview"
-    val mainPanel = FlowPanel()
+    val mainPanel = SFlowPanel()
     mainPanel.contents += TimetableView(TimetableInputPortMocked())
     contents = mainPanel
     visible = true
