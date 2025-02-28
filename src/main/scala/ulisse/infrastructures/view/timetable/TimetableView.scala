@@ -9,6 +9,7 @@ import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 import ulisse.infrastructures.view.timetable.components.EditingTab.EditorTab
 import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
+import ulisse.infrastructures.view.timetable.components.SavedTab
 
 trait TimetableUpdateListener:
   def showError(errorMessage: String): Unit
@@ -34,7 +35,7 @@ object TimetableView:
 
     Map(
       formIcon  -> EditorTab(controller),
-      savedIcon -> FlowPanel(Label("Create timetable form"))
+      savedIcon -> SavedTab(controller)
     ).toTabbedPane
 
 @main def timetableViewDemoGUI(): Unit =
