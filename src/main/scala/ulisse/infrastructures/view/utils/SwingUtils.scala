@@ -2,6 +2,8 @@ package ulisse.infrastructures.view.utils
 
 import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.components.ExtendedSwing.{SButton, SFlowPanel, STextField}
+import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
+import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
 import ulisse.infrastructures.view.components.styles.Styles
 
 import scala.swing.event.ValueChanged
@@ -37,11 +39,17 @@ object SwingUtils:
     def showPreview(): MainFrame =
       new MainFrame() {
         title = "timetable preview"
-        val mainPanel = SFlowPanel()
+        val mainPanel: SFlowPanel = SFlowPanel()
         mainPanel.contents += c
         contents = mainPanel
         visible = true
       }
+
+  extension (panes: Map[ComposedImageLabel, Component])
+    def toTabbedPane: JTabbedPane =
+      val tabbedPane = ComposedSwing.createTabbedPane(panes.keys.toList: _*)
+      panes.foreach((k, p) => tabbedPane.paneOf(k).contents += p)
+      tabbedPane
 
   class SNumberField(cols: Int) extends STextField(cols):
     import ulisse.infrastructures.view.common.Themes.withAlpha
@@ -53,9 +61,6 @@ object SwingUtils:
     reactions += {
       case ValueChanged(_) => Swing.onEDT(if (!text.matches("^[0-9]*$")) text = text.filter(_.isDigit))
     }
-
-  class StyledButton(label: String) extends SButton(label):
-    this.rect = Styles.defaultRect.withPaddingWidthAndHeight(20, 10)
 
   import ulisse.infrastructures.view.components.composed.ComposedSwing
   import ulisse.infrastructures.view.common.Themes.withAlpha
