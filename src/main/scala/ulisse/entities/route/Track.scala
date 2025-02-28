@@ -22,7 +22,7 @@ trait Track extends TrainAgentsContainer[Track]:
 object Track:
   enum TrainAgentsDirection:
     case Forward, Backward
-  // TODO evaluate if leave there minPermittedDistanceBetweenTrains or pass as parameter for isAvailable
+
   def apply(trackNumber: Int)(using minPermittedDistanceBetweenTrains: Double): Track =
     TrackImpl(math.max(1, trackNumber), Seq(), None)
   def createCheckedTrack(
@@ -43,7 +43,6 @@ object Track:
       )
 
     override def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[Track] =
-      // TODO evaluate if could be nice to remove the control for already moved train
       (
         currentDirection,
         copy(trains = trains :+ train) when isAvailable && !contains(train) && train.distanceTravelled == 0

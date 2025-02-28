@@ -34,6 +34,7 @@ object EnvironmentElements:
     // TODO evaluate if make sense to make it stricter putting at generic level
     type TAC <: TrainAgentsContainer[TAC]
     def containers: Seq[TAC]
+    def isAvailable: Boolean                       = containers.exists(_.isAvailable)
     def updateTrain(train: TrainAgent): Option[EE] = updaterTemplate(train, _.updateTrain(train), contains(train))
     def removeTrain(train: TrainAgent): Option[EE] = updaterTemplate(train, _.removeTrain(train), contains(train))
     def contains(train: TrainAgent): Boolean       = containers.exists(_.contains(train))

@@ -31,7 +31,7 @@ object Platform:
       currentTrain: Option[TrainAgent]
   ) extends Platform:
     override def trains: Seq[TrainAgent] = currentTrain.toList
-    // TODO evaluate if could be nice to remove the control for already moved train
+
     override def putTrain(train: TrainAgent): Option[Platform] =
       copy(currentTrain = Some(train)) when isAvailable && train.distanceTravelled == 0
 
