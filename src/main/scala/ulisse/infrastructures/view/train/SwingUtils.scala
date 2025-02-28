@@ -1,5 +1,6 @@
 package ulisse.infrastructures.view.train
 
+import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.components.ExtendedSwing.{SButton, STextField}
 import ulisse.infrastructures.view.components.styles.Styles
 
@@ -34,6 +35,12 @@ object SwingUtils:
       }
 
   class SNumberField(cols: Int) extends STextField(cols):
+    import ulisse.infrastructures.view.common.Themes.withAlpha
+    private val textFieldPadding    = Styles.createPadding(10, 5)
+    private val textFieldBackground = Theme.light.background.withAlpha(50)
+
+    rect = rect.withPadding(textFieldPadding)
+    rectPalette = rectPalette.withBackground(textFieldBackground)
     reactions += {
       case ValueChanged(_) => Swing.onEDT(if (!text.matches("^[0-9]*$")) text = text.filter(_.isDigit))
     }
