@@ -24,14 +24,17 @@ trait AppState:
   /** Update station manager. */
   def updateStation(update: StationManager => StationManager): AppState
 
-object AppState:
+  /** Update a single manager. */
+  def updateSingleManager[A <: Managers](update: A => A): AppState
 
+object AppState:
   /** Create new application state with empty managers. */
   def apply(): AppState = new AppStateImpl()
 
+  /** [[Managers]] that can be updated. */
   type Managers = StationManager | RouteManager | TrainManager | TimetableManager
 
-  case class AppStateImpl(
+  private case class AppStateImpl(
       stationManager: StationManager,
       routeManager: RouteManager,
       trainManager: TrainManager,
@@ -46,11 +49,11 @@ object AppState:
       SimulationManager.emptyBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
     )
 
-    def testB[A >: Managers](update: Managers => Managers): AppStateImpl = update match
-      case upA: (StationManager => StationManager)     => copy(stationManager = upA(stationManager))
-      case upA: (RouteManager => RouteManager)         => copy(routeManager = upA(routeManager))
-      case upA: (TrainManager => TrainManager)         => copy(trainManager = upA(trainManager))
-      case upA: (TimetableManager => TimetableManager) => copy(timetableManager = upA(timetableManager))
+    override def updateSingleManager[A <: Managers](update: A => A): AppState = update match
+      case update: (StationManager => StationManager)     => copy(stationManager = update(stationManager))
+      case update: (RouteManager => RouteManager)         => copy(routeManager = update(routeManager))
+      case update: (TrainManager => TrainManager)         => copy(trainManager = update(trainManager))
+      case update: (TimetableManager => TimetableManager) => copy(timetableManager = update(timetableManager))
 
     override def updateSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState =
       copy(simulationManager = update(simulationManager, stationManager))
