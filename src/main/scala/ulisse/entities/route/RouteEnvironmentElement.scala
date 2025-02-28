@@ -30,8 +30,9 @@ object RouteEnvironmentElement:
     override def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[RouteEnvironmentElement] =
       (for
         firstAvailableContainer <- containers.find(_.isAvailable)
-        updatedContainer <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
-      yield copy(containers = updatedContainer)) when !contains(train) // firstAvailableContainer.isEmpty &&
+        updatedContainers <-
+          containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
+      yield copy(containers = updatedContainers)) when !contains(train)
 
     override def buildNewEnvironmentElement(containers: Seq[Track]): RouteEnvironmentElement =
       copy(containers = containers)
