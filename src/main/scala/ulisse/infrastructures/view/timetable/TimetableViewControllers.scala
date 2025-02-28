@@ -6,6 +6,7 @@ import ulisse.infrastructures.view.timetable.TimetableViewControllers.Error.{
   RequestException,
   TimetableSaveError
 }
+import ulisse.infrastructures.view.timetable.components.Observers.{UpdatablePreview, UpdatableTimetableView}
 import ulisse.utils.Times.{ClockTime, Time}
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.{
   generateMockTimetable,
@@ -33,11 +34,14 @@ object TimetableViewControllers:
     def requestTimetable(trainName: String, time: Time): Unit
     def selectTrain(trainName: String): Unit
     def setDepartureTime(h: Int, m: Int): Unit
-    def insertStation(stationName: String, waitTime: Option[Int]): Either[Error, List[TimetableEntry]]
-    def undoLastInsert(): List[TimetableEntry]
+    def insertStation(stationName: String, waitTime: Option[Int]): Unit
+    def undoLastInsert(): Unit
     def insertedStations(): List[TimetableEntry]
-    def reset(): List[TimetableEntry]
+    def reset(): Unit
     def save(): Unit
+    def deleteTimetable(trainName: String, selectedTime: Time): Unit
+    def addTimetableViewListener(timetableViewer: UpdatableTimetableView): Unit
+    def addPreviewListener(previewObserver: UpdatablePreview): Unit
 
   object TimetableViewController:
     def apply(port: TimetablePorts.Input): TimetableViewController =
@@ -46,14 +50,18 @@ object TimetableViewControllers:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private class ViewControllerImpl(port: TimetablePorts.Input, private var stations: List[TimetableEntry])
         extends TimetableViewController:
-      private var selectedTrain: Option[String] = None
-      private var startTime: Option[ClockTime]  = None
+      private var selectedTrain: Option[String]                 = None
+      private var startTime: Option[ClockTime]                  = None
+      private var timetablePreview: Option[UpdatablePreview]    = None
+      private var timetableView: Option[UpdatableTimetableView] = None
 
       given executionContext: ExecutionContext = ExecutionContext.fromExecutorService(
         Executors.newFixedThreadPool(1)
       )
 
-      override def insertStation(stationName: String, waitTime: Option[Int]): Either[Error, List[TimetableEntry]] =
+      private def updatePreview() = timetablePreview.map(_.update(stations))
+
+      override def insertStation(stationName: String, waitTime: Option[Int]): Unit =
         import Error.{EmptyDepartureTime, EmptyTrainSelection}
         for
           _           <- selectedTrain.toRight(EmptyTrainSelection())
@@ -62,11 +70,11 @@ object TimetableViewControllers:
         yield
           val departString = Option.when(stations.isEmpty)(s"${departTime.h}:${departTime.m}")
           stations = stations.appended(TableEntryData(stationName, None, departString, waitTime))
-          stations
+          updatePreview()
 
-      override def undoLastInsert(): List[TimetableEntry] =
+      override def undoLastInsert(): Unit =
         stations = stations.dropRight(1)
-        stations
+        updatePreview()
 
       override def trainNames: List[String] = List("Rv-3908", "AV-1000", "RV-2020")
       override def save(): Unit =
@@ -79,7 +87,7 @@ object TimetableViewControllers:
           res.onComplete {
             case Failure(exc)       => println(RequestException(exc.getMessage))
             case Success(Left(err)) => println(TimetableSaveError(s"$err"))
-            case Success(Right(_)) =>
+            case Success(Right(l)) =>
               reset()
               // TODO: show on gui that timetable is saved
               println(s"updated list of timetables: done")
@@ -94,15 +102,27 @@ object TimetableViewControllers:
               val timetable = tt.table.map((st, t) =>
                 TableEntryData(st.name, t.arriving.map(_.toString), t.departure.map(_.toString), t.waitTime)
               ).toList
-          // TODO: notify view to show selected timetable
+              timetableView.map(_.update(timetable))
         }
 
-      override def reset(): List[TimetableEntry] =
+      override def reset(): Unit =
         selectedTrain = None
         startTime = None
         stations = List.empty
-        stations
+        updatePreview()
 
       override def insertedStations(): List[TimetableEntry] = stations
-      override def selectTrain(trainName: String): Unit     = selectedTrain = Some(trainName)
-      override def setDepartureTime(h: Int, m: Int): Unit   = startTime = ClockTime(h, m).toOption
+      override def selectTrain(trainName: String): Unit =
+        selectedTrain.foreach(_ => reset())
+        selectedTrain = Some(trainName)
+      override def setDepartureTime(h: Int, m: Int): Unit =
+        startTime.foreach(_ => reset())
+        startTime = ClockTime(h, m).toOption
+
+      override def deleteTimetable(trainName: String, selectedTime: Time): Unit =
+        port.deleteTimetable(trainName, ClockTime(selectedTime.h, selectedTime.m).getOrDefault)
+
+      override def addTimetableViewListener(timetableViewer: UpdatableTimetableView): Unit =
+        timetableView = Some(timetableViewer)
+      override def addPreviewListener(previewObserver: UpdatablePreview): Unit =
+        timetablePreview = Some(previewObserver)
