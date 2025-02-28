@@ -97,22 +97,12 @@ object Form:
     override def onExit(data: Point): Unit    = ()
 
   case class ScheduleForm() extends Form with Observer[Point]:
-
     import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
     import ulisse.infrastructures.view.timetable.TimetableView
 
     private val mainPanel: ExtendedSwing.SBoxPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     mainPanel.rect = Styles.panelRect
     mainPanel.contents += TimetableView(TimetableInputPortMocked())
-//    private val form = BaseForm("Schedule", field, field1, field2)
-
-//    private val saveButton = ExtendedSwing.SButton("Save")
-//    saveButton.rect = Styles.formTrueButtonRect
-//    saveButton.fontEffect = Styles.whiteFont
-
-//    private val deleteButton = ExtendedSwing.SButton("Delete")
-//    deleteButton.rect = Styles.formFalseButtonRect
-//    deleteButton.fontEffect = Styles.whiteFont
 
     override def mapObserver: Observer[Point] = this
     override def onClick(data: Point): Unit   = ()
