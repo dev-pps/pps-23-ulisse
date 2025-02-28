@@ -6,22 +6,15 @@ import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
 
 import scala.swing.Swing.EmptyBorder
 import scala.swing.event.ButtonClicked
-import scala.swing.{BoxPanel, ComboBox, Orientation}
-import ulisse.infrastructures.view.components.ComponentUtils.{alignLeft, hSpaced}
-import ulisse.infrastructures.view.components.styles.Styles
+import scala.swing.{BoxPanel, ComboBox, Font, Orientation}
 import ulisse.infrastructures.view.train.SwingUtils
+import ulisse.infrastructures.view.train.SwingUtils.StyledButton
 import ulisse.utils.ValidationUtils.validateNonBlankString
 
 import scala.util.Try
 
-private def StyledButton(label: String): SButton =
-  val buttonRect = Styles.defaultRect.withPaddingWidthAndHeight(20, 10)
-  val btn        = SButton(label)
-  btn.rect = buttonRect
-  btn
-
-class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orientation.Vertical):
-  private val waitMinutesField             = SwingUtils.JNumberFieldItem(5)
+class EditorTabPane(controller: TimetableViewController) extends SBoxPanel(Orientation.Vertical):
+  private val waitMinutesField             = SwingUtils.SNumberField(5)
   private val trainCombo: ComboBox[String] = ComboBox[String](controller.trainNames)
   private val stationSelection             = STextField(10)
   private val clearBtn                     = StyledButton("reset")
@@ -34,6 +27,7 @@ class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orient
   clearBtn.reactions += {
     case ButtonClicked(_) =>
       // Todo: reset also temporary timetable data
+      controller.reset()
       clearFields()
   }
 

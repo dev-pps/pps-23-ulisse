@@ -33,7 +33,7 @@ object SwingUtils:
         font = valueFont
       }
 
-  class JNumberFieldItem(cols: Int) extends STextField(cols):
+  class SNumberField(cols: Int) extends STextField(cols):
     reactions += {
       case ValueChanged(_) => Swing.onEDT(if (!text.matches("^[0-9]*$")) text = text.filter(_.isDigit))
     }
