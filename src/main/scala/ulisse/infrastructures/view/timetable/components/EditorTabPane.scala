@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.timetable.components
 
-import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SLabel, STextField}
+import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SLabel, STextField}
+import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.components.ExtendedSwing.{SButton, SLabel, STextField}
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
@@ -18,16 +19,16 @@ import scala.util.Try
 class EditorTabPane(controller: TimetableViewController) extends SBoxPanel(Orientation.Vertical):
   private val waitMinutesField             = SwingUtils.SNumberField(5)
   private val trainCombo: ComboBox[String] = ComboBox[String](controller.trainNames)
-  private val stationSelection             = STextField(10)
-  private val resetBtn                     = StyledButton("reset")
+  private val stationSelection             = ComposedSwing.createInfoTextField("Station")
+  private val resetBtn                     = SButton("reset")
   resetBtn.rect = Styles.formFalseButtonRect
   resetBtn.fontEffect = Styles.whiteFont
 
-  private val undoBtn = StyledButton("undo")
+  private val undoBtn = SButton("undo")
   undoBtn.rect = Styles.formFalseButtonRect
   undoBtn.fontEffect = Styles.whiteFont
 
-  private val insertBtn = StyledButton("insert")
+  private val insertBtn = SButton("insert")
   insertBtn.rect = Styles.formTrueButtonRect
   insertBtn.fontEffect = Styles.whiteFont
 
@@ -76,7 +77,7 @@ class EditorTabPane(controller: TimetableViewController) extends SBoxPanel(Orien
   contents += SLabel("Train: ").createLeftRight(trainCombo)
   contents += SLabel("Departure time").centerHorizontally()
   contents += SLabel("h").createLeftRight(hoursCombo.createLeftRight(SLabel("m").createLeftRight(minutesCombo)))
-  contents += SLabel("Station: ").createLeftRight(stationSelection)
+  contents += stationSelection.component
   contents += SLabel("Wait minutes: ").createLeftRight(waitMinutesField)
   contents += formButtonsPane
 
