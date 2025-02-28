@@ -1,5 +1,8 @@
 package ulisse.infrastructures.view.train
 
+import ulisse.infrastructures.view.components.ExtendedSwing.{SButton, STextField}
+import ulisse.infrastructures.view.components.styles.Styles
+
 import scala.swing.event.ValueChanged
 import scala.swing.{ComboBox, Component, FlowPanel, Font, Graphics2D, Label, Swing, TextField}
 
@@ -30,14 +33,10 @@ object SwingUtils:
         font = valueFont
       }
 
-  class JNumberFieldItem(cols: Int) extends JTextFieldItem(cols):
+  class JNumberFieldItem(cols: Int) extends STextField(cols):
     reactions += {
       case ValueChanged(_) => Swing.onEDT(if (!text.matches("^[0-9]*$")) text = text.filter(_.isDigit))
     }
 
-  class StyledButton(label: String) extends JButtonItem(label):
+  class StyledButton(label: String) extends SButton(label):
     this.rect = Styles.defaultRect.withPaddingWidthAndHeight(20, 10)
-
-  class JComboBoxItem
-
-//  class JComboBoxItem[A](items: Seq[A]) extends ComboBox(items) with ExtendedSwingStyle:
