@@ -65,14 +65,12 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
 
     "a train is updated" should:
       "be updated if present" in:
-        val updatedTrain3905 = train3905.updateDistanceTravelled(1)
-        stationEE.putTrain(train3905).flatMap(_.updateTrain(updatedTrain3905)) match
+        val train        = train3905
+        val updatedTrain = train.updateDistanceTravelled(1)
+        stationEE.putTrain(train).flatMap(_.updateTrain(updatedTrain)) match
           case Some(us) =>
             validateStationInfo(us)
-            us.containers.find(_.contains(train3905)).map(c => (c.id, c.trains)) shouldBe Some((
-              1,
-              Seq(updatedTrain3905)
-            ))
+            us.containers.find(_.contains(train3905)).map(c => (c.id, c.trains)) shouldBe Some((1, Seq(updatedTrain)))
           case None => fail()
 
       "not be updated if not present" in:
@@ -80,11 +78,12 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
 
     "a train is removed" should:
       "be removed if it's present in a platform" in:
-        val updatedTrain3905 = train3905.updateDistanceTravelled(1)
-        stationEE.putTrain(train3905).flatMap(_.updateTrain(updatedTrain3905)).flatMap(_.removeTrain(train3905)) match
+        val train        = train3905
+        val trainUpdated = train.updateDistanceTravelled(1)
+        stationEE.putTrain(train).flatMap(_.updateTrain(trainUpdated)).flatMap(_.removeTrain(train)) match
           case Some(us) =>
             validateStationInfo(us)
-            us.containers.find(_.contains(train3905)) shouldBe None
+            us.containers.find(_.contains(train)) shouldBe None
           case None => fail()
 
       "not be removed if not present" in:
@@ -92,11 +91,12 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
 
     "a train is searched" should:
       "be found if there is a train with the same name in a track" in:
-        val updatedTrain3905 = train3905.updateDistanceTravelled(10)
-        stationEE.putTrain(train3905) match
+        val train        = train3905
+        val updatedTrain = train.updateDistanceTravelled(10)
+        stationEE.putTrain(train) match
           case Some(us) =>
-            us.contains(train3905) shouldBe true
-            us.contains(updatedTrain3905) shouldBe true
+            us.contains(train) shouldBe true
+            us.contains(updatedTrain) shouldBe true
           case _ => fail()
 
       "not be found if there isn't a train with the same name in a track" in:
