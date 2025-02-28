@@ -6,7 +6,7 @@ import ulisse.infrastructures.view.timetable.TimetableViewControllers.Error.{
   RequestException,
   TimetableSaveError
 }
-import ulisse.utils.Times.ClockTime
+import ulisse.utils.Times.{ClockTime, Time}
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.{
   generateMockTimetable,
   TableEntryData,
@@ -14,6 +14,7 @@ import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.{
 }
 import ulisse.utils.Errors.{BaseError, ErrorMessage}
 import ulisse.utils.ValidationUtils.validateNonBlankString
+
 import java.util.concurrent.Executors
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -28,14 +29,15 @@ object TimetableViewControllers:
     final case class RequestException(excMsg: String)  extends Error with ErrorMessage(s"message: $excMsg")
 
   trait TimetableViewController:
-    def insertStation(stationName: String, waitTime: Option[Int]): Either[Error, List[TimetableEntry]]
-    def undoLastInsert(): Unit
     def trainNames: List[String]
+    def requestTimetable(trainName: String, time: Time): Unit
     def selectTrain(trainName: String): Unit
     def setDepartureTime(h: Int, m: Int): Unit
-    def save(): Unit
+    def insertStation(stationName: String, waitTime: Option[Int]): Either[Error, List[TimetableEntry]]
+    def undoLastInsert(): List[TimetableEntry]
     def insertedStations(): List[TimetableEntry]
-    def reset(): Unit
+    def reset(): List[TimetableEntry]
+    def save(): Unit
 
   object TimetableViewController:
     def apply(port: TimetablePorts.Input): TimetableViewController =
@@ -52,7 +54,6 @@ object TimetableViewControllers:
       )
 
       override def insertStation(stationName: String, waitTime: Option[Int]): Either[Error, List[TimetableEntry]] =
-        println("insert station")
         import Error.{EmptyDepartureTime, EmptyTrainSelection}
         for
           _           <- selectedTrain.toRight(EmptyTrainSelection())
@@ -60,13 +61,12 @@ object TimetableViewControllers:
           stationName <- validateNonBlankString(stationName, EmptyStationField())
         yield
           val departString = Option.when(stations.isEmpty)(s"${departTime.h}:${departTime.m}")
-          stations = TableEntryData(stationName, None, departString, waitTime) :: stations
+          stations = stations.appended(TableEntryData(stationName, None, departString, waitTime))
           stations
 
-      override def undoLastInsert(): Unit =
+      override def undoLastInsert(): List[TimetableEntry] =
         stations = stations.dropRight(1)
-        // TODO: update timetable preview list view
-        println(s"undoLastInsert: $stations")
+        stations
 
       override def trainNames: List[String] = List("Rv-3908", "AV-1000", "RV-2020")
       override def save(): Unit =
@@ -77,20 +77,32 @@ object TimetableViewControllers:
         yield
           val res = port.createTimetable(trainName, departureTime, stations.map(e => (e.name, e.waitMinutes)))
           res.onComplete {
-            case Failure(exc) => println(RequestException(exc.getMessage))
-            case Success(value) => value match
-                case Left(err) =>
-                  // TODO: show error
-                  println(TimetableSaveError(s"$err"))
-                case Right(l) =>
-                  // TODO: update gui
-                  println(s"updated list of timetables: $l")
+            case Failure(exc)       => println(RequestException(exc.getMessage))
+            case Success(Left(err)) => println(TimetableSaveError(s"$err"))
+            case Success(Right(_)) =>
+              reset()
+              // TODO: show on gui that timetable is saved
+              println(s"updated list of timetables: done")
           }
 
-      override def reset(): Unit =
+      override def requestTimetable(trainName: String, time: Time): Unit =
+        port.timetablesOf(trainName).onComplete {
+          case Failure(exc)       => RequestException(exc.getMessage)
+          case Success(Left(err)) => println(s"SERVICE error: $err")
+          case Success(Right(l)) =>
+            l.find(_.departureTime.asTime == time).map: tt =>
+              val timetable = tt.table.map((st, t) =>
+                TableEntryData(st.name, t.arriving.map(_.toString), t.departure.map(_.toString), t.waitTime)
+              ).toList
+          // TODO: notify view to show selected timetable
+        }
+
+      override def reset(): List[TimetableEntry] =
         selectedTrain = None
         startTime = None
         stations = List.empty
+        stations
+
       override def insertedStations(): List[TimetableEntry] = stations
       override def selectTrain(trainName: String): Unit     = selectedTrain = Some(trainName)
       override def setDepartureTime(h: Int, m: Int): Unit   = startTime = ClockTime(h, m).toOption

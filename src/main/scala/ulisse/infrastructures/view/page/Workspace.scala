@@ -4,6 +4,7 @@ import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.manager.FormManager
 import ulisse.infrastructures.view.map.MapPanel
+import ulisse.infrastructures.view.train.TrainEditorView
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.BorderPanel.Position
@@ -55,6 +56,15 @@ object Workspace:
 
   /** Represents the train workspace of the application. */
   case class TrainWorkspace() extends Workspace:
-    private val workspace = BaseWorkspace()
+    import ulisse.applications.ports.TrainPorts
+    import ulisse.applications.useCases.TrainService
+    import java.util.concurrent.LinkedBlockingQueue
+    import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+    import ulisse.applications.managers.TrainManagers.TrainManager
+    import ulisse.entities.train.Trains.TrainTechnology
 
-    export workspace.{component, revalidate}
+    private type AppState = (TrainManager, TechnologyManager[TrainTechnology])
+    val trainPort: TrainPorts.Input = TrainService(LinkedBlockingQueue[AppState => AppState])
+    private val workspace           = TrainEditorView(trainPort)
+    export workspace.revalidate
+    override def component[T >: Component]: T = workspace

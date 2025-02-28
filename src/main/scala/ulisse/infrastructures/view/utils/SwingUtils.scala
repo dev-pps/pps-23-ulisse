@@ -1,11 +1,11 @@
-package ulisse.infrastructures.view.train
+package ulisse.infrastructures.view.utils
 
 import ulisse.infrastructures.view.common.Themes.Theme
-import ulisse.infrastructures.view.components.ExtendedSwing.{SButton, STextField}
+import ulisse.infrastructures.view.components.ExtendedSwing.{SButton, SFlowPanel, STextField}
 import ulisse.infrastructures.view.components.styles.Styles
 
 import scala.swing.event.ValueChanged
-import scala.swing.{ComboBox, Component, FlowPanel, Font, Graphics2D, Label, Swing, TextField}
+import scala.swing.*
 
 object SwingUtils:
 
@@ -33,6 +33,15 @@ object SwingUtils:
       new Label(text) {
         font = valueFont
       }
+  extension (c: Component)
+    def showPreview(): MainFrame =
+      new MainFrame() {
+        title = "timetable preview"
+        val mainPanel = SFlowPanel()
+        mainPanel.contents += c
+        contents = mainPanel
+        visible = true
+      }
 
   class SNumberField(cols: Int) extends STextField(cols):
     import ulisse.infrastructures.view.common.Themes.withAlpha
@@ -47,3 +56,19 @@ object SwingUtils:
 
   class StyledButton(label: String) extends SButton(label):
     this.rect = Styles.defaultRect.withPaddingWidthAndHeight(20, 10)
+
+  import ulisse.infrastructures.view.components.composed.ComposedSwing
+  import ulisse.infrastructures.view.common.Themes.withAlpha
+  import ulisse.infrastructures.view.components.ExtendedSwing
+  class SFieldLabel(text: String)(fieldComponent: Component) extends ComposedSwing:
+    private val fieldBackground = Theme.light.background.withAlpha(50)
+    private val mainPanel       = ExtendedSwing.SBoxPanel(Orientation.Vertical)
+    private val labelPanel      = ExtendedSwing.SFlowPanel()
+    private val label           = ExtendedSwing.SLabel(text)
+
+    fieldComponent.background = fieldBackground
+    labelPanel.contents += label
+    mainPanel.contents += labelPanel
+    mainPanel.contents += fieldComponent
+
+    override def component[T >: Component]: T = mainPanel
