@@ -97,26 +97,26 @@ object Form:
     override def onExit(data: Point): Unit    = ()
 
   case class ScheduleForm() extends Form with Observer[Point]:
-    private val field  = ComposedSwing.createInfoTextField("Field")
-    private val field1 = ComposedSwing.createInfoTextField("Field1")
-    private val field2 = ComposedSwing.createInfoTextField("Field2")
 
-    private val form = BaseForm("Schedule", field, field1, field2)
+    import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
+    import ulisse.infrastructures.view.timetable.TimetableView
 
-    private val saveButton = ExtendedSwing.SButton("Save")
-    saveButton.rect = Styles.formTrueButtonRect
-    saveButton.fontEffect = Styles.whiteFont
+    private val mainPanel: ExtendedSwing.SBoxPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
+    mainPanel.rect = Styles.panelRect
+    mainPanel.contents += TimetableView(TimetableInputPortMocked())
+//    private val form = BaseForm("Schedule", field, field1, field2)
 
-    private val deleteButton = ExtendedSwing.SButton("Delete")
-    deleteButton.rect = Styles.formFalseButtonRect
-    deleteButton.fontEffect = Styles.whiteFont
+//    private val saveButton = ExtendedSwing.SButton("Save")
+//    saveButton.rect = Styles.formTrueButtonRect
+//    saveButton.fontEffect = Styles.whiteFont
 
-    buttonPanel.contents += saveButton
-    buttonPanel.contents += deleteButton
+//    private val deleteButton = ExtendedSwing.SButton("Delete")
+//    deleteButton.rect = Styles.formFalseButtonRect
+//    deleteButton.fontEffect = Styles.whiteFont
 
-    export form._
     override def mapObserver: Observer[Point] = this
     override def onClick(data: Point): Unit   = ()
     override def onHover(data: Point): Unit   = ()
     override def onRelease(data: Point): Unit = ()
     override def onExit(data: Point): Unit    = ()
+    override def component[T >: Component]: T = mainPanel

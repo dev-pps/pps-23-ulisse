@@ -1,6 +1,8 @@
 package ulisse.infrastructures.view.timetable.components
 
 import ulisse.infrastructures.view.components.ExtendedSwing
+import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton}
+import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 import ulisse.infrastructures.view.timetable.components.EditingTab.EditorTab
 import ulisse.infrastructures.view.timetable.components.{EditorTabPane, TimetableListView}
@@ -15,15 +17,17 @@ import scala.swing.*
 
 object EditingTab:
 
-  class EditorTab(controller: TimetableViewController) extends BoxPanel(Orientation.Vertical):
+  class EditorTab(controller: TimetableViewController) extends SBoxPanel(Orientation.Vertical):
     private val formPane    = EditorTabPane(controller)
     private val previewPane = ScrollPane(TimetableListView(controller.insertedStations()))
-    private val saveBtn     = StyledButton("Save")
+    private val saveBtn     = SButton("Save")
+    saveBtn.rect = Styles.formTrueButtonRect
+    saveBtn.fontEffect = Styles.whiteFont
     contents += formPane.withHeader("Timetable creation")
     contents += previewPane.withHeader("Timetable Preview")
-    import ulisse.infrastructures.view.components.ComponentUtils.centerHorizontally
-    contents += saveBtn.centerHorizontally()
 
+    import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
+    contents += saveBtn.centerHorizontally()
     saveBtn.reactions += {
       case ButtonClicked(_) => controller.save()
     }
@@ -35,7 +39,7 @@ object EditingTab:
         contents += c
       }
 
-  private def header(headerText: String): BoxPanel = new BoxPanel(Orientation.Horizontal) {
+  private def header(headerText: String): BoxPanel = new SBoxPanel(Orientation.Horizontal) {
     border = EmptyBorder(10, 5, 5, 0)
     contents += new Label(headerText) {
       font = new Font("Arial", java.awt.Font.BOLD, 15)
