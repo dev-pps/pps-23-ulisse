@@ -73,6 +73,7 @@ final case class StationSettings():
   import ulisse.applications.useCases.TrainService
   import ulisse.entities.train.Trains.TrainTechnology
   import ulisse.infrastructures.view.train.TrainEditorView
+  import ulisse.infrastructures.view.utils.SwingUtils.showPreview
 
   type AppState = (TrainManager, TechnologyManager[TrainTechnology])
   val stateEventQueue = LinkedBlockingQueue[AppState => AppState]
@@ -80,7 +81,7 @@ final case class StationSettings():
   // Train Fleet init
   val trainPort: TrainPorts.Input = TrainService(stateEventQueue)
   val trainView                   = TrainEditorView(trainPort)
-  // trainView.open()
+  trainView.showPreview()
 
   // Init Managers state
   // Managers can be initialized loading entities from file/external repo

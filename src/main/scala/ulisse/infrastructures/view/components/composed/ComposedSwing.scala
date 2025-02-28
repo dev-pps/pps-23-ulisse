@@ -57,7 +57,7 @@ object ComposedSwing:
     mainPanel.contents += labelPanel
     mainPanel.contents += textField
 
-    export textField.{text, text_=}
+    export textField.{editable, editable_=, text, text_=}
     override def component[T >: Component]: T = mainPanel
 
   case class JNavBar(iconLabels: ComposedImageLabel*) extends ComposedSwing:
