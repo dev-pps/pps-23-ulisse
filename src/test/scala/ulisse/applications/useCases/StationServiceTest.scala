@@ -4,7 +4,7 @@ import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.Runner.runAll
-import ulisse.applications.AppState
+import ulisse.applications.{AppState, QueueState}
 import ulisse.applications.managers.StationManager
 import ulisse.entities.Coordinate
 import ulisse.entities.Coordinate.*
@@ -18,10 +18,10 @@ import scala.util.Right
 class StationServiceTest extends AnyWordSpec with Matchers:
 
   private val station       = Station("StationA", Coordinate(0, 0), 1)
-  private val initialState  = AppState.default()
-  private val eventStream   = LinkedBlockingQueue[AppState => AppState]()
-  private val inputPort     = StationService(eventStream)
-  private def updateState() = runAll(initialState, eventStream)
+  private val initialState  = AppState()
+  private val statesQueue   = QueueState()
+  private val inputPort     = StationService(statesQueue)
+  private def updateState() = runAll(initialState, statesQueue.events)
 
   "StationService" should:
     "add a valid station to the station manager" in:

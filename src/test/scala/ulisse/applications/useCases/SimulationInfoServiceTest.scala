@@ -48,13 +48,15 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
   private val otherMockedTrain = mock[Train]
   when(otherMockedTrain.name).thenReturn(otherTrainName)
 
-  private val initialState = AppState.default().swap(_.simulationManager.setupEnvironment(
-    RailwayEnvironment(
-      Seq(mockedStationEE),
-      Seq(mockedRouteEE),
-      Seq(mockedTrainAgent)
+  private val initialState = AppState().updateSimulation((simulationManager, _) =>
+    simulationManager.setupEnvironment(
+      RailwayEnvironment(
+        Seq(mockedStationEE),
+        Seq(mockedRouteEE),
+        Seq(mockedTrainAgent)
+      )
     )
-  ))
+  )
 
   private val eventQueue            = LinkedBlockingQueue[AppState => AppState]()
   private val simulationInfoService = SimulationInfoService(eventQueue)

@@ -1,37 +1,61 @@
 package ulisse.applications
 
 import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
+import ulisse.applications.AppState.Managers
 import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
-import ulisse.applications.managers.{SimulationManager, StationManager}
-import ulisse.entities.station.Station
-import ulisse.entities.train.Trains.TrainTechnology
+import ulisse.applications.managers.{SimulationManager, StationManager, TimetableManagers}
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
-import ulisse.utils.Times.Time
+
+import scala.compiletime.{erasedValue, summonInline}
+
+/** Application state that contains all managers. */
+trait AppState:
+  val stationManager: StationManager
+  val routeManager: RouteManager
+  val trainManager: TrainManager
+  val timetableManager: TimetableManager
+  val simulationManager: SimulationManager
+
+  /** Update simulation manager. */
+  def updateSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState
+
+  /** Update station manager. */
+  def updateStation(update: StationManager => StationManager): AppState
 
 object AppState:
-  def default(): AppState =
-    AppState(
+
+  /** Create new application state with empty managers. */
+  def apply(): AppState = new AppStateImpl()
+
+  type Managers = StationManager | RouteManager | TrainManager | TimetableManager
+
+  case class AppStateImpl(
+      stationManager: StationManager,
+      routeManager: RouteManager,
+      trainManager: TrainManager,
+      timetableManager: TimetableManager,
+      simulationManager: SimulationManager
+  ) extends AppState:
+    def this() = this(
       StationManager(),
       RouteManager.empty(),
-      TrainManager(List.empty),
-      TechnologyManager(List.empty),
+      TrainManager.empty(),
+      TimetableManagers.emptyManager(),
       SimulationManager.emptyBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
     )
 
-final case class AppState(
-    stationManager: StationManager,
-    routeManager: RouteManager,
-    trainManager: TrainManager,
-    technologyManager: TechnologyManager[TrainTechnology],
-    simulationManager: SimulationManager
-):
-  def swap(f: AppState => StationManager | RouteManager | TrainManager | TechnologyManager[
-    TrainTechnology
-  ] | SimulationManager): AppState = f(this) match
-    case s: StationManager                     => copy(stationManager = s)
-    case r: RouteManager                       => copy(routeManager = r)
-    case t: TrainManager                       => copy(trainManager = t)
-    case t: TechnologyManager[TrainTechnology] => copy(technologyManager = t)
-    case s: SimulationManager                  => copy(simulationManager = s)
+    def testB[A >: Managers](update: Managers => Managers): AppStateImpl = update match
+      case upA: (StationManager => StationManager)     => copy(stationManager = upA(stationManager))
+      case upA: (RouteManager => RouteManager)         => copy(routeManager = upA(routeManager))
+      case upA: (TrainManager => TrainManager)         => copy(trainManager = upA(trainManager))
+      case upA: (TimetableManager => TimetableManager) => copy(timetableManager = upA(timetableManager))
+
+    override def updateSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState =
+      copy(simulationManager = update(simulationManager, stationManager))
+
+    override def updateStation(update: StationManager => StationManager): AppState =
+      copy(stationManager = update(stationManager))
+
+  final case class SimulationState(simulationManager: SimulationManager)

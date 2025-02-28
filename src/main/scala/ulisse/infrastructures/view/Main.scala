@@ -8,7 +8,7 @@ import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.useCases.{RouteService, SimulationService, StationService}
-import ulisse.applications.AppState
+import ulisse.applications.{AppState, QueueState}
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.TrainTechnology
@@ -20,22 +20,14 @@ import ulisse.utils.Times.Time
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
 
+val statesQueue = QueueState()
 val eventStream = LinkedBlockingQueue[AppState => AppState]()
 
 def runEngine(): Unit =
   val timeProviderAdapter = TimeProviderAdapter(TimeProvider.systemTimeProvider())
   val technologies        = List(TrainTechnology("AV", 300, 2.0, 1.0), TrainTechnology("Normal", 160, 1.0, 0.5))
-  val initialState =
-    AppState(
-      StationManager(),
-      RouteManager.empty(),
-      TrainManager(List.empty),
-      TechnologyManager(technologies),
-      SimulationManager.emptyBatchManager(timeProviderAdapter)
-    )
-  LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) =>
-    event(state)
-  )
+  val initialState        = AppState()
+  LazyList.continually(eventStream.take()).foldLeft(initialState)((state, event) => event(state))
 
 @main def launchApp(): Unit =
   val app = AppFrame()
@@ -57,16 +49,13 @@ final case class SimulationSettings():
   val simulationNotificationAdapter: SimulationNotificationAdapter =
     SimulationNotificationAdapter(simulationNoficationBridge)
 
-  val inputAdapter: SimulationService = SimulationService(
-    eventStream,
-    simulationNotificationAdapter
-  )
+  val inputAdapter: SimulationService = SimulationService(statesQueue, simulationNotificationAdapter)
 
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
 
 final case class StationSettings():
-  val inputAdapter: StationService                  = StationService(eventStream)
+  val inputAdapter: StationService                  = StationService(statesQueue)
   val stationEditorController: StationEditorAdapter = StationEditorAdapter(inputAdapter)
   val stationEditorView: StationEditorView          = StationEditorView(stationEditorController)
 

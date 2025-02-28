@@ -105,6 +105,9 @@ object TrainManagers:
       */
     def apply(trains: List[Train]): TrainManager = DefaultManager(trains)
 
+    /** Create [[TrainManager]] with empty list of trains. */
+    def empty(): TrainManager = DefaultManager(List.empty)
+
     def unapply(manager: TrainManager): Option[List[Train]] = Some(manager.trains)
 
     private case class DefaultManager(trains: List[Train]) extends TrainManager:
