@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.timetable.components
 
-import ulisse.infrastructures.view.components.Images.ImagePanel.createSVGPanel
+import ulisse.infrastructures.view.components.ExtendedSwing.createSVGPanel
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.TimetableEntry
 import ulisse.infrastructures.view.train.SwingUtils
 import ulisse.infrastructures.view.train.SwingUtils.headerLabel
@@ -53,5 +53,5 @@ final case class TimetableListView(timeEntries: List[TimetableEntry]) extends Li
     contents += heading
     contents += infos
     contents += new Label() {
-      contents += createSVGPanel("icons/arrow_down.svg", Color.BLACK)
+      contents += createSVGPanel("icons/arrow_down.svg")
     }

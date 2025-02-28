@@ -1,14 +1,11 @@
 package ulisse.infrastructures.view.timetable.components
 
-import ulisse.infrastructures.view.components.ComposedSwing.createInfoTextField
-import ulisse.infrastructures.view.components.ExtendedSwing.{JButtonItem, JLabelItem, JTextFieldItem}
-import ulisse.infrastructures.view.components.Styles
+import ulisse.infrastructures.view.components.ExtendedSwing.{SLabel, STextField}
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
-
+import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
 import scala.swing.Swing.EmptyBorder
 import scala.swing.event.ButtonClicked
 import scala.swing.{BoxPanel, ComboBox, Font, Orientation}
-import ulisse.infrastructures.view.components.ComponentUtils.{alignLeft, centerHorizontally, hSpaced}
 import ulisse.infrastructures.view.train.SwingUtils
 import ulisse.infrastructures.view.train.SwingUtils.StyledButton
 import ulisse.utils.ValidationUtils.validateNonBlankString
@@ -19,11 +16,11 @@ import scala.util.Try
 class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orientation.Vertical):
   private val waitMinutesField             = SwingUtils.JNumberFieldItem(5)
   private val trainCombo: ComboBox[String] = ComboBox[String](controller.trainNames)
-  private val stationSelection             = JTextFieldItem(10)
+  private val stationSelection             = STextField(10)
   private val clearBtn                     = StyledButton("reset")
   private val undoBtn                      = StyledButton("undo")
   private val insertBtn                    = StyledButton("insert")
-  private val formButtonsPane              = clearBtn.hSpaced(undoBtn.hSpaced(insertBtn))
+  private val formButtonsPane              = clearBtn.createLeftRight(undoBtn.createLeftRight(insertBtn))
   undoBtn.reactions += {
     case ButtonClicked(_) => controller.undoLastInsert()
   }
@@ -65,12 +62,12 @@ class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orient
           println(l)
   }
 
-  import ulisse.infrastructures.view.components.ComponentUtils.onLeftOf
-  contents += JLabelItem("Train: ").onLeftOf(trainCombo)
-  contents += JLabelItem("Departure time").centerHorizontally()
-  contents += Label("h").onLeftOf(hoursCombo.onLeftOf(Label("m").onLeftOf(minutesCombo)))
-  contents += JLabelItem("Station: ").onLeftOf(stationSelection)
-  contents += JLabelItem("Wait minutes: ").onLeftOf(waitMinutesField)
+  import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
+  contents += SLabel("Train: ").createLeftRight(trainCombo)
+  contents += SLabel("Departure time").centerHorizontally()
+  contents += Label("h").createLeftRight(hoursCombo.createLeftRight(Label("m").createLeftRight(minutesCombo)))
+  contents += SLabel("Station: ").createLeftRight(stationSelection)
+  contents += SLabel("Wait minutes: ").createLeftRight(waitMinutesField)
   contents += formButtonsPane
 
   def clearFields(): Unit =
