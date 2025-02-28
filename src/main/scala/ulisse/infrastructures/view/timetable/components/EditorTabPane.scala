@@ -1,11 +1,10 @@
 package ulisse.infrastructures.view.timetable.components
 
 import ulisse.infrastructures.view.components.ComposedSwing.createInfoTextField
-import ulisse.infrastructures.view.components.ExtendedSwing.{JButtonItem, JLabelItem, JTextFieldItem, SButton, SLabel}
+import ulisse.infrastructures.view.components.ExtendedSwing.{JButtonItem, JLabelItem, JTextFieldItem}
 import ulisse.infrastructures.view.components.Styles
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 
-import javax.swing.{JSpinner, SpinnerNumberModel}
 import scala.swing.Swing.EmptyBorder
 import scala.swing.event.ButtonClicked
 import scala.swing.{BoxPanel, ComboBox, Orientation}
@@ -22,18 +21,23 @@ private def StyledButton(label: String): SButton =
   btn
 
 class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orientation.Vertical):
-  private val minutesSpinnerModel = SpinnerNumberModel()
-  minutesSpinnerModel.setMinimum(0)
-  minutesSpinnerModel.setStepSize(1)
-  private val minutesSpinner               = new JSpinner(minutesSpinnerModel)
+  private val waitMinutesField             = SwingUtils.JNumberFieldItem(5)
   private val trainCombo: ComboBox[String] = ComboBox[String](controller.trainNames)
   private val stationSelection             = JTextFieldItem(10)
+  private val clearBtn                     = StyledButton("reset")
   private val undoBtn                      = StyledButton("undo")
   private val insertBtn                    = StyledButton("insert")
   private val editButtonsPane              = undoBtn.hSpaced(insertBtn)
   undoBtn.reactions += {
     case ButtonClicked(_) => controller.undoLastInsert()
   }
+  clearBtn.reactions += {
+    case ButtonClicked(_) =>
+      // Todo: reset also temporary timetable data
+      clearFields()
+  }
+
+  trainCombo.font = new Font("Arial", Font.Plain.id, 15)
 
   // Hours and Minutes ComboBox
   private val hourValues                     = (0 to 23).map[String](h => "%02d".format(h)).prepended("-")
@@ -55,13 +59,15 @@ class EditorTabPane(controller: TimetableViewController) extends BoxPanel(Orient
 
   insertBtn.reactions += {
     case ButtonClicked(_) =>
-      minutesSpinner.getValue match
-        case waitMin: Int =>
-          val stationName = stationSelection.text
-          val res         = controller.insertStation(stationName, Option.when(waitMin > 0)(waitMin))
-          res match
-            case Left(e)  => println(s"error: $e")
-            case Right(l) => println(l)
+      val waitMin     = Try(waitMinutesField.text.toInt).toOption
+      val stationName = stationSelection.text
+      val res         = controller.insertStation(stationName, waitMin)
+      res match
+        case Left(e) => println(s"error: $e")
+        case Right(l) =>
+          stationSelection.text = ""
+          waitMinutesField.text = ""
+          println(l)
   }
 
   import ulisse.infrastructures.view.components.composed.onLeftOf
