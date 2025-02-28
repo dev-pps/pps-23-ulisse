@@ -24,10 +24,8 @@ object StationEnvironmentElement:
     def putTrain(train: TrainAgent): Option[StationEnvironmentElement] =
       (for
         firstAvailableContainer <- containers.find(_.isAvailable)
-        updatedContainer        <- firstAvailableContainer.putTrain(train)
-      yield copy(containers =
-        containers.updateWhen(_ == firstAvailableContainer)(_ => updatedContainer)
-      )) when !contains(train)
+        updatedContainers       <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train))
+      yield copy(containers = updatedContainers)) when !contains(train)
 
     override protected def buildNewEnvironmentElement(containers: Seq[Platform]): StationEnvironmentElement =
       copy(containers = containers)

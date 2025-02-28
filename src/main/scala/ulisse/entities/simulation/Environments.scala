@@ -45,7 +45,6 @@ object Environments:
       provider.perceptionFor(this, agent)
 
   object RailwayEnvironment:
-    // TODO evaluate where to do the initial placement of the trains
     def apply(
         stations: Seq[Station],
         routes: Seq[Route],
@@ -59,13 +58,14 @@ object Environments:
       val stationsEEInitialState = schedulesMap.putTrainsInInitialStations(stationsEE)
       SimulationEnvironmentImpl(stationsEEInitialState, routesEE, schedulesMap.map(identity))
 
-    def orderedScheduleByTrain(timetables: Seq[DynamicTimetable]): Map[TrainAgent, Seq[DynamicTimetable]] =
+    private def orderedScheduleByTrain(timetables: Seq[DynamicTimetable]): Map[TrainAgent, Seq[DynamicTimetable]] =
       timetables.map(tt => TrainAgent(tt.train) -> tt).groupBy(_._1).view.mapValues(_.map(_._2)).toMap.map(t =>
         (t._1, t._2.sortBy(_.departureTime))
       )
 
     extension (schedulesMap: Map[TrainAgent, Seq[DynamicTimetable]])
-      def putTrainsInInitialStations(stationsEE: Seq[StationEnvironmentElement]): Seq[StationEnvironmentElement] =
+      private def putTrainsInInitialStations(stationsEE: Seq[StationEnvironmentElement])
+          : Seq[StationEnvironmentElement] =
         schedulesMap.foldLeft(stationsEE)((stationsEE, tt) =>
           tt._2.headOption.flatMap(firstTimeTable =>
             stationsEE.updateWhenWithEffects(station => station.name == firstTimeTable.startStation.name)(
@@ -98,6 +98,7 @@ object Environments:
     ) extends RailwayEnvironment:
 
       def doStep(dt: Int): RailwayEnvironment =
+        // Agents are placed in an envir
         // Allow agents to be at the same time in more than an environment element
         // that because an agent when enters a station doesn't leave immediately the route and vice versa
         // also for future improvements, an agent when crossing two rails will be in two rails at the same time

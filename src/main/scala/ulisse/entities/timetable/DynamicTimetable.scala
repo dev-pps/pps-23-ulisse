@@ -24,8 +24,8 @@ trait DynamicTimetable extends Timetable with EnvironmentElement:
   def departureUpdate(time: ClockTime): Option[DynamicTimetable]
 
 object DynamicTimetable:
-  type StationWithTimingInfo = (Station, TrainStationTime)
-  type RouteWithTimingInfo   = (StationWithTimingInfo, StationWithTimingInfo)
+  private type StationWithTimingInfo = (Station, TrainStationTime)
+  private type RouteWithTimingInfo   = (StationWithTimingInfo, StationWithTimingInfo)
 
   extension (timetable: List[(Station, TrainStationTime)])
     def routesWithTimingInfo: List[RouteWithTimingInfo] = timetable.zip(timetable.drop(1))
