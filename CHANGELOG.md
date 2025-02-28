@@ -1,3 +1,10 @@
+## [1.14.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.14.0...v1.14.1) (2025-02-28)
+
+### Bug Fixes
+
+* enhancedLook for button in windows ([165f4be](https://github.com/dev-pps/pps-23-ulisse/commit/165f4bedff2b8bdb24eed9ad3d85fe732011faf3))
+* exspansion of form buttons ([3499267](https://github.com/dev-pps/pps-23-ulisse/commit/3499267f875a86094950d7b7db39895292657c26))
+
 ## [1.14.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.13.0...v1.14.0) (2025-02-27)
 
 ### Features
