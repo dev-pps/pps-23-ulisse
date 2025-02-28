@@ -27,7 +27,6 @@ object TimetableViewControllers:
     final case class TimetableSaveError(descr: String) extends Error with ErrorMessage(s"error: $descr")
     final case class RequestException(excMsg: String)  extends Error with ErrorMessage(s"message: $excMsg")
 
-  trait TimetableUpdateObserver
   trait TimetableViewController:
     def insertStation(stationName: String, waitTime: Option[Int]): Either[Error, List[TimetableEntry]]
     def undoLastInsert(): Unit
@@ -36,6 +35,7 @@ object TimetableViewControllers:
     def setDepartureTime(h: Int, m: Int): Unit
     def save(): Unit
     def insertedStations(): List[TimetableEntry]
+    def reset(): Unit
 
   object TimetableViewController:
     def apply(port: TimetablePorts.Input): TimetableViewController =
@@ -87,6 +87,10 @@ object TimetableViewControllers:
                   println(s"updated list of timetables: $l")
           }
 
+      override def reset(): Unit =
+        selectedTrain = None
+        startTime = None
+        stations = List.empty
       override def insertedStations(): List[TimetableEntry] = stations
       override def selectTrain(trainName: String): Unit     = selectedTrain = Some(trainName)
       override def setDepartureTime(h: Int, m: Int): Unit   = startTime = ClockTime(h, m).toOption
