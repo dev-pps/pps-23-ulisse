@@ -38,6 +38,9 @@ object StationManager:
   /** Creates a `StationManager` instance, which is a `StationManager` with validation for unique names and locations. */
   def apply(): StationManager = StationManagerImpl(List.empty)
 
+  /** Creates a `StationManager` instance with the given list of stations. */
+  def create(stations: List[Station]): StationManager = StationManagerImpl(stations)
+
   private final case class StationManagerImpl(stations: List[Station]) extends StationManager:
     type StationMapType = List[Station]
 
