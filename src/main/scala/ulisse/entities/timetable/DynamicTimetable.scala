@@ -25,7 +25,9 @@ trait DynamicTimetable extends Timetable with EnvironmentElement:
     if currentDelay.isDefined then expectedDeparture + currentDelay else expectedDeparture
 //  def currentWaitingTime: Option[Int] =
 //    table.routesWithTimingInfo2.findRouteWhere(_.isDefined, _.isEmpty).flatMap((dd, _) => dd._2.waitTime)
-  def completed: Boolean = nextRoute.isEmpty
+  def completed: Boolean =
+    println(nextRoute)
+    nextRoute.isEmpty
   def arrivalUpdate(time: ClockTime): Option[DynamicTimetable]
   def departureUpdate(time: ClockTime): Option[DynamicTimetable]
 
@@ -64,11 +66,16 @@ object DynamicTimetable:
       effectiveTable.updateWhen(swti => swti._1.name == nr._1.name)(swti =>
         (
           swti._1,
-          TrainStationTime(swti._2.arriving,
-            (Some(time) - expectedDepartureTime).map(c => c.h * 60 + c.m + expectedWaitingTime.getOrElse(0)), Some(time))
+          TrainStationTime(
+            swti._2.arriving,
+            (Some(time) - expectedDepartureTime).map(c => c.h * 60 + c.m + expectedWaitingTime.getOrElse(0)),
+            Some(time)
+          )
         )
       )
     ).update
-    private def expectedDepartureTime: Option[ClockTime] = nextRoute.flatMap(nr => table.find(_._1 == nr._1).flatMap(_._2.departure))
+    private def expectedDepartureTime: Option[ClockTime] =
+      nextRoute.flatMap(nr => table.find(_._1 == nr._1).flatMap(_._2.departure))
     private def expectedWaitingTime: Option[Int] = nextRoute.flatMap(nr =>
-      table.find(_._1 == nr._1).flatMap(_._2.waitTime))
+      table.find(_._1 == nr._1).flatMap(_._2.waitTime)
+    )
