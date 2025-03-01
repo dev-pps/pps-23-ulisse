@@ -50,9 +50,11 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
         dtt.effectiveTable.map(_._1) shouldBe tt.table.keys
         dtt.effectiveTable.forall(_._2 == TrainStationTime(None, None, None)) shouldBe true
 
-      "have not a current route" in:
+      "not have a current route" in:
         dtt.currentRoute shouldBe None
-        dtt.currentWaitingTime shouldBe None
+
+      "not have a current delay" in:
+        dtt.currentDelay shouldBe None
 
       "have as a next route the first route" in:
         dtt.nextRoute shouldBe Some(stationA, stationB)
@@ -62,26 +64,31 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
         dtt.completed shouldBe false
 
     "updated with a departure time" should:
-        "update the effective table with the new departure time" in:
-            val newTime = (Right(departureTime) + ClockTime(0, 5)).getOrDefault
-            dtt.departureUpdate(newTime) match
-            case Some(newDtt) =>
-              newDtt.effectiveTable.find(_._1 == stationA).map(_._2) shouldBe Some(TrainStationTime(None, None, Some(newTime)))
-              newDtt.nextRoute shouldBe Some(stationB, stationC)
-              newDtt.nextDepartureTime shouldBe None
-              newDtt.currentRoute shouldBe Some(stationA, stationB)
-              newDtt.completed shouldBe false
-            case _ => fail()
-
-    "updated with an arrival time" should:
-      "update the effective table with the new arrival time" in:
-        val newTime = (Right(departureTime) + ClockTime(0, 5)).getOrDefault
-        dtt.arrivalUpdate(newTime) match
+      "update the effective table with the expected departure time" in:
+          val expectedDepartureTime = Right(departureTime).getOrDefault
+          dtt.departureUpdate(expectedDepartureTime) match
           case Some(newDtt) =>
-            newDtt.effectiveTable.find(_._1 == stationB).map(_._2) shouldBe Some(TrainStationTime(Some(newTime), None, None))
+            newDtt.effectiveTable.find(_._1 == stationA).map(_._2) shouldBe Some(TrainStationTime(None, Some(0), Some(expectedDepartureTime)))
             newDtt.nextRoute shouldBe Some(stationB, stationC)
-            newDtt.nextDepartureTime shouldBe None
-            newDtt.currentRoute shouldBe None
+            newDtt.currentDelay shouldBe ClockTime(0, 0).toOption
+            newDtt.nextDepartureTime shouldBe tt.table.find(_._1 == stationB).flatMap(tte => tte._2.departure)
+            newDtt.currentRoute shouldBe Some(stationA, stationB)
             newDtt.completed shouldBe false
           case _ => fail()
+
+      "update the effective table with an effective departure time" in :
+        val expectedDepartureTime = Right(departureTime)
+        val minutesDelay = 5
+        val delay = ClockTime(0, minutesDelay)
+        val effectiveDepartureTime = (expectedDepartureTime + delay).getOrDefault
+        dtt.departureUpdate(effectiveDepartureTime) match
+          case Some(newDtt) =>
+            newDtt.effectiveTable.find(_._1 == stationA).map(_._2) shouldBe Some(TrainStationTime(None, Some(minutesDelay), Some(effectiveDepartureTime)))
+            newDtt.nextRoute shouldBe Some(stationB, stationC)
+            newDtt.currentDelay shouldBe delay.toOption
+            newDtt.nextDepartureTime shouldBe tt.table.find(_._1 == stationB).flatMap(tte => tte._2.departure + delay.toOption)
+            newDtt.currentRoute shouldBe Some(stationA, stationB)
+            newDtt.completed shouldBe false
+          case _ => fail()
+
 
