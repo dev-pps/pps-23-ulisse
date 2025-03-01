@@ -1,5 +1,8 @@
 package ulisse.infrastructures.view.timetable.model
 
+import ulisse.entities.timetable.Timetables.Timetable
+import ulisse.utils.Times.ClockTime
+
 import scala.util.Random
 
 object TimetableGUIModel:
@@ -19,7 +22,21 @@ object TimetableGUIModel:
       waitMinutes: Option[Int]
   ) extends TimetableEntry
 
-  def randomTime(): String = {
+  extension (t: Timetable)
+    def toTimetableEntries: List[TimetableEntry] =
+      extension [T](t: Option[T])
+        private def optionString: Option[String] = t.map(_.toString)
+
+      t.table.map((station, times) =>
+        TableEntryData(
+          station.name,
+          times.arriving.optionString,
+          times.departure.optionString,
+          times.waitTime
+        )
+      ).toList
+
+  private def randomTime(): String = {
     val hour   = Random.nextInt(24)
     val minute = Random.nextInt(60)
     s"$hour:$minute"
