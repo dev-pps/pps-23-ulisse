@@ -1,6 +1,6 @@
 package ulisse.entities.simulation
 
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{spy, when}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -33,14 +33,10 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val defaultTechnology  = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
   private val defaultWagon       = Wagon(UseType.Passenger, 50)
   private val defaultWagonNumber = 5
-  private val train3905 =
-    TrainAgent.apply(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
-  private val train3906 =
-    TrainAgent.apply(Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber))
-  private val train3907 =
-    TrainAgent.apply(Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber))
+  private val train3905 = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber)
+  private val train3906 = Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber)
+  private val train3907 = Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber)
   private val trains = Seq(train3905, train3906, train3907)
-
   val railsCount: Int      = 1
   val typeRoute: TypeRoute = TypeRoute.Normal
   val pathLength: Double =
@@ -120,30 +116,21 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
         timetables.map(DynamicTimetable(_)) should contain allElementsOf env.timetables
 
       "have placed the trains in their initial stations if possible and then for the others drops it with all their time tables" in:
-        val trainWithInitialStations =
+        val trainWithFirstDepartureStation =
           for
             a <- timetables.groupBy(_.train).flatMap(_._2.minByOption(_.departureTime)).map(tt =>
               (tt.train, tt.startStation)
             )
             b <- stations.find(_.name == a._2.name)
           yield (a._1, b)
+
         val allTrainsInStations =
           for
-            stationWithTrains <- trainWithInitialStations.groupBy(_._2).view.mapValues(_.map(_._1))
+            stationWithTrains <- trainWithFirstDepartureStation.groupBy(_._2).view.mapValues(_.map(_._1))
             stationEE         <- env.stations.find(_.name == stationWithTrains._1.name)
           yield
             val stationEETrains = stationEE.containers.flatMap(_.trains).map(_.name)
-            stationWithTrains._2.take(stationEETrains.size).map(_.name) should contain theSameElementsAs stationEETrains
+            stationWithTrains._2.toList.sortBy(_.name).take(stationEETrains.size).map(_.name) should contain theSameElementsAs stationEETrains
             stationEETrains should have size stationEE.containers.size
             stationEETrains
-
         env.timetables.map(_.train.name).distinct should contain theSameElementsAs allTrainsInStations.flatten.toList
-
-//    "doStep" should:
-//      "move train" in:
-//        env.agents.collect({case ta: TrainAgent => ta }).find(_.name == train3905.name) match
-//          case Some(train) =>
-//            when(train.doStep(dt, env)).thenReturn(MoveBy(movement))
-//            println(train.doStep(dt, env))
-//            fail()
-//          case None => fail()
