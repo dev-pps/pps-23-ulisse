@@ -39,6 +39,7 @@ object Environments:
     def routes: Seq[RouteEnvironmentElement]
     def agents: Seq[SimulationAgent] =
       (stations.flatMap(_.containers.flatMap(_.trains)) ++ routes.flatMap(_.containers.flatMap(_.trains))).distinct
+    def timetables: Seq[DynamicTimetable]
     def perceptionFor[A <: SimulationAgent](agent: A)(using
         provider: PerceptionProvider[RailwayEnvironment, A]
     ): Option[provider.P] =
@@ -46,10 +47,10 @@ object Environments:
 
   object RailwayEnvironment:
     def apply(
-        stations: Seq[Station],
-        routes: Seq[Route],
-        agents: Seq[Train],
-        timetables: Seq[Timetable]
+               stations: Seq[Station],
+               routes: Seq[Route],
+               trains: Seq[Train],
+               timetables: Seq[Timetable]
     ): RailwayEnvironment =
       val stationsEE             = stations.map(StationEnvironmentElement(_))
       val routesEE               = routes.map(RouteEnvironmentElement(_, 0.0))
@@ -94,9 +95,10 @@ object Environments:
     private final case class RailwayEnvironmentImpl(
         stations: Seq[StationEnvironmentElement],
         routes: Seq[RouteEnvironmentElement],
-        schedulesMap: Map[Train, Seq[DynamicTimetable]]
+        _timetables: Map[Train, Seq[DynamicTimetable]]
     ) extends RailwayEnvironment:
-
+      
+      def timetables: Seq[DynamicTimetable] = _timetables.values.flatten.toSeq
       def doStep(dt: Int): RailwayEnvironment =
         // Allow agents to be at the same time in more than an environment element
         // that because an agent when enters a station doesn't leave immediately the route and vice versa
