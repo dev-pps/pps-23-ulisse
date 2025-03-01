@@ -12,9 +12,16 @@ import scala.compiletime.{erasedValue, summonInline}
 
 /** Application state that contains all managers. */
 trait AppState:
+  /** Station manager. */
   val stationManager: StationManager
+
+  /** Route manager. */
   val routeManager: RouteManager
+
+  /** Train manager. */
   val trainManager: TrainManager
+
+  /** Timetable manager. */
   val timetableManager: TimetableManager
   val simulationManager: SimulationManager
 
@@ -24,11 +31,15 @@ trait AppState:
   /** Update station manager. */
   def updateStation(update: StationManager => StationManager): AppState
 
-  /** Update a single manager. */
-  def updateManager[M <: Managers](update: M): AppState
+  /** Update railway map. */
+  def updateMap(update: (
+      StationManager,
+      RouteManager,
+      TimetableManager
+  ) => (StationManager, RouteManager, TimetableManager)): AppState
 
-  /** Update multiple managers. */
-  def updateManagers[M <: Managers](updates: M*): AppState = updates.foldLeft(this)(_.updateManager(_))
+  /** Update train. */
+  def updateTrain(update: (TrainManager, TimetableManager) => (TrainManager, TimetableManager)): AppState
 
 object AppState:
   /** Create new application state with empty managers. */
@@ -52,12 +63,17 @@ object AppState:
       SimulationManager.emptyBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
     )
 
-    override def updateManager[M <: Managers](update: M): AppState = update match
-      case m: StationManager   => copy(stationManager = m)
-      case m: RouteManager     => copy(routeManager = m)
-      case m: TrainManager     => copy(trainManager = m)
-      case m: TimetableManager => copy(timetableManager = m)
-      case _                   => this
+    override def updateMap(update: (
+        StationManager,
+        RouteManager,
+        TimetableManager
+    ) => (StationManager, RouteManager, TimetableManager)): AppState =
+      val (newStation, newRoute, newTimetable) = update(stationManager, routeManager, timetableManager)
+      copy(stationManager = newStation, routeManager = newRoute, timetableManager = newTimetable)
+
+    override def updateTrain(update: (TrainManager, TimetableManager) => (TrainManager, TimetableManager)): AppState =
+      val (newTrainManager, newTimetableManager) = update(trainManager, timetableManager)
+      copy(trainManager = newTrainManager, timetableManager = newTimetableManager)
 
     override def updateSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState =
       copy(simulationManager = update(simulationManager, stationManager))
