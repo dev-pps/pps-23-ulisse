@@ -1,6 +1,8 @@
 package ulisse.infrastructures.view.timetable.subviews
 
+import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.TimetableEntry
+import ulisse.utils.Times.Time
 
 object Observers:
 
@@ -16,4 +18,4 @@ object Observers:
     def update(data: T): Unit
 
   trait UpdatablePreview       extends Updatable[List[TimetableEntry]]
-  trait UpdatableTimetableView extends Updatable[List[TimetableEntry]]
+  trait UpdatableTimetableView extends Updatable[List[Timetable]]
