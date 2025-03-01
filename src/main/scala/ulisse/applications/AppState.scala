@@ -25,7 +25,10 @@ trait AppState:
   def updateStation(update: StationManager => StationManager): AppState
 
   /** Update a single manager. */
-  def updateSingleManager[A <: Managers](update: A => A): AppState
+  def updateManager[M <: Managers](update: M): AppState
+
+  /** Update multiple managers. */
+  def updateManagers[M <: Managers](updates: M*): AppState = updates.foldLeft(this)(_.updateManager(_))
 
 object AppState:
   /** Create new application state with empty managers. */
@@ -49,11 +52,12 @@ object AppState:
       SimulationManager.emptyBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
     )
 
-    override def updateSingleManager[A <: Managers](update: A => A): AppState = update match
-      case update: (StationManager => StationManager)     => copy(stationManager = update(stationManager))
-      case update: (RouteManager => RouteManager)         => copy(routeManager = update(routeManager))
-      case update: (TrainManager => TrainManager)         => copy(trainManager = update(trainManager))
-      case update: (TimetableManager => TimetableManager) => copy(timetableManager = update(timetableManager))
+    override def updateManager[M <: Managers](update: M): AppState = update match
+      case m: StationManager   => copy(stationManager = m)
+      case m: RouteManager     => copy(routeManager = m)
+      case m: TrainManager     => copy(trainManager = m)
+      case m: TimetableManager => copy(timetableManager = m)
+      case _                   => this
 
     override def updateSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState =
       copy(simulationManager = update(simulationManager, stationManager))
