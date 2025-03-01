@@ -14,12 +14,12 @@ final case class StationService(private val eventQueue: EventQueue) extends Stat
 
   override def stationMap: Future[SM] =
     val p = Promise[SM]()
-    eventQueue.offerUpdateStation(stationManager => { p.success(stationManager.stations); stationManager })
+    eventQueue.addStationCreationEvent(stationManager => { p.success(stationManager.stations); stationManager })
     p.future
 
   override def addStation(station: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.offerUpdateStation(stationManager => {
+    eventQueue.addStationCreationEvent(stationManager => {
       val updatedMap = stationManager.addStation(station)
       updateState(p, stationManager, updatedMap)
     })
@@ -27,7 +27,7 @@ final case class StationService(private val eventQueue: EventQueue) extends Stat
 
   override def removeStation(station: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.offerUpdateStation(stationManager => {
+    eventQueue.addStationCreationEvent(stationManager => {
       val updatedMap = stationManager.removeStation(station)
       updateState(p, stationManager, updatedMap)
     })
@@ -35,7 +35,7 @@ final case class StationService(private val eventQueue: EventQueue) extends Stat
 
   override def updateStation(oldStation: Station, newStation: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.offerUpdateStation(stationManager => {
+    eventQueue.addStationCreationEvent(stationManager => {
       val updatedMap = stationManager.removeStation(oldStation).flatMap(_.addStation(newStation))
       updateState(p, stationManager, updatedMap)
     })
@@ -43,7 +43,7 @@ final case class StationService(private val eventQueue: EventQueue) extends Stat
 
   override def findStationAt(coordinate: Coordinate): Future[Option[Station]] =
     val p = Promise[Option[Station]]()
-    eventQueue.offerUpdateStation(stationManager => {
+    eventQueue.addStationCreationEvent(stationManager => {
       val station = stationManager.findStationAt(coordinate)
       p.success(station)
       stationManager
