@@ -11,13 +11,9 @@ import ulisse.infrastructures.view.timetable.subviews.TimetableViewerTab
 import scala.swing.{Component, Orientation}
 
 object TimetableView:
-
-  extension (panes: Map[ComposedImageLabel, Component])
-    private def toTabbedPane: JTabbedPane =
-      val tabbedPane = ComposedSwing.createTabbedPane(panes.keys.toList: _*)
-      panes.foreach((k, p) => tabbedPane.paneOf(k).contents += p)
-      tabbedPane
-
+  /** Creates timetable root view with its controller given `port`.
+    * Child views are configured to be notified from internal controller of updates.
+    */
   def apply(port: TimetablePorts.Input): Component =
     val portAdapterController = TimetableViewController(port)
     TimetableTabbedPane(portAdapterController).component

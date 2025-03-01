@@ -3,12 +3,8 @@ package ulisse.infrastructures.view.timetable
 import ulisse.applications.ports.TimetablePorts
 import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.infrastructures.view.timetable.subviews.Observers.*
-import ulisse.utils.Times.{ClockTime, Time}
-import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.{
-  generateMockTimetable,
-  TableEntryData,
-  TimetableEntry
-}
+import ulisse.utils.Times.ClockTime
+import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.{TableEntryData, TimetableEntry}
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.validateNonBlankString
 
@@ -18,6 +14,7 @@ import scala.swing.Swing
 import scala.util.{Failure, Success}
 
 object TimetableViewControllers:
+  /** Timetable view error. It contains a `title` and a `descr` (description). */
   sealed trait Error(val title: String, val descr: String) extends BaseError
   object Error:
     final case class EmptyTrainSelection(action: String) extends Error(action, "Empty train field")
@@ -27,19 +24,39 @@ object TimetableViewControllers:
         extends Error("Timetable Save request Error", msg)
     final case class RequestException(excMsg: String) extends Error("Request Exception", s"message: $excMsg")
 
+  /** Timetable view controller. */
   trait TimetableViewController extends Observed:
+    /** Returns train names. */
     def trainNames: List[String]
+
+    /** Requests timetables given the `trainName` to timetable service. */
     def requestTimetables(trainName: String): Unit
+
+    /** Requests timetable deletion given a `trainName` and `departingTime` to timetable service only
+      * if both params are present.
+      */
+    def deleteTimetable(trainName: Option[String], departingTime: Option[ClockTime]): Unit
+
+    /** Set `trainName` as train in timetable in draft and keep it until timetable draft is saved correctly. */
     def selectTrain(trainName: String): Unit
+
+    /** Set departure time draft of timetable until timetable draft is saved correctly. */
     def setDepartureTime(h: Int, m: Int): Unit
+
+    /** Insert station with `stationName` and `waitTime` to timetable draft. */
     def insertStation(stationName: String, waitTime: Option[Int]): Unit
+
+    /** Remove last inserted station from timetable draft. */
     def undoLastInsert(): Unit
-    def insertedStations(): List[TimetableEntry]
+
+    /** Reset timetable draft, forget train name, departure time and all stations. */
     def reset(): Unit
+
+    /** Save timetable draft. */
     def save(): Unit
-    def deleteTimetable(trainName: Option[String], selectedTime: Option[ClockTime]): Unit
 
   object TimetableViewController:
+    /** Creates view controller for the timetables views. It requires `port` to which communicate to save and get required infos. */
     def apply(port: TimetablePorts.Input): TimetableViewController =
       ViewControllerImpl(port)
 
@@ -121,7 +138,6 @@ object TimetableViewControllers:
         stations = List.empty
         updatePreview()
 
-      override def insertedStations(): List[TimetableEntry] = stations
       override def selectTrain(trainName: String): Unit =
         selectedTrain.foreach(_ => reset())
         selectedTrain = Some(trainName)

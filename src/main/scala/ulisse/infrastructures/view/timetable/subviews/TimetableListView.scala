@@ -10,7 +10,8 @@ import java.awt.Color
 import scala.swing.Swing.{EmptyBorder, HGlue}
 import scala.swing.*
 
-final case class TimetableListView(timeEntries: List[TimetableEntry]) extends ListView(timeEntries)
+/** Timetable `entries` list view with custom ItemRenderer. */
+final case class TimetableListView(entries: List[TimetableEntry]) extends ListView(entries)
     with Updatable[List[TimetableEntry]]:
   import scala.swing.ListView.IntervalMode
   selection.intervalMode = IntervalMode.Single
