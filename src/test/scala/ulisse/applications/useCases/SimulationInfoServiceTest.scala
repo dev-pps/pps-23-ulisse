@@ -21,7 +21,7 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
   private val mockedStationName = "mockedStation"
   private val mockedStation     = mock[Station]
   when(mockedStation.name).thenReturn(mockedStationName)
-  private val stationEE = StationEnvironmentElement(mockedStation)
+  private val stationEE          = StationEnvironmentElement(mockedStation)
   private val otherStationName   = "otherStation"
   private val otherMockedStation = mock[Station]
   when(otherMockedStation.name).thenReturn(otherStationName)
@@ -30,7 +30,7 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
   private val mockedRouteId                     = 1000
   private val mockedRoute                       = mock[Route]
   when(mockedRoute.id).thenReturn(mockedRouteId)
-  private val routeEE = RouteEnvironmentElement(mockedRoute, minPermittedDistanceBetweenTrains)
+  private val routeEE          = RouteEnvironmentElement(mockedRoute, minPermittedDistanceBetweenTrains)
   private val otherRouteId     = 2000
   private val otherMockedRoute = mock[RouteEnvironmentElement]
   when(otherMockedRoute.id).thenReturn(otherRouteId)
