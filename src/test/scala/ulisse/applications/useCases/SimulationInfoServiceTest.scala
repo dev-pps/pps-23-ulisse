@@ -21,6 +21,7 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
   private val mockedStationName = "mockedStation"
   private val mockedStation     = mock[Station]
   when(mockedStation.name).thenReturn(mockedStationName)
+  private val stationEE = StationEnvironmentElement(mockedStation)
   private val otherStationName   = "otherStation"
   private val otherMockedStation = mock[Station]
   when(otherMockedStation.name).thenReturn(otherStationName)
@@ -29,27 +30,27 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
   private val mockedRouteId                     = 1000
   private val mockedRoute                       = mock[Route]
   when(mockedRoute.id).thenReturn(mockedRouteId)
+  private val routeEE = RouteEnvironmentElement(mockedRoute, minPermittedDistanceBetweenTrains)
   private val otherRouteId     = 2000
-  private val otherMockedRoute = mock[Route]
+  private val otherMockedRoute = mock[RouteEnvironmentElement]
   when(otherMockedRoute.id).thenReturn(otherRouteId)
 
   private val mockedTrainName = "mockedTrain"
-  private val mockedTrain     = mock[Train]
+  private val mockedTrain     = mock[TrainAgent]
   when(mockedTrain.name).thenReturn(mockedTrainName)
   private val otherTrainName   = "otherTrain"
-  private val otherMockedTrain = mock[Train]
+  private val otherMockedTrain = mock[TrainAgent]
   when(otherMockedTrain.name).thenReturn(otherTrainName)
 
   private val initialState = AppState().initSimulation((simulationManager, _, _, _, _) =>
     simulationManager.setupEnvironment(
-      RailwayEnvironment(
-        Seq(mockedStation),
-        Seq(mockedRoute),
-        Seq(mockedTrain),
-        Seq()
-      )
+    RailwayEnvironment(
+      Seq(stationEE),
+      Seq(routeEE),
+      Seq(mockedTrain),
+      Seq()
     )
-  )
+  ))
 
   private val eventQueue            = EventQueue()
   private val simulationInfoService = SimulationInfoService(eventQueue)
@@ -59,7 +60,7 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
     "return station info if station is in the manager" in:
       val stationInfoResult = simulationInfoService.stationInfo(mockedStation)
       updateState()
-      Await.result(stationInfoResult, Duration.Inf) shouldBe Some(StationEnvironmentElement(mockedStation))
+      Await.result(stationInfoResult, Duration.Inf) shouldBe Some(stationEE)
 
     "return None if station is not in the manager" in:
       val stationInfoResult = simulationInfoService.stationInfo(otherMockedStation)
@@ -69,10 +70,7 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
     "return route info" in:
       val routeInfoResult = simulationInfoService.routeInfo(mockedRoute)
       updateState()
-      Await.result(routeInfoResult, Duration.Inf) shouldBe Some(RouteEnvironmentElement(
-        mockedRoute,
-        minPermittedDistanceBetweenTrains
-      ))
+      Await.result(routeInfoResult, Duration.Inf) shouldBe Some(routeEE)
 
     "return None if route is not in the manager" in:
       val routeInfoResult = simulationInfoService.routeInfo(otherMockedRoute)
