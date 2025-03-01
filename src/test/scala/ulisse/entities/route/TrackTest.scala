@@ -229,12 +229,10 @@ class TrackTest extends AnyWordSpec with Matchers:
         val train        = train3905
         val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains)
         val otherTrain   = train3906
-        val a = Track(id).putTrain(train, direction).flatMap(_.updateTrain(updatedTrain)).flatMap(_.putTrain(
+        Track(id).putTrain(train, direction).flatMap(_.updateTrain(updatedTrain)).flatMap(_.putTrain(
           otherTrain,
           direction
-        ))
-        println(a)
-        a.flatMap(
+        )).flatMap(
           _.removeTrain(train)
         ) match
           case Some(ut) =>
