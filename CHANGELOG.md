@@ -1,3 +1,12 @@
+## [1.15.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.14.1...v1.15.0) (2025-03-01)
+
+### Features
+
+* **DynamicTimetables:** introduce trait ([9080ca2](https://github.com/dev-pps/pps-23-ulisse/commit/9080ca2614644c2567fcaf5d06f1f83ffb358298))
+* **Environment:** define a perception provider type class ([04dbfd7](https://github.com/dev-pps/pps-23-ulisse/commit/04dbfd7eaf120b971266679a45261efd0cc165bb))
+* **SimulationService:** add api for setup ([809ef43](https://github.com/dev-pps/pps-23-ulisse/commit/809ef43101d2e0d12710e50be9070731872ad868))
+* **TrainAgentPerception:** define perception concept and setup train perceptions ([a7da109](https://github.com/dev-pps/pps-23-ulisse/commit/a7da10974cdd0ee160789a90339dec6abacbfe73))
+
 ## [1.14.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.14.0...v1.14.1) (2025-02-28)
 
 ### Bug Fixes
