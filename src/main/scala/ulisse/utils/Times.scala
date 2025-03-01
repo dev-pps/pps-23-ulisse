@@ -120,6 +120,13 @@ object Times:
       checkCondition(time, time2)(_ == 0)
 
   extension (time: Option[ClockTime])
+    @targetName("add")
+    def +(time2: Option[ClockTime]): Option[ClockTime] =
+      for
+        t   <- time
+        t2  <- time2
+        sum <- calculateSum(t, t2).toOption
+      yield sum
     @targetName("sub")
     def -(time2: Option[ClockTime]): Option[ClockTime] =
       for
