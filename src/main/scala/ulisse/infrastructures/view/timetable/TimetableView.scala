@@ -11,7 +11,9 @@ import ulisse.infrastructures.view.timetable.subviews.TimetableViewerTab
 import scala.swing.{Component, Orientation}
 
 object TimetableView:
-
+  /** Creates timetable root view with its controller given `port`.
+    * Child views are configured to be notified from internal controller of updates.
+    */
   def apply(port: TimetablePorts.Input): Component =
     val portAdapterController = TimetableViewController(port)
     TimetableTabbedPane(portAdapterController).component

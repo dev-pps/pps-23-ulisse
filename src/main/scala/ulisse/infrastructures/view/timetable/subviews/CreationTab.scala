@@ -13,7 +13,7 @@ import scala.swing.*
 object EditingTab:
 
   class EditorTab(controller: TimetableViewController) extends SBoxPanel(Orientation.Vertical) with UpdatablePreview:
-    private val listPreview = TimetableListView(controller.insertedStations())
+    private val listPreview = TimetableListView(List.empty)
     private val previewPane = ScrollPane(listPreview)
     private val formPane    = TimetableFormPane(controller)
     private val saveBtn     = SButton("Save")

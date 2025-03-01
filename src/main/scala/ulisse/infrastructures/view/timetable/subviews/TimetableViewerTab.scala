@@ -9,10 +9,12 @@ import ulisse.infrastructures.view.timetable.subviews.Observers.UpdatableTimetab
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel
 import ulisse.infrastructures.view.utils.SwingUtils.SFieldLabel
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
-
 import scala.swing.event.ButtonClicked
 import scala.swing.{BorderPanel, ComboBox, Orientation, ScrollPane, Swing}
 
+/** Timetable consulting tab view.
+  * It gets `controller` and observes (adhering to [[UpdatableTimetableView]]) specific updates from controller to updates timetable preview.
+  */
 class TimetableViewerTab(controller: TimetableViewController) extends SBoxPanel(Orientation.Vertical)
     with UpdatableTimetableView:
   private val trainCombo: ComboBox[String]        = ComboBox[String](controller.trainNames)
