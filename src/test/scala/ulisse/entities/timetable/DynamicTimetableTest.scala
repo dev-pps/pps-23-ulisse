@@ -68,7 +68,7 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
               newDtt.effectiveTable.find(_._1 == stationA).map(_._2) shouldBe Some(TrainStationTime(
                 None,
                 Some(0),
-                Some(expectedDepartureTime)
+                Some(departureTime)
               ))
               newDtt.nextRoute shouldBe Some(stationB, stationC)
               newDtt.currentDelay shouldBe ClockTime(0, 0).toOption
