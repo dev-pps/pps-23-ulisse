@@ -63,19 +63,19 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
 
     "updated with a departure time" should:
       "update the effective table with the expected departure time" in:
-          dtt.departureUpdate(departureTime) match
-            case Some(newDtt) =>
-              newDtt.effectiveTable.find(_._1 == stationA).map(_._2) shouldBe Some(TrainStationTime(
-                None,
-                Some(0),
-                Some(departureTime)
-              ))
-              newDtt.nextRoute shouldBe Some(stationB, stationC)
-              newDtt.currentDelay shouldBe ClockTime(0, 0).toOption
-              newDtt.nextDepartureTime shouldBe tt.table.find(_._1 == stationB).flatMap(tte => tte._2.departure)
-              newDtt.currentRoute shouldBe Some(stationA, stationB)
-              newDtt.completed shouldBe false
-            case _ => fail()
+        dtt.departureUpdate(departureTime) match
+          case Some(newDtt) =>
+            newDtt.effectiveTable.find(_._1 == stationA).map(_._2) shouldBe Some(TrainStationTime(
+              None,
+              Some(0),
+              Some(departureTime)
+            ))
+            newDtt.nextRoute shouldBe Some(stationB, stationC)
+            newDtt.currentDelay shouldBe ClockTime(0, 0).toOption
+            newDtt.nextDepartureTime shouldBe tt.table.find(_._1 == stationB).flatMap(tte => tte._2.departure)
+            newDtt.currentRoute shouldBe Some(stationA, stationB)
+            newDtt.completed shouldBe false
+          case _ => fail()
 
       "update the effective table with an effective departure time" in:
         val expectedDepartureTime  = Right(departureTime)
