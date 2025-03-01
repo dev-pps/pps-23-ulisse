@@ -1,6 +1,6 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.QueueState
+import ulisse.applications.EventQueue
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.ports.SimulationPorts
 import ulisse.entities.route.RouteEnvironmentElement
@@ -13,13 +13,13 @@ import ulisse.infrastructures.commons.TimeProviders.*
 import scala.concurrent.{Future, Promise}
 
 final case class SimulationService(
-    private val statesQueue: QueueState,
+    private val eventQueue: EventQueue,
     private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
 
   override def initSimulation(): Future[(EngineState, SimulationData)] =
     val p = Promise[(EngineState, SimulationData)]()
-    statesQueue.offerUpdateSimulation((simulationManager, stationManager) => {
+    eventQueue.offerUpdateSimulation((simulationManager, stationManager) => {
       val newSimulationManager = simulationManager.setupEnvironment(RailwayEnvironment(
         stationManager.stations.map(StationEnvironmentElement.apply),
         Seq[RouteEnvironmentElement](),
@@ -32,7 +32,7 @@ final case class SimulationService(
 
   override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Future[Option[EngineState]] = {
     val p = Promise[Option[EngineState]]()
-    statesQueue.offerUpdateSimulation((simulationManager, stationManager) => {
+    eventQueue.offerUpdateSimulation((simulationManager, stationManager) => {
       simulationManager.setupEngine(stepSize, cyclesPerSecond) match
         case Some(newSimulationManager) =>
           p.success(Some(newSimulationManager.engineState))
@@ -46,7 +46,7 @@ final case class SimulationService(
 
   def start(): Future[EngineState] =
     val p = Promise[EngineState]()
-    statesQueue.offerUpdateSimulation((simulationManager, _) => {
+    eventQueue.offerUpdateSimulation((simulationManager, _) => {
       val newSimulationManager = simulationManager.start()
       p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engineState })
       println("Start1")
@@ -57,7 +57,7 @@ final case class SimulationService(
 
   def stop(): Future[EngineState] =
     val p = Promise[EngineState]()
-    statesQueue.offerUpdateSimulation((simulationManager, _) => {
+    eventQueue.offerUpdateSimulation((simulationManager, _) => {
       val newSimulationManager = simulationManager.stop()
       p.success({ println("[SimulationService]: Simulation Stopped"); newSimulationManager.engineState })
       newSimulationManager
@@ -66,7 +66,7 @@ final case class SimulationService(
 
   def reset(): Future[EngineState] =
     val p = Promise[EngineState]()
-    statesQueue.offerUpdateSimulation((simulationManager, _) => {
+    eventQueue.offerUpdateSimulation((simulationManager, _) => {
       val newSimulationManager = simulationManager.reset()
       p.success({ println("[SimulationService]: Simulation Reset"); newSimulationManager.engineState })
       newSimulationManager
@@ -75,7 +75,7 @@ final case class SimulationService(
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   private def doStep(): Unit =
-    statesQueue.offerUpdateSimulation((simulationManager, _) => {
+    eventQueue.offerUpdateSimulation((simulationManager, _) => {
       println("Start2")
       if simulationManager.engineState.running then
         println("Start3")

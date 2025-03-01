@@ -8,7 +8,7 @@ import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.useCases.{RouteService, SimulationService, StationService}
-import ulisse.applications.{AppState, QueueState}
+import ulisse.applications.{AppState, EventQueue}
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.TrainTechnology
@@ -20,7 +20,7 @@ import ulisse.utils.Times.Time
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue}
 
-val statesQueue = QueueState()
+val eventQueue  = EventQueue()
 val eventStream = LinkedBlockingQueue[AppState => AppState]()
 
 def runEngine(): Unit =
@@ -49,13 +49,13 @@ final case class SimulationSettings():
   val simulationNotificationAdapter: SimulationNotificationAdapter =
     SimulationNotificationAdapter(simulationNoficationBridge)
 
-  val inputAdapter: SimulationService = SimulationService(statesQueue, simulationNotificationAdapter)
+  val inputAdapter: SimulationService = SimulationService(eventQueue, simulationNotificationAdapter)
 
   val simulationPageController: SimulationPageAdapter = SimulationPageAdapter(inputAdapter)
   val simulationPage: SimulationPage                  = SimulationPage(simulationPageController)
 
 final case class StationSettings():
-  val inputAdapter: StationService                  = StationService(statesQueue)
+  val inputAdapter: StationService                  = StationService(eventQueue)
   val stationEditorController: StationEditorAdapter = StationEditorAdapter(inputAdapter)
   val stationEditorView: StationEditorView          = StationEditorView(stationEditorController)
 

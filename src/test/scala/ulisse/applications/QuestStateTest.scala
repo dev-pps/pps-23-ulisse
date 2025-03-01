@@ -11,8 +11,8 @@ import ulisse.applications.managers.TrainManagers.TrainManager
 
 class QuestStateTest extends AnyFlatSpec with Matchers:
   private val initialState  = AppState()
-  private val queueState    = QueueState()
-  private def updateState() = runAll(initialState, queueState.events)
+  private val eventQueue    = EventQueue()
+  private def updateState() = runAll(initialState, eventQueue.events)
 
   "update railway map" should "update the application state" in:
     val stationManager   = mock[StationManager]
@@ -21,7 +21,7 @@ class QuestStateTest extends AnyFlatSpec with Matchers:
     val updateMap = (_: StationManager, _: RouteManager, _: TimetableManager) =>
       (stationManager, routeManager, timetableManager)
 
-    queueState.offerUpdateMap(updateMap)
+    eventQueue.offerUpdateMap(updateMap)
     val states = updateState()
 
     states.lastOption mustBe Some(initialState.updateMap(updateMap))
@@ -31,7 +31,7 @@ class QuestStateTest extends AnyFlatSpec with Matchers:
     val timetableManager = mock[TimetableManager]
     val updateTrain      = (_: TrainManager, _: TimetableManager) => (trainManager, timetableManager)
 
-    queueState.offerUpdateTrain(updateTrain)
+    eventQueue.offerUpdateTrain(updateTrain)
     val states = updateState()
 
     states.lastOption mustBe Some(initialState.updateTrain(updateTrain))
