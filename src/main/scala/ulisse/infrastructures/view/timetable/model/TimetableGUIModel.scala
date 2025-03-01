@@ -12,6 +12,13 @@ object TimetableGUIModel:
     override def toString: String =
       s"(Station: $name, arrivingAt: $arrivingTime, departingAt: $departureTime, waits: $waitMinutes min)"
 
+  case class TableEntryData(
+      name: String,
+      arrivingTime: Option[String],
+      departureTime: Option[String],
+      waitMinutes: Option[Int]
+  ) extends TimetableEntry
+
   def randomTime(): String = {
     val hour   = Random.nextInt(24)
     val minute = Random.nextInt(60)
@@ -28,10 +35,3 @@ object TimetableGUIModel:
       }
     }.toList
   }
-
-  case class TableEntryData(
-      name: String,
-      arrivingTime: Option[String],
-      departureTime: Option[String],
-      waitMinutes: Option[Int]
-  ) extends TimetableEntry
