@@ -5,9 +5,9 @@ import ulisse.infrastructures.view.common.ImagePath as ImgPath
 import ulisse.infrastructures.view.components.ExtendedSwing.SFlowPanel
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
-import ulisse.infrastructures.view.timetable.components.EditingTab.EditorTab
+import ulisse.infrastructures.view.timetable.subviews.EditingTab.EditorTab
 import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
-import ulisse.infrastructures.view.timetable.components.TimetableViewerTab
+import ulisse.infrastructures.view.timetable.subviews.TimetableViewerTab
 import scala.swing.{Component, MainFrame, Orientation}
 
 object TimetableView:

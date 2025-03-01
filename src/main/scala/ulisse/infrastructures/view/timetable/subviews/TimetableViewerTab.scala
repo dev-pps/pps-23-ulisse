@@ -1,9 +1,9 @@
-package ulisse.infrastructures.view.timetable.components
+package ulisse.infrastructures.view.timetable.subviews
 
 import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton}
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
-import ulisse.infrastructures.view.timetable.components.Observers.UpdatableTimetableView
+import ulisse.infrastructures.view.timetable.subviews.Observers.UpdatableTimetableView
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.TimetableEntry
 import ulisse.infrastructures.view.utils.SwingUtils.SFieldLabel

@@ -1,4 +1,4 @@
-package ulisse.infrastructures.view.timetable.components
+package ulisse.infrastructures.view.timetable.subviews
 
 import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SLabel}
 import ulisse.infrastructures.view.components.composed.ComposedSwing
