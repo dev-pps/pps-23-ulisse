@@ -19,6 +19,8 @@ import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Times.FluentDeclaration.h
 
+import scala.Seq
+
 class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val dt       = 1
   private val movement = 10
@@ -141,12 +143,26 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
 
     "doStep" should:
       "move train" in:
+        val env = RailwayEnvironment(
+          stations.map(StationEnvironmentElement(_)),
+          routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
+          trainAgents,
+          timetables.map(DynamicTimetable(_))
+        )
         env.agents.collect({case ta: TrainAgent => ta }).find(_.name == trainAgent3905.name) match
           case Some(train) =>
-            env.stations.flatMap(_.containers.flatMap(_.trains)).map(_.name) should contain Seq("3905")
+            env.stations.flatMap(_.containers.flatMap(_.trains)).map(_.name).contains(trainAgent3905.name) shouldBe true
             when(trainAgent3905.doStep(dt, env)).thenReturn(Some(MoveBy(movement)))
-
-//            println(train.doStep(dt, env))
-            fail()
+            val newEnv = env.doStep(dt)
+            println(routes.foreach(s => println(s.id)))
+            println(routeAB.id)
+            println(newEnv.routes.foreach(r => println(s"${r.id} ${r.departure} ${r.arrival}, $r")))
+            (newEnv.stations.find(_.name == stationA.name), newEnv.routes.find(_.id == routeAB.id)) match
+              case (Some(stationEE), Some(routeEE)) =>
+                println(routeEE)
+                println(stationEE)
+                stationEE.containers.flatMap(_.trains).map(_.name).contains(trainAgent3905.name) shouldBe false
+                routeEE.containers.flatMap(_.trains).map(_.name).contains(trainAgent3905.name) shouldBe true
+              case _ => fail()
           case None => fail()
 
