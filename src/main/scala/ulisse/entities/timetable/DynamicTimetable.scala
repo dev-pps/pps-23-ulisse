@@ -15,10 +15,16 @@ trait DynamicTimetable extends Timetable with EnvironmentElement:
     effectiveTable.routesWithTimingInfo.findRouteWhere(_.isDefined, _.isEmpty).stations
   def nextRoute: Option[(Station, Station)] =
     effectiveTable.routesWithTimingInfo.findRouteWhere(_.isEmpty, _.isEmpty).stations
+  def currentDelay: Option[ClockTime] =
+    if currentRoute.isDefined then
+      currentRoute.flatMap((ds, _) => effectiveTable.find(_._1 == ds).flatMap(_._2.departure) - table(ds).departure)
+    else
+      nextRoute.flatMap((ds, _) => effectiveTable.find(_._1 == ds).flatMap(_._2.arriving) - table(ds).arriving)
   def nextDepartureTime: Option[ClockTime] =
-    nextRoute.flatMap(nr => table(nr._1).departure)
-  def currentWaitingTime: Option[Int] =
-    table.routesWithTimingInfo2.findRouteWhere(_.isDefined, _.isEmpty).flatMap((dd, _) => dd._2.waitTime)
+    val expectedDeparture = nextRoute.flatMap(nr => table(nr._1).departure)
+    if currentDelay.isDefined then expectedDeparture + currentDelay else expectedDeparture
+//  def currentWaitingTime: Option[Int] =
+//    table.routesWithTimingInfo2.findRouteWhere(_.isDefined, _.isEmpty).flatMap((dd, _) => dd._2.waitTime)
   def completed: Boolean = nextRoute.isEmpty
   def arrivalUpdate(time: ClockTime): Option[DynamicTimetable]
   def departureUpdate(time: ClockTime): Option[DynamicTimetable]
@@ -58,7 +64,11 @@ object DynamicTimetable:
       effectiveTable.updateWhen(swti => swti._1.name == nr._1.name)(swti =>
         (
           swti._1,
-          TrainStationTime(swti._2.arriving, (Some(time) - swti._2.arriving).map(c => c.h * 60 + c.m), Some(time))
+          TrainStationTime(swti._2.arriving,
+            (Some(time) - expectedDepartureTime).map(c => c.h * 60 + c.m + expectedWaitingTime.getOrElse(0)), Some(time))
         )
       )
     ).update
+    private def expectedDepartureTime: Option[ClockTime] = nextRoute.flatMap(nr => table.find(_._1 == nr._1).flatMap(_._2.departure))
+    private def expectedWaitingTime: Option[Int] = nextRoute.flatMap(nr =>
+      table.find(_._1 == nr._1).flatMap(_._2.waitTime))
