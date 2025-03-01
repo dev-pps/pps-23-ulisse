@@ -23,11 +23,7 @@ trait DynamicTimetable extends Timetable with EnvironmentElement:
   def nextDepartureTime: Option[ClockTime] =
     val expectedDeparture = nextRoute.flatMap(nr => table(nr._1).departure)
     if currentDelay.isDefined then expectedDeparture + currentDelay else expectedDeparture
-//  def currentWaitingTime: Option[Int] =
-//    table.routesWithTimingInfo2.findRouteWhere(_.isDefined, _.isEmpty).flatMap((dd, _) => dd._2.waitTime)
-  def completed: Boolean =
-    println(nextRoute)
-    nextRoute.isEmpty
+  def completed: Boolean = nextRoute.isEmpty
   def arrivalUpdate(time: ClockTime): Option[DynamicTimetable]
   def departureUpdate(time: ClockTime): Option[DynamicTimetable]
 
