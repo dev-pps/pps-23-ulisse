@@ -1,7 +1,6 @@
 package ulisse.applications
 
 import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
-import ulisse.applications.AppState.Managers
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
@@ -23,6 +22,8 @@ trait AppState:
 
   /** Timetable manager. */
   val timetableManager: TimetableManager
+
+  /** Simulation manager. */
   val simulationManager: SimulationManager
 
   /** Update simulation manager. */
@@ -44,9 +45,6 @@ trait AppState:
 object AppState:
   /** Create new application state with empty managers. */
   def apply(): AppState = new AppStateImpl()
-
-  /** [[Managers]] that can be updated. */
-  type Managers = StationManager | RouteManager | TrainManager | TimetableManager
 
   private case class AppStateImpl(
       stationManager: StationManager,

@@ -1,8 +1,7 @@
 package ulisse.applications
 
-import ulisse.applications.AppState.{AppStateImpl, Managers}
 import ulisse.applications.managers.{SimulationManager, StationManager}
-import ulisse.applications.AppState.Managers
+import ulisse.applications.AppState
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
@@ -28,9 +27,6 @@ trait QueueState:
   /** Start the queue. */
   def play(initState: AppState): Unit
 
-  /** Update a single manager. */
-  def updateSingleManager[A <: Managers](update: A => A): Unit
-
   def offerUpdateStation(update: StationManager => StationManager): Unit
 
   def offerUpdateSimulation(update: (SimulationManager, StationManager) => SimulationManager): Unit
@@ -47,7 +43,6 @@ object QueueState:
         RouteManager,
         TimetableManager
     ) => (StationManager, RouteManager, TimetableManager)): Unit = events.offer(_.updateMap(update))
-    override def updateSingleManager[A <: Managers](state: A => A): Unit = ()
 
     override def offerUpdateTrain(update: (TrainManager, TimetableManager) => (TrainManager, TimetableManager)): Unit =
       events.offer(_ updateTrain update)
