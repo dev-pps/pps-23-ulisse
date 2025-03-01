@@ -1,11 +1,11 @@
-package ulisse.infrastructures.view.timetable.components
+package ulisse.infrastructures.view.timetable.subviews
 
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton}
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
-import ulisse.infrastructures.view.timetable.components.EditingTab.EditorTab
-import ulisse.infrastructures.view.timetable.components.Observers.UpdatablePreview
+import ulisse.infrastructures.view.timetable.subviews.EditingTab.EditorTab
+import ulisse.infrastructures.view.timetable.subviews.Observers.UpdatablePreview
 import scala.swing.Swing.{EmptyBorder, HGlue}
 import scala.swing.event.ButtonClicked
 import scala.swing.*

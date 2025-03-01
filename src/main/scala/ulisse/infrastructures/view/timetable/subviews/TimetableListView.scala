@@ -1,7 +1,7 @@
-package ulisse.infrastructures.view.timetable.components
+package ulisse.infrastructures.view.timetable.subviews
 
 import ulisse.infrastructures.view.components.ExtendedSwing.createSVGPanel
-import ulisse.infrastructures.view.timetable.components.Observers.Updatable
+import ulisse.infrastructures.view.timetable.subviews.Observers.Updatable
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.TimetableEntry
 import ulisse.infrastructures.view.utils.SwingUtils.headerLabel
 import ulisse.infrastructures.view.utils.SwingUtils
