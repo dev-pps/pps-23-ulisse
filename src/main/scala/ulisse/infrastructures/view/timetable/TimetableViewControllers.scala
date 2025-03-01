@@ -6,7 +6,7 @@ import ulisse.infrastructures.view.timetable.TimetableViewControllers.Error.{
   RequestException,
   TimetableSaveError
 }
-import ulisse.infrastructures.view.timetable.components.Observers.{UpdatablePreview, UpdatableTimetableView}
+import ulisse.infrastructures.view.timetable.subviews.Observers.{UpdatablePreview, UpdatableTimetableView}
 import ulisse.utils.Times.{ClockTime, Time}
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.{
   generateMockTimetable,
