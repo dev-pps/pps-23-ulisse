@@ -37,6 +37,10 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val train3906 = Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber)
   private val train3907 = Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber)
   private val trains = Seq(train3905, train3906, train3907)
+  private val trainAgent3905 = spy(TrainAgent(train3905))
+  private val trainAgent3906 = spy(TrainAgent(train3906))
+  private val trainAgent3907 = spy(TrainAgent(train3907))
+  private val trainAgents    = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
   val railsCount: Int      = 1
   val typeRoute: TypeRoute = TypeRoute.Normal
   val pathLength: Double =
@@ -93,7 +97,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val env = RailwayEnvironment(
     stations.map(StationEnvironmentElement(_)),
     routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
-    trains.map(TrainAgent(_)),
+    trainAgents,
     timetables.map(DynamicTimetable(_))
   )
 
@@ -134,3 +138,15 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
             stationEETrains should have size stationEE.containers.size
             stationEETrains
         env.timetables.map(_.train.name).distinct should contain theSameElementsAs allTrainsInStations.flatten.toList
+
+    "doStep" should:
+      "move train" in:
+        env.agents.collect({case ta: TrainAgent => ta }).find(_.name == trainAgent3905.name) match
+          case Some(train) =>
+            env.stations.flatMap(_.containers.flatMap(_.trains)).map(_.name) should contain Seq("3905")
+            when(trainAgent3905.doStep(dt, env)).thenReturn(Some(MoveBy(movement)))
+
+//            println(train.doStep(dt, env))
+            fail()
+          case None => fail()
+

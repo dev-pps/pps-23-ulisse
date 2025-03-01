@@ -48,25 +48,34 @@ object Environments:
         trains: Seq[TrainAgent],
         dynamicTimetables: Seq[DynamicTimetable]
     ): RailwayEnvironment =
-      val timetablesByTrainId           = orderedTimetablesByTrainId(trains, dynamicTimetables)
+      val timetablesByTrainId    = orderedTimetablesByTrainId(trains, dynamicTimetables)
       val stationsEEInitialState = timetablesByTrainId.putTrainsInInitialStations(stationsEE)
       RailwayEnvironmentImpl(
         stationsEEInitialState,
         routesEE,
-        timetablesByTrainId.filter(t => stationsEEInitialState.flatMap(_.containers).flatMap(_.trains).contains(t._1)).toMap
+        timetablesByTrainId.filter(t =>
+          stationsEEInitialState.flatMap(_.containers).flatMap(_.trains).contains(t._1)
+        ).toMap
       )
 
-    private def orderedTimetablesByTrainId(trains: Seq[TrainAgent], timetables: Seq[DynamicTimetable]): List[(TrainAgent, Seq[DynamicTimetable])] =
-      def mapTrainsWithTimeTables(trains: Seq[TrainAgent], timetables: Seq[DynamicTimetable]): Seq[(TrainAgent, DynamicTimetable)] =
+    private def orderedTimetablesByTrainId(
+        trains: Seq[TrainAgent],
+        timetables: Seq[DynamicTimetable]
+    ): List[(TrainAgent, Seq[DynamicTimetable])] =
+      def mapTrainsWithTimeTables(
+          trains: Seq[TrainAgent],
+          timetables: Seq[DynamicTimetable]
+      ): Seq[(TrainAgent, DynamicTimetable)] =
         timetables.flatMap: tt =>
           trains.find(_.name == tt.train.name) match
             case Some(trainAgent) => Some(trainAgent -> tt)
-            case _ => None
+            case _                => None
 
       def groupByTrainId(timetables: Seq[(TrainAgent, DynamicTimetable)]): List[(TrainAgent, Seq[DynamicTimetable])] =
         timetables.groupBy(_._1).view.mapValues(_.map(_._2)).toList
 
-      def sortTimetablesByTrainName(timetables: Seq[(TrainAgent, DynamicTimetable)]): Seq[(TrainAgent, DynamicTimetable)] =
+      def sortTimetablesByTrainName(timetables: Seq[(TrainAgent, DynamicTimetable)])
+          : Seq[(TrainAgent, DynamicTimetable)] =
         timetables.sortBy(_._1.name)
 
       groupByTrainId(mapTrainsWithTimeTables(trains, timetables)).sortBy(_._1.name)
@@ -75,26 +84,38 @@ object Environments:
 //        (t._1, t._2.sortBy(_.departureTime))
 //      ).toList.sortBy(_._1.name)
 
-
     extension (timetablesByTrainId: List[(TrainAgent, Seq[DynamicTimetable])])
       private def putTrainsInInitialStations(stationsEE: Seq[StationEnvironmentElement])
           : Seq[StationEnvironmentElement] =
-        def sortTimetablesByDepartureTime(timetablesByTrainId: List[(TrainAgent, Seq[DynamicTimetable])]): List[(TrainAgent, Seq[DynamicTimetable])] =
+        def sortTimetablesByDepartureTime(timetablesByTrainId: List[(TrainAgent, Seq[DynamicTimetable])])
+            : List[(TrainAgent, Seq[DynamicTimetable])] =
           timetablesByTrainId.map(e => (e._1, e._2.sortBy(_.departureTime)))
 
-        def takeFirstTimetableForTrains(timetablesByTrainId: List[(TrainAgent, Seq[DynamicTimetable])]): List[(TrainAgent, Option[DynamicTimetable])] =
+        def takeFirstTimetableForTrains(timetablesByTrainId: List[(TrainAgent, Seq[DynamicTimetable])])
+            : List[(TrainAgent, Option[DynamicTimetable])] =
           timetablesByTrainId.map(e => (e._1, e._2.headOption))
 
-        def updateStationEE(stationsEE: Seq[StationEnvironmentElement], timetable: DynamicTimetable, trainAgent: TrainAgent): Option[Seq[StationEnvironmentElement]] =
+        def updateStationEE(
+            stationsEE: Seq[StationEnvironmentElement],
+            timetable: DynamicTimetable,
+            trainAgent: TrainAgent
+        ): Option[Seq[StationEnvironmentElement]] =
           stationsEE.updateWhenWithEffects(station => station.name == timetable.startStation.name)(
-              _.putTrain(trainAgent)
+            _.putTrain(trainAgent)
           )
 
-        takeFirstTimetableForTrains(sortTimetablesByDepartureTime(timetablesByTrainId)).foldLeft(stationsEE)((stationsEE, tt) =>
-            tt._2.flatMap(updateStationEE(stationsEE, _, tt._1)).getOrElse(stationsEE))
+        takeFirstTimetableForTrains(sortTimetablesByDepartureTime(timetablesByTrainId)).foldLeft(stationsEE)(
+          (stationsEE, tt) =>
+            tt._2.flatMap(updateStationEE(stationsEE, _, tt._1)).getOrElse(stationsEE)
+        )
 
     def empty(): RailwayEnvironment =
-      apply(Seq[StationEnvironmentElement](), Seq[RouteEnvironmentElement](), Seq[TrainAgent](), Seq[DynamicTimetable]())
+      apply(
+        Seq[StationEnvironmentElement](),
+        Seq[RouteEnvironmentElement](),
+        Seq[TrainAgent](),
+        Seq[DynamicTimetable]()
+      )
 
     given PerceptionProvider[RailwayEnvironment, TrainAgent] with
       type P = TrainAgentPerception
