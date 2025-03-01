@@ -1,17 +1,14 @@
 package ulisse.infrastructures.view.timetable
 
 import ulisse.applications.ports.TimetablePorts
-import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
-import ulisse.infrastructures.view.common.ImagePath as ImgPath
-import ulisse.infrastructures.view.components.ExtendedSwing.SFlowPanel
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
 import ulisse.infrastructures.view.timetable.subviews.EditingTab.EditorTab
 import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
-import ulisse.infrastructures.view.timetable.components.SavedTab
+import ulisse.infrastructures.view.timetable.subviews.Observers.ErrorObserver
+import ulisse.infrastructures.view.timetable.subviews.TimetableViewerTab
 
-trait TimetableUpdateListener:
-  def showError(errorMessage: String): Unit
+import scala.swing.{Component, Orientation}
 
 object TimetableView:
 
@@ -23,23 +20,35 @@ object TimetableView:
 
   def apply(port: TimetablePorts.Input): Component =
     val portAdapterController = TimetableViewController(port)
-    timetableTabbedPane(portAdapterController).component
+    TimetableTabbedPane(portAdapterController).component
 
-  private def timetableTabbedPane(controller: TimetableViewController): JTabbedPane =
+  private class TimetableTabbedPane(controller: TimetableViewController) extends JTabbedPane with ErrorObserver:
     given orientation: Orientation.Value = Orientation.Horizontal
-    val formIcon                         = ComposedImageLabel.createIcon("icons/calendar_add_on.svg", "Create")
-    val savedIcon                        = ComposedImageLabel.createIcon("icons/calendar_clock.svg", "Saved")
-    val formTab                          = EditorTab(controller)
-    val timetableViewer                  = TimetableViewerTab(controller)
+    private val formIcon                 = ComposedImageLabel.createIcon("icons/calendar_add_on.svg", "Create")
+    private val savedIcon                = ComposedImageLabel.createIcon("icons/calendar_clock.svg", "Saved")
+    private val formTab                  = EditorTab(controller)
+    private val timetableViewer          = TimetableViewerTab(controller)
+    import ulisse.infrastructures.view.utils.SwingUtils.toTabbedPane
+    private val tabbedPane =
+      Map(
+        formIcon  -> formTab,
+        savedIcon -> timetableViewer
+      ).toTabbedPane
     controller.addTimetableViewListener(timetableViewer)
     controller.addPreviewListener(formTab)
-//    controller.addErrorListener(this)
-    import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
+    controller.addErrorObserver(this)
 
-    Map(
-      formIcon  -> formTab,
-      savedIcon -> timetableViewer
-    ).toTabbedPane
+    override def component[T >: Component]: T = tabbedPane.component
+
+    override def showError(title: String, descr: String): Unit =
+      import scala.swing.Dialog
+      import scala.swing.Dialog.Message
+      Dialog.showMessage(
+        this.component,
+        descr,
+        title,
+        Message.Error
+      )
 
 @main def timetableViewDemoGUI(): Unit =
   import ulisse.infrastructures.view.utils.SwingUtils.showPreview
