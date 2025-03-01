@@ -1,24 +1,34 @@
 package ulisse.applications
 
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar.mock
+import ulisse.applications.AppState.Managers
+import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
-import ulisse.entities.station.Station
+
+import scala.compiletime.{erasedValue, summonInline}
+import scala.reflect.ClassTag
 
 class AppStateTest extends AnyFlatSpec with Matchers:
   private val appState = AppState()
 
-  "AppState" should "update a single manager" in:
-    val updateManager  = mock[StationManager => StationManager]
-    val stationManager = mock[StationManager]
-    val station        = mock[Station]
+  "update manager" should "update a single manager" in:
+    val stationManager  = mock[StationManager]
+    val updatedAppState = appState.updateManager(stationManager)
 
-    when(updateManager(any[StationManager])).thenReturn(stationManager)
-    when(stationManager.stations).thenReturn(List(station))
-
-    val updatedAppState = appState.updateSingleManager(updateManager)
     appState must not be updatedAppState
-    updatedAppState.stationManager.stations must be(List(station))
+    updatedAppState.stationManager mustBe stationManager
+
+  "update non-existing manager" should "not update the application state" in:
+    val updatedAppState = appState.updateManager(mock[Managers])
+    appState mustBe updatedAppState
+
+  "update multiple managers" should "update all managers" in:
+    val stationManager  = mock[StationManager]
+    val routeManager    = mock[RouteManager]
+    val updatedAppState = appState.updateManagers(stationManager, routeManager)
+
+    appState must not be updatedAppState
+    updatedAppState.stationManager mustBe stationManager
+    updatedAppState.routeManager mustBe routeManager
