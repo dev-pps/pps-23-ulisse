@@ -1,12 +1,13 @@
 package ulisse.entities.train
 
 import ulisse.entities.route.Routes.TypeRoute
-import ulisse.entities.simulation.Environments.{Perception, PerceptionData, RailwayEnvironment}
+import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.simulation.{Environments, SimulationAgent}
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.simulation.Environments.RailwayEnvironment.*
 import ulisse.entities.simulation.Environments.RailwayEnvironment.given
+import ulisse.entities.simulation.Perceptions.{Perception, PerceptionData}
 import ulisse.entities.timetable.DynamicTimetable
 import ulisse.entities.timetable.Timetables.Timetable
 
