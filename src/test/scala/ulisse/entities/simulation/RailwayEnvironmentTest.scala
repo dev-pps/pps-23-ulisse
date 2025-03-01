@@ -45,7 +45,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
 
   val railsCount: Int = 1
   val typeRoute: TypeRoute = TypeRoute.Normal
-  val pathLength: Double = 2 * minPermittedDistanceBetweenTrains + train3905.lengthSize + train3906.lengthSize + train3907.lengthSize
+  val pathLength: Double = trains.foldLeft(2 * minPermittedDistanceBetweenTrains)((length, trainAgent) => length + trainAgent.lengthSize)
   private def routeAB: Route =
     Route(stationA, stationB, typeRoute, railsCount, pathLength) match
       case Left(errors) => fail()
@@ -69,29 +69,30 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   val timeTable1: Timetable =
     TimetableBuilder(
       train = train3905,
-      startStation = stationA,
+      startStation = stationD,
       departureTime = h(20).m(0).getOrDefault
-    ).stopsIn(stationB, waitTime = 5)(railAV_10)
-     .transitIn(stationC)(railAV_10)
-     .arrivesTo(stationD)(railAV_10)
+    ).stopsIn(stationC, waitTime = 5)(railAV_10)
+      .transitIn(stationB)(railAV_10)
+      .arrivesTo(stationA)(railAV_10)
 
   val timeTable2: Timetable =
     TimetableBuilder(
       train = train3905,
-      startStation = stationD,
+      startStation = stationA,
       departureTime = h(8).m(0).getOrDefault
-    ).stopsIn(stationC, waitTime = 5)(railAV_10)
-      .transitIn(stationB)(railAV_10)
-      .arrivesTo(stationA)(railAV_10)
+    ).stopsIn(stationB, waitTime = 5)(railAV_10)
+      .transitIn(stationC)(railAV_10)
+      .arrivesTo(stationD)(railAV_10)
 
   val timeTable3: Timetable =
     TimetableBuilder(
       train = train3906,
       startStation = stationA,
-      departureTime = h(80).m(0).getOrDefault
+      departureTime = h(8).m(0).getOrDefault
     ).stopsIn(stationB, waitTime = 5)(railAV_10)
       .transitIn(stationC)(railAV_10)
       .arrivesTo(stationD)(railAV_10)
+
   private val timetables = Seq(timeTable1, timeTable2, timeTable3)
 
 
@@ -110,16 +111,26 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
       "have all routes" in:
         env.routes should contain theSameElementsAs routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains))
 
-      "have all trains associated with a timetable" in:
+      "have at least a subset of all trains associated with a timetable" in:
         val timetablesTrains = timetables.map(_.train).distinct
-        env.agents should contain theSameElementsAs trains.filter(timetablesTrains.contains(_)).map(TrainAgent(_))
+        trains.filter(timetablesTrains.contains(_)).map(TrainAgent(_)) should contain allElementsOf env.agents
 
-      "have all timetables" in:
-        env.timetables should contain theSameElementsAs timetables.map(DynamicTimetable(_))
+      "have at least a subset of all timetables" in:
+         timetables.map(DynamicTimetable(_)) should contain allElementsOf env.timetables
 
-      "have placed all trains in their initial stations" in:
-        timetables.groupBy(_.train).foreachEntry: (train, timetables) =>
-          for
-           firstTimetable <- timetables.minByOption(_.departureTime)
-           stationEE <- env.stations.find(_.name == firstTimetable.startStation.name)
-          yield stationEE.containers.flatMap(_.trains).map(_.name) should contain(train.name)
+      "have placed the trains in their initial stations if possible and then for the others drops it with all their time tables" in:
+        val trainWithInitialStations = for
+          a <- timetables.groupBy(_.train).flatMap(_._2.minByOption(_.departureTime)).map(tt => (tt.train, tt.startStation))
+          b <- stations.find(_.name == a._2.name)
+        yield  (a._1, b)
+        val allTrainsInStations = for
+         stationWithTrains <- trainWithInitialStations.groupBy(_._2).view.mapValues(_.map(_._1))
+         stationEE <- env.stations.find(_.name == stationWithTrains._1.name)
+        yield
+          val stationEETrains = stationEE.containers.flatMap(_.trains).map(_.name)
+          stationWithTrains._2.take(stationEETrains.size).map(_.name) should contain theSameElementsAs stationEETrains
+          stationEETrains should have size stationEE.containers.size
+          stationEETrains
+
+        env.timetables.map(_.train.name).distinct should contain theSameElementsAs allTrainsInStations.flatten.toList
+

@@ -57,7 +57,9 @@ object Environments:
       val dynamicTimeTables      = timetables.map(DynamicTimetable(_))
       val schedulesMap           = orderedScheduleByTrain(dynamicTimeTables)
       val stationsEEInitialState = schedulesMap.putTrainsInInitialStations(stationsEE)
-      RailwayEnvironmentImpl(stationsEEInitialState, routesEE, schedulesMap.map(identity))
+      RailwayEnvironmentImpl(stationsEEInitialState, routesEE,
+        schedulesMap.filter(t => stationsEEInitialState.flatMap(_.containers).flatMap(_.trains).contains(t._1)).map(identity)
+      )
 
     private def orderedScheduleByTrain(timetables: Seq[DynamicTimetable]): Map[TrainAgent, Seq[DynamicTimetable]] =
       timetables.map(tt => TrainAgent(tt.train) -> tt).groupBy(_._1).view.mapValues(_.map(_._2)).toMap.map(t =>
