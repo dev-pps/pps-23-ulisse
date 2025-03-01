@@ -97,7 +97,7 @@ object Environments:
         routes: Seq[RouteEnvironmentElement],
         _timetables: Map[Train, Seq[DynamicTimetable]]
     ) extends RailwayEnvironment:
-      
+
       def timetables: Seq[DynamicTimetable] = _timetables.values.flatten.toSeq
       def doStep(dt: Int): RailwayEnvironment =
         // Allow agents to be at the same time in more than an environment element
