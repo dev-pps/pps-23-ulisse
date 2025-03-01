@@ -43,15 +43,12 @@ object Environments:
   object RailwayEnvironment:
 
     def apply(
-        stations: Seq[Station],
-        routes: Seq[Route],
-        trains: Seq[Train],
-        timetables: Seq[Timetable]
+        stationsEE: Seq[StationEnvironmentElement],
+        routesEE: Seq[RouteEnvironmentElement],
+        trains: Seq[TrainAgent],
+        dynamicTimetables: Seq[DynamicTimetable]
     ): RailwayEnvironment =
-      val stationsEE             = stations.map(StationEnvironmentElement(_))
-      val routesEE               = routes.map(RouteEnvironmentElement(_, 0.0))
-      val dynamicTimeTables      = timetables.map(DynamicTimetable(_))
-      val schedulesMap           = orderedScheduleByTrain(dynamicTimeTables)
+      val schedulesMap           = orderedScheduleByTrain(dynamicTimetables)
       val stationsEEInitialState = schedulesMap.putTrainsInInitialStations(stationsEE)
       RailwayEnvironmentImpl(
         stationsEEInitialState,
@@ -78,7 +75,7 @@ object Environments:
         )
 
     def empty(): RailwayEnvironment =
-      apply(Seq[Station](), Seq[Route](), Seq[Train](), Seq[Timetable]())
+      apply(Seq[StationEnvironmentElement](), Seq[RouteEnvironmentElement](), Seq[TrainAgent](), Seq[DynamicTimetable]())
 
     given PerceptionProvider[RailwayEnvironment, TrainAgent] with
       type P = TrainAgentPerception

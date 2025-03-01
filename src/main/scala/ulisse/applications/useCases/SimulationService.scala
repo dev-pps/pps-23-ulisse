@@ -8,6 +8,8 @@ import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
 import ulisse.entities.station.{Station, StationEnvironmentElement}
+import ulisse.entities.timetable.DynamicTimetable
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.infrastructures.commons.TimeProviders.*
 import ulisse.utils.Times
 import ulisse.utils.Times.Time
@@ -19,15 +21,15 @@ final case class SimulationService(
     private val eventQueue: LinkedBlockingQueue[AppState => AppState],
     private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
-
+  private val minPermittedDistanceBetweenTrains: Double = 100.0
   override def initSimulation(): Future[(EngineState, SimulationData)] =
     val p = Promise[(EngineState, SimulationData)]()
     eventQueue.add((appState: AppState) => {
       val newSimulationManager = appState.simulationManager.setupEnvironment(RailwayEnvironment(
-        appState.stationManager.stations,
-        appState.routeManager.routes,
-        appState.trainManager.trains,
-        appState.timetableManager.tables
+        appState.stationManager.stations.map(StationEnvironmentElement(_)),
+        appState.routeManager.routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
+        appState.trainManager.trains.map(TrainAgent(_)),
+        appState.timetableManager.tables.map(DynamicTimetable(_))
       ))
       p.success((newSimulationManager.engineState, newSimulationManager.simulationData))
       appState.copy(simulationManager = newSimulationManager)

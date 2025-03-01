@@ -95,10 +95,10 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val timetables = Seq(timeTable1, timeTable2, timeTable3)
 
   private val env = RailwayEnvironment(
-    stations,
-    routes,
-    trains,
-    timetables
+    stations.map(StationEnvironmentElement(_)),
+    routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
+    trains.map(TrainAgent(_)),
+    timetables.map(DynamicTimetable(_))
   )
 
   "RailwayEnvironment" when:
