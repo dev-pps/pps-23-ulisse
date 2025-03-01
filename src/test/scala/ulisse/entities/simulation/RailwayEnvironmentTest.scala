@@ -116,3 +116,10 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
 
       "have all timetables" in:
         env.timetables should contain theSameElementsAs timetables.map(DynamicTimetable(_))
+
+      "have placed all trains in their initial stations" in:
+        timetables.groupBy(_.train).foreachEntry: (train, timetables) =>
+          for
+           firstTimetable <- timetables.minByOption(_.departureTime)
+           stationEE <- env.stations.find(_.name == firstTimetable.startStation.name)
+          yield stationEE.containers.flatMap(_.trains).map(_.name) should contain(train.name)
