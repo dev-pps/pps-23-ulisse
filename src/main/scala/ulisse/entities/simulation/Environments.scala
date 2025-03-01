@@ -4,6 +4,7 @@ import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.findIn
+import ulisse.entities.simulation.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.station.StationEnvironmentElement.*
@@ -26,13 +27,7 @@ import scala.collection.immutable.ListMap
 
 object Environments:
   trait Environment
-  trait Perception[PD <: PerceptionData]:
-    def perceptionData: PD
-  trait PerceptionData
 
-  trait PerceptionProvider[E <: Environment, A <: SimulationAgent]:
-    type P <: Perception[?]
-    def perceptionFor(environment: E, agent: A): Option[P]
   trait RailwayEnvironment extends Environment:
     def doStep(dt: Int): RailwayEnvironment
     def stations: Seq[StationEnvironmentElement]
@@ -46,19 +41,24 @@ object Environments:
       provider.perceptionFor(this, agent)
 
   object RailwayEnvironment:
+
     def apply(
-               stations: Seq[Station],
-               routes: Seq[Route],
-               trains: Seq[Train],
-               timetables: Seq[Timetable]
+        stations: Seq[Station],
+        routes: Seq[Route],
+        trains: Seq[Train],
+        timetables: Seq[Timetable]
     ): RailwayEnvironment =
       val stationsEE             = stations.map(StationEnvironmentElement(_))
       val routesEE               = routes.map(RouteEnvironmentElement(_, 0.0))
       val dynamicTimeTables      = timetables.map(DynamicTimetable(_))
       val schedulesMap           = orderedScheduleByTrain(dynamicTimeTables)
       val stationsEEInitialState = schedulesMap.putTrainsInInitialStations(stationsEE)
-      RailwayEnvironmentImpl(stationsEEInitialState, routesEE,
-        schedulesMap.filter(t => stationsEEInitialState.flatMap(_.containers).flatMap(_.trains).contains(t._1)).map(identity)
+      RailwayEnvironmentImpl(
+        stationsEEInitialState,
+        routesEE,
+        schedulesMap.filter(t => stationsEEInitialState.flatMap(_.containers).flatMap(_.trains).contains(t._1)).map(
+          identity
+        )
       )
 
     private def orderedScheduleByTrain(timetables: Seq[DynamicTimetable]): Map[TrainAgent, Seq[DynamicTimetable]] =

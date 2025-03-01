@@ -19,10 +19,8 @@ import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Times.FluentDeclaration.h
 
-
-
 class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
-  private val dt = 1
+  private val dt       = 1
   private val movement = 10
   private val stationA = Station("A", Coordinate(0, 0), 1)
   private val stationB = Station("B", Coordinate(0, 1), 1)
@@ -32,8 +30,8 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
 
   given minPermittedDistanceBetweenTrains: Double = 100.0
 
-  private val defaultTechnology = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
-  private val defaultWagon = Wagon(UseType.Passenger, 50)
+  private val defaultTechnology  = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
+  private val defaultWagon       = Wagon(UseType.Passenger, 50)
   private val defaultWagonNumber = 5
   private val train3905 =
     TrainAgent.apply(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
@@ -43,9 +41,10 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
     TrainAgent.apply(Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber))
   private val trains = Seq(train3905, train3906, train3907)
 
-  val railsCount: Int = 1
+  val railsCount: Int      = 1
   val typeRoute: TypeRoute = TypeRoute.Normal
-  val pathLength: Double = trains.foldLeft(2 * minPermittedDistanceBetweenTrains)((length, trainAgent) => length + trainAgent.lengthSize)
+  val pathLength: Double =
+    trains.foldLeft(2 * minPermittedDistanceBetweenTrains)((length, trainAgent) => length + trainAgent.lengthSize)
   private def routeAB: Route =
     Route(stationA, stationB, typeRoute, railsCount, pathLength) match
       case Left(errors) => fail()
@@ -95,12 +94,11 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
 
   private val timetables = Seq(timeTable1, timeTable2, timeTable3)
 
-
   private val env = RailwayEnvironment(
     stations,
     routes,
     trains,
-    timetables,
+    timetables
   )
 
   "RailwayEnvironment" when:
@@ -109,28 +107,43 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
         env.stations.map(_.name) should contain theSameElementsAs stations.map(_.name)
 
       "have all routes" in:
-        env.routes should contain theSameElementsAs routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains))
+        env.routes should contain theSameElementsAs routes.map(RouteEnvironmentElement(
+          _,
+          minPermittedDistanceBetweenTrains
+        ))
 
       "have at least a subset of all trains associated with a timetable" in:
         val timetablesTrains = timetables.map(_.train).distinct
         trains.filter(timetablesTrains.contains(_)).map(TrainAgent(_)) should contain allElementsOf env.agents
 
       "have at least a subset of all timetables" in:
-         timetables.map(DynamicTimetable(_)) should contain allElementsOf env.timetables
+        timetables.map(DynamicTimetable(_)) should contain allElementsOf env.timetables
 
       "have placed the trains in their initial stations if possible and then for the others drops it with all their time tables" in:
-        val trainWithInitialStations = for
-          a <- timetables.groupBy(_.train).flatMap(_._2.minByOption(_.departureTime)).map(tt => (tt.train, tt.startStation))
-          b <- stations.find(_.name == a._2.name)
-        yield  (a._1, b)
-        val allTrainsInStations = for
-         stationWithTrains <- trainWithInitialStations.groupBy(_._2).view.mapValues(_.map(_._1))
-         stationEE <- env.stations.find(_.name == stationWithTrains._1.name)
-        yield
-          val stationEETrains = stationEE.containers.flatMap(_.trains).map(_.name)
-          stationWithTrains._2.take(stationEETrains.size).map(_.name) should contain theSameElementsAs stationEETrains
-          stationEETrains should have size stationEE.containers.size
-          stationEETrains
+        val trainWithInitialStations =
+          for
+            a <- timetables.groupBy(_.train).flatMap(_._2.minByOption(_.departureTime)).map(tt =>
+              (tt.train, tt.startStation)
+            )
+            b <- stations.find(_.name == a._2.name)
+          yield (a._1, b)
+        val allTrainsInStations =
+          for
+            stationWithTrains <- trainWithInitialStations.groupBy(_._2).view.mapValues(_.map(_._1))
+            stationEE         <- env.stations.find(_.name == stationWithTrains._1.name)
+          yield
+            val stationEETrains = stationEE.containers.flatMap(_.trains).map(_.name)
+            stationWithTrains._2.take(stationEETrains.size).map(_.name) should contain theSameElementsAs stationEETrains
+            stationEETrains should have size stationEE.containers.size
+            stationEETrains
 
         env.timetables.map(_.train.name).distinct should contain theSameElementsAs allTrainsInStations.flatten.toList
 
+//    "doStep" should:
+//      "move train" in:
+//        env.agents.collect({case ta: TrainAgent => ta }).find(_.name == train3905.name) match
+//          case Some(train) =>
+//            when(train.doStep(dt, env)).thenReturn(MoveBy(movement))
+//            println(train.doStep(dt, env))
+//            fail()
+//          case None => fail()
