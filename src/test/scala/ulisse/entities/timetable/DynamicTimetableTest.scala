@@ -92,3 +92,35 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
           case _ => fail()
 
 
+    "updated with an arrival time" should:
+      "update the effective table with the expected arrival time" in:
+        val expectedArrivalTime = dtt.table(stationB).arriving match
+          case Some(at) => dtt.arrivalUpdate(at) match
+            case Some(newDtt) =>
+              newDtt.effectiveTable.find(_._1 == stationB).map(_._2) shouldBe Some(TrainStationTime(Some(at), None, None))
+              newDtt.nextRoute shouldBe Some(stationB, stationC)
+              newDtt.currentDelay shouldBe ClockTime(0, 0).toOption
+              newDtt.nextDepartureTime shouldBe dtt.table(stationB).departure
+              newDtt.currentRoute shouldBe None
+              newDtt.completed shouldBe false
+            case _ => fail()
+          case _        => fail()
+
+      "update the effective table with an effective arrival time" in :
+        val expectedArrivalTime = dtt.table(stationB).arriving
+        val minutesDelay = 5
+        val delay = ClockTime(0, minutesDelay).toOption
+        val effectiveArrivalTime = (expectedArrivalTime + delay) match
+          case Some(at) =>
+            dtt.arrivalUpdate(at) match
+            case Some(newDtt) =>
+              newDtt.effectiveTable.find(_._1 == stationB).map(_._2) shouldBe Some(TrainStationTime(Some(at), None, None))
+              newDtt.nextRoute shouldBe Some(stationB, stationC)
+              newDtt.currentDelay shouldBe delay
+              newDtt.nextDepartureTime shouldBe dtt.table(stationB).departure + delay
+              newDtt.currentRoute shouldBe None
+              newDtt.completed shouldBe false
+            case _ => fail()
+          case _ => fail()
+
+
