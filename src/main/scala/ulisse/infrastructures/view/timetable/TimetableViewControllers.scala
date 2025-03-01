@@ -1,30 +1,19 @@
 package ulisse.infrastructures.view.timetable
 
 import ulisse.applications.ports.TimetablePorts
-import ulisse.infrastructures.view.timetable.TimetableViewControllers.Error.{
-  EmptyDepartureTime,
-  EmptyStationField,
-  EmptyTrainSelection,
-  RequestException,
-  TimetableSaveError
-}
-import ulisse.infrastructures.view.timetable.subviews.Observers.{
-  ErrorObserver,
-  Observed,
-  UpdatablePreview,
-  UpdatableTimetableView
-}
+import ulisse.entities.timetable.Timetables.Timetable
+import ulisse.infrastructures.view.timetable.subviews.Observers.*
 import ulisse.utils.Times.{ClockTime, Time}
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.{
   generateMockTimetable,
   TableEntryData,
   TimetableEntry
 }
-import ulisse.utils.Errors.{BaseError, ErrorMessage}
+import ulisse.utils.Errors.BaseError
 import ulisse.utils.ValidationUtils.validateNonBlankString
 
 import java.util.concurrent.Executors
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.Swing
 import scala.util.{Failure, Success}
 
@@ -40,7 +29,7 @@ object TimetableViewControllers:
 
   trait TimetableViewController extends Observed:
     def trainNames: List[String]
-    def requestTimetable(trainName: String, time: Time): Unit
+    def requestTimetables(trainName: String): Unit
     def selectTrain(trainName: String): Unit
     def setDepartureTime(h: Int, m: Int): Unit
     def insertStation(stationName: String, waitTime: Option[Int]): Unit
@@ -48,15 +37,17 @@ object TimetableViewControllers:
     def insertedStations(): List[TimetableEntry]
     def reset(): Unit
     def save(): Unit
-    def deleteTimetable(trainName: String, selectedTime: Time): Unit
+    def deleteTimetable(trainName: Option[String], selectedTime: Option[ClockTime]): Unit
 
   object TimetableViewController:
     def apply(port: TimetablePorts.Input): TimetableViewController =
-      ViewControllerImpl(port, generateMockTimetable(0))
+      ViewControllerImpl(port)
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private class ViewControllerImpl(port: TimetablePorts.Input, private var stations: List[TimetableEntry])
+    private class ViewControllerImpl(port: TimetablePorts.Input)
         extends TimetableViewController:
+      import ulisse.infrastructures.view.timetable.TimetableViewControllers.Error.*
+      private var stations: List[TimetableEntry]                = List.empty
       private var selectedTrain: Option[String]                 = None
       private var startTime: Option[ClockTime]                  = None
       private var timetablePreview: Option[UpdatablePreview]    = None
@@ -72,6 +63,8 @@ object TimetableViewControllers:
 
       private def showError(err: Error): Unit =
         errorObserver.foreach(o => Swing.onEDT(o.showError(err.title, err.descr)))
+
+      override def trainNames: List[String] = List("Rv-3908", "AV-1000", "RV-2020")
 
       override def insertStation(stationName: String, waitTime: Option[Int]): Unit =
         import Error.{EmptyDepartureTime, EmptyTrainSelection}
@@ -95,7 +88,13 @@ object TimetableViewControllers:
         stations = stations.dropRight(1)
         updatePreview()
 
-      override def trainNames: List[String] = List("Rv-3908", "AV-1000", "RV-2020")
+      override def deleteTimetable(trainName: Option[String], departureTime: Option[ClockTime]): Unit =
+        for
+          t       <- trainName
+          depTime <- departureTime
+        yield port.deleteTimetable(t, depTime).handleOnComplete: updatedTimetables =>
+          timetableView.map(_.update(updatedTimetables))
+
       override def save(): Unit =
         println("request port to save timetable")
         val errorTitle = "Save timetable"
@@ -107,25 +106,13 @@ object TimetableViewControllers:
 
         res match
           case Left(err) => showError(TimetableSaveError(err.descr))
-          case Right(fs) =>
-            fs.onComplete {
-              case Failure(exc) => showError(RequestException(exc.getMessage))
-              case Success(Right(l)) =>
-                reset()
-                println(s"updated list of timetables: done")
-              case Success(Left(err)) => showError(RequestException(s"SERVICE: $err"))
-            }
+          case Right(fs) => fs.handleOnComplete(_ => reset())
 
-      override def requestTimetable(trainName: String, time: Time): Unit =
+      override def requestTimetables(trainName: String): Unit =
         port.timetablesOf(trainName).onComplete {
-          case Failure(exc)       => showError(RequestException(exc.getMessage))
-          case Success(Left(err)) => showError(RequestException(s"SERVICE: $err"))
-          case Success(Right(l)) =>
-            l.find(_.departureTime.asTime == time).map: tt =>
-              val timetable = tt.table.map((st, t) =>
-                TableEntryData(st.name, t.arriving.map(_.toString), t.departure.map(_.toString), t.waitTime)
-              ).toList
-              timetableView.map(_.update(timetable))
+          case Failure(exc)               => showError(RequestException(exc.getMessage))
+          case Success(Left(err))         => showError(RequestException(s"SERVICE: $err"))
+          case Success(Right(timetables)) => timetableView.map(_.update(timetables))
         }
 
       override def reset(): Unit =
@@ -142,13 +129,18 @@ object TimetableViewControllers:
         startTime.foreach(_ => reset())
         startTime = ClockTime(h, m).toOption
 
-      override def deleteTimetable(trainName: String, selectedTime: Time): Unit =
-        val res = port.deleteTimetable(trainName, ClockTime(selectedTime.h, selectedTime.m).getOrDefault)
-
       override def addTimetableViewListener(timetableViewer: UpdatableTimetableView): Unit =
         timetableView = Some(timetableViewer)
       override def addPreviewListener(previewObserver: UpdatablePreview): Unit =
         timetablePreview = Some(previewObserver)
-
       override def addErrorObserver(errObserver: ErrorObserver): Unit =
         errorObserver = Some(errObserver)
+
+      import ulisse.applications.ports.TimetablePorts.RequestResult
+      extension (toComplete: Future[RequestResult])
+        private def handleOnComplete(onSuccess: List[Timetable] => Unit): Unit =
+          toComplete.onComplete {
+            case Failure(e)         => showError(RequestException(e.getMessage))
+            case Success(Left(err)) => showError(RequestException(s"SERVICE: $err"))
+            case Success(Right(r))  => onSuccess(r)
+          }

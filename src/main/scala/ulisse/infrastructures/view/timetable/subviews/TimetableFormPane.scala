@@ -34,8 +34,8 @@ class TimetableFormPane(controller: TimetableViewController)
   }
   resetBtn.reactions += {
     case ButtonClicked(_) =>
-      controller.reset()
       clearFields()
+      controller.reset()
   }
 
   // Hours and Minutes ComboBox
