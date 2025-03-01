@@ -49,6 +49,7 @@ lazy val root = (project in file("."))
       "org.scalatestplus"      %% "mockito-5-10"      % "3.2.18.0" % Test,
       "org.scalatest"          %% "scalatest"         % "3.2.19"   % Test,
       "io.cucumber"            %% "cucumber-scala"    % "8.25.1"   % Test,
+      "it.unibo.alice.tuprolog" % "tuprolog"          % "3.3.0",
       "com.tngtech.archunit"    % "archunit"          % "1.3.0"    % Test,
       "org.junit.jupiter"       % "junit-jupiter-api" % "5.10.3"   % Test
       ),
