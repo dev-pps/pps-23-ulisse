@@ -1,11 +1,9 @@
 package ulisse.infrastructures.view.timetable.model
 
 import ulisse.entities.timetable.Timetables.Timetable
-import ulisse.utils.Times.ClockTime
-
-import scala.util.Random
 
 object TimetableGUIModel:
+
   trait TimetableEntry:
     def name: String
     def arrivingTime: Option[String]
@@ -26,7 +24,6 @@ object TimetableGUIModel:
     def toTimetableEntries: List[TimetableEntry] =
       extension [T](t: Option[T])
         private def optionString: Option[String] = t.map(_.toString)
-
       t.table.map((station, times) =>
         TableEntryData(
           station.name,
@@ -36,19 +33,18 @@ object TimetableGUIModel:
         )
       ).toList
 
-  private def randomTime(): String = {
+  import scala.util.Random
+  private def randomTime(): String =
     val hour   = Random.nextInt(24)
     val minute = Random.nextInt(60)
     s"$hour:$minute"
-  }
 
-  def generateMockTimetable(size: Int): List[TimetableEntry] = {
-    (1 to size).map { i =>
+  def generateMockTimetable(size: Int): List[TimetableEntry] =
+    (1 to size).map(i =>
       new TimetableEntry {
         val name                          = s"Station $i"
         val arrivingTime: Option[String]  = Some(randomTime())
         val departureTime: Option[String] = Some(randomTime())
         val waitMinutes: Option[Int]      = Option.when(Random.nextBoolean())(Random.nextInt(30))
       }
-    }.toList
-  }
+    ).toList

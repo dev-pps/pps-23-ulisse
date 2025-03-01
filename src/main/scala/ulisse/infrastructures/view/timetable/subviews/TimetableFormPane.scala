@@ -11,6 +11,7 @@ import scala.swing.event.ButtonClicked
 import scala.swing.{ComboBox, Orientation}
 import scala.util.Try
 
+/** Timetable creation form containing fields to select train, departing time and stations sequence. */
 class TimetableFormPane(controller: TimetableViewController)
     extends SBoxPanel(Orientation.Vertical):
   private val waitMinutesField             = SwingUtils.SNumberField(5)
