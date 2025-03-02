@@ -44,11 +44,15 @@ object Environments:
         trains: Seq[TrainAgent],
         dynamicTimetables: Seq[DynamicTimetable]
     ): RailwayEnvironment =
-      val sortedTimetablesByTrainId    = orderedTimetablesByTrainId(trains, dynamicTimetables)
-      val stationsEEInitialState = sortedTimetablesByTrainId.putTrainsInInitialStations(stationsEE)
+      val distinctStationsEE = stationsEE.distinctBy(_.name)
+      val distinctRoutesEE    = routesEE.distinctBy(_.id)
+      val distinctTrains       = trains.distinctBy(_.name)
+      val distinctDynamicTimetables   = dynamicTimetables.distinctBy(table => (table.train.name, table.startStation.name, table.departureTime, table.table))
+      val sortedTimetablesByTrainId    = orderedTimetablesByTrainId(distinctTrains, distinctDynamicTimetables)
+      val stationsEEInitialState = sortedTimetablesByTrainId.putTrainsInInitialStations(distinctStationsEE)
       RailwayEnvironmentImpl(
         stationsEEInitialState,
-        routesEE,
+        distinctRoutesEE,
         sortedTimetablesByTrainId.filter(t =>
           stationsEEInitialState.flatMap(_.containers).flatMap(_.trains).contains(t._1)
         ).map(t => (t._1.name, t._2)).toMap
