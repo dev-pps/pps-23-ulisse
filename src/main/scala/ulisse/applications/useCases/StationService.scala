@@ -1,7 +1,7 @@
 package ulisse.applications.useCases
 
 import cats.data.NonEmptyChain
-import ulisse.applications.{EventQueue, StationEventQueue}
+import ulisse.applications.StationEventQueue
 import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinate
@@ -13,9 +13,7 @@ final case class StationService(private val eventQueue: StationEventQueue) exten
 
   override def stationMap: Future[SM] =
     val p = Promise[SM]()
-    eventQueue.addUpdateStationEvent((stationManager, routeManager) =>
-      p.success(stationManager.stations); (stationManager, routeManager)
-    )
+    eventQueue.addReadStationEvent(stationManager => { p.success(stationManager.stations); stationManager })
     p.future
 
   override def addStation(station: Station): Future[Either[E, SM]] =
@@ -28,23 +26,23 @@ final case class StationService(private val eventQueue: StationEventQueue) exten
 
   override def removeStation(station: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.addCreateStationEvent(stationManager => {
+    eventQueue.addDeleteStationEvent((stationManager, routeManager, timetableManager) => {
       val updatedMap = stationManager.removeStation(station)
-      updateState(p, stationManager, updatedMap)
+      (updateState(p, stationManager, updatedMap), routeManager, timetableManager)
     })
     p.future
 
   override def updateStation(oldStation: Station, newStation: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.addCreateStationEvent(stationManager => {
+    eventQueue.addUpdateStationEvent((stationManager, routeManager, timetableManager) => {
       val updatedMap = stationManager.removeStation(oldStation).flatMap(_.addStation(newStation))
-      updateState(p, stationManager, updatedMap)
+      (updateState(p, stationManager, updatedMap), routeManager, timetableManager)
     })
     p.future
 
   override def findStationAt(coordinate: Coordinate): Future[Option[Station]] =
     val p = Promise[Option[Station]]()
-    eventQueue.addCreateStationEvent(stationManager => {
+    eventQueue.addReadStationEvent(stationManager => {
       val station = stationManager.findStationAt(coordinate)
       p.success(station)
       stationManager

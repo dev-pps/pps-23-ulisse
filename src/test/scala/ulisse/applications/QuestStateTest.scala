@@ -22,9 +22,9 @@ class QuestStateTest extends AnyFlatSpec with Matchers:
     states.lastOption mustBe Some(initialState.updateStation(updateStation))
 
   "add update station event" should "update railway network" in:
-    eventQueue.addUpdateStationEvent(updateRailwayNetwork)
+    eventQueue.addUpdateStationEvent(updateStationSchedule)
     val states = updateState()
-    states.lastOption mustBe Some(initialState.updateRailwayNetwork(updateRailwayNetwork))
+    states.lastOption mustBe Some(initialState.updateStationSchedule(updateStationSchedule))
 
   "add delete station event" should "update station schedule" in:
     eventQueue.addDeleteStationEvent(updateStationSchedule)
