@@ -28,5 +28,5 @@ object StationEnvironmentElement:
         updatedContainers       <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train))
       yield copy(containers = updatedContainers)) when !contains(train)
 
-    override protected def buildNewEnvironmentElement(containers: Seq[Platform]): StationEnvironmentElement =
+    override protected def updateEEContainers(containers: Seq[Platform]): StationEnvironmentElement =
       copy(containers = containers)

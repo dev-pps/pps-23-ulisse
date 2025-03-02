@@ -1,15 +1,16 @@
 package ulisse.entities.simulation
 
-import ulisse.entities.station.Platform
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.utils.OptionUtils.when
 import ulisse.utils.CollectionUtils.updateWhenWithEffects
-import ulisse.utils.OptionUtils.given_Conversion_Option_Option
+import ulisse.utils.OptionUtils.{given_Conversion_Option_Option, when}
 
+/** Contains the EnvironmentElements objects used in the simulation */
 object EnvironmentElements:
-
+  
+  /** Represents an element of the simulation environment*/
   trait EnvironmentElement
 
+  /** A data structure that contains trains */
   trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
     self: TAC =>
     def id: Int
@@ -18,40 +19,56 @@ object EnvironmentElements:
     def removeTrain(train: TrainAgent): Option[TAC]
     def contains(train: TrainAgent): Boolean = trains.exists(train.matchId)
     def isEmpty: Boolean                     = trains.isEmpty
-
+  
+  /** Companion object for TrainAgentsContainer */
   object TrainAgentsContainer:
-    /** Creates a List of `TrainAgentContainer[TAC]` instance. If the specified numberOfContainers is not positive an empty List is returned */
-    def generateSequentialContainers[TAC <: TrainAgentsContainer[TAC]](
+    /** Creates a List of `TrainAgentContainer[?]` instance. If the specified numberOfContainers is not positive an empty List is returned */
+    def generateSequentialContainers[TAC <: TrainAgentsContainer[?]](
         constructor: Int => TAC,
         numberOfContainers: Int
     ): List[TAC] =
       val step: Int => Int = _ + 1
       List.tabulate(numberOfContainers)(i => constructor(step(i)))
-
+  
+  /** An Environment Element that contains multiple TrainAgentsContainer of the same type */
   trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE]] extends EnvironmentElement:
     self: EE =>
-    // TODO evaluate if make sense to make it stricter putting at generic level
+    /** The type of the TrainAgentsContainer */
     type TAC <: TrainAgentsContainer[TAC]
+    
+    /** The list of TrainAgentsContainer */
     def containers: Seq[TAC]
-    def updateTrain(train: TrainAgent): Option[EE] = updaterTemplate(train, _.updateTrain(train), contains(train))
-    def removeTrain(train: TrainAgent): Option[EE] = updaterTemplate(train, _.removeTrain(train), contains(train))
+    
+    /** Try to update the train in the respective container if it's present */
+    def updateTrain(train: TrainAgent): Option[EE] = updateEE(train, _.updateTrain(train), contains(train))
+    
+    /** Try to remove the train from the respective container if it's present */
+    def removeTrain(train: TrainAgent): Option[EE] = updateEE(train, _.removeTrain(train), contains(train))
+    
+    /** Check if the provided train is present inside the element containers */
     def contains(train: TrainAgent): Boolean       = containers.exists(_.contains(train))
 
-    private def updaterTemplate(
+    private def updateEE(
         trainAgent: TrainAgent,
         updateFunction: TAC => Option[TAC],
         condition: Boolean
     ): Option[EE] =
       containers.updateWhenWithEffects(_.contains(trainAgent))(updateFunction).map(tracks =>
-        buildNewEnvironmentElement(tracks)
+        updateEEContainers(tracks)
       ) when condition
+    
+    /** Update the containers with the provided sequence */
+    protected def updateEEContainers(containers: Seq[TAC]): EE
 
-    protected def buildNewEnvironmentElement(containers: Seq[TAC]): EE
-
+  /** Companion object for TrainAgentEEWrapper */
   object TrainAgentEEWrapper:
+    
+    /** Extension methods for train agent */
     extension [EE <: TrainAgentEEWrapper[EE]](train: TrainAgent)
+      /** Try to remove the train from the provided environmentElement */
       def leave(ee: EE): Option[EE] =
         ee.removeTrain(train)
-
+        
+      /** Search the train in the provided list of environmentElement */
       def findIn(eeSeq: Seq[EE]): Option[EE] =
         eeSeq.find(_.contains(train))
