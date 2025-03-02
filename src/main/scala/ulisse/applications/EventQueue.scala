@@ -30,14 +30,18 @@ trait StationEventQueue:
   def addCreateStationEvent(event: StationManager => StationManager): Unit = addReadStationEvent(event)
 
   /** Add an event to update a station. */
-  def addUpdateStationEvent(event: (StationManager, RouteManager) => (StationManager, RouteManager)): Unit
+  def addUpdateStationEvent(event: (
+      StationManager,
+      RouteManager,
+      TimetableManager
+  ) => (StationManager, RouteManager, TimetableManager)): Unit
 
   /** Add an event to delete a station. */
   def addDeleteStationEvent(event: (
       StationManager,
       RouteManager,
       TimetableManager
-  ) => (StationManager, RouteManager, TimetableManager)): Unit
+  ) => (StationManager, RouteManager, TimetableManager)): Unit = addUpdateStationEvent(event)
 
 /** Event queue to update the route. */
 trait RouteEventQueue:
@@ -120,10 +124,7 @@ object EventQueue:
     override def addReadStationEvent(event: StationManager => StationManager): Unit =
       events.offer(_.updateStation(event))
 
-    override def addUpdateStationEvent(event: (StationManager, RouteManager) => (StationManager, RouteManager)): Unit =
-      events.offer(_.updateRailwayNetwork(event))
-
-    override def addDeleteStationEvent(event: (
+    override def addUpdateStationEvent(event: (
         StationManager,
         RouteManager,
         TimetableManager
