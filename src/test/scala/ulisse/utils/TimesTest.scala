@@ -21,7 +21,14 @@ class TimesTest extends AnyWordSpec with Matchers:
         59,
         59
       ).toSeconds shouldBe 23 * Time.minutesInHour * Time.secondsInMinute + 59 * Time.secondsInMinute + 59
-
+    
+    "be converted in minutes" in:
+      Time(1, 1, 1).toMinutes shouldBe 1 * Time.minutesInHour + 1
+      Time(0, 0, 0).toMinutes shouldBe 0
+      Time(0, 0, 59).toMinutes shouldBe 0
+      Time(0, 59, 80).toMinutes shouldBe 60
+      Time(23, 59, 59).toMinutes shouldBe 23 * Time.minutesInHour + 59
+    
   "ClockTime" should:
     "validate non in range values of hours and minutes" in:
       ClockTime(h = -12, m = 30) should be(Left(InvalidHours(Time(-12, 30, 0))))

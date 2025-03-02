@@ -1,7 +1,7 @@
 package ulisse.utils
 
-import cats.{Functor, Id, Monad}
 import cats.syntax.all.*
+import cats.{Functor, Monad}
 import ulisse.utils.Errors.{BaseError, ErrorMessage}
 
 import scala.annotation.targetName
@@ -29,7 +29,7 @@ object Times:
     val secondsInMinute, minutesInHour = 60
     extension (time: Time)
       def toSeconds: Int = time.h * secondsInMinute * minutesInHour + time.m * secondsInMinute + time.s
-
+      def toMinutes: Int = time.h * minutesInHour + time.m + time.s / secondsInMinute
     private case class TimeImpl(h: Hour, m: Minute, s: Second) extends Time
 
   trait ClockTime extends Time:
@@ -135,7 +135,7 @@ object Times:
 
   given TimeConstructor[Either[ClockTimeErrors, ClockTime]] with
     def construct(h: Int, m: Int, s: Int): Either[ClockTimeErrors, ClockTime] = ClockTime(h, m)
-
+  
   given [M[_]: Functor]: Conversion[M[Time], M[ClockTime]] = _.map(t => ClockTime(t.h, t.m).getOrDefault)
   extension [M[_]: Monad, T <: Time](time: M[T])
     @targetName("add")
