@@ -194,10 +194,16 @@ object Environments:
         else updateAgentInStation(agent, time)
 
       private def updateAgentOnRoute(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
-        agent.findIn(routes).flatMap(routeUpdateFunction(_, agent, time))
+        agent.findIn(routes).flatMap(r =>
+          println("ROUTE UPDATE FUNCTION")
+          routeUpdateFunction(r, agent, time)
+        )
 
       private def updateAgentInStation(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
-        agent.findIn(stations).flatMap(stationUpdateFunction(_, agent, time))
+        agent.findIn(stations).flatMap(s =>
+          println("STATION UPDATE FUNCTION")
+          stationUpdateFunction(s, agent, time)
+        )
 
       private def routeUpdateFunction(
           route: RouteEnvironmentElement,
@@ -209,11 +215,12 @@ object Environments:
             for
               ree <- route.removeTrain(agent)
               re = routes.updateWhen(_.id == ree.id)(_ => ree)
+              _  = println(s"REMOVE TRAIN FROM ROUTE")
               tt  <- findCurrentTimeTableFor(agent)
-              utt <- tt.arrivalUpdate(ClockTime(time.h, time.m).getOrDefault)
-              dt = _timetables.toList.updateWhen(_._1 == agent.name)(e =>
-                (e._1, e._2.updateWhen(dtt => dtt.table == utt.table)(_ => utt))
-              ).toMap
+              ct  <- ClockTime(time.h, time.m).toOption
+              utt <- tt.arrivalUpdate(ct)
+              _  = println(s"AU: ${utt.effectiveTable}]")
+              dt = _timetables.map((k, v) => if v.contains(tt) then (k, v.updateWhen(_ == tt)(_ => utt)) else (k, v))
               currentRoute <- tt.currentRoute
               see          <- stations.find(currentRoute._2.name == _.name)
               usee         <- see.putTrain(agent.resetDistanceTravelled())
@@ -231,9 +238,7 @@ object Environments:
           se = stations.updateWhen(_.name == see.name)(_ => see)
           tt  <- findCurrentTimeTableFor(agent)
           utt <- tt.departureUpdate(ClockTime(time.h, time.m).getOrDefault)
-          dt = _timetables.toList.updateWhen(_._1 == agent.name)(e =>
-            (e._1, e._2.updateWhen(dtt => dtt.table == utt.table)(_ => utt))
-          ).toMap
+          dt = _timetables.map((k, v) => if v.contains(tt) then (k, v.updateWhen(_ == tt)(_ => utt)) else (k, v))
           nextRoute         <- tt.nextRoute
           routeAndDirection <- findRouteWithTravelDirection(nextRoute)
           ree               <- routes.find(routeAndDirection._1.id == _.id)
