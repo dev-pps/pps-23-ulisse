@@ -6,6 +6,7 @@ import ulisse.entities.timetable.DynamicTimetable.*
 import ulisse.entities.timetable.Timetables.{StationTime, Timetable}
 import ulisse.utils.Times.{-, ClockTime, InvalidHours}
 import ulisse.utils.CollectionUtils.updateWhen
+import ulisse.utils.Times.given
 
 import scala.collection.immutable.ListMap
 
