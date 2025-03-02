@@ -25,6 +25,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val dt       = 1
   private val movement = 10
   private val stationA = Station("A", Coordinate(0, 0), 1)
+  private val stationA2 = Station("A", Coordinate(0, 0), 3)
   private val stationB = Station("B", Coordinate(0, 1), 1)
   private val stationC = Station("C", Coordinate(0, 2), 1)
   private val stationD = Station("D", Coordinate(0, 3), 1)
@@ -36,10 +37,12 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val defaultWagon       = Wagon(UseType.Passenger, 50)
   private val defaultWagonNumber = 5
   private val train3905 = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber)
+  private val train39052 = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber + 1)
   private val train3906 = Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber)
   private val train3907 = Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber)
   private val trains = Seq(train3905, train3906, train3907)
   private val trainAgent3905 = spy(TrainAgent(train3905))
+  private val trainAgent39052 = spy(TrainAgent(train39052))
   private val trainAgent3906 = spy(TrainAgent(train3906))
   private val trainAgent3907 = spy(TrainAgent(train3907))
   private val trainAgents    = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
@@ -47,8 +50,12 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   val typeRoute: TypeRoute = TypeRoute.Normal
   val pathLength: Double =
     trains.foldLeft(2 * minPermittedDistanceBetweenTrains)((length, trainAgent) => length + trainAgent.lengthSize)
-  private def routeAB: Route =
+  private val routeAB: Route =
     Route(stationA, stationB, typeRoute, railsCount, pathLength) match
+      case Left(errors) => fail()
+      case Right(route) => route
+  private val routeAB2: Route =
+    Route(stationA, stationB, typeRoute, railsCount, pathLength + 1) match
       case Left(errors) => fail()
       case Right(route) => route
   private val routeBC: Route =
@@ -85,6 +92,15 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
       .transitIn(stationC)(railAV_10)
       .arrivesTo(stationD)(railAV_10)
 
+  val timeTable22: Timetable =
+    TimetableBuilder(
+      train = train39052,
+      startStation = stationA,
+      departureTime = h(8).m(0).getOrDefault
+    ).stopsIn(stationB, waitTime = 5)(railAV_10)
+      .transitIn(stationC)(railAV_10)
+      .arrivesTo(stationD)(railAV_10)
+
   val timeTable3: Timetable =
     TimetableBuilder(
       train = train3906,
@@ -108,7 +124,28 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
       "have all stations" in:
         env.stations.map(_.name) should contain theSameElementsAs stations.map(_.name)
 
+      "exclude in order duplicate stations" in:
+        val env = RailwayEnvironment(
+          (stations :+ stationA2).map(StationEnvironmentElement(_)),
+          routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
+          trainAgents,
+          timetables.map(DynamicTimetable(_))
+        )
+        env.stations.map(s => (s.name, s.numberOfTracks)) should contain theSameElementsAs stations.map(s => (s.name, s.numberOfTracks))
+
       "have all routes" in:
+        env.routes should contain theSameElementsAs routes.map(RouteEnvironmentElement(
+          _,
+          minPermittedDistanceBetweenTrains
+        ))
+
+      "exclude in order duplicate routes" in:
+        val env = RailwayEnvironment(
+          stations.map(StationEnvironmentElement(_)),
+          (routes :+ routeAB2).map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
+          trainAgents,
+          timetables.map(DynamicTimetable(_))
+        )
         env.routes should contain theSameElementsAs routes.map(RouteEnvironmentElement(
           _,
           minPermittedDistanceBetweenTrains
@@ -118,8 +155,28 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
         val timetablesTrains = timetables.map(_.train).distinct
         trains.filter(timetablesTrains.contains(_)).map(TrainAgent(_)) should contain allElementsOf env.agents
 
+      "exclude in order duplicate trains" in:
+        val env = RailwayEnvironment(
+          stations.map(StationEnvironmentElement(_)),
+          routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
+          (trainAgents :+ trainAgent39052),
+          timetables.map(DynamicTimetable(_))
+        )
+        val trains = env.agents.collect({case t: TrainAgent => (t.name, t.length)})
+        trains.filter(_._1 == train3905.name) shouldBe Seq((trainAgent3905.name, defaultWagonNumber))
+
       "have at least a subset of all timetables" in:
         timetables.map(DynamicTimetable(_)) should contain allElementsOf env.timetables
+
+      "exclude in order duplicate timetables" in:
+        val env = RailwayEnvironment(
+          stations.map(StationEnvironmentElement(_)),
+          routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
+          trainAgents,
+          (timetables :+ timeTable22).map(DynamicTimetable(_))
+        )
+        env.timetables should contain allElementsOf Seq(DynamicTimetable(timeTable2))
+        env.timetables should not contain DynamicTimetable(timeTable22)
 
       "have placed the trains in their initial stations if possible and then for the others drops it with all their time tables" in:
         val trainWithFirstDepartureStation =
