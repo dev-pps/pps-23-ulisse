@@ -14,12 +14,18 @@ import ulisse.entities.station.StationEnvironmentElement.*
 import ulisse.entities.timetable.{DynamicTimetable, Timetables, TrainStationTime}
 import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.entities.train.TrainAgents
-import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentPerception, TrainAgentPerceptionData, TrainRouteInfo, TrainStationInfo}
+import ulisse.entities.train.TrainAgents.{
+  TrainAgent,
+  TrainAgentPerception,
+  TrainAgentPerceptionData,
+  TrainRouteInfo,
+  TrainStationInfo
+}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.Times
 import ulisse.entities.timetable.DynamicTimetable.*
-import ulisse.utils.Times.Time
+import ulisse.utils.Times.{ClockTime, Time}
 
 import scala.collection.immutable.ListMap
 
@@ -48,13 +54,15 @@ object Environments:
         dynamicTimetables: Seq[DynamicTimetable]
     ): RailwayEnvironment =
       val distinctStationsEE = stationsEE.distinctBy(_.name)
-      val distinctRoutesEE    = routesEE.distinctBy(_.id)
-      val distinctTrains       = trains.distinctBy(_.name)
-      val distinctDynamicTimetables   = dynamicTimetables.distinctBy(table => (table.train.name, table.startStation.name, table.departureTime, table.table))
-      val sortedTimetablesByTrainId    = orderedTimetablesByTrainId(distinctTrains, distinctDynamicTimetables)
-      val stationsEEInitialState = sortedTimetablesByTrainId.putTrainsInInitialStations(distinctStationsEE)
+      val distinctRoutesEE   = routesEE.distinctBy(_.id)
+      val distinctTrains     = trains.distinctBy(_.name)
+      val distinctDynamicTimetables = dynamicTimetables.distinctBy(table =>
+        (table.train.name, table.startStation.name, table.departureTime, table.table)
+      )
+      val sortedTimetablesByTrainId = orderedTimetablesByTrainId(distinctTrains, distinctDynamicTimetables)
+      val stationsEEInitialState    = sortedTimetablesByTrainId.putTrainsInInitialStations(distinctStationsEE)
       RailwayEnvironmentImpl(
-        Time(0,0,0),
+        Time(0, 0, 0),
         stationsEEInitialState,
         distinctRoutesEE,
         sortedTimetablesByTrainId.filter(t =>
@@ -79,7 +87,7 @@ object Environments:
         timetables.groupBy(_._1).view.mapValues(_.map(_._2)).toList
 
       def sortTimetablesByDepartureTime(timetablesByTrainId: List[(TrainAgent, Seq[DynamicTimetable])])
-      : List[(TrainAgent, Seq[DynamicTimetable])] =
+          : List[(TrainAgent, Seq[DynamicTimetable])] =
         timetablesByTrainId.map(e => (e._1, e._2.sortBy(_.departureTime)))
 
       sortTimetablesByDepartureTime(groupByTrainId(mapTrainsWithTimeTables(trains, timetables)).sortBy(_._1.name))
@@ -101,10 +109,9 @@ object Environments:
             _.putTrain(trainAgent)
           )
 
-        takeFirstTimetableForTrains(sortedTimetablesByTrainId).foldLeft(stationsEE)(
-          (stationsEE, tt) =>
-            println(s"eya $tt")
-            tt._2.flatMap(updateStationEE(stationsEE, _, tt._1)).getOrElse(stationsEE)
+        takeFirstTimetableForTrains(sortedTimetablesByTrainId).foldLeft(stationsEE)((stationsEE, tt) =>
+          println(s"eya $tt")
+          tt._2.flatMap(updateStationEE(stationsEE, _, tt._1)).getOrElse(stationsEE)
         )
 
     def empty(): RailwayEnvironment =
@@ -130,7 +137,7 @@ object Environments:
               case _ => None
 
     private final case class RailwayEnvironmentImpl(
-        time: Time,
+        time: Id[Time],
         stations: Seq[StationEnvironmentElement],
         routes: Seq[RouteEnvironmentElement],
         _timetables: Map[String, Seq[DynamicTimetable]]
@@ -155,7 +162,8 @@ object Environments:
               //  could enter the route and so leave the station
               println(s"MOVE d: $d")
               import ulisse.utils.Times.given
-              env.updateEnvironmentWith(agent.updateDistanceTravelled(d), time + Time(0,0,dt))
+
+              env.updateEnvironmentWith(agent.updateDistanceTravelled(d), time + Time(0, 0, dt))
             case _ =>
               println("NO ACTION")
               this
@@ -165,65 +173,69 @@ object Environments:
 
       private def updateEnvironmentWith(agent: TrainAgent, time: Time): RailwayEnvironmentImpl =
         println("updateEnvironmentWith")
-        updateAgentOnRoute(agent).updateAgentInStation(agent)
-      private def updateAgentOnRoute(agent: TrainAgent): RailwayEnvironmentImpl =
+        updateAgentOnRoute(agent, time).getOrElse(updateAgentInStation(agent, time).getOrElse(this))
+      private def updateAgentOnRoute(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
         println("updateAgentOnRoute")
-        agent.findIn(routes).fold(this)(ree =>
+        agent.findIn(routes).map(ree =>
           println("updateAgentOnRoute")
-          routeUpdateFunction(ree, agent))
-      private def updateAgentInStation(agent: TrainAgent): RailwayEnvironmentImpl =
-        agent.findIn(stations).fold(this)(see =>
+          routeUpdateFunction(ree, agent, time)
+        )
+      private def updateAgentInStation(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
+        agent.findIn(stations).map(see =>
           println("updateAgentInStation")
-          stationUpdateFunction(see, agent) match
+          stationUpdateFunction(see, agent, time) match
             case Some(re) =>
               println("ok")
               re
-            case _        =>
+            case _ =>
               println("FFFFF")
               this
         )
 
-      private def routeUpdateFunction(route: RouteEnvironmentElement, agent: TrainAgent): RailwayEnvironmentImpl =
+      private def routeUpdateFunction(
+          route: RouteEnvironmentElement,
+          agent: TrainAgent,
+          time: Time
+      ): RailwayEnvironmentImpl =
         agent.distanceTravelled match
           case d if d >= route.length =>
             (for
               ree <- route.removeTrain(agent)
               re = routes.updateWhen(_.id == ree.id)(_ => ree)
-              tt <- findCurrentTimeTable(agent)
+              tt  <- findCurrentTimeTable(agent)
+              utt <- tt.arrivalUpdate(ClockTime(time.h, time.m).getOrDefault)
+              dt = _timetables.toList.updateWhen(_._1 == agent.name)(e =>
+                (e._1, e._2.updateWhen(dtt => dtt.table == utt.table)(_ => utt))
+              ).toMap
               currentRoute <- tt.currentRoute
-              see <- stations.find(currentRoute._2.name == _.name)
-              usee <- see.putTrain(agent.resetDistanceTravelled())
+              see          <- stations.find(currentRoute._2.name == _.name)
+              usee         <- see.putTrain(agent.resetDistanceTravelled())
               se = stations.updateWhen(_.name == usee.name)(_ => usee)
-            yield copy(stations = se, routes = re)).getOrElse(this)
+            yield copy(stations = se, routes = re, _timetables = dt)).getOrElse(this)
           case _ => route.updateTrain(agent) match
               case Some(ree) => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree))
               case _         => this
 
       private def stationUpdateFunction(
           station: StationEnvironmentElement,
-          agent: TrainAgent
+          agent: TrainAgent,
+          time: Time
       ): Option[RailwayEnvironmentImpl] =
         for
           see <- station.removeTrain(agent)
           se = stations.updateWhen(_.name == see.name)(_ => see)
-          tt <- findCurrentTimeTable(agent)
-          nextRoute <- tt.nextRoute
+          tt  <- findCurrentTimeTable(agent)
+          utt <- tt.departureUpdate(ClockTime(time.h, time.m).getOrDefault)
+          dt = _timetables.toList.updateWhen(_._1 == agent.name)(e =>
+            (e._1, e._2.updateWhen(dtt => dtt.table == utt.table)(_ => utt))
+          ).toMap
+          nextRoute         <- tt.nextRoute
           routeAndDirection <- findRouteDirection(nextRoute)
-          ree <- routes.find(routeAndDirection._1.id == _.id)
-          uree <- ree.putTrain(agent.resetDistanceTravelled(), routeAndDirection._2)
+          ree               <- routes.find(routeAndDirection._1.id == _.id)
+          uree              <- ree.putTrain(agent.resetDistanceTravelled(), routeAndDirection._2)
           re = routes.updateWhen(_.id == uree.id)(_ => uree)
-        yield copy(stations = se, routes = re)
-//        match
-//          case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
-//          case _         => this
-//        agent.distanceTravelled match
-//          case  if d >= agent.length =>
-//            station.removeTrain(agent) match
-//              case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
-//              case _         => this
-//          case _ => station.updateTrain(agent) match
-//              case Some(see) => copy(stations = stations.updateWhen(_.name == see.name)(_ => see))
-//              case _         => this
+        yield copy(stations = se, routes = re, _timetables = dt)
+
       private def findCurrentTimeTable(train: TrainAgent): Option[DynamicTimetable] =
         val tt = _timetables.get(train.name)
         println(tt)
@@ -242,4 +254,4 @@ object Environments:
         p match
           case (Some(r), _) => Some((r, Forward))
           case (_, Some(r)) => Some((r, Backward))
-          case _                => None
+          case _            => None
