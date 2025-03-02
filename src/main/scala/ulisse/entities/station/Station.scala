@@ -13,6 +13,14 @@ trait Station:
   val coordinate: Coordinate
   val numberOfTracks: Int
 
+  override def equals(that: Any): Boolean =
+    that match
+      case s: Station =>
+        id == s.id &&
+        name == s.name &&
+        coordinate == s.coordinate
+      case _ => false
+
 /** Factory for [[Station]] instances. */
 object Station:
   /** Creates a `Station` instance. The resulting station has at least 1 track. */

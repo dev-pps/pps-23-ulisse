@@ -155,7 +155,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
         )
 
       "have all routes" in:
-        env.routes should contain theSameElementsAs routes.map(RouteEnvironmentElement(
+        env.routes shouldBe routes.map(RouteEnvironmentElement(
           _,
           minPermittedDistanceBetweenTrains
         ))
@@ -167,7 +167,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
           trainAgents,
           timetables.map(DynamicTimetable(_))
         )
-        env.routes should contain theSameElementsAs routes.map(RouteEnvironmentElement(
+        env.routes shouldBe routes.map(RouteEnvironmentElement(
           _,
           minPermittedDistanceBetweenTrains
         ))

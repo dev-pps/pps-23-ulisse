@@ -19,6 +19,7 @@ object Tracks:
   object TrackDirection:
     /** Extension methods for TrackDirection */
     extension (direction: TrackDirection)
+      /** Return the opposite direction */
       def opposite: TrackDirection = direction match
         case TrackDirection.Forward => TrackDirection.Backward
         case TrackDirection.Backward => TrackDirection.Forward
@@ -29,7 +30,7 @@ object Tracks:
 
   /** Defines a rail in a Route. */
   trait Track extends TrainAgentsContainer[Track]:
-    /** Try to put train inside a track given the desired direction */
+    /** Try to put train inside the track given the desired direction */
     def putTrain(train: TrainAgent, direction: TrackDirection): Option[Track]
 
     /** Return the current direction of the track */

@@ -4,12 +4,22 @@ import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
+import ulisse.entities.station.StationTest.numberOfTracks
+object StationTest:
+  val numberOfTracks = 2
+  val stationA = makeStation("A", Coordinate(0, 0))
+  val stationB = makeStation("B", Coordinate(0, 1))
+  val stationC = makeStation("C", Coordinate(0, 2))
+  val stationD = makeStation("D", Coordinate(0, 3))
+  val stationE = makeStation("E", Coordinate(0, 4))
+  val stationF = makeStation("F", Coordinate(0, 5))
+  def makeStation(name: String, coordinate: Coordinate): Station =
+    Station(name, coordinate, numberOfTracks)
 
 class StationTest extends AnyWordSpec with Matchers:
 
-  private val defaultName          = "name"
-  private val defaultCoordinate    = Coordinate(0, 0)
-  private val defaultNumberOfTrack = 1
+  private val defaultName = "name"
+  private val defaultCoordinate = Coordinate(0, 0)
 
   "A Station" when:
     "is created" should:
@@ -24,15 +34,15 @@ class StationTest extends AnyWordSpec with Matchers:
 
     "is checked" should:
       "be created if the name is not blank and numberOfTracks is greater than 0" in:
-        Station.createCheckedStation(defaultName, defaultCoordinate, defaultNumberOfTrack) shouldBe Right(Station(
+        Station.createCheckedStation(defaultName, defaultCoordinate, numberOfTracks) shouldBe Right(Station(
           defaultName,
           defaultCoordinate,
-          defaultNumberOfTrack
+          numberOfTracks
         ))
 
       "not be created if the name is blank" in:
         List("", "  ").foreach(invalidName =>
-          Station.createCheckedStation(invalidName, defaultCoordinate, defaultNumberOfTrack) shouldBe Left(
+          Station.createCheckedStation(invalidName, defaultCoordinate, numberOfTracks) shouldBe Left(
             Chain(Station.Error.InvalidName)
           )
         )
