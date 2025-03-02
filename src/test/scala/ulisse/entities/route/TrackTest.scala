@@ -26,7 +26,8 @@ class TrackTest extends AnyWordSpec with Matchers:
       "not contain any train" in:
         Track(1).trains shouldBe Seq()
         Track(1).isEmpty shouldBe true
-        Track(1).isAvailable shouldBe true
+        Track(1).isAvailable(Forward) shouldBe true
+        Track(1).isAvailable(Backward) shouldBe true
 
       "have a min permitted distance between trains" in:
         Track(1).minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
@@ -50,7 +51,8 @@ class TrackTest extends AnyWordSpec with Matchers:
           case Right(track) =>
             track.trains shouldBe Seq()
             track.isEmpty shouldBe true
-            track.isAvailable shouldBe true
+            track.isAvailable(Forward) shouldBe true
+            track.isAvailable(Backward) shouldBe true
           case _ => fail()
 
       "have a min permitted distance between trains" in:
@@ -75,7 +77,8 @@ class TrackTest extends AnyWordSpec with Matchers:
             ut.id shouldBe id
             ut.trains shouldBe Seq(train)
             ut.isEmpty shouldBe false
-            ut.isAvailable shouldBe false
+            ut.isAvailable(Forward) shouldBe false
+            ut.isAvailable(Backward) shouldBe false
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
             ut.currentDirection shouldBe Some(direction)
           case _ => fail()
@@ -101,7 +104,8 @@ class TrackTest extends AnyWordSpec with Matchers:
             ut.id shouldBe id
             ut.trains shouldBe Seq(updatedTrain, otherTrain)
             ut.isEmpty shouldBe false
-            ut.isAvailable shouldBe false
+            ut.isAvailable(Forward) shouldBe false
+            ut.isAvailable(Backward) shouldBe false
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
             ut.currentDirection shouldBe Some(direction)
           case None => fail()
@@ -137,7 +141,8 @@ class TrackTest extends AnyWordSpec with Matchers:
         val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains - 1)
         Track(1).putTrain(train, Forward).flatMap(_.updateTrain(updatedTrain)) match
           case Some(ut) =>
-            ut.isAvailable shouldBe false
+            ut.isAvailable(Forward) shouldBe false
+            ut.isAvailable(Backward) shouldBe false
           case _ => fail()
 
       "make track available again" in:
@@ -145,7 +150,8 @@ class TrackTest extends AnyWordSpec with Matchers:
         val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains)
         Track(1).putTrain(train, Forward).flatMap(_.updateTrain(updatedTrain)) match
           case Some(ut) =>
-            ut.isAvailable shouldBe true
+            ut.isAvailable(Forward) shouldBe true
+            ut.isAvailable(Backward) shouldBe false
           case _ => fail()
 
       "not be updated if the track doesn't contain the specified train" in:
@@ -202,7 +208,8 @@ class TrackTest extends AnyWordSpec with Matchers:
             ut.id shouldBe id
             ut.trains shouldBe Seq()
             ut.isEmpty shouldBe true
-            ut.isAvailable shouldBe true
+            ut.isAvailable(Forward) shouldBe true
+            ut.isAvailable(Backward) shouldBe true
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
             ut.currentDirection shouldBe None
           case _ => fail()
@@ -239,7 +246,8 @@ class TrackTest extends AnyWordSpec with Matchers:
             ut.id shouldBe id
             ut.trains shouldBe Seq(otherTrain)
             ut.isEmpty shouldBe false
-            ut.isAvailable shouldBe false
+            ut.isAvailable(Forward) shouldBe false
+            ut.isAvailable(Backward) shouldBe false
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
             ut.currentDirection shouldBe Some(direction)
           case _ => fail()

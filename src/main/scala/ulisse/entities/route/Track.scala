@@ -16,8 +16,10 @@ trait Track extends TrainAgentsContainer[Track]:
   def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[Track]
   def currentDirection: Option[TrainAgentsDirection]
   def minPermittedDistanceBetweenTrains: Double
-  override def isAvailable: Boolean =
-    trains.lastOption.forall(t => t.distanceTravelled - t.lengthSize >= minPermittedDistanceBetweenTrains)
+  def isAvailable(direction: TrainAgentsDirection): Boolean =
+    trains.lastOption.forall(t =>
+      t.distanceTravelled - t.lengthSize >= minPermittedDistanceBetweenTrains
+    ) && currentDirection.getOrElse(direction) == direction
 
 object Track:
   enum TrainAgentsDirection:
@@ -45,7 +47,7 @@ object Track:
     override def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[Track] =
       (
         currentDirection,
-        copy(trains = trains :+ train) when isAvailable && !contains(train) && train.distanceTravelled == 0
+        copy(trains = trains :+ train) when isAvailable(direction) && !contains(train) && train.distanceTravelled == 0
       ) match
         case (Some(`direction`), Some(updatedTrack)) => Some(updatedTrack)
         case (None, Some(updatedTrack))              => Some(updatedTrack.copy(currentDirection = Some(direction)))

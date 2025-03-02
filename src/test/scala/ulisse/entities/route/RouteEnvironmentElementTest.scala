@@ -46,7 +46,8 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
       "have all empty tracks" in:
         routeEE.containers.size shouldBe route.railsCount
         routeEE.containers.forall(_.isEmpty) shouldBe true
-        routeEE.containers.forall(_.isAvailable) shouldBe true
+        routeEE.containers.forall(_.isAvailable(Forward)) shouldBe true
+        routeEE.containers.forall(_.isAvailable(Backward)) shouldBe true
 
       "have a default minPermittedDistanceBetweenTrains" in:
         routeEE.containers.forall(
@@ -64,7 +65,8 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         routeEE.putTrain(train3905, Forward) match
           case Some(ur) =>
             validateRouteInfo(ur)
-            ur.isAvailable shouldBe true
+            ur.isAvailable(Forward) shouldBe true
+            ur.isAvailable(Backward) shouldBe true
             ur.containers.find(_.contains(train3905)).map(_.id) shouldBe Some(1)
           case None => fail()
 
@@ -76,7 +78,8 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         routeEE.putTrain(train3905, Forward).flatMap(_.putTrain(train3906, Backward)) match
           case Some(ur) =>
             validateRouteInfo(ur)
-            ur.isAvailable shouldBe false
+            ur.isAvailable(Forward) shouldBe false
+            ur.isAvailable(Backward) shouldBe false
             ur.containers.find(_.contains(train3906)).map(_.id) shouldBe Some(2)
           case None => fail()
 
@@ -93,7 +96,9 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           .flatMap(_.putTrain(train3906, Forward)) match
           case Some(ur) =>
             validateRouteInfo(ur)
-            ur.isAvailable shouldBe true
+            print(ur)
+            ur.isAvailable(Forward) shouldBe true
+            ur.isAvailable(Backward) shouldBe true
             ur.containers.find(_.contains(train)).map(_.id) shouldBe Some(1)
             ur.containers.find(_.contains(train3906)).map(_.id) shouldBe Some(1)
           case None => fail()
@@ -124,7 +129,8 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           _.updateTrain(updatedTrain)
         ) match
           case Some(ur) =>
-            ur.isAvailable shouldBe false
+            ur.isAvailable(Forward) shouldBe false
+            ur.isAvailable(Backward) shouldBe false
           case None => fail()
 
       "make route available again" in:
@@ -134,7 +140,8 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           _.updateTrain(updatedTrain)
         ) match
           case Some(ur) =>
-            ur.isAvailable shouldBe true
+            ur.isAvailable(Forward) shouldBe true
+            ur.isAvailable(Backward) shouldBe false
           case None => fail()
 
     "a train is removed" should:
