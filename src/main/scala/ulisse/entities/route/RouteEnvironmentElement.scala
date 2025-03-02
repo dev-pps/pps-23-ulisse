@@ -13,6 +13,7 @@ import ulisse.utils.OptionUtils.given
 trait RouteEnvironmentElement extends Route with TrainAgentEEWrapper[RouteEnvironmentElement]:
   type TAC = Track
   def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[RouteEnvironmentElement]
+  def isAvailable(direction: TrainAgentsDirection): Boolean = containers.exists(_.isAvailable(direction))
 
 object RouteEnvironmentElement:
 
@@ -29,7 +30,7 @@ object RouteEnvironmentElement:
 
     override def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[RouteEnvironmentElement] =
       (for
-        firstAvailableContainer <- containers.find(_.isAvailable)
+        firstAvailableContainer <- containers.find(_.isAvailable(direction))
         updatedContainers <-
           containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
       yield copy(containers = updatedContainers)) when !contains(train)

@@ -9,6 +9,7 @@ import ulisse.utils.OptionUtils.{given_Conversion_Option_Option, when}
 trait StationEnvironmentElement extends Station with TrainAgentEEWrapper[StationEnvironmentElement]:
   type TAC = Platform
   def putTrain(train: TrainAgent): Option[StationEnvironmentElement]
+  def isAvailable: Boolean = containers.exists(_.isAvailable)
 
 object StationEnvironmentElement:
   def apply(station: Station): StationEnvironmentElement =

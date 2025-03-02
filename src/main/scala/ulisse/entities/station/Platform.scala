@@ -11,6 +11,7 @@ import ulisse.utils.ValidationUtils.validatePositive
 /** Defines a track in a station. */
 trait Platform extends TrainAgentsContainer[Platform]:
   def putTrain(train: TrainAgent): Option[Platform]
+  def isAvailable: Boolean = isEmpty
 
 /** Factory for [[Platform]] instances. */
 object Platform:
