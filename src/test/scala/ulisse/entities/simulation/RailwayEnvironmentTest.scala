@@ -232,6 +232,8 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
                 stationEE.containers.flatMap(_.trains).map(_.name).contains(trainAgent3905.name) shouldBe false
                 val updatedAgent = routeEE.containers.flatMap(_.trains).find(_.name == trainAgent3905.name)
                 updatedAgent shouldBe defined
+                newEnv.findCurrentTimeTableFor(trainAgent3905).flatMap(_.currentRoute).flatMap(newEnv.findRouteWithTravelDirection).flatMap((ree, dir) =>
+                  routeEE.containers.find(_.contains(trainAgent3905)).flatMap(_.currentDirection).map(_ == dir)) shouldBe Some(true)
                 updatedAgent.map(_.distanceTravelled) shouldBe Some(0.0)
               case _ => fail()
           case None => fail()
@@ -246,5 +248,6 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
                 updatedAgent shouldBe defined
                 updatedAgent.map(_.distanceTravelled) shouldBe Some(0.0)
                 routeEE.containers.flatMap(_.trains).map(_.name).contains(trainAgent3905.name) shouldBe false
+                routeEE.containers.foreach(_.currentDirection shouldBe None)
               case _ => fail()
           case None => fail()
