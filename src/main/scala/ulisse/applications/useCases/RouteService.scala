@@ -1,7 +1,7 @@
 package ulisse.applications.useCases
 
 import cats.syntax.either.*
-import ulisse.applications.RouteEventQueue
+import ulisse.applications.EventQueues.RouteEventQueue
 import ulisse.applications.managers.RouteManagers
 import ulisse.applications.managers.RouteManagers.{Errors, RouteManager}
 import ulisse.applications.ports.RoutePorts
@@ -9,25 +9,19 @@ import ulisse.entities.route.Routes.Route
 
 import scala.concurrent.{Future, Promise}
 
+/** Contains the service for routes. */
 object RouteService:
+
+  /** Creates a [[RoutePorts.Input]] instance. */
   def apply(eventQueue: RouteEventQueue): RoutePorts.Input = RouteServiceImpl(eventQueue)
 
   private case class RouteServiceImpl(eventQueue: RouteEventQueue) extends RoutePorts.Input:
-
-    private def updateState(
-        promise: Promise[Either[Errors, List[Route]]],
-        routeManager: RouteManager,
-        updatedManager: Either[Errors, RouteManager]
-    ) =
-      updatedManager match
-        case Left(error: RouteManagers.Errors) => promise.success(Left(error)); routeManager
-        case Right(newManager)                 => promise.success(Right(newManager.routes)); newManager
 
     override def save(route: Route): Future[Either[Errors, List[Route]]] =
       val promise = Promise[Either[Errors, List[Route]]]()
       eventQueue.addCreateRouteEvent((stationManager, routeManager) => {
         val updatedManager = routeManager.save(route)
-        (stationManager, updateState(promise, routeManager, updatedManager))
+        (stationManager, Services.updateManager(promise, routeManager, updatedManager, _.routes))
       })
       promise.future
 
@@ -35,7 +29,7 @@ object RouteService:
       val promise = Promise[Either[Errors, List[Route]]]()
       eventQueue.addUpdateRouteEvent((stationManager, routeManager) => {
         val updatedManager = routeManager.modify(oldRoute, newRoute)
-        (stationManager, updateState(promise, routeManager, updatedManager))
+        (stationManager, Services.updateManager(promise, routeManager, updatedManager, _.routes))
       })
       promise.future
 
@@ -43,6 +37,6 @@ object RouteService:
       val promise = Promise[Either[Errors, List[Route]]]()
       eventQueue.addDeleteRouteEvent((routeManager, timetableManager) => {
         val updatedManager = routeManager.delete(route)
-        (updateState(promise, routeManager, updatedManager), timetableManager)
+        (Services.updateManager(promise, routeManager, updatedManager, _.routes), timetableManager)
       })
       promise.future

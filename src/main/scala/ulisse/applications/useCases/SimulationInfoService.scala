@@ -1,5 +1,6 @@
 package ulisse.applications.useCases
 
+import ulisse.applications.EventQueues.SimulationEventQueue
 import ulisse.applications.ports.SimulationInfoPorts
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.route.{RouteEnvironmentElement, Routes}
@@ -9,7 +10,6 @@ import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.Trains
 import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentInfo}
-import ulisse.applications.{AppState, SimulationEventQueue}
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}

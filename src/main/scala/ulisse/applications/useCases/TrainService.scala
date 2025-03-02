@@ -1,6 +1,6 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.TrainEventQueue
+import ulisse.applications.EventQueues.TrainEventQueue
 import ulisse.applications.managers.TechnologyManagers.TechErrors.TechnologyNotExists
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TrainManagers.TrainManager
@@ -10,7 +10,6 @@ import ulisse.entities.train.Wagons.UseType
 import ulisse.utils.Errors
 import ulisse.utils.Errors.BaseError
 
-import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 final case class TrainService(eventQueue: TrainEventQueue) extends Input:
