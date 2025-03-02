@@ -100,8 +100,8 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
 
     "updated with an arrival time" should:
       "update the effective table with the expected arrival time" in:
-        val expectedArrivalTime = dtt.table(stationB).arriving match
-          case Some(at) => dtt.arrivalUpdate(at) match
+        dtt.table(stationB).arriving match
+          case Some(at) => dtt.departureUpdate(dtt.departureTime).flatMap(_.arrivalUpdate(at)) match
               case Some(newDtt) =>
                 newDtt.effectiveTable.find(_._1 == stationB).map(_._2) shouldBe Some(TrainStationTime(
                   Some(at),
@@ -122,7 +122,7 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
         val delay               = ClockTime(0, minutesDelay).toOption
         val effectiveArrivalTime = (expectedArrivalTime + delay) match
           case Some(at) =>
-            dtt.arrivalUpdate(at) match
+            dtt.departureUpdate(dtt.departureTime).flatMap(_.arrivalUpdate(at)) match
               case Some(newDtt) =>
                 newDtt.effectiveTable.find(_._1 == stationB).map(_._2) shouldBe Some(TrainStationTime(
                   Some(at),
@@ -176,4 +176,5 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
           takeThirdRoute        <- completeSecondRoute.departureUpdate(stationCDepartureTime)
           stationDArrivalTime   <- takeThirdRoute.table(stationD).arriving + delays.lift(5)
           completeThirdRoute    <- takeThirdRoute.arrivalUpdate(stationDArrivalTime)
-        yield completeThirdRoute.currentDelay shouldBe delays.map(Option(_)).reduceOption(_ + _)
+          _ = println("0000")
+        yield completeThirdRoute.currentDelay shouldBe delays.lastOption
