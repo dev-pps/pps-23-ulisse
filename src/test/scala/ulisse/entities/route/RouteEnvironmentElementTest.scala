@@ -22,6 +22,7 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
   private val train3907 =
     TrainAgent.apply(Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber))
 
+  private val direction = Forward
   def route: Route =
     // Create a route with 2 tracks and a length of 200.0 + trainLength
     validateRoute.flatMap(_.withLength(2 * minPermittedDistanceBetweenTrains + train3905.lengthSize)) match
@@ -46,7 +47,8 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
       "have all empty tracks" in:
         routeEE.containers.size shouldBe route.railsCount
         routeEE.containers.forall(_.isEmpty) shouldBe true
-        routeEE.containers.forall(_.isAvailable) shouldBe true
+        routeEE.containers.forall(_.isAvailable(Forward)) shouldBe true
+        routeEE.containers.forall(_.isAvailable(Backward)) shouldBe true
 
       "have a default minPermittedDistanceBetweenTrains" in:
         routeEE.containers.forall(
@@ -61,110 +63,118 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
 
     "a train is put in" should:
       "be placed in the first track" in:
-        routeEE.putTrain(train3905, Forward) match
+        routeEE.putTrain(train3905, direction) match
           case Some(ur) =>
             validateRouteInfo(ur)
-            ur.isAvailable shouldBe true
+            ur.isAvailable(Forward) shouldBe true
+            ur.isAvailable(Backward) shouldBe true
             ur.containers.find(_.contains(train3905)).map(_.id) shouldBe Some(1)
           case None => fail()
 
       "not be placed if it's already in the route" in:
-        val direction = Forward
         routeEE.putTrain(train3905, direction).flatMap(_.putTrain(train3905, direction)) shouldBe None
 
       "be placed in the first available track if other trains are present" in:
-        routeEE.putTrain(train3905, Forward).flatMap(_.putTrain(train3906, Backward)) match
+        routeEE.putTrain(train3905, direction).flatMap(_.putTrain(train3906, direction.opposite)) match
           case Some(ur) =>
             validateRouteInfo(ur)
-            ur.isAvailable shouldBe false
+            ur.isAvailable(Forward) shouldBe false
+            ur.isAvailable(Backward) shouldBe false
             ur.containers.find(_.contains(train3906)).map(_.id) shouldBe Some(2)
           case None => fail()
 
       "not be placed if it's not available" in:
-        val direction = Forward
         routeEE.putTrain(train3905, direction).flatMap(_.putTrain(train3906, direction)).flatMap(
           _.putTrain(train3907, direction)
         ) shouldBe None
 
       "be placed behind if it is possible" in:
-        val train        = train3905
-        val trainUpdated = train.updateDistanceTravelled(minPermittedDistanceBetweenTrains + train.lengthSize)
-        routeEE.putTrain(train, Forward).flatMap(_.updateTrain(trainUpdated))
-          .flatMap(_.putTrain(train3906, Forward)) match
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(minPermittedDistanceBetweenTrains + train3905.lengthSize)
+        routeEE.putTrain(train3905, direction).flatMap(_.updateTrain(updatedTrain3905))
+          .flatMap(_.putTrain(train3906, direction)) match
           case Some(ur) =>
             validateRouteInfo(ur)
             ur.isAvailable shouldBe true
-            ur.containers.find(_.contains(train)).map(_.id) shouldBe Some(1)
+            ur.containers.find(_.contains(train3905)).map(_.id) shouldBe Some(1)
+            ur.isAvailable(Forward) shouldBe true
+            ur.isAvailable(Backward) shouldBe true
             ur.containers.find(_.contains(train3906)).map(_.id) shouldBe Some(1)
           case None => fail()
 
       "not be placed behind if it is not possible" in:
-        val train        = train3905
-        val trainUpdated = train.updateDistanceTravelled(minPermittedDistanceBetweenTrains + train.lengthSize)
-        routeEE.putTrain(train, Forward).flatMap(_.putTrain(train3906, Backward)).flatMap(_.updateTrain(trainUpdated))
-          .flatMap(_.putTrain(train3907, Backward)) shouldBe None
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(minPermittedDistanceBetweenTrains + train3905.lengthSize)
+        routeEE.putTrain(train3905, direction).flatMap(_.putTrain(train3906, direction.opposite)).flatMap(
+          _.updateTrain(updatedTrain3905)
+        )
+          .flatMap(_.putTrain(train3907, direction.opposite)) shouldBe None
 
     "a train is updated" should:
       "be updated if present" in:
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(1)
-        routeEE.putTrain(train, Forward).flatMap(_.updateTrain(updatedTrain)) match
+        val updatedTrain3905 = train3905.updateDistanceTravelled(1)
+        routeEE.putTrain(train3905, Forward).flatMap(_.updateTrain(updatedTrain3905)) match
           case Some(ur) =>
             validateRouteInfo(ur)
-            ur.containers.find(_.contains(train3905)).map(c => (c.id, c.trains)) shouldBe Some((1, Seq(updatedTrain)))
+            ur.containers.find(_.contains(train3905)).map(c => (c.id, c.trains)) shouldBe Some((
+              1,
+              Seq(updatedTrain3905)
+            ))
           case None => fail()
 
       "not be updated if not present" in:
         routeEE.updateTrain(train3905) shouldBe None
 
       "leave route unavailable" in:
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains - 1)
-        routeEE.putTrain(train, Forward).flatMap(_.putTrain(train3906, Backward)).flatMap(
-          _.updateTrain(updatedTrain)
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(train3905.lengthSize + minPermittedDistanceBetweenTrains - 1)
+        routeEE.putTrain(train3905, direction).flatMap(_.putTrain(train3906, direction.opposite)).flatMap(
+          _.updateTrain(updatedTrain3905)
         ) match
           case Some(ur) =>
-            ur.isAvailable shouldBe false
+            ur.isAvailable(Forward) shouldBe false
+            ur.isAvailable(Backward) shouldBe false
           case None => fail()
 
       "make route available again" in:
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains)
-        routeEE.putTrain(train, Forward).flatMap(_.putTrain(train3906, Backward)).flatMap(
-          _.updateTrain(updatedTrain)
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(train3905.lengthSize + minPermittedDistanceBetweenTrains)
+        routeEE.putTrain(train3905, direction).flatMap(_.putTrain(train3906, direction.opposite)).flatMap(
+          _.updateTrain(updatedTrain3905)
         ) match
           case Some(ur) =>
-            ur.isAvailable shouldBe true
+            ur.isAvailable(Forward) shouldBe true
+            ur.isAvailable(Backward) shouldBe false
           case None => fail()
 
     "a train is removed" should:
       "be removed if it's last in a track" in:
-        val train        = train3905
-        val trainUpdated = train.updateDistanceTravelled(1)
-        routeEE.putTrain(train, Forward).flatMap(_.updateTrain(trainUpdated)).flatMap(_.removeTrain(train)) match
+        val updatedTrain3905 = train3905.updateDistanceTravelled(1)
+        routeEE.putTrain(train3905, Forward).flatMap(_.updateTrain(updatedTrain3905)).flatMap(
+          _.removeTrain(train3905)
+        ) match
           case Some(ur) =>
             validateRouteInfo(ur)
-            ur.containers.find(_.contains(train)) shouldBe None
+            ur.containers.find(_.contains(train3905)) shouldBe None
           case None => fail()
 
       "not be removed if is not last in a track" in:
-        val train        = train3905
-        val trainUpdated = train.updateDistanceTravelled(minPermittedDistanceBetweenTrains + train.lengthSize)
-        routeEE.putTrain(train, Forward).flatMap(_.updateTrain(trainUpdated))
-          .flatMap(_.putTrain(train3906, Forward)).flatMap(_.removeTrain(train3906)) shouldBe None
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(minPermittedDistanceBetweenTrains + train3905.lengthSize)
+        routeEE.putTrain(train3905, direction).flatMap(_.updateTrain(updatedTrain3905))
+          .flatMap(_.putTrain(train3906, direction)).flatMap(_.removeTrain(train3906)) shouldBe None
 
       "not be removed if not present" in:
         routeEE.removeTrain(train3905) shouldBe None
 
     "a train is searched" should:
       "be found if there is a train with the same name in a track" in:
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(10)
-        routeEE.putTrain(train, Forward) match
+        val updatedTrain3905 = train3905.updateDistanceTravelled(10)
+        routeEE.putTrain(train3905, direction) match
           case Some(ur) =>
-            ur.contains(train) shouldBe true
-            ur.contains(updatedTrain) shouldBe true
+            ur.contains(train3905) shouldBe true
+            ur.contains(updatedTrain3905) shouldBe true
           case _ => fail()
 
       "not be found if there isn't a train with the same name in a track" in:
-        routeEE.putTrain(train3905, Forward).map(_.contains(train3906)) shouldBe Some(false)
+        routeEE.putTrain(train3905, direction).map(_.contains(train3906)) shouldBe Some(false)
