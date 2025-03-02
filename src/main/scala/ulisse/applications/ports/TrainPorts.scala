@@ -1,14 +1,11 @@
 package ulisse.applications.ports
 
-import ulisse.applications.TrainEventQueue
-import ulisse.applications.managers.TechnologyManagers.TechnologyManager
-import ulisse.applications.managers.TrainManagers.TrainManager
+import ulisse.applications.EventQueues.TrainEventQueue
 import ulisse.applications.useCases.TrainService
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons.{UseType, Wagon}
+import ulisse.entities.train.Wagons.UseType
 import ulisse.utils.Errors.{BaseError, ErrorMessage}
 
-import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Future
 
 object TrainPorts:

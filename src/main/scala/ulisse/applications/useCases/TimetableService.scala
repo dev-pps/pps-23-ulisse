@@ -1,6 +1,6 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.TimeTableEventQueue
+import ulisse.applications.EventQueues.TimeTableEventQueue
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.TimetableManagers.{TimetableManager, TimetableManagerErrors}
@@ -131,8 +131,6 @@ final case class TimetableService(eventQueue: TimeTableEventQueue) extends Timet
         case _                                                   => GenericError("Unknown error")
 
   extension (eventQueue: TimeTableEventQueue)
-    // state = (StationManager, RouteManager, TrainManager, TimetableManager)
-
     private def updateWith(f: (
         (StationManager, RouteManager, TrainManager, TimetableManager),
         Promise[RequestResult]
