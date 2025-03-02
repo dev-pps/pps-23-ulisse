@@ -2,7 +2,7 @@ package ulisse.entities.route
 
 import ulisse.entities
 import ulisse.entities.route.Routes.Route
-import ulisse.entities.route.Track.TrainAgentsDirection
+import ulisse.entities.route.Tracks.{Track, TrackDirection}
 import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
 import ulisse.entities.simulation.Environments
 import ulisse.entities.train.TrainAgents.TrainAgent
@@ -12,8 +12,8 @@ import ulisse.utils.OptionUtils.given
 
 trait RouteEnvironmentElement extends Route with TrainAgentEEWrapper[RouteEnvironmentElement]:
   type TAC = Track
-  def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[RouteEnvironmentElement]
-  def isAvailable(direction: TrainAgentsDirection): Boolean = containers.exists(_.isAvailable(direction))
+  def putTrain(train: TrainAgent, direction: TrackDirection): Option[RouteEnvironmentElement]
+  def isAvailable(direction: TrackDirection): Boolean = containers.exists(_.isAvailable(direction))
 
 object RouteEnvironmentElement:
 
@@ -28,7 +28,7 @@ object RouteEnvironmentElement:
       extends RouteEnvironmentElement:
     export route.*
 
-    override def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[RouteEnvironmentElement] =
+    override def putTrain(train: TrainAgent, direction: TrackDirection): Option[RouteEnvironmentElement] =
       (for
         firstAvailableContainer <- containers.find(_.isAvailable(direction))
         updatedContainers <-

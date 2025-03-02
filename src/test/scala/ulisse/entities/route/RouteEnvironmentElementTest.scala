@@ -5,7 +5,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.applications.managers.RouteManagerTest.validateRoute
 import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.entities.route.Routes.Route
-import ulisse.entities.route.Track.TrainAgentsDirection.{Backward, Forward}
+import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
@@ -95,7 +95,6 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
           .flatMap(_.putTrain(train3906, direction)) match
           case Some(ur) =>
             validateRouteInfo(ur)
-            ur.isAvailable shouldBe true
             ur.containers.find(_.contains(train3905)).map(_.id) shouldBe Some(1)
             ur.isAvailable(Forward) shouldBe true
             ur.isAvailable(Backward) shouldBe true

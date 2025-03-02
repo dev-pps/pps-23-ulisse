@@ -4,8 +4,8 @@ import cats.Id
 import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
-import ulisse.entities.route.Track.TrainAgentsDirection
-import ulisse.entities.route.Track.TrainAgentsDirection.{Backward, Forward}
+import ulisse.entities.route.Tracks.TrackDirection
+import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
 import ulisse.entities.simulation.EnvironmentElements.EnvironmentElement
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.simulation.Perceptions.PerceptionProvider
@@ -15,13 +15,7 @@ import ulisse.entities.station.StationEnvironmentElement.*
 import ulisse.entities.timetable.{DynamicTimetable, Timetables, TrainStationTime}
 import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.entities.train.TrainAgents
-import ulisse.entities.train.TrainAgents.{
-  TrainAgent,
-  TrainAgentPerception,
-  TrainAgentPerceptionData,
-  TrainRouteInfo,
-  TrainStationInfo
-}
+import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentPerception, TrainAgentPerceptionData, TrainRouteInfo, TrainStationInfo}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.Times
@@ -49,7 +43,7 @@ object Environments:
     override def agents: List[SimulationAgent] = trains.toList
     def timetables: Seq[DynamicTimetable]
     def findCurrentTimeTableFor(train: TrainAgent): Option[DynamicTimetable]
-    def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrainAgentsDirection)]
+    def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrackDirection)]
 
   object RailwayEnvironment:
     def apply(
@@ -250,7 +244,7 @@ object Environments:
         _timetables.get(train.name).flatMap(_.find(!_.completed))
 
       def findRouteWithTravelDirection(route: (Station, Station))
-          : Option[(RouteEnvironmentElement, TrainAgentsDirection)] =
+          : Option[(RouteEnvironmentElement, TrackDirection)] =
         extension (r: Route)
           private def matchStations(departure: Station, arrival: Station): Boolean =
             r.departure.name == departure.name && r.arrival.name == arrival.name
