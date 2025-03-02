@@ -9,37 +9,36 @@ import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.Trains
 import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentInfo}
-import ulisse.applications.AppState
+import ulisse.applications.{AppState, SimulationEventQueue}
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
-final case class SimulationInfoService(
-    private val eventQueue: LinkedBlockingQueue[AppState => AppState]
-) extends SimulationInfoPorts.Input:
+final case class SimulationInfoService(private val eventQueue: SimulationEventQueue) extends SimulationInfoPorts.Input:
 
   override def stationInfo(s: Station): Future[Option[StationEnvironmentElement]] =
     val p = Promise[Option[StationEnvironmentElement]]
-    eventQueue.add((state: AppState) => {
-      p.success(state.simulationManager.simulationData.simulationEnvironment.stations.find(_.name == s.name))
-      state
+    eventQueue.addReadSimulationEvent(simulationManager => {
+      p.success(simulationManager.simulationData.simulationEnvironment.stations.find(_.name == s.name))
+      simulationManager
     })
     p.future
 
   override def routeInfo(r: Route): Future[Option[RouteEnvironmentElement]] =
     val p = Promise[Option[RouteEnvironmentElement]]
-    eventQueue.add((state: AppState) => {
-      p.success(state.simulationManager.simulationData.simulationEnvironment.routes.find(_.id == r.id))
-      state
+    eventQueue.addReadSimulationEvent(simulationManager => {
+      p.success(simulationManager.simulationData.simulationEnvironment.routes.find(_.id == r.id))
+      simulationManager
     })
     p.future
 
   override def trainInfo(t: Train): Future[Option[TrainAgentInfo]] =
     val p = Promise[Option[TrainAgentInfo]]
     // TODO find timetables
-    eventQueue.add((state: AppState) => {
-      p.success(state.simulationManager.simulationData.simulationEnvironment.agents.collect({ case t: TrainAgent => t }
-      ).find(_.name == t.name).map(TrainAgentInfo(_, List.empty)))
-      state
+    eventQueue.addReadSimulationEvent(simulationManager => {
+      p.success(simulationManager.simulationData.simulationEnvironment.agents.collect({ case t: TrainAgent => t }).find(
+        _.name == t.name
+      ).map(TrainAgentInfo(_, List.empty)))
+      simulationManager
     })
     p.future

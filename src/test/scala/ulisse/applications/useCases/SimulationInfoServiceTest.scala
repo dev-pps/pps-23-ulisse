@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
-import ulisse.applications.AppState
+import ulisse.applications.{AppState, EventQueue}
 import ulisse.entities.route.{RouteEnvironmentElement, Track}
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.Environments.RailwayEnvironment
@@ -58,10 +58,10 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
     )
   )
 
-  private val eventQueue            = LinkedBlockingQueue[AppState => AppState]()
+  private val eventQueue            = EventQueue()
   private val simulationInfoService = SimulationInfoService(eventQueue)
 
-  private def updateState() = runAll(initialState, eventQueue)
+  private def updateState() = runAll(initialState, eventQueue.events)
   "SimulationInfoService" should:
     "return station info if station is in the manager" in:
       val stationInfoResult = simulationInfoService.stationInfo(mockedStation)
