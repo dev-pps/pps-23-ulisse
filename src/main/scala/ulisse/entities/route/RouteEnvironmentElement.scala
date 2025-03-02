@@ -35,5 +35,5 @@ object RouteEnvironmentElement:
           containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
       yield copy(containers = updatedContainers)) when !contains(train)
 
-    override def buildNewEnvironmentElement(containers: Seq[Track]): RouteEnvironmentElement =
+    override def updateEEContainers(containers: Seq[Track]): RouteEnvironmentElement =
       copy(containers = containers)
