@@ -10,8 +10,8 @@ import ulisse.entities.route.RouteTest.departureCoordinate
 import ulisse.entities.route.Routes.{Route, TypeRoute}
 import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.simulation.Environments.RailwayEnvironment
-import ulisse.entities.simulation.Simulations.Actions
-import ulisse.entities.simulation.Simulations.Actions.MoveBy
+import ulisse.entities.simulation.Actions
+import ulisse.entities.simulation.Actions.MoveBy
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetable
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}

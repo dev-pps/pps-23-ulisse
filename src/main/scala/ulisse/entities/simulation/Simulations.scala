@@ -4,10 +4,6 @@ import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.utils.Times.{ClockTime, Time}
 
 object Simulations:
-  object Actions:
-    sealed trait SimulationAction
-    final case class MoveBy(distance: Double) extends SimulationAction
-
   object EngineState:
     def empty(): EngineState = EngineState(false, None, 0, None, 0, 0)
 
