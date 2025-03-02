@@ -1,6 +1,10 @@
 package ulisse.applications.useCases
 
+import ulisse.applications.TimeTableEventQueue
+import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.TimetableManagers.{TimetableManager, TimetableManagerErrors}
+import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.TimetablePorts
 import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{
   GenericError,
@@ -12,18 +16,16 @@ import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{
 import ulisse.applications.ports.TimetablePorts.{RequestResult, StationId, TimetableServiceErrors, WaitingTime}
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
-import ulisse.entities.timetable.MockedEntities.AppStateTimetable
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.Times.ClockTime
 
-import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 /** Timetable service that jobs is like gatekeeper and enqueue edits to app state using `stateEventQueue` queue. */
-final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateTimetable => AppStateTimetable])
-    extends TimetablePorts.Input:
+final case class TimetableService(eventQueue: TimeTableEventQueue) extends TimetablePorts.Input:
+
   extension (toCheck: List[(StationId, WaitingTime)])
     /** Returns a list of pair `(Route, WaitingTime)` starting from `toCheck` list.
       * If some route does not exist `InvalidStation` error is returned.
@@ -62,17 +64,19 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
       trainName: String,
       departureTime: ClockTime,
       stations: List[(StationId, WaitingTime)]
-  ): Future[RequestResult] = stateEventQueue.updateWith: (state, promise) =>
-    val savedRoutes: List[Route] = state.routeManager.routes
-    val savedTrains              = state.trainManager.trains
-    val savedTimetables          = state.timetableManager.tables
-    for
-      timetable     <- buildTimetable(trainName, departureTime, stations)(savedTrains, savedRoutes, savedTimetables)
-      newManager    <- state.timetableManager.save(timetable)
-      updatedTables <- newManager.tablesOf(trainName)
-    yield
-      promise.success(Right(updatedTables))
-      newManager
+  ): Future[RequestResult] =
+    eventQueue.updateWith: (managers, promise) =>
+      val (stationManager, routeManager, trainManager, timetableManager) = managers
+      val savedRoutes: List[Route]                                       = routeManager.routes
+      val savedTrains                                                    = trainManager.trains
+      val savedTimetables                                                = timetableManager.tables
+      for
+        timetable     <- buildTimetable(trainName, departureTime, stations)(savedTrains, savedRoutes, savedTimetables)
+        newManager    <- timetableManager.save(timetable)
+        updatedTables <- newManager.tablesOf(trainName)
+      yield
+        promise.success(Right(updatedTables))
+        newManager
 
   private def buildTimetable(
       trainName: String,
@@ -97,9 +101,10 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
 
   /** Given `trainName` and `departureTime` if timetable exist then is deleted, otherwise an `TrainTablesNotExist` error. */
   def deleteTimetable(trainName: String, departureTime: ClockTime): Future[RequestResult] =
-    stateEventQueue.updateWith: (state, promise) =>
+    eventQueue.updateWith: (managers, promise) =>
+      val (stationManager, routeManager, trainManager, timetableManager) = managers
       for
-        newManager <- state.timetableManager.remove(trainName, departureTime)
+        newManager <- timetableManager.remove(trainName, departureTime)
         tablesList <- newManager.tablesOf(trainName)
       yield
         promise.success(Right(tablesList))
@@ -107,12 +112,14 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
 
   /** Returns list of all Timetable saved for a given `trainName` */
   def timetablesOf(trainName: String): Future[RequestResult] =
-    stateEventQueue.updateWith: (state, promise) =>
-      for
-        res <- state.timetableManager.tablesOf(trainName)
-      yield
-        promise.success(Right(res))
-        state.timetableManager
+    val promise = Promise[RequestResult]()
+
+    eventQueue.addReadTimetableEvent(timetableManager =>
+      for res <- timetableManager.tablesOf(trainName)
+      yield promise.success(Right(res))
+    )
+
+    promise.future
 
   extension (error: BaseError)
     /** Returns `TimetableServiceErrors` starting from any error that is a `BaseError` errors. */
@@ -123,16 +130,21 @@ final case class TimetableService(stateEventQueue: LinkedBlockingQueue[AppStateT
         case e: TimetableServiceErrors                           => e
         case _                                                   => GenericError("Unknown error")
 
-  extension (queue: LinkedBlockingQueue[AppStateTimetable => AppStateTimetable])
-    private def updateWith(f: (AppStateTimetable, Promise[RequestResult]) => Either[BaseError, TimetableManager])
-        : Future[RequestResult] =
+  extension (eventQueue: TimeTableEventQueue)
+    // state = (StationManager, RouteManager, TrainManager, TimetableManager)
+
+    private def updateWith(f: (
+        (StationManager, RouteManager, TrainManager, TimetableManager),
+        Promise[RequestResult]
+    ) => Either[BaseError, TimetableManager]): Future[RequestResult] =
       val promise = Promise[RequestResult]
-      queue.offer: state =>
-        f(state, promise).fold(
-          err =>
-            promise.success(Left(err.toServiceError))
-            state
-          ,
-          manager => state.timetableManagerUpdate(manager)
-        )
+
+      eventQueue.addUpdateTimetableEvent((stationManager, routeManager, trainManager, timetableManager) =>
+        f((stationManager, routeManager, trainManager, timetableManager), promise) match
+          case Left(error) =>
+            promise.success(Left(error.toServiceError))
+            (stationManager, routeManager, trainManager, timetableManager)
+          case Right(newManager) =>
+            (stationManager, routeManager, trainManager, newManager)
+      )
       promise.future

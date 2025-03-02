@@ -2,12 +2,15 @@ package ulisse.applications.useCases
 
 import cats.data.NonEmptyChain
 import ulisse.Runner.runAll
+import ulisse.applications.EventQueue
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.TimetablePorts
+import ulisse.applications.AppState
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.entities.route.Routes
-import ulisse.entities.timetable.MockedEntities.AppStateMocked
+//import ulisse.entities.timetable.MockedEntities.AppStateMocked
 
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -15,28 +18,27 @@ import java.util.concurrent.LinkedBlockingQueue
 object TimetableTestEnvironment:
   import ulisse.entities.route.Routes.{Route, TypeRoute}
   import ulisse.entities.timetable.TestMockedEntities.*
-  import ulisse.entities.timetable.MockedEntities.AppStateTimetable
+//  import ulisse.entities.timetable.MockedEntities.AppStateTimetable
 
-  type AppState = AppStateTimetable
-  private val initState: Either[NonEmptyChain[Routes.Errors], AppStateMocked] =
+//  type AppState = AppStateTimetable
+  private val initState: Either[NonEmptyChain[Routes.Errors], AppState] =
     for
       routeAB <- Route(stationA, stationB, TypeRoute.AV, railsCount = 1, length = 10)
       routeBC <- Route(stationB, stationC, TypeRoute.AV, railsCount = 1, length = 15)
       routeCD <- Route(stationC, stationD, TypeRoute.AV, railsCount = 1, length = 30)
-    yield AppStateMocked(
-      trainManager = TrainManager(List(AV1000Train, AV800Train)),
-      timetableManager = TimetableManager(List.empty),
-      routeManager = RouteManager.createOf(List(routeAB, routeBC, routeCD))
-    )
+    yield AppState()
+      .updateTechnology(_ => TechnologyManager(List(trainTechnology)))
+      .updateTrain((_, _) => TrainManager(List(AV1000Train, AV800Train)))
+      .updateRoute(_ => RouteManager.createOf(List(routeAB, routeBC, routeCD)))
 
   def apply(): Either[NonEmptyChain[Routes.Errors], TestEnvConfig] =
     initState.map: state =>
-      val eventStream = LinkedBlockingQueue[AppState => AppState]()
-      TestEnvConfig(inputPort = TimetableService(eventStream), initialState = state, eventStream = eventStream)
+      val eventQueue = EventQueue()
+      TestEnvConfig(inputPort = TimetableService(eventQueue), initialState = state, eventQueue = eventQueue)
 
   case class TestEnvConfig(
       inputPort: TimetablePorts.Input,
-      private val initialState: AppStateMocked,
-      private val eventStream: LinkedBlockingQueue[AppState => AppState]
+      private val initialState: AppState,
+      private val eventQueue: EventQueue
   ):
-    def updateState() = runAll(initialState, eventStream)
+    def updateState(): Seq[AppState] = runAll(initialState, eventQueue.events)

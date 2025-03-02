@@ -1,5 +1,8 @@
 package ulisse.entities.timetable
 
+import ulisse.applications.AppState
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.station.Station
@@ -19,3 +22,7 @@ object TestMockedEntities:
   val stationC: Station = Station("Station C", Coordinate(25, 0), 1) // 3 min from B
   val stationD: Station = Station("Station D", Coordinate(50, 0), 1) // 5 min from C
   val stationF: Station = Station("Station F", Coordinate(55, 0), 1) // 1 min from D
+
+  val appState: AppState = AppState()
+    .updateTechnology(_ => TechnologyManager(List(trainTechnology)))
+    .updateTrain((_, _) => TrainManager(List(AV1000Train, AV800Train)))

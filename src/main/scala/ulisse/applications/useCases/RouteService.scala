@@ -15,13 +15,13 @@ object RouteService:
   private case class RouteServiceImpl(eventQueue: RouteEventQueue) extends RoutePorts.Input:
 
     private def updateState(
-        p: Promise[Either[Errors, List[Route]]],
+        promise: Promise[Either[Errors, List[Route]]],
         routeManager: RouteManager,
         updatedManager: Either[Errors, RouteManager]
     ) =
       updatedManager match
-        case Left(error: RouteManagers.Errors) => p.success(Left(error)); routeManager
-        case Right(value)                      => p.success(Right(value.routes)); value
+        case Left(error: RouteManagers.Errors) => promise.success(Left(error)); routeManager
+        case Right(newManager)                 => promise.success(Right(newManager.routes)); newManager
 
     override def save(route: Route): Future[Either[Errors, List[Route]]] =
       val promise = Promise[Either[Errors, List[Route]]]()

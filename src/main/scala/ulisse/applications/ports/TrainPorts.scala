@@ -1,5 +1,6 @@
 package ulisse.applications.ports
 
+import ulisse.applications.TrainEventQueue
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.useCases.TrainService
@@ -88,6 +89,4 @@ object TrainPorts:
     ): Future[Either[BaseError, List[Train]]]
 
   object Input:
-    type AppState = (TrainManager, TechnologyManager[TrainTechnology])
-    def apply(stateEventQueue: LinkedBlockingQueue[AppState => AppState]): Input =
-      TrainService(stateEventQueue)
+    def apply(eventQueue: TrainEventQueue): Input = TrainService(eventQueue)

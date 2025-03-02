@@ -1,6 +1,7 @@
 package ulisse.applications.managers
 
 import ulisse.entities.Technology
+import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist, ErrorValidation}
 
 object TechnologyManagers:
@@ -42,6 +43,8 @@ object TechnologyManagers:
     def getBy(name: String): Either[TechErrors, T]
 
   object TechnologyManager:
+    val defaultTrainTecnhology = List(TrainTechnology("AV", 300, 2.0, 1.0), TrainTechnology("Normal", 160, 1.0, 0.5))
+
     /** @param technologies
       *   Technologies saved
       * @return
@@ -49,6 +52,12 @@ object TechnologyManagers:
       */
     def apply[T <: Technology](technologies: List[T]): TechnologyManager[T] =
       TechnologyManagerImpl(technologies.map(t => (t.name, t)).toMap)
+
+    /** Creates a [[TechnologyManager]] with default train technologies */
+    def createTrainTechnology(): TechnologyManager[TrainTechnology] = TechnologyManager(defaultTrainTecnhology)
+
+    /** Create an empty [[TechnologyManager]] with [[TrainTechnology]]. */
+    def empy(): TechnologyManager[TrainTechnology] = TechnologyManager(List.empty)
 
     private case class TechnologyManagerImpl[T <: Technology](technologies: Map[String, T])
         extends TechnologyManager[T]:
