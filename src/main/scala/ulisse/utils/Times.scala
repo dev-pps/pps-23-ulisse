@@ -1,7 +1,6 @@
 package ulisse.utils
 
-import cats.Monad
-import cats.Id
+import cats.{Functor, Id, Monad}
 import cats.syntax.all.*
 import ulisse.utils.Errors.{BaseError, ErrorMessage}
 
@@ -22,10 +21,15 @@ object Times:
     def h: Hour
     def m: Minute
     def s: Second
-    override def toString: String = s"$h:$m"
+    override def toString: String = s"$h:$m:$s"
 
   object Time:
     def apply(h: Hour, m: Minute, s: Second): Time = TimeImpl(h, m, s)
+
+    val secondsInMinute, minutesInHour = 60
+    extension (time: Time)
+      def toSeconds: Int = time.h * secondsInMinute * minutesInHour + time.m * secondsInMinute + time.s
+
     private case class TimeImpl(h: Hour, m: Minute, s: Second) extends Time
 
   trait ClockTime extends Time:
@@ -60,7 +64,6 @@ object Times:
 
     extension (time: Either[ClockTimeErrors, ClockTime])
       def getOrDefault(using dts: DefaultTimeStrategy): ClockTime =
-        import ulisse.utils.Times.ClockTimeErrors
         time match
           case Left(e) =>
             val dTime = dts.defaultTime(e.time)
@@ -118,18 +121,30 @@ object Times:
     def sameAs(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
       checkCondition(time, time2)(_ == 0)
 
-  given ((Int, Int, Int) => Either[ClockTimeErrors, ClockTime]) = (x, y, z) => ClockTime(x, y)
-  given ((Int, Int, Int) => ClockTime)                          = (x, y, z) => ClockTime(x, y).getOrDefault
-  given ((Int, Int, Int) => Option[ClockTime])                  = (x, y, z) => ClockTime(x, y).toOption
-  given ((Int, Int, Int) => Time)                               = Time.apply
+  trait TimeConstructor[T]:
+    def construct(h: Int, m: Int, s: Int): T
+
+  given TimeConstructor[Time] with
+    def construct(h: Int, m: Int, s: Int): Time = Time(h, m, s)
+
+  given TimeConstructor[ClockTime] with
+    def construct(h: Int, m: Int, s: Int): ClockTime = ClockTime(h, m).getOrDefault
+
+  given TimeConstructor[Option[ClockTime]] with
+    def construct(h: Int, m: Int, s: Int): Option[ClockTime] = ClockTime(h, m).toOption
+
+  given TimeConstructor[Either[ClockTimeErrors, ClockTime]] with
+    def construct(h: Int, m: Int, s: Int): Either[ClockTimeErrors, ClockTime] = ClockTime(h, m)
+
+  given [M[_]: Functor]: Conversion[M[Time], M[ClockTime]] = _.map(t => ClockTime(t.h, t.m).getOrDefault)
   extension [M[_]: Monad, T <: Time](time: M[T])
     @targetName("add")
-    def +(time2: M[T])(using constructor: (Int, Int, Int) => M[T]): M[T] =
+    def +(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
       extractAndPerform(time, time2): (t, t2) =>
         calculateSum(t, t2)
 
     @targetName("sub")
-    def -(time2: M[T])(using constructor: (Int, Int, Int) => M[T]): M[T] =
+    def -(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
       extractAndPerform(time, time2): (t, t2) =>
         calculateSub(t, t2)
 
@@ -160,37 +175,19 @@ object Times:
     def ===(time2: ClockTime): Boolean =
       summon[Ordering[ClockTime]].compare(time, time2) == 0
 
-  private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(using
-      constructor: (Int, Int, Int) => M[T]
+  private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
+      using constructor: TimeConstructor[M[T]]
   ): M[T] =
-    val secondsInMinute, minutesInHour = 60
-    val hoursInDay                     = 24
-    val ts                             = time1.s + time2.s
-    val tm                             = time1.m + time2.m
-    val th                             = time1.h + time2.h
-    val seconds                        = ts                  % secondsInMinute
-    val extraMinutes                   = ts / secondsInMinute
-    val minutes                        = (tm + extraMinutes) % minutesInHour
-    val extraHours                     = (tm + extraMinutes) / minutesInHour
-    val hours                          = (th + extraHours)   % hoursInDay
-    constructor(hours, minutes, seconds)
+    buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
 
-  private def calculateSub[M[_]: Monad, T <: Time](time1: T, time2: T)(using
-      constructor: (Int, Int, Int) => M[T]
+  private def calculateSub[M[_]: Monad, T <: Time](time1: T, time2: T)(using constructor: TimeConstructor[M[T]]): M[T] =
+    buildTimeFromSeconds(time1.toSeconds - time2.toSeconds)
+
+  private def buildTimeFromSeconds[M[_]: Monad, T <: Time](seconds: Int)(using
+      constructor: TimeConstructor[M[T]]
   ): M[T] =
-    val secondsInMinute, minutesInHour = 60
-    val hoursInDay                     = 24
-
-    def normalizeWithBorrowing(h: Int, m: Int, s: Int): (Int, Int, Int) =
-      val (adjustedMinutes, normalizedSeconds) =
-        if (s < 0) (m - 1, s + secondsInMinute)
-        else (m, s)
-
-      val (adjustedHours, normalizedMinutes) =
-        if (adjustedMinutes < 0) (h - 1, adjustedMinutes + minutesInHour)
-        else (h, adjustedMinutes)
-
-      (adjustedHours, normalizedMinutes, normalizedSeconds)
-
-    val (h, m, s) = normalizeWithBorrowing(time1.h - time2.h, time1.m - time2.m, time1.s - time2.s)
-    constructor(h, m, s)
+    constructor.construct(
+      seconds / (Time.secondsInMinute * Time.minutesInHour) % 24,
+      (seconds / Time.secondsInMinute)                      % Time.minutesInHour,
+      seconds                                               % Time.secondsInMinute
+    )
