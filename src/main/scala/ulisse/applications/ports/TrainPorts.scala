@@ -1,6 +1,6 @@
 package ulisse.applications.ports
 
-import ulisse.applications.EventQueues.TrainEventQueue
+import ulisse.applications.event.TrainEventQueue
 import ulisse.applications.useCases.TrainService
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.UseType
