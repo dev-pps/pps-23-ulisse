@@ -82,12 +82,9 @@ final case class SimulationService(
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   private def doStep(): Unit =
     eventQueue.offer((appState: AppState) => {
-      println("Start2")
       if appState.simulationManager.engineState.running then
-        println("Start3")
         doStep()
         appState.copy(simulationManager = appState.simulationManager.doStep())
       else
-        println("Start4")
         appState
     })

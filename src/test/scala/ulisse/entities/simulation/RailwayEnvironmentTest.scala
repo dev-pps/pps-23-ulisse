@@ -240,7 +240,6 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
         env.agents.collect({ case ta: TrainAgent => ta }).find(_.name == trainAgent3905.name) match
           case Some(train) =>
             val newEnv = env.doStep(dt).doStep(dt)
-            println(s"YOOOOO $newEnv")
             (newEnv.stations.find(_.name == stationB.name), newEnv.routes.find(_.id == routeAB.id)) match
               case (Some(stationEE), Some(routeEE)) =>
                 val updatedAgent = stationEE.containers.flatMap(_.trains).find(_.name == trainAgent3905.name)
