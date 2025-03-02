@@ -26,40 +26,47 @@ trait AppState:
   /** Simulation manager. */
   val simulationManager: SimulationManager
 
-  /** Update [[StationManager]] with a function. */
+  /** Update [[StationManager]]. */
   def updateStation(update: StationManager => StationManager): AppState
 
-  /** Update [[TrainManager]] with a function. */
+  /** Update [[RouteManager]]. */
+  def updateRoute(update: RouteManager => RouteManager): AppState
+
+  /** Update [[TrainManager]]. */
   def updateTrain(update: TrainManager => TrainManager): AppState
 
-  /** Update [[TimetableManager]] with a function. */
+  /** Update [[TimetableManager]]. */
   def updateTimetable(update: TimetableManager => TimetableManager): AppState
 
-  /** Update [[StationManager]] and [[RouteManager]] with a function. */
+  /** Update [[SimulationManager]]. */
+  def updateSimulation(update: SimulationManager => SimulationManager): AppState
+
+  /** Update [[StationManager]], [[RouteManager]]. */
   def updateRailwayNetwork(update: (StationManager, RouteManager) => (StationManager, RouteManager)): AppState
 
-  /** Update [[StationManager]] and [[RouteManager]] and [[TimetableManager]] with a function. */
+  /** Update [[StationManager]], [[RouteManager]] and [[TimetableManager]]. */
   def updateStationSchedule(update: (
       StationManager,
       RouteManager,
       TimetableManager
   ) => (StationManager, RouteManager, TimetableManager)): AppState
 
-  /** Update [[RouteManager]] and [[TimetableManager]] with a function. */
+  /** Update [[RouteManager]] and [[TimetableManager]]. */
   def updateRouteSchedule(update: (RouteManager, TimetableManager) => (RouteManager, TimetableManager)): AppState
 
-  /** Update [[TrainManager]] and [[TimetableManager]] with a function. */
+  /** Update [[TrainManager]] and [[TimetableManager]]. */
   def updateTrainSchedule(update: (TrainManager, TimetableManager) => (TrainManager, TimetableManager)): AppState
 
-  /** Update [[StationManager]], [[RouteManager]] and [[TrainManager]] with a function. */
-  def updateRailway(update: (
+  /** Update [[StationManager]], [[RouteManager]] and [[TrainManager]]. */
+  def updateRailwaySchedule(update: (
       StationManager,
       RouteManager,
-      TrainManager
-  ) => (StationManager, RouteManager, TrainManager)): AppState
+      TrainManager,
+      TimetableManager
+  ) => (StationManager, RouteManager, TrainManager, TimetableManager)): AppState
 
   /** update [[SimulationManager]], with a function that takes a [[SimulationManager]] and a [[StationManager]]. */
-  def updateSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState
+  def initSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState
 
 object AppState:
   /** Create new application state with empty managers. */
@@ -83,11 +90,17 @@ object AppState:
     override def updateStation(update: StationManager => StationManager): AppState =
       copy(stationManager = update(stationManager))
 
+    override def updateRoute(update: RouteManager => RouteManager): AppState =
+      copy(routeManager = update(routeManager))
+
     override def updateTrain(update: TrainManager => TrainManager): AppState =
       copy(trainManager = update(trainManager))
 
     override def updateTimetable(update: TimetableManager => TimetableManager): AppState =
       copy(timetableManager = update(timetableManager))
+
+    override def updateSimulation(update: SimulationManager => SimulationManager): AppState =
+      copy(simulationManager = update(simulationManager))
 
     override def updateRailwayNetwork(update: (StationManager, RouteManager) => (StationManager, RouteManager))
         : AppState =
@@ -112,13 +125,15 @@ object AppState:
       val (newTrainManager, newTimetableManager) = update(trainManager, timetableManager)
       copy(trainManager = newTrainManager, timetableManager = newTimetableManager)
 
-    override def updateRailway(update: (
+    override def updateRailwaySchedule(update: (
         StationManager,
         RouteManager,
-        TrainManager
-    ) => (StationManager, RouteManager, TrainManager)): AppState =
-      val (newStation, newRoute, newTimetable) = update(stationManager, routeManager, trainManager)
-      copy(stationManager = newStation, routeManager = newRoute, trainManager = newTimetable)
+        TrainManager,
+        TimetableManager
+    ) => (StationManager, RouteManager, TrainManager, TimetableManager)): AppState =
+      val (newStation, newRoute, newTrain, newTimetable) =
+        update(stationManager, routeManager, trainManager, timetableManager)
+      copy(newStation, newRoute, newTrain, newTimetable)
 
-    override def updateSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState =
+    override def initSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState =
       copy(simulationManager = update(simulationManager, stationManager))
