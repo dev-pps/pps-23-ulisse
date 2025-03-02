@@ -13,29 +13,26 @@ object TechnologyManagers:
     final case class TechnologyNotExists(name: String)     extends ErrorNotExist(s"technology $name") with TechErrors
 
   trait TechnologyManager[T <: Technology]:
-    /** Add new technology if is valid and there no duplicate
-      * @param technology
-      *   Technology to add
-      * @return
-      *   Returns [[Right]] of updated `TechnologyManager` if technology is added else [[Left]] of
-      *   [[TechnologyAlreadyExists]] error
+    /** Adds `technology` if is valid and there no duplicate
+      *
+      * Returns `Right` of updated `TechnologyManager` if technology is added else [[Left]] of [[TechnologyAlreadyExists]] error
       */
     def add(technology: T): Either[TechErrors, TechnologyManager[T]]
 
-    /** Removes technology given its `name` if exists.
+    /** Remove technology with given `name` if exist
       *
-      * Returns [[Right]] of updated `TechnologyManager` if technology is removed else [[Left]] of [[TechnologyNotExists]] error
+      * Returns Right of updated `TechnologyManager` if technology is removed else [[Left]] of
+      * [[TechnologyNotExists]] error
       */
     def remove(name: String): Either[TechErrors, TechnologyManager[T]]
 
-    /** Returns List of saved technologies */
+    /** Returns List of saved technologies of type `T` */
     def technologiesList: List[T]
 
     /** Returns technology given its `name` */
     def getBy(name: String): Either[TechErrors, T]
 
   object TechnologyManager:
-
     /** Returns `TechnologyManager` initialized with `technologies` */
     def apply[T <: Technology](technologies: List[T]): TechnologyManager[T] =
       TechnologyManagerImpl(technologies.map(t => (t.name, t)).toMap)

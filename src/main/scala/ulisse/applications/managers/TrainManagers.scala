@@ -45,9 +45,9 @@ object TrainManagers:
       */
     def removeTrain(name: String): Either[TrainErrors, TrainManager]
 
-    /** Updates the information of the train given its `name`.
+    /** Updates the information of the train identified by `name`.
       *
-      *  Returns [[Right]] of updated `TrainManager` if train is updated else [[Left]] of [[TrainErrors]]
+      * Returns [[Right]] of updated `TrainManager` if train is updated else [[Left]] of [[TrainErrors]]
       */
     def updateTrain(name: String)(
         technology: TrainTechnology,

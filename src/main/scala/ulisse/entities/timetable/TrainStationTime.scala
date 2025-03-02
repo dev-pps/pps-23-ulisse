@@ -4,7 +4,7 @@ import ulisse.utils.Times.ClockTime
 import ulisse.utils.Times.FluentDeclaration.h
 
 private type WaitTime = Int
-
+//TODO: scala doc
 trait TrainStationTime:
   def arriving: Option[ClockTime]
   def waitTime: Option[WaitTime]
