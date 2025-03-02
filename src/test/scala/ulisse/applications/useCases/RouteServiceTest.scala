@@ -3,6 +3,7 @@ package ulisse.applications.useCases
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.Runner.runAll
+import ulisse.applications.{AppState, EventQueue}
 import ulisse.applications.managers.RouteManagerTest.*
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.entities.route.RouteTest
@@ -12,10 +13,11 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class RouteServiceTest extends AnyFlatSpec with Matchers:
-  private val events       = LinkedBlockingQueue[RouteManager => RouteManager]()
-  private val routeService = RouteService(events)
+  private val initState    = AppState()
+  private val eventQueue   = EventQueue()
+  private val routeService = RouteService(eventQueue)
 
-  private def updateState() = runAll(emptyManager, events)
+  private def updateState() = runAll(initState, eventQueue.events)
 
   "save route on service" should "add a valid route to the route manager" in:
     validateRoute.foreach(route =>
