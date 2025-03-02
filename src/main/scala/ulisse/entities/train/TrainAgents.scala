@@ -2,7 +2,7 @@ package ulisse.entities.train
 
 import ulisse.entities.route.Routes.TypeRoute
 import ulisse.entities.simulation.Environments.RailwayEnvironment
-import ulisse.entities.simulation.Simulations.Actions
+import ulisse.entities.simulation.Actions
 import ulisse.entities.simulation.{Environments, SimulationAgent}
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.simulation.Environments.RailwayEnvironment.*

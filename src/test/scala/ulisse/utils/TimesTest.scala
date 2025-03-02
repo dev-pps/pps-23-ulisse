@@ -1,5 +1,6 @@
 package ulisse.utils
 
+import cats.Id
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.TestUtility.in
@@ -9,6 +10,18 @@ import ulisse.utils.Times.FluentDeclaration.h
 import scala.language.postfixOps
 
 class TimesTest extends AnyWordSpec with Matchers:
+  "Time" should:
+    "be converted in seconds" in:
+      Time(1, 1, 1).toSeconds shouldBe 1 * Time.minutesInHour * Time.secondsInMinute + 1 * Time.secondsInMinute + 1
+      Time(0, 0, 0).toSeconds shouldBe 0
+      Time(0, 0, 59).toSeconds shouldBe 59
+      Time(0, 59, 0).toSeconds shouldBe 59 * Time.secondsInMinute
+      Time(
+        23,
+        59,
+        59
+      ).toSeconds shouldBe 23 * Time.minutesInHour * Time.secondsInMinute + 59 * Time.secondsInMinute + 59
+
   "ClockTime" should:
     "validate non in range values of hours and minutes" in:
       ClockTime(h = -12, m = 30) should be(Left(InvalidHours(Time(-12, 30, 0))))
@@ -23,6 +36,7 @@ class TimesTest extends AnyWordSpec with Matchers:
       h(23).m(59) + h(0).m(1) should be(h(0).m(0))
 
     "be subtracted to another ClockTimes" in:
+      Id(Time(0, 0, 0)) - Id(Time(0, 10, 5)) shouldBe Id(Time(0, -10, -5))
       h(10).m(45) - h(1).m(25) shouldBe h(9).m(20)
       h(10).m(0) - h(1).m(10) shouldBe h(8).m(50)
       h(10).m(0) - h(11).m(0) shouldBe h(-1).m(0)

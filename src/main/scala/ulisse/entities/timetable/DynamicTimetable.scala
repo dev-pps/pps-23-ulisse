@@ -4,9 +4,8 @@ import ulisse.entities.simulation.EnvironmentElements.EnvironmentElement
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.DynamicTimetable.*
 import ulisse.entities.timetable.Timetables.{StationTime, Timetable}
-import ulisse.utils.Times.{-, ClockTime, InvalidHours}
+import ulisse.utils.Times.{-, ClockTime, InvalidHours, Time, given}
 import ulisse.utils.CollectionUtils.updateWhen
-import ulisse.utils.Times.given
 
 import scala.collection.immutable.ListMap
 
@@ -16,7 +15,7 @@ trait DynamicTimetable extends Timetable with EnvironmentElement:
     effectiveTable.routesWithTimingInfo.findRouteWhere(_.isDefined, _.isEmpty).stations
   def nextRoute: Option[(Station, Station)] =
     effectiveTable.routesWithTimingInfo.findRouteWhere(_.isEmpty, _.isEmpty).stations
-  def currentDelay: Option[ClockTime] =
+  def currentDelay: Option[Time] =
     if currentRoute.isDefined then
       currentRoute.flatMap((ds, _) => effectiveTable.find(_._1 == ds).flatMap(_._2.departure) - table(ds).departure)
     else
