@@ -2,36 +2,111 @@ package ulisse.applications
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
-import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.applications.managers.StationManager
-import ulisse.applications.managers.TimetableManagers.TimetableManager
-import ulisse.applications.managers.TrainManagers.TrainManager
 
 class QuestStateTest extends AnyFlatSpec with Matchers:
+  import AppStateTest.*
+
   private val initialState  = AppState()
   private val eventQueue    = EventQueue()
   private def updateState() = runAll(initialState, eventQueue.events)
 
-//  "update railway map" should "update the application state" in:
-//    val stationManager   = mock[StationManager]
-//    val routeManager     = mock[RouteManager]
-//    val timetableManager = mock[TimetableManager]
-//    val updateMap = (_: StationManager, _: RouteManager, _: TimetableManager) =>
-//      (stationManager, routeManager, timetableManager)
-//
-//    eventQueue.offerUpdateMap(updateMap)
-//    val states = updateState()
-//
-//    states.lastOption mustBe Some(initialState.updateMap(updateMap))
-//
-//  "update train" should "update the application state" in:
-//    val trainManager     = mock[TrainManager]
-//    val timetableManager = mock[TimetableManager]
-//    val updateTrain      = (_: TrainManager, _: TimetableManager) => (trainManager, timetableManager)
-//
-//    eventQueue.offerUpdateTrain(updateTrain)
-//    val states = updateState()
-//
-//    states.lastOption mustBe Some(initialState.updateTrain(updateTrain))
+  "add read station event" should "update station manager" in:
+    eventQueue.addReadStationEvent(updateStation)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateStation(updateStation))
+
+  "add create station event" should "update station manager" in:
+    eventQueue.addCreateStationEvent(updateStation)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateStation(updateStation))
+
+  "add update station event" should "update railway network" in:
+    eventQueue.addUpdateStationEvent(updateRailwayNetwork)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateRailwayNetwork(updateRailwayNetwork))
+
+  "add delete station event" should "update station schedule" in:
+    eventQueue.addDeleteStationEvent(updateStationSchedule)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateStationSchedule(updateStationSchedule))
+
+  "add read route event" should "update route manager" in:
+    eventQueue.addReadRouteEvent(updateRoute)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateRoute(updateRoute))
+
+  "add create route event" should "update railway network" in:
+    eventQueue.addCreateRouteEvent(updateRailwayNetwork)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateRailwayNetwork(updateRailwayNetwork))
+
+  "add update route event" should "update railway network" in:
+    eventQueue.addUpdateRouteEvent(updateRailwayNetwork)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateRailwayNetwork(updateRailwayNetwork))
+
+  "add delete route event" should "update route schedule" in:
+    eventQueue.addDeleteRouteEvent(updateRouteSchedule)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateRouteSchedule(updateRouteSchedule))
+
+  "add read train event" should "update train manager" in:
+    eventQueue.addReadTrainEvent(updateTrain)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateTrain(updateTrain))
+
+  "add create train event" should "update train manager" in:
+    eventQueue.addCreateTrainEvent(updateTrain)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateTrain(updateTrain))
+
+  "add update train event" should "update train manager" in:
+    eventQueue.addUpdateTrainEvent(updateTrain)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateTrain(updateTrain))
+
+  "add delete train event" should "update train schedule" in:
+    eventQueue.addDeleteTrainEvent(updateTrainSchedule)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateTrainSchedule(updateTrainSchedule))
+
+  "add read timetable event" should "update timetable manager" in:
+    eventQueue.addReadTimetableEvent(updateTimetable)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateTimetable(updateTimetable))
+
+  "add create timetable event" should "update railway schedule" in:
+    eventQueue.addCreateTimetableEvent(updateRailwaySchedule)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateRailwaySchedule(updateRailwaySchedule))
+
+  "add update timetable event" should "update railway schedule" in:
+    eventQueue.addUpdateTimetableEvent(updateRailwaySchedule)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateRailwaySchedule(updateRailwaySchedule))
+
+  "add delete timetable event" should "update timetable manager" in:
+    eventQueue.addDeleteTimetableEvent(updateTimetable)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateTimetable(updateTimetable))
+
+  "add read simulation event" should "update simulation manager" in:
+    eventQueue.addReadSimulationEvent(updateSimulation)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateSimulation(updateSimulation))
+
+  "add create simulation event" should "update simulation manager" in:
+    eventQueue.addCreateSimulationEvent(initSimulation)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.initSimulation(initSimulation))
+
+  "add update simulation event" should "update simulation manager" in:
+    eventQueue.addUpdateSimulationEvent(initSimulation)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.initSimulation(initSimulation))
+
+  "add delete simulation event" should "update simulation manager" in:
+    eventQueue.addDeleteSimulationEvent(updateSimulation)
+    val states = updateState()
+    states.lastOption mustBe Some(initialState.updateSimulation(updateSimulation))

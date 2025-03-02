@@ -1,25 +1,26 @@
 package ulisse.applications.useCases
 
 import cats.data.NonEmptyChain
-import ulisse.applications.{AppState, EventQueue}
+import ulisse.applications.{EventQueue, StationEventQueue}
 import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 
-import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
-final case class StationService(private val eventQueue: EventQueue) extends StationPorts.Input:
+final case class StationService(private val eventQueue: StationEventQueue) extends StationPorts.Input:
 
   override def stationMap: Future[SM] =
     val p = Promise[SM]()
-    eventQueue.addStationCreationEvent(stationManager => { p.success(stationManager.stations); stationManager })
+    eventQueue.addUpdateStationEvent((stationManager, routeManager) =>
+      p.success(stationManager.stations); (stationManager, routeManager)
+    )
     p.future
 
   override def addStation(station: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.addStationCreationEvent(stationManager => {
+    eventQueue.addCreateStationEvent(stationManager => {
       val updatedMap = stationManager.addStation(station)
       updateState(p, stationManager, updatedMap)
     })
@@ -27,7 +28,7 @@ final case class StationService(private val eventQueue: EventQueue) extends Stat
 
   override def removeStation(station: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.addStationCreationEvent(stationManager => {
+    eventQueue.addCreateStationEvent(stationManager => {
       val updatedMap = stationManager.removeStation(station)
       updateState(p, stationManager, updatedMap)
     })
@@ -35,7 +36,7 @@ final case class StationService(private val eventQueue: EventQueue) extends Stat
 
   override def updateStation(oldStation: Station, newStation: Station): Future[Either[E, SM]] =
     val p = Promise[Either[E, SM]]()
-    eventQueue.addStationCreationEvent(stationManager => {
+    eventQueue.addCreateStationEvent(stationManager => {
       val updatedMap = stationManager.removeStation(oldStation).flatMap(_.addStation(newStation))
       updateState(p, stationManager, updatedMap)
     })
@@ -43,7 +44,7 @@ final case class StationService(private val eventQueue: EventQueue) extends Stat
 
   override def findStationAt(coordinate: Coordinate): Future[Option[Station]] =
     val p = Promise[Option[Station]]()
-    eventQueue.addStationCreationEvent(stationManager => {
+    eventQueue.addCreateStationEvent(stationManager => {
       val station = stationManager.findStationAt(coordinate)
       p.success(station)
       stationManager
