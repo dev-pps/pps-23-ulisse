@@ -1,6 +1,10 @@
 package ulisse.utils
 
+import cats.Monad
+import cats.Id
+import cats.syntax.all.*
 import ulisse.utils.Errors.{BaseError, ErrorMessage}
+
 import scala.annotation.targetName
 
 object Times:
@@ -108,7 +112,7 @@ object Times:
     @targetName("add")
     def +(time2: Either[ClockTimeErrors, ClockTime]): Either[ClockTimeErrors, ClockTime] =
       extractAndPerform(time, time2): (t, t2) =>
-        calculateSum(t, t2)
+        calculateSumWithEither(t, t2)
 
     def greaterEqThan(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
       checkCondition(time, time2)(_ >= 0)
@@ -120,13 +124,6 @@ object Times:
       checkCondition(time, time2)(_ == 0)
 
   extension (time: Option[ClockTime])
-    @targetName("add")
-    def +(time2: Option[ClockTime]): Option[ClockTime] =
-      for
-        t   <- time
-        t2  <- time2
-        sum <- calculateSum(t, t2).toOption
-      yield sum
     @targetName("sub")
     def -(time2: Option[ClockTime]): Option[ClockTime] =
       for
@@ -134,6 +131,19 @@ object Times:
         t2  <- time2
         sub <- calculateSub(t, t2)
       yield sub
+
+  given ((Int, Int, Int) => Either[ClockTimeErrors, ClockTime]) = (x, y, z) => ClockTime(x, y)
+  given ((Int, Int, Int) => ClockTime)                          = (x, y, z) => ClockTime(x, y).getOrDefault
+  given ((Int, Int, Int) => Option[ClockTime])                  = (x, y, z) => ClockTime(x, y).toOption
+  given ((Int, Int, Int) => Time)                               = Time.apply
+  extension [M[_]: Monad, T <: Time](time: M[T])
+    @targetName("add")
+    def +(time2: M[T])(using constructor: (Int, Int, Int) => M[T]): M[T] =
+      for
+        t  <- time
+        t2 <- time2
+        ct <- calculateSum(t, t2)
+      yield ct
 
   /** Returns true if predicate on the two provided `ClockTime` is satisfied */
   private def checkCondition(
@@ -149,7 +159,7 @@ object Times:
     def ++(time2: Either[ClockTimeErrors, ClockTime]): Either[ClockTimeErrors, ClockTime] =
       for
         t2  <- time2
-        sum <- calculateSum(time, t2)
+        sum <- calculateSumWithEither(time, t2)
       yield sum
 
     @targetName("greaterEquals")
@@ -164,7 +174,7 @@ object Times:
     def ===(time2: ClockTime): Boolean =
       summon[Ordering[ClockTime]].compare(time, time2) == 0
 
-  private def calculateSum(t: ClockTime, t2: ClockTime): Either[ClockTimeErrors, ClockTime] =
+  private def calculateSumWithEither(t: ClockTime, t2: ClockTime): Either[ClockTimeErrors, ClockTime] =
     val minutesInHour = 60
     val hoursInDay    = 24
     val totalMinutes  = t.m + t2.m
@@ -172,6 +182,21 @@ object Times:
     val minutes       = totalMinutes              % minutesInHour
     val hours         = (t.h + t2.h + extraHours) % hoursInDay
     ClockTime(hours, minutes)
+
+  private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(using
+      constructor: (Int, Int, Int) => M[T]
+  ): M[T] =
+    val secondInMinutes, minutesInHour = 60
+    val hoursInDay                     = 24
+    val ts                             = time1.s + time2.s
+    val tm                             = time1.m + time2.m
+    val th                             = time1.h + time2.h
+    val seconds                        = ts                  % secondInMinutes
+    val extraMinutes                   = ts / secondInMinutes
+    val minutes                        = (tm + extraMinutes) % minutesInHour
+    val extraHours                     = (tm + extraMinutes) / minutesInHour
+    val hours                          = (th + extraHours)   % hoursInDay
+    constructor(hours, minutes, seconds)
 
   private def calculateSub(t: ClockTime, t2: ClockTime): Option[ClockTime] =
     val minutesInHour = 60
