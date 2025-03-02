@@ -84,5 +84,5 @@ final case class StationSettings():
 
 @main def testNewGraphicComponents(): Unit =
   val list = LinkedBlockingQueue[RouteManager => RouteManager]()
-  val port = RouteService(list)
+  val port = RouteService(eventQueue)
   val map  = GUIView(port)

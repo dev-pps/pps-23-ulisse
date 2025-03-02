@@ -56,5 +56,4 @@ final case class StationService(private val eventQueue: StationEventQueue) exten
   ) =
     updatedMap match
       case Left(value: E) => p.success(Left(value)); stationManager
-      case Right(value) =>
-        p.success(Right(value.stations)); value
+      case Right(value)   => p.success(Right(value.stations)); value

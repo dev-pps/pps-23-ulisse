@@ -1,6 +1,6 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.EventQueue
+import ulisse.applications.{EventQueue, SimulationEventQueue}
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.ports.SimulationPorts
 import ulisse.entities.route.RouteEnvironmentElement
@@ -13,7 +13,7 @@ import ulisse.infrastructures.commons.TimeProviders.*
 import scala.concurrent.{Future, Promise}
 
 final case class SimulationService(
-    private val eventQueue: EventQueue,
+    private val eventQueue: SimulationEventQueue,
     private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
 
