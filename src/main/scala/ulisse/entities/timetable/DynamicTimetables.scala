@@ -77,17 +77,13 @@ object DynamicTimetables:
           swti =>
             TrainStationTime(
               swti._2.arriving,
-              (Some(time) - expectedDepartureTime).map(c => c.h * 60 + c.m + expectedWaitingTime.getOrElse(0)),
+              (Some(time) - expectedDepartureTime).map(_.toMinutes),
               Some(time)
             )
         )
 
       private def expectedDepartureTime: Option[ClockTime] =
         nextRoute.flatMap(nr => table.find(_._1 == nr._1).flatMap(_._2.departure))
-
-      private def expectedWaitingTime: Option[Int] = nextRoute.flatMap(nr =>
-        table.find(_._1 == nr._1).flatMap(_._2.waitTime)
-      )
 
       extension (route: Option[(Station, Station)])
         private def updateTimeInfo(
