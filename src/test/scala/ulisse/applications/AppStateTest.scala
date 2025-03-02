@@ -4,25 +4,30 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
+import ulisse.entities.train.Trains.TrainTechnology
 
 import scala.compiletime.{erasedValue, summonInline}
 import scala.reflect.ClassTag
 
 object AppStateTest:
-  val stationManager: StationManager       = mock[StationManager]
-  val routeManager: RouteManager           = mock[RouteManager]
-  val trainManager: TrainManager           = mock[TrainManager]
-  val timetableManager: TimetableManager   = mock[TimetableManager]
-  val simulationManager: SimulationManager = mock[SimulationManager]
+  val stationManager: StationManager                        = mock[StationManager]
+  val routeManager: RouteManager                            = mock[RouteManager]
+  val technologyManager: TechnologyManager[TrainTechnology] = mock[TechnologyManager[TrainTechnology]]
+  val trainManager: TrainManager                            = mock[TrainManager]
+  val timetableManager: TimetableManager                    = mock[TimetableManager]
+  val simulationManager: SimulationManager                  = mock[SimulationManager]
 
-  val updateStation: StationManager => StationManager          = _ => stationManager
-  val updateRoute: RouteManager => RouteManager                = _ => routeManager
-  val updateTrain: TrainManager => TrainManager                = _ => trainManager
-  val updateTimetable: TimetableManager => TimetableManager    = _ => timetableManager
-  val updateSimulation: SimulationManager => SimulationManager = _ => simulationManager
+  val updateStation: StationManager => StationManager = _ => stationManager
+  val updateRoute: RouteManager => RouteManager       = _ => routeManager
+  val updateTechnology: TechnologyManager[TrainTechnology] => TechnologyManager[TrainTechnology] =
+    _ => technologyManager
+  val updateTrain: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager = (_, _) => trainManager
+  val updateTimetable: TimetableManager => TimetableManager                           = _ => timetableManager
+  val updateSimulation: SimulationManager => SimulationManager                        = _ => simulationManager
   val updateRailwayNetwork: (StationManager, RouteManager) => (StationManager, RouteManager) =
     (_, _) => (stationManager, routeManager)
   val updateStationSchedule
@@ -57,7 +62,7 @@ class AppStateTest extends AnyFlatSpec with Matchers:
 
   "read train manager" should "be a function that not update manager" in:
     val initTrainManager = appState.trainManager
-    appState.readTrain(_ => ())
+    appState.readTrain((_, _) => ())
     appState.trainManager mustBe initTrainManager
 
   "read timetable manager" should "be a function that not update manager" in:
@@ -77,6 +82,10 @@ class AppStateTest extends AnyFlatSpec with Matchers:
   "update route manager" should "update manager" in:
     val newState = appState.updateRoute(updateRoute)
     newState.routeManager mustBe routeManager
+
+  "update technology manager" should "update manager" in:
+    val newState = appState.updateTechnology(updateTechnology)
+    newState.technologyManager mustBe technologyManager
 
   "update train manager" should "update manager" in:
     val newState = appState.updateTrain(updateTrain)

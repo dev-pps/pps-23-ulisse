@@ -54,7 +54,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
       val managerWithSimpleTimetable = TimetableManagers.TimetableManager(List(timetableABC))
 
       Given("a Timetable and a new brand TimetableManager")
-      val emptyManager = TimetableManagers.emptyManager()
+      val emptyManager = TimetableManagers.empty()
       When("I request to save timetable built on a sequence of connected stations (exist route between station)")
       Then("timetable should be saved")
       val res = emptyManager.save(timetableABC)
@@ -93,7 +93,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
     val timetableManager = TimetableManagers.TimetableManager(List(timetableAB, timetableBC, timetableABC))
     Scenario("Request not existing timetables of a train"):
       Given("A timetable manager without any timetables")
-      val timetableManager = TimetableManagers.emptyManager()
+      val timetableManager = TimetableManagers.empty()
       When("I request timetables by train name")
       val res = timetableManager.tablesOf("trainName")
       Then("An error should be returned")
@@ -122,7 +122,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
       val requestResult =
         manager.remove(trainName = timetableABC.train.name, departureTime = timetableABC.departureTime)
       Then("new empty manager should be returned")
-      requestResult should be(Right(TimetableManagers.emptyManager()))
+      requestResult should be(Right(TimetableManagers.empty()))
       Then("no timetable should be available for the train if requested (error TimetableNotFound)")
       requestResult match
         case Right(m) =>
@@ -133,7 +133,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
 
     Scenario("Remove a train timetable that not saved"):
       Given("A timetable manager empty")
-      val manager = TimetableManagers.emptyManager()
+      val manager = TimetableManagers.empty()
       When("I request to remove that timetable")
       val requestResult = manager.remove(timetableABC.train.name, timetableABC.departureTime)
       Then("should be returned an error")

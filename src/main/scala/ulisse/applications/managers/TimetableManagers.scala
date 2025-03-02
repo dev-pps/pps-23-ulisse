@@ -45,8 +45,7 @@ object TimetableManagers:
   given defaultAcceptancePolicy: AcceptanceTimetablePolicy = NoOverlappingTimePolicy
 
   /** Return an empty manager */
-  def emptyManager(): TimetableManager =
-    TimetableManager(List.empty)
+  def empty(): TimetableManager = TimetableManager(List.empty)
 
   trait TimetableManager:
     /** Save new `timetable` for a train. Timetable is accepted if passes the `acceptancePolicy` rules.

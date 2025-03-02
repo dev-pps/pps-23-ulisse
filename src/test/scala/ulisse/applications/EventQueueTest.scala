@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.Runner.runAll
 
-class QuestStateTest extends AnyFlatSpec with Matchers:
+class EventQueueTest extends AnyFlatSpec with Matchers:
   import AppStateTest.*
 
   private val initialState  = AppState()
@@ -52,7 +52,7 @@ class QuestStateTest extends AnyFlatSpec with Matchers:
     states.lastOption mustBe Some(initialState.updateRouteSchedule(updateRouteSchedule))
 
   "add read train event" should "update train manager" in:
-    eventQueue.addReadTrainEvent(_ => ())
+    eventQueue.addReadTrainEvent((_, _) => ())
     val states = updateState()
     states.lastOption mustBe Some(initialState)
 

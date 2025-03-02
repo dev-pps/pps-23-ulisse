@@ -1,5 +1,6 @@
 package ulisse.applications.useCases
 
+import ulisse.applications.TrainEventQueue
 import ulisse.applications.managers.TechnologyManagers.TechErrors.TechnologyNotExists
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TrainManagers.TrainManager
@@ -12,17 +13,15 @@ import ulisse.utils.Errors.BaseError
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
-type AppState = (TrainManager, TechnologyManager[TrainTechnology])
-
-final case class TrainService(stateEventQueue: LinkedBlockingQueue[AppState => AppState])
-    extends Input:
+final case class TrainService(eventQueue: TrainEventQueue) extends Input:
 
   def removeTrain(name: String): Future[Either[BaseError, List[Train]]] =
     val promise = Promise[Either[BaseError, List[Train]]]
-    stateEventQueue.offer((state: AppState) => {
-      val managerResult = state._1.removeTrain(name)
-      unpackResult(managerResult)(promise, state)
-    })
+
+    eventQueue.addDeleteTrainEvent((trainManager, timetableManager) =>
+      val managerResult = trainManager.removeTrain(name)
+      (unpackResult(managerResult)(promise, trainManager), timetableManager)
+    )
     promise.future
 
   def addTrain(
@@ -33,14 +32,13 @@ final case class TrainService(stateEventQueue: LinkedBlockingQueue[AppState => A
       wagonCount: Int
   ): Future[Either[BaseError, List[Train]]] =
     val promise = Promise[Either[BaseError, List[Train]]]
-    stateEventQueue.offer((state: AppState) => {
-      val (trainManager, techManager) = state
-      val tech                        = techManager.technologiesList.find(_.name.contentEquals(technologyName))
+    eventQueue.addCreateTrainEvent((trainManager, technologyManager) =>
+      val tech = technologyManager.technologiesList.find(_.name.contentEquals(technologyName))
       val managerResult = tech match
         case Some(tk) => trainManager.createTrain(name, tk, wagonUseTypeName, wagonCapacity, wagonCount)
         case None     => Left(TechnologyNotExists(technologyName))
-      unpackResult(managerResult)(promise, state)
-    })
+      unpackResult(managerResult)(promise, trainManager)
+    )
     promise.future
 
   def updateTrain(name: String)(
@@ -50,50 +48,46 @@ final case class TrainService(stateEventQueue: LinkedBlockingQueue[AppState => A
       wagonCount: Int
   ): Future[Either[BaseError, List[Train]]] =
     val promise = Promise[Either[BaseError, List[Train]]]
-    stateEventQueue.offer((state: AppState) => {
-      val (trainManager, techManager) = state
+
+    eventQueue.addUpdateTrainEvent((trainManager, technologyManager) =>
       val res =
         for
-          t <- techManager.technologiesList.find(_.name.contentEquals(technologyName)).toRight(TechnologyNotExists(
-            technologyName
-          ))
+          t <-
+            technologyManager.technologiesList.find(_.name.contentEquals(technologyName)).toRight(TechnologyNotExists(
+              technologyName
+            ))
           r <- trainManager.updateTrain(name)(t, wagonUseTypeName, wagonCapacity, wagonCount)
         yield r
-      unpackResult(res)(promise, state)
-    })
+      unpackResult(res)(promise, trainManager)
+    )
     promise.future
 
   def trains: Future[List[Train]] =
     val promise = Promise[List[Train]]
-    stateEventQueue.offer((state: AppState) => {
-      promise.success(state._1.trains)
-      state
-    })
+    eventQueue.addReadTrainEvent((traintManager, technologyManager) => promise.success(traintManager.trains))
     promise.future
 
   def technologies: Future[List[TrainTechnology]] =
-    itemsRequest[List[TrainTechnology]](state => state._2.technologiesList)(stateEventQueue)
+    itemsRequest[List[TrainTechnology]]((trainManager, technologyManager) => technologyManager.technologiesList)(
+      eventQueue
+    )
 
   def wagonTypes: Future[List[UseType]] =
-    itemsRequest[List[UseType]](state => state._1.wagonTypes)(stateEventQueue)
+    itemsRequest[List[UseType]]((trainManager, technologyManager) => trainManager.wagonTypes)(eventQueue)
 
-  private def itemsRequest[T](items: AppState => T)(queue: LinkedBlockingQueue[AppState => AppState]) =
+  private def itemsRequest[T](items: (TrainManager, TechnologyManager[TrainTechnology]) => T)(queue: TrainEventQueue) =
     val promise = Promise[T]
-    queue.offer((state: AppState) => {
-      promise.success(items(state))
-      state
-    })
+    queue.addReadTrainEvent((trainManager, technologyManager) =>
+      promise.success(items(trainManager, technologyManager))
+    )
     promise.future
 
   private def unpackResult(managerResult: Either[BaseError, TrainManager])(
       promise: Promise[Either[BaseError, List[Train]]],
-      state: AppState
-  ) = {
+      state: TrainManager
+  ) =
     managerResult match
-      case Left(e) =>
-        promise.success(Left(e))
-        state
+      case Left(error) => promise.success(Left(error)); state
       case Right(newManager) =>
         promise.success(Right(newManager.trains))
-        state.copy(_1 = newManager)
-  }
+        newManager

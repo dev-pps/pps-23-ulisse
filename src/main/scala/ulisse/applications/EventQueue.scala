@@ -1,10 +1,12 @@
 package ulisse.applications
 
 import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.entities.simulation.Simulations.SimulationData
+import ulisse.entities.train.Trains.TrainTechnology
 
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -15,7 +17,6 @@ trait EventQueue
     with TrainEventQueue
     with TimeTableEventQueue
     with SimulationEventQueue:
-
   /** Events queue, contains all the events to process. */
   val events: LinkedBlockingQueue[AppState => AppState]
 
@@ -62,13 +63,14 @@ trait RouteEventQueue:
 /** Event queue to update the train. */
 trait TrainEventQueue:
   /** Add an event to create a train. */
-  def addReadTrainEvent(update: TrainManager => Unit): Unit
+  def addReadTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology]) => Unit): Unit
 
   /** Add an event to create a train. */
-  def addCreateTrainEvent(update: TrainManager => TrainManager): Unit
+  def addCreateTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): Unit
 
   /** Add an event to update a train. */
-  def addUpdateTrainEvent(update: TrainManager => TrainManager): Unit = addCreateTrainEvent(update)
+  def addUpdateTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): Unit =
+    addCreateTrainEvent(update)
 
   /** Add an event to delete a train. */
   def addDeleteTrainEvent(update: (TrainManager, TimetableManager) => (TrainManager, TimetableManager)): Unit
@@ -141,9 +143,11 @@ object EventQueue:
     override def addDeleteRouteEvent(update: (RouteManager, TimetableManager) => (RouteManager, TimetableManager))
         : Unit = events.offer(_ updateRouteSchedule update)
 
-    override def addReadTrainEvent(update: TrainManager => Unit): Unit = events.offer(_ readTrain update)
+    override def addReadTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology]) => Unit): Unit =
+      events.offer(_ readTrain update)
 
-    override def addCreateTrainEvent(update: TrainManager => TrainManager): Unit = events.offer(_ updateTrain update)
+    def addCreateTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): Unit =
+      events.offer(_ updateTrain update)
 
     override def addDeleteTrainEvent(update: (TrainManager, TimetableManager) => (TrainManager, TimetableManager))
         : Unit = events.offer(_ updateTrainSchedule update)
