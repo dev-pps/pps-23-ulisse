@@ -15,7 +15,9 @@ class PlatformTest extends AnyWordSpec with Matchers:
   private val defaultWagonNumber = 5
   private val train3905          = TrainAgent.apply(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
   private val train3906          = TrainAgent.apply(Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber))
-
+  private val id                = 1
+  private val platform           = Platform(id)
+  
   "A Platform" when:
     "is created" should:
       "have a positive platform number" in:
@@ -24,9 +26,9 @@ class PlatformTest extends AnyWordSpec with Matchers:
         )
 
       "not contain any train" in:
-        Platform(1).trains shouldBe Seq()
-        Platform(1).isEmpty shouldBe true
-        Platform(1).isAvailable shouldBe true
+        platform.trains shouldBe Seq()
+        platform.isEmpty shouldBe true
+        platform.isAvailable shouldBe true
 
     "created checked" should:
       "have a positive platform number" in:
@@ -60,29 +62,29 @@ class PlatformTest extends AnyWordSpec with Matchers:
           case _ => fail()
 
       "not be updated if the platform is not available" in:
-        Platform(1).putTrain(train3905).flatMap(_.putTrain(train3905)) shouldBe None
-        Platform(1).putTrain(train3905).flatMap(_.putTrain(train3906)) shouldBe None
+        platform.putTrain(train3905).flatMap(_.putTrain(train3905)) shouldBe None
+        platform.putTrain(train3905).flatMap(_.putTrain(train3906)) shouldBe None
 
       "not be updated if the train is already moved" in:
-        Platform(1).putTrain(train3905.updateDistanceTravelled(10)) shouldBe None
+        platform.putTrain(train3905.updateDistanceTravelled(10)) shouldBe None
 
     "a train is updated" should:
       "be updated with the specified train if it's present" in:
         val id           = 1
         val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(10)
+        val updatedTrain3905 = train.updateDistanceTravelled(10)
         Platform(id).putTrain(train).flatMap(
-          _.updateTrain(updatedTrain)
+          _.updateTrain(updatedTrain3905)
         ) match
           case Some(up) =>
             up.id shouldBe id
-            up.trains shouldBe Seq(updatedTrain)
+            up.trains shouldBe Seq(updatedTrain3905)
             up.isEmpty shouldBe false
             up.isAvailable shouldBe false
           case _ => fail()
 
       "not be updated if the platform doesn't contain the specified train" in:
-        Platform(1).putTrain(train3905).flatMap(_.updateTrain(train3906)) shouldBe None
+        platform.putTrain(train3905).flatMap(_.updateTrain(train3906)) shouldBe None
 
     "a train is removed" should:
       "be updated if the specified train it's present" in:
@@ -99,17 +101,17 @@ class PlatformTest extends AnyWordSpec with Matchers:
           case _ => fail()
 
       "not be updated if the platform doesn't contain the specified train" in:
-        Platform(1).putTrain(train3905).flatMap(_.removeTrain(train3906)) shouldBe None
+        platform.putTrain(train3905).flatMap(_.removeTrain(train3906)) shouldBe None
 
     "a train is searched" should:
       "be found if there is a train with the same name" in:
         val train        = train3905
         val updatedTrain = train.updateDistanceTravelled(10)
-        Platform(1).putTrain(train) match
+        platform.putTrain(train) match
           case Some(up) =>
             up.contains(train) shouldBe true
             up.contains(updatedTrain) shouldBe true
           case _ => fail()
 
       "not be found if there isn't a train with the same name" in:
-        Platform(1).putTrain(train3905).map(_.contains(train3906)) shouldBe Some(false)
+        platform.putTrain(train3905).map(_.contains(train3906)) shouldBe Some(false)

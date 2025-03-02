@@ -23,6 +23,12 @@ object Track:
   enum TrainAgentsDirection:
     case Forward, Backward
 
+  object TrainAgentsDirection:
+    extension (direction: TrainAgentsDirection)
+      def opposite: TrainAgentsDirection = direction match
+        case TrainAgentsDirection.Forward  => TrainAgentsDirection.Backward
+        case TrainAgentsDirection.Backward => TrainAgentsDirection.Forward
+
   def apply(trackNumber: Int)(using minPermittedDistanceBetweenTrains: Double): Track =
     TrackImpl(math.max(1, trackNumber), Seq(), None)
   def createCheckedTrack(

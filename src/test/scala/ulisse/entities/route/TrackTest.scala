@@ -13,8 +13,11 @@ class TrackTest extends AnyWordSpec with Matchers:
   private val defaultTechnology                   = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
   private val defaultWagon                        = Wagon(UseType.Passenger, 50)
   private val defaultWagonNumber                  = 5
-  private val train3905 = TrainAgent.apply(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
-  private val train3906 = TrainAgent.apply(Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber))
+  private val train3905 = TrainAgent(Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber))
+  private val train3906 = TrainAgent(Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber))
+  private val id        = 1
+  private val direction = Forward
+  private val track     = Track(id)
 
   "A track" when:
     "created" should:
@@ -24,15 +27,15 @@ class TrackTest extends AnyWordSpec with Matchers:
         )
 
       "not contain any train" in:
-        Track(1).trains shouldBe Seq()
-        Track(1).isEmpty shouldBe true
-        Track(1).isAvailable shouldBe true
+        track.trains shouldBe Seq()
+        track.isEmpty shouldBe true
+        track.isAvailable shouldBe true
 
       "have a min permitted distance between trains" in:
-        Track(1).minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
+        track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
 
       "not have a set direction" in:
-        Track(1).currentDirection shouldBe None
+        track.currentDirection shouldBe None
 
     "created checked" should:
       "have a positive track number" in:
@@ -46,7 +49,7 @@ class TrackTest extends AnyWordSpec with Matchers:
         )
 
       "not contain any train" in:
-        Track.createCheckedTrack(1) match
+        Track.createCheckedTrack(id) match
           case Right(track) =>
             track.trains shouldBe Seq()
             track.isEmpty shouldBe true
@@ -54,26 +57,23 @@ class TrackTest extends AnyWordSpec with Matchers:
           case _ => fail()
 
       "have a min permitted distance between trains" in:
-        Track.createCheckedTrack(1) match
+        Track.createCheckedTrack(id) match
           case Right(track) =>
             track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
           case _ => fail()
 
       "not have a set direction" in:
-        Track.createCheckedTrack(1) match
+        Track.createCheckedTrack(id) match
           case Right(track) =>
             track.currentDirection shouldBe None
           case _ => fail()
 
     "a train is put in" should:
       "be updated with the specified train" in:
-        val id        = 1
-        val train     = train3905
-        val direction = Forward
-        Track(id).putTrain(train, direction) match
+        track.putTrain(train3905, direction) match
           case Some(ut) =>
             ut.id shouldBe id
-            ut.trains shouldBe Seq(train)
+            ut.trains shouldBe Seq(train3905)
             ut.isEmpty shouldBe false
             ut.isAvailable shouldBe false
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
@@ -81,25 +81,22 @@ class TrackTest extends AnyWordSpec with Matchers:
           case _ => fail()
 
       "not be updated if the track is not available" in:
-        val direction = Forward
-        Track(1).putTrain(train3905, direction).flatMap(_.putTrain(train3905, direction)) shouldBe None
-        Track(1).putTrain(train3905, direction).flatMap(_.putTrain(train3906, direction)) shouldBe None
+        track.putTrain(train3905, direction).flatMap(_.putTrain(train3905, direction)) shouldBe None
+        track.putTrain(train3905, direction).flatMap(_.putTrain(train3906, direction)) shouldBe None
 
       "not be updated if the train is already moved" in:
-        Track(1).putTrain(train3905.updateDistanceTravelled(10), Forward) shouldBe None
+        track.putTrain(train3905.updateDistanceTravelled(10), direction) shouldBe None
 
       "contain multiple trains" in:
-        val id           = 1
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains)
-        val otherTrain   = train3906
-        val direction    = Forward
-        Track(1).putTrain(train, direction).flatMap(
-          _.updateTrain(updatedTrain)
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(train3905.lengthSize + minPermittedDistanceBetweenTrains)
+        val otherTrain = train3906
+        track.putTrain(train3905, direction).flatMap(
+          _.updateTrain(updatedTrain3905)
         ).flatMap(_.putTrain(otherTrain, direction)) match
           case Some(ut) =>
             ut.id shouldBe id
-            ut.trains shouldBe Seq(updatedTrain, otherTrain)
+            ut.trains shouldBe Seq(updatedTrain3905, otherTrain)
             ut.isEmpty shouldBe false
             ut.isAvailable shouldBe false
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
@@ -107,97 +104,83 @@ class TrackTest extends AnyWordSpec with Matchers:
           case None => fail()
 
       "not contain multiple train in different directions" in:
-        Track(1).putTrain(train3905, Forward).flatMap(
+        track.putTrain(train3905, direction).flatMap(
           _.updateTrain(train3905.updateDistanceTravelled(train3905.lengthSize))
-        ).flatMap(_.putTrain(train3906, Backward)) shouldBe None
+        ).flatMap(_.putTrain(train3906, direction.opposite)) shouldBe None
 
       "not contain the same train multiple times" in:
-        val direction = Forward
-        Track(1).putTrain(train3905, direction).flatMap(
+        track.putTrain(train3905, direction).flatMap(
           _.updateTrain(train3905.updateDistanceTravelled(train3905.lengthSize))
         ).flatMap(_.putTrain(train3905, direction)) shouldBe None
 
     "a train is updated" should:
       "be updated with the specified train if it's present" in:
-        val id           = 1
-        val direction    = Forward
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(10)
-        Track(id).putTrain(train, direction).flatMap(_.updateTrain(updatedTrain)) match
+        val updatedTrain3905 = train3905.updateDistanceTravelled(10)
+        track.putTrain(train3905, direction).flatMap(_.updateTrain(updatedTrain3905)) match
           case Some(ut) =>
             ut.id shouldBe id
-            ut.trains shouldBe Seq(updatedTrain)
+            ut.trains shouldBe Seq(updatedTrain3905)
             ut.isEmpty shouldBe false
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
             ut.currentDirection shouldBe Some(direction)
           case _ => fail()
 
       "leave track unavailable" in:
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains - 1)
-        Track(1).putTrain(train, Forward).flatMap(_.updateTrain(updatedTrain)) match
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(train3905.lengthSize + minPermittedDistanceBetweenTrains - 1)
+        track.putTrain(train3905, direction).flatMap(_.updateTrain(updatedTrain3905)) match
           case Some(ut) =>
             ut.isAvailable shouldBe false
           case _ => fail()
 
       "make track available again" in:
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains)
-        Track(1).putTrain(train, Forward).flatMap(_.updateTrain(updatedTrain)) match
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(train3905.lengthSize + minPermittedDistanceBetweenTrains)
+        track.putTrain(train3905, direction).flatMap(_.updateTrain(updatedTrain3905)) match
           case Some(ut) =>
             ut.isAvailable shouldBe true
           case _ => fail()
 
       "not be updated if the track doesn't contain the specified train" in:
-        Track(1).putTrain(train3905, Forward).flatMap(_.updateTrain(train3906)) shouldBe None
+        track.putTrain(train3905, direction).flatMap(_.updateTrain(train3906)) shouldBe None
 
       "be updated if the securityDistance is preserved" in:
-        val id            = 1
-        val direction     = Forward
         val movementDelta = 10
-        val train         = train3905
-        val updatedTrain =
-          train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains + movementDelta)
-        val otherTrain        = train3906
-        val updatedOtherTrain = otherTrain.updateDistanceTravelled(movementDelta)
-        Track(id).putTrain(train, direction).flatMap(_.updateTrain(updatedTrain)).flatMap(
-          _.putTrain(otherTrain, direction)
-        ).flatMap(_.updateTrain(updatedOtherTrain)) match
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(train3905.lengthSize + minPermittedDistanceBetweenTrains + movementDelta)
+        val updatedTrain3906 = train3906.updateDistanceTravelled(movementDelta)
+        track.putTrain(train3905, direction).flatMap(_.updateTrain(updatedTrain3905)).flatMap(
+          _.putTrain(train3906, direction)
+        ).flatMap(_.updateTrain(updatedTrain3906)) match
           case Some(ut) =>
             ut.id shouldBe id
-            ut.trains shouldBe Seq(updatedTrain, updatedOtherTrain)
+            ut.trains shouldBe Seq(updatedTrain3905, updatedTrain3906)
             ut.isEmpty shouldBe false
             ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
             ut.currentDirection shouldBe Some(direction)
           case _ => fail()
 
       "not be updated if the trains will be to close" in:
-        val direction         = Forward
-        val train             = train3905
-        val updatedTrain      = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains)
-        val otherTrain        = train3906
-        val updatedOtherTrain = otherTrain.updateDistanceTravelled(1)
-        Track(1).putTrain(train, direction).flatMap(_.updateTrain(updatedTrain)).flatMap(
-          _.putTrain(otherTrain, direction)
-        ).flatMap(_.updateTrain(updatedOtherTrain)) shouldBe None
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(train3905.lengthSize + minPermittedDistanceBetweenTrains)
+        val updatedTrain3906 = train3906.updateDistanceTravelled(1)
+        track.putTrain(train3905, direction).flatMap(_.updateTrain(updatedTrain3905)).flatMap(
+          _.putTrain(train3906, direction)
+        ).flatMap(_.updateTrain(updatedTrain3906)) shouldBe None
 
       "not be updated if there is an overtake" in:
-        val direction    = Forward
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains)
-        val otherTrain   = train3906
-        val updatedOtherTrain = otherTrain.updateDistanceTravelled(
-          train.lengthSize + minPermittedDistanceBetweenTrains + updatedTrain.distanceTravelled
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(train3905.lengthSize + minPermittedDistanceBetweenTrains)
+        val updatedTrain3906 = train3906.updateDistanceTravelled(
+          train3905.lengthSize + minPermittedDistanceBetweenTrains + updatedTrain3905.distanceTravelled
         )
-        Track(1).putTrain(train, direction).flatMap(_.updateTrain(updatedTrain)).flatMap(
-          _.putTrain(otherTrain, direction)
-        ).flatMap(_.updateTrain(updatedOtherTrain)) shouldBe None
+        track.putTrain(train3905, direction).flatMap(_.updateTrain(updatedTrain3905)).flatMap(
+          _.putTrain(train3906, direction)
+        ).flatMap(_.updateTrain(updatedTrain3906)) shouldBe None
 
     "a train is removed" should:
       "be updated if the specified train is the last" in:
-        val id    = 1
-        val train = train3905
-        Track(id).putTrain(train, Forward).flatMap(_.removeTrain(train)) match
+        track.putTrain(train3905, direction).flatMap(_.removeTrain(train3905)) match
           case Some(ut) =>
             ut.id shouldBe id
             ut.trains shouldBe Seq()
@@ -208,34 +191,27 @@ class TrackTest extends AnyWordSpec with Matchers:
           case _ => fail()
 
       "not be updated if the track doesn't contain the specified train" in:
-        Track(1).putTrain(train3905, Forward).flatMap(_.removeTrain(train3906)) shouldBe None
+        track.putTrain(train3905, direction).flatMap(_.removeTrain(train3906)) shouldBe None
 
       "not be updated if the train is not the last in the track" in:
-        val id           = 1
-        val direction    = Forward
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains)
-        val otherTrain   = train3906
-        Track(id).putTrain(train, direction).flatMap(_.updateTrain(updatedTrain)).flatMap(_.putTrain(
-          otherTrain,
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(train3905.lengthSize + minPermittedDistanceBetweenTrains)
+        track.putTrain(train3905, direction).flatMap(_.updateTrain(updatedTrain3905)).flatMap(_.putTrain(
+          train3906,
           direction
         )).flatMap(
-          _.removeTrain(otherTrain)
+          _.removeTrain(train3906)
         ) shouldBe None
 
       "maintain direction if the track doesn't become empty" in:
-        val id           = 1
-        val direction    = Forward
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(train.lengthSize + minPermittedDistanceBetweenTrains)
-        val otherTrain   = train3906
-        val a = Track(id).putTrain(train, direction).flatMap(_.updateTrain(updatedTrain)).flatMap(_.putTrain(
+        val updatedTrain3905 =
+          train3905.updateDistanceTravelled(train3905.lengthSize + minPermittedDistanceBetweenTrains)
+        val otherTrain = train3906
+        track.putTrain(train3905, direction).flatMap(_.updateTrain(updatedTrain3905)).flatMap(_.putTrain(
           otherTrain,
           direction
-        ))
-        println(a)
-        a.flatMap(
-          _.removeTrain(train)
+        )).flatMap(
+          _.removeTrain(train3905)
         ) match
           case Some(ut) =>
             ut.id shouldBe id
@@ -248,13 +224,21 @@ class TrackTest extends AnyWordSpec with Matchers:
 
     "a train is searched" should:
       "be found if there is a train with the same name" in:
-        val train        = train3905
-        val updatedTrain = train.updateDistanceTravelled(10)
-        Track(1).putTrain(train, Forward) match
+        val updatedTrain3905 = train3905.updateDistanceTravelled(10)
+        track.putTrain(train3905, direction) match
           case Some(ut) =>
-            ut.contains(train) shouldBe true
-            ut.contains(updatedTrain) shouldBe true
+            ut.contains(train3905) shouldBe true
+            ut.contains(updatedTrain3905) shouldBe true
           case _ => fail()
 
       "not be found if there isn't a train with the same name" in:
-        Track(1).putTrain(train3905, Forward).map(_.contains(train3906)) shouldBe Some(false)
+        track.putTrain(train3905, direction).map(_.contains(train3906)) shouldBe Some(false)
+
+  "A direction" when:
+    "forward" should:
+      "have an opposite direction" in:
+        Forward.opposite shouldBe Backward
+
+    "backward" should:
+      "have an opposite direction" in:
+        Backward.opposite shouldBe Forward
