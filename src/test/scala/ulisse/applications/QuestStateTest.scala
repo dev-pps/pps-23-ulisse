@@ -12,9 +12,9 @@ class QuestStateTest extends AnyFlatSpec with Matchers:
   private def updateState() = runAll(initialState, eventQueue.events)
 
   "add read station event" should "update station manager" in:
-    eventQueue.addReadStationEvent(updateStation)
+    eventQueue.addReadStationEvent(_ => ())
     val states = updateState()
-    states.lastOption mustBe Some(initialState.updateStation(updateStation))
+    states.lastOption mustBe Some(initialState)
 
   "add create station event" should "update station manager" in:
     eventQueue.addCreateStationEvent(updateStation)
@@ -32,9 +32,9 @@ class QuestStateTest extends AnyFlatSpec with Matchers:
     states.lastOption mustBe Some(initialState.updateStationSchedule(updateStationSchedule))
 
   "add read route event" should "update route manager" in:
-    eventQueue.addReadRouteEvent(updateRoute)
+    eventQueue.addReadRouteEvent(_ => ())
     val states = updateState()
-    states.lastOption mustBe Some(initialState.updateRoute(updateRoute))
+    states.lastOption mustBe Some(initialState)
 
   "add create route event" should "update railway network" in:
     eventQueue.addCreateRouteEvent(updateRailwayNetwork)
@@ -52,9 +52,9 @@ class QuestStateTest extends AnyFlatSpec with Matchers:
     states.lastOption mustBe Some(initialState.updateRouteSchedule(updateRouteSchedule))
 
   "add read train event" should "update train manager" in:
-    eventQueue.addReadTrainEvent(updateTrain)
+    eventQueue.addReadTrainEvent(_ => ())
     val states = updateState()
-    states.lastOption mustBe Some(initialState.updateTrain(updateTrain))
+    states.lastOption mustBe Some(initialState)
 
   "add create train event" should "update train manager" in:
     eventQueue.addCreateTrainEvent(updateTrain)
@@ -72,9 +72,9 @@ class QuestStateTest extends AnyFlatSpec with Matchers:
     states.lastOption mustBe Some(initialState.updateTrainSchedule(updateTrainSchedule))
 
   "add read timetable event" should "update timetable manager" in:
-    eventQueue.addReadTimetableEvent(updateTimetable)
+    eventQueue.addReadTimetableEvent(_ => ())
     val states = updateState()
-    states.lastOption mustBe Some(initialState.updateTimetable(updateTimetable))
+    states.lastOption mustBe Some(initialState)
 
   "add create timetable event" should "update railway schedule" in:
     eventQueue.addCreateTimetableEvent(updateRailwaySchedule)
@@ -92,9 +92,9 @@ class QuestStateTest extends AnyFlatSpec with Matchers:
     states.lastOption mustBe Some(initialState.updateTimetable(updateTimetable))
 
   "add read simulation event" should "update simulation manager" in:
-    eventQueue.addReadSimulationEvent(updateSimulation)
+    eventQueue.addReadSimulationEvent(_ => ())
     val states = updateState()
-    states.lastOption mustBe Some(initialState.updateSimulation(updateSimulation))
+    states.lastOption mustBe Some(initialState)
 
   "add create simulation event" should "update simulation manager" in:
     eventQueue.addCreateSimulationEvent(initSimulation)

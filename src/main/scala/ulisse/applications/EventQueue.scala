@@ -4,6 +4,7 @@ import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
+import ulisse.entities.simulation.Simulations.SimulationData
 
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -24,10 +25,10 @@ trait EventQueue
 /** Event queue to update the station. */
 trait StationEventQueue:
   /** Add an event to read a station. */
-  def addReadStationEvent(event: StationManager => StationManager): Unit
+  def addReadStationEvent(event: StationManager => Unit): Unit
 
   /** Add an event to create a station. */
-  def addCreateStationEvent(event: StationManager => StationManager): Unit = addReadStationEvent(event)
+  def addCreateStationEvent(event: StationManager => StationManager): Unit
 
   /** Add an event to update a station. */
   def addUpdateStationEvent(event: (
@@ -46,7 +47,7 @@ trait StationEventQueue:
 /** Event queue to update the route. */
 trait RouteEventQueue:
   /** Add an event to read a route. */
-  def addReadRouteEvent(event: RouteManager => RouteManager): Unit
+  def addReadRouteEvent(event: RouteManager => Unit): Unit
 
   /** Add an event to create a route. */
   def addCreateRouteEvent(update: (StationManager, RouteManager) => (StationManager, RouteManager)): Unit
@@ -61,13 +62,13 @@ trait RouteEventQueue:
 /** Event queue to update the train. */
 trait TrainEventQueue:
   /** Add an event to create a train. */
-  def addReadTrainEvent(update: TrainManager => TrainManager): Unit
+  def addReadTrainEvent(update: TrainManager => Unit): Unit
 
   /** Add an event to create a train. */
-  def addCreateTrainEvent(update: TrainManager => TrainManager): Unit = addReadTrainEvent(update)
+  def addCreateTrainEvent(update: TrainManager => TrainManager): Unit
 
   /** Add an event to update a train. */
-  def addUpdateTrainEvent(update: TrainManager => TrainManager): Unit = addReadTrainEvent(update)
+  def addUpdateTrainEvent(update: TrainManager => TrainManager): Unit = addCreateTrainEvent(update)
 
   /** Add an event to delete a train. */
   def addDeleteTrainEvent(update: (TrainManager, TimetableManager) => (TrainManager, TimetableManager)): Unit
@@ -75,7 +76,7 @@ trait TrainEventQueue:
 /** Event queue to update the timetable. */
 trait TimeTableEventQueue:
   /** Add an event to read a timetable. */
-  def addReadTimetableEvent(update: TimetableManager => TimetableManager): Unit
+  def addReadTimetableEvent(update: TimetableManager => Unit): Unit
 
   /** Add an event to create a timetable. */
   def addCreateTimetableEvent(update: (
@@ -94,12 +95,12 @@ trait TimeTableEventQueue:
   ) => (StationManager, RouteManager, TrainManager, TimetableManager)): Unit = addCreateTimetableEvent(update)
 
   /** Add an event to delete a timetable. */
-  def addDeleteTimetableEvent(update: TimetableManager => TimetableManager): Unit = addReadTimetableEvent(update)
+  def addDeleteTimetableEvent(update: TimetableManager => TimetableManager): Unit
 
 /** Event queue to update the simulation. */
 trait SimulationEventQueue:
   /** Add an event to read a simulation. */
-  def addReadSimulationEvent(update: SimulationManager => SimulationManager): Unit
+  def addReadSimulationEvent(update: SimulationData => Unit): Unit
 
   /** Add an event to create a simulation. */
   def addCreateSimulationEvent(update: (SimulationManager, StationManager) => SimulationManager): Unit
@@ -109,7 +110,7 @@ trait SimulationEventQueue:
     addCreateSimulationEvent(update)
 
   /** Add an event to delete the simulation. */
-  def addDeleteSimulationEvent(update: SimulationManager => SimulationManager): Unit = addReadSimulationEvent(update)
+  def addDeleteSimulationEvent(update: SimulationManager => SimulationManager): Unit
 
 object EventQueue:
   /** Create a new queue state. */
@@ -119,37 +120,35 @@ object EventQueue:
     def this() = this(LinkedBlockingQueue[AppState => AppState]())
 
     override def startProcessing(initState: AppState): Unit =
-      LazyList.continually(events.take()).foldLeft(initState)((state, fun) => fun(state))
+      LazyList.continually(events.take).foldLeft(initState)((state, fun) => fun(state))
 
-    override def addReadStationEvent(event: StationManager => StationManager): Unit =
-      events.offer(_.updateStation(event))
+    override def addReadStationEvent(event: StationManager => Unit): Unit = events.offer(_ readStation event)
+
+    override def addCreateStationEvent(event: StationManager => StationManager): Unit =
+      events.offer(_ updateStation event)
 
     override def addUpdateStationEvent(event: (
         StationManager,
         RouteManager,
         TimetableManager
-    ) => (StationManager, RouteManager, TimetableManager)): Unit =
-      events.offer(_.updateStationSchedule(event))
+    ) => (StationManager, RouteManager, TimetableManager)): Unit = events.offer(_ updateStationSchedule event)
 
-    override def addReadRouteEvent(event: RouteManager => RouteManager): Unit =
-      events.offer(_.updateRoute(event))
+    override def addReadRouteEvent(event: RouteManager => Unit): Unit = events.offer(_ readRoute event)
 
     override def addCreateRouteEvent(update: (StationManager, RouteManager) => (StationManager, RouteManager)): Unit =
-      events.offer(_.updateRailwayNetwork(update))
+      events.offer(_ updateRailwayNetwork update)
 
     override def addDeleteRouteEvent(update: (RouteManager, TimetableManager) => (RouteManager, TimetableManager))
-        : Unit = events.offer(_.updateRouteSchedule(update))
+        : Unit = events.offer(_ updateRouteSchedule update)
 
-    override def addReadTrainEvent(update: TrainManager => TrainManager): Unit = events.offer(_.updateTrain(update))
+    override def addReadTrainEvent(update: TrainManager => Unit): Unit = events.offer(_ readTrain update)
+
+    override def addCreateTrainEvent(update: TrainManager => TrainManager): Unit = events.offer(_ updateTrain update)
 
     override def addDeleteTrainEvent(update: (TrainManager, TimetableManager) => (TrainManager, TimetableManager))
-        : Unit = events.offer(_.updateTrainSchedule(update))
+        : Unit = events.offer(_ updateTrainSchedule update)
 
-    override def addReadTimetableEvent(update: TimetableManager => TimetableManager): Unit =
-      events.offer(_.updateTimetable(update))
-
-    override def addReadSimulationEvent(update: SimulationManager => SimulationManager): Unit =
-      events.offer(_.updateSimulation(update))
+    override def addReadTimetableEvent(update: TimetableManager => Unit): Unit = events.offer(_ readTimetable update)
 
     override def addCreateTimetableEvent(update: (
         StationManager,
@@ -157,7 +156,15 @@ object EventQueue:
         TrainManager,
         TimetableManager
     ) => (StationManager, RouteManager, TrainManager, TimetableManager)): Unit =
-      events.offer(_.updateRailwaySchedule(update))
+      events.offer(_ updateRailwaySchedule update)
+
+    override def addDeleteTimetableEvent(update: TimetableManager => TimetableManager): Unit =
+      events.offer(_ updateTimetable update)
+
+    override def addReadSimulationEvent(update: SimulationData => Unit): Unit = events.offer(_ readSimulation update)
 
     override def addCreateSimulationEvent(update: (SimulationManager, StationManager) => SimulationManager): Unit =
-      events.offer(_.initSimulation(update))
+      events.offer(_ initSimulation update)
+
+    override def addDeleteSimulationEvent(update: SimulationManager => SimulationManager): Unit =
+      events.offer(_ updateSimulation update)
