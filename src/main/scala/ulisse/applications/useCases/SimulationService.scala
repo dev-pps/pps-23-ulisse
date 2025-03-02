@@ -55,7 +55,6 @@ final case class SimulationService(
     eventQueue.offer((appState: AppState) => {
       val newSimulationManager = appState.simulationManager.start()
       p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engineState })
-      println("Start1")
       doStep()
       appState.copy(simulationManager = newSimulationManager)
     })
