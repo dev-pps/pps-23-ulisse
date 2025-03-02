@@ -7,14 +7,10 @@ object Trains:
 
   /** Technology used by train */
   trait TrainTechnology extends Technology:
-    /** @return
-      *   value of acceleration in m/s
-      */
+    /** Returns value of acceleration in m/s */
     def acceleration: Double
 
-    /** @return
-      *   value of deceleration in m/s
-      */
+    /** Returns value of deceleration in m/s */
     def deceleration: Double
 
   object TrainTechnology:
@@ -45,14 +41,10 @@ object Trains:
     /** Length size in meters */
     def lengthSize: Int
 
-    /** @return
-      *   max speed reachable by train
-      */
+    /** Returns max speed reachable by train */
     def maxSpeed: Int
 
-    /** @return
-      *   total transport capacity
-      */
+    /** Returns total transport capacity */
     def capacity: Int
 
     /** Defines equality for Trains */
@@ -64,19 +56,7 @@ object Trains:
 
   /** Factory for [[Trains.Train]] instances. */
   object Train:
-    /** Creates train with a given name, technology type and wagons information.
-      *
-      * @param name
-      *   Train name
-      * @param techType
-      *   [[TrainTechnology]] technology used by train
-      * @param wagon
-      *   [[Wagons.Wagon]] wagon that compose train
-      * @param length
-      *   train length (mount of wagon)
-      * @return
-      *   A new Train instance
-      */
+    /** Creates Train with a given `name`, `techType` technology type, `wagon` information and `length` (count of wagons). */
     def apply(
         name: String,
         techType: TrainTechnology,
@@ -85,11 +65,7 @@ object Trains:
     ): Train =
       TrainImpl(name, techType, wagon, length)
 
-    /** @param train
-      *   Train instance
-      * @return
-      *   An `Option` containing all characteristic of train.
-      */
+    /** Returns an `Option` containing all characteristic of train. */
     def unapply(train: Train): Option[(String, TrainTechnology, Wagon, Int)] =
       Some(train.name, train.techType, train.wagon, train.length)
 

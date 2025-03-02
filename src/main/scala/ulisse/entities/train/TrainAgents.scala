@@ -64,13 +64,20 @@ object TrainAgents:
     def updateDistanceTravelled(distanceDelta: Double): TrainAgent = distanceTravelled += distanceDelta
 
   object TrainAgent:
-    def apply(train: Train): TrainAgent = TrainAgentImpl(train, 0.0)
+    def apply(train: Train): TrainAgent = TrainAgentImpl(train, 0.0, 0.0)
 
-    private final case class TrainAgentImpl(train: Train, distanceTravelled: Double) extends TrainAgent:
+    private final case class TrainAgentImpl(train: Train, distanceTravelled: Double, currentSpeed: Double)
+        extends TrainAgent:
       export train.*
       def distanceTravelled_=(newDistanceTravelled: Double): TrainAgent =
         val minDistanceTravelled = 0.0
         copy(distanceTravelled = math.max(minDistanceTravelled, newDistanceTravelled))
-      override def doStep(dt: Int, simulationEnvironment: E): Option[TrainAgent] =
+
+      // todo: modificare il tipo di ritorno con TrainAgent invece di `Option[Actions.SimulationAction]`
+      override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[TrainAgent] =
         val perception: Option[TrainAgentPerception[?]] = simulationEnvironment.perceptionFor[TrainAgent](this)
-        Some(this)
+        // TODO: aggiornare anche env
+        // in env la prima cosa che fa dopo aver fatto do step è aggiornare l'agente con l'azione nuova
+        // --> diventerebbe che viene sostituito direttamente con l'agente restituito da doStep
+        // TODO: here write behaviour of train based on perceptions.
+        None

@@ -4,7 +4,8 @@ import ulisse.applications.event.TrainEventQueue
 import ulisse.applications.useCases.TrainService
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.UseType
-import ulisse.utils.Errors.BaseError
+import ulisse.utils.Errors.{BaseError, ErrorMessage}
+
 import scala.concurrent.Future
 
 object TrainPorts:
@@ -13,18 +14,18 @@ object TrainPorts:
     * about `Trains`, trains `Technology` and wagon `UseType`.
     */
   trait Input:
-    /** Returns the list of `Train` */
+    /** Returns list of `Train` */
     def trains: Future[List[Train]]
 
-    /** Returns List of saved train `Technology`. */
+    /** Returns list of saved train `Technology`. */
     def technologies: Future[List[TrainTechnology]]
 
-    /** Returns List of `Wagons.UseType` */
+    /** Returns list of [[UseType]] */
     def wagonTypes: Future[List[UseType]]
 
-    /** Creates new train given all needed info.
+    /** Add/save new train given train `name`, existing `technologyName` and `wagonUseTypeName`, valid values of `wagonCapacity` and `wagonCount`
       *
-      * Returns updated list of train if train is created successfully otherwise returns a [[BaseError]].
+      * Returns `Left` type of [[BaseError]] in case of some errors, `Right(List[Train])` if edits are saved.
       */
     def createTrain(
         name: String,
@@ -40,9 +41,9 @@ object TrainPorts:
       */
     def removeTrain(trainName: String): Future[Either[BaseError, List[Train]]]
 
-    /** Updates train information given its `name`.
+    /** Updates train with new information given its `name`.
       *
-      * Returns [[Right]] of List[Train] if train is updated else [[Left]] of
+      * Returns [[Right]] of List[Train] if train is updated else [[Left]] of [[ErrorMessage]]
       */
     def updateTrain(name: String)(
         technologyName: String,
