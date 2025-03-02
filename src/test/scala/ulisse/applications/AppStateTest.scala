@@ -45,6 +45,31 @@ class AppStateTest extends AnyFlatSpec with Matchers:
   import AppStateTest.*
   private val appState = AppState()
 
+  "read station manager" should "be a function that not update manager" in:
+    val initStationManager = appState.stationManager
+    appState.readStation(_ => ())
+    appState.stationManager mustBe initStationManager
+
+  "read route manager" should "be a function that not update manager" in:
+    val initRouteManager = appState.routeManager
+    appState.readRoute(_ => ())
+    appState.routeManager mustBe initRouteManager
+
+  "read train manager" should "be a function that not update manager" in:
+    val initTrainManager = appState.trainManager
+    appState.readTrain(_ => ())
+    appState.trainManager mustBe initTrainManager
+
+  "read timetable manager" should "be a function that not update manager" in:
+    val initTimetableManager = appState.timetableManager
+    appState.readTimetable(_ => ())
+    appState.timetableManager mustBe initTimetableManager
+
+  "read simulation manager" should "be a function that not update manager" in:
+    val initSimulationManager = appState.simulationManager
+    appState.readSimulation(_ => ())
+    appState.simulationManager mustBe initSimulationManager
+
   "update station manager" should "update manager" in:
     val newState = appState.updateStation(updateStation)
     newState.stationManager mustBe stationManager

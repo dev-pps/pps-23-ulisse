@@ -5,6 +5,7 @@ import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager, TimetableManagers}
+import ulisse.entities.simulation.Simulations.SimulationData
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 
 import scala.compiletime.{erasedValue, summonInline}
@@ -25,6 +26,21 @@ trait AppState:
 
   /** Simulation manager. */
   val simulationManager: SimulationManager
+
+  /** Read [[StationManager]]. */
+  def readStation(read: StationManager => Unit): AppState = { read(stationManager); this }
+
+  /** Read [[RouteManager]]. */
+  def readRoute(read: RouteManager => Unit): AppState = { read(routeManager); this }
+
+  /** Read [[TrainManager]]. */
+  def readTrain(read: TrainManager => Unit): AppState = { read(trainManager); this }
+
+  /** Read [[TimetableManager]]. */
+  def readTimetable(read: TimetableManager => Unit): AppState = { read(timetableManager); this }
+
+  /** Read [[SimulationManager]]. */
+  def readSimulation(read: SimulationData => Unit): AppState = { read(simulationManager.simulationData); this }
 
   /** Update [[StationManager]]. */
   def updateStation(update: StationManager => StationManager): AppState
