@@ -5,7 +5,12 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.applications.managers.RouteManagerTest.validateRoute
 import ulisse.entities.route.RouteEnvironmentElement.*
-import ulisse.entities.route.RouteEnvironmentElementTest.{direction, minPermittedDistanceBetweenTrains, routeAB, routeAB_EE}
+import ulisse.entities.route.RouteEnvironmentElementTest.{
+  direction,
+  minPermittedDistanceBetweenTrains,
+  routeAB,
+  routeAB_EE
+}
 import ulisse.entities.route.RouteTest.{arrival, departure, pathLength, railsCount, typeRoute}
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
@@ -15,14 +20,15 @@ import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906, tra
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
+import ulisse.Utils.TestUtility.getOrFail
 
 object RouteEnvironmentElementTest:
   given minPermittedDistanceBetweenTrains: Double = 100.0
-  val direction = Forward
-  val routeAB = makeRoute(stationA, stationB)
-  val routeBC = makeRoute(stationB, stationC)
-  val routeCD = makeRoute(stationC, stationD)
-  val routeDE = makeRoute(stationD, stationE)
+  val direction                                   = Forward
+  val routeAB                                     = makeRoute(stationA, stationB)
+  val routeBC                                     = makeRoute(stationB, stationC)
+  val routeCD                                     = makeRoute(stationC, stationD)
+  val routeDE                                     = makeRoute(stationD, stationE)
 
   val routeAB_EE = makeRouteEE(routeAB)
   val routeBC_EE = makeRouteEE(routeBC)
@@ -30,9 +36,13 @@ object RouteEnvironmentElementTest:
   val routeDE_EE = makeRouteEE(routeDE)
 
   def makeRoute(departure: Station, arrival: Station): Route =
-    Route(departure, arrival, typeRoute, railsCount, 2 * minPermittedDistanceBetweenTrains + trainAgent3905.lengthSize) match
-      case Left(errors) => fail()
-      case Right(route) => route
+    Route(
+      departure,
+      arrival,
+      typeRoute,
+      railsCount,
+      2 * minPermittedDistanceBetweenTrains + trainAgent3905.lengthSize
+    ).getOrFail
 
   def makeRouteEE(route: Route): RouteEnvironmentElement =
     RouteEnvironmentElement(route, minPermittedDistanceBetweenTrains)

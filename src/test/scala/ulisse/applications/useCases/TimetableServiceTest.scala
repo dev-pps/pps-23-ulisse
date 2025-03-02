@@ -4,7 +4,7 @@ import cats.data.NonEmptyChain
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers.shouldBe
-import ulisse.TestUtility.{and, in}
+import ulisse.Utils.TestUtility.{and, in}
 import ulisse.applications.ports.TimetablePorts
 import ulisse.applications.ports.TimetablePorts.RequestResult
 import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{GenericError, InvalidStation, UnavailableTracks}

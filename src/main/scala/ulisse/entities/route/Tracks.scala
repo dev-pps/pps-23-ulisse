@@ -11,7 +11,7 @@ import ulisse.utils.ValidationUtils.{validatePositive, validateRange, validateUn
 
 object Tracks:
 
-  /** The possible directions in witch a Track can be used*/
+  /** The possible directions in witch a Track can be used */
   enum TrackDirection:
     case Forward, Backward
 
@@ -21,7 +21,7 @@ object Tracks:
     extension (direction: TrackDirection)
       /** Return the opposite direction */
       def opposite: TrackDirection = direction match
-        case TrackDirection.Forward => TrackDirection.Backward
+        case TrackDirection.Forward  => TrackDirection.Backward
         case TrackDirection.Backward => TrackDirection.Forward
 
   /** Errors for Track */
@@ -54,7 +54,7 @@ object Tracks:
 
     /** Creates a `Track` instance with validation. If track id is not positive an error is returned */
     def createCheckedTrack(
-                            id: Int
+        id: Int
     )(using minPermittedDistanceBetweenTrains: Double): Either[NonEmptyChain[Tracks.Errors], Track] =
       validatePositive(id, Errors.InvalidTrackId).toValidatedNec.toEither.map(Track(_))
 

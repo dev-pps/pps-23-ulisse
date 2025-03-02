@@ -7,7 +7,7 @@ import ulisse.utils.OptionUtils.{given_Conversion_Option_Option, when}
 /** Contains the EnvironmentElements objects used in the simulation */
 object EnvironmentElements:
 
-  /** Represents an element of the simulation environment*/
+  /** Represents an element of the simulation environment */
   trait EnvironmentElement
 
   /** A data structure that contains trains */
@@ -33,6 +33,7 @@ object EnvironmentElements:
   /** An Environment Element that contains multiple TrainAgentsContainer of the same type */
   trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE]] extends EnvironmentElement:
     self: EE =>
+
     /** The type of the TrainAgentsContainer */
     type TAC <: TrainAgentsContainer[TAC]
 
@@ -46,7 +47,7 @@ object EnvironmentElements:
     def removeTrain(train: TrainAgent): Option[EE] = updateEE(train, _.removeTrain(train), contains(train))
 
     /** Check if the provided train is present inside the element containers */
-    def contains(train: TrainAgent): Boolean       = containers.exists(_.contains(train))
+    def contains(train: TrainAgent): Boolean = containers.exists(_.contains(train))
 
     private def updateEE(
         trainAgent: TrainAgent,

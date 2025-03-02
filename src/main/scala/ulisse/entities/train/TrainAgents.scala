@@ -8,7 +8,7 @@ import ulisse.entities.train.Trains.Train
 import ulisse.entities.simulation.Environments.RailwayEnvironment.*
 import ulisse.entities.simulation.Environments.RailwayEnvironment.given
 import ulisse.entities.simulation.Perceptions.{Perception, PerceptionData}
-import ulisse.entities.timetable.DynamicTimetable
+import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.Timetables.Timetable
 
 object TrainAgents:

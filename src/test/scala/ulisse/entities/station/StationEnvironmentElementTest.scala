@@ -78,7 +78,9 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
     "a train is removed" should:
       "be removed if it's present in a platform" in:
         val updatedTrainAgent3905 = trainAgent3905.updateDistanceTravelled(1)
-        stationA_EE.putTrain(trainAgent3905).flatMap(_.updateTrain(updatedTrainAgent3905)).flatMap(_.removeTrain(trainAgent3905)) match
+        stationA_EE.putTrain(trainAgent3905).flatMap(_.updateTrain(updatedTrainAgent3905)).flatMap(
+          _.removeTrain(trainAgent3905)
+        ) match
           case Some(us) =>
             us shouldBe stationA
             us.containers.find(_.contains(trainAgent3905)) shouldBe None

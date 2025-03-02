@@ -11,8 +11,8 @@ import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 class PlatformTest extends AnyWordSpec with Matchers:
-  private val id                 = 1
-  private val platform           = Platform(id)
+  private val id       = 1
+  private val platform = Platform(id)
 
   "A Platform" when:
     "is created" should:

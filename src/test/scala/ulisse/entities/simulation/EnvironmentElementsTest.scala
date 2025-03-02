@@ -30,7 +30,7 @@ class EnvironmentElementsTest extends AnyWordSpec with Matchers:
 
   private trait TestTrainAgentEEWrapper extends TrainAgentEEWrapper[TestTrainAgentEEWrapper]
   private val train = mock[TrainAgent]
-  private val ee = mock[TestTrainAgentEEWrapper]
+  private val ee    = mock[TestTrainAgentEEWrapper]
 
   "TrainAgent" should:
     "be able to leave a TrainAgentEEWrapper" in:
