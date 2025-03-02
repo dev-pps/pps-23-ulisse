@@ -1,6 +1,6 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.EventQueues.SimulationEventQueue
+import ulisse.applications.event.SimulationEventQueue
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.ports.SimulationPorts
 import ulisse.entities.route.RouteEnvironmentElement

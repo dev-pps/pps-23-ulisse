@@ -1,7 +1,7 @@
 package ulisse.applications.useCases
 
 import cats.syntax.either.*
-import ulisse.applications.EventQueues.RouteEventQueue
+import ulisse.applications.event.RouteEventQueue
 import ulisse.applications.managers.RouteManagers
 import ulisse.applications.managers.RouteManagers.{Errors, RouteManager}
 import ulisse.applications.ports.RoutePorts

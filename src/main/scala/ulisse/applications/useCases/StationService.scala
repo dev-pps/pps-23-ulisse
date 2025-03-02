@@ -1,6 +1,6 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.EventQueues.StationEventQueue
+import ulisse.applications.event.StationEventQueue
 import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinate
