@@ -98,22 +98,17 @@ object Times:
     */
   given Ordering[ClockTime] = Ordering.by(ct => (ct.h, ct.m))
 
-  private def extractAndPerform[R](
-      t: Either[ClockTimeErrors, ClockTime],
-      t2: Either[ClockTimeErrors, ClockTime]
-  )(f: (ClockTime, ClockTime) => Either[ClockTimeErrors, R]): Either[ClockTimeErrors, R] =
+  private def extractAndPerform[M[_]: Monad, T <: Time, R](
+      t1: M[T],
+      t2: M[T]
+  )(f: (T, T) => M[R]): M[R] =
     for
-      ClockTime <- t
-      time2     <- t2
-      res       <- f(ClockTime, time2)
+      time1 <- t1
+      time2 <- t2
+      res   <- f(time1, time2)
     yield res
 
   extension (time: Either[ClockTimeErrors, ClockTime])
-    @targetName("add")
-    def +(time2: Either[ClockTimeErrors, ClockTime]): Either[ClockTimeErrors, ClockTime] =
-      extractAndPerform(time, time2): (t, t2) =>
-        calculateSumWithEither(t, t2)
-
     def greaterEqThan(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
       checkCondition(time, time2)(_ >= 0)
 
@@ -123,15 +118,6 @@ object Times:
     def sameAs(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
       checkCondition(time, time2)(_ == 0)
 
-  extension (time: Option[ClockTime])
-    @targetName("sub")
-    def -(time2: Option[ClockTime]): Option[ClockTime] =
-      for
-        t   <- time
-        t2  <- time2
-        sub <- calculateSub(t, t2)
-      yield sub
-
   given ((Int, Int, Int) => Either[ClockTimeErrors, ClockTime]) = (x, y, z) => ClockTime(x, y)
   given ((Int, Int, Int) => ClockTime)                          = (x, y, z) => ClockTime(x, y).getOrDefault
   given ((Int, Int, Int) => Option[ClockTime])                  = (x, y, z) => ClockTime(x, y).toOption
@@ -139,28 +125,28 @@ object Times:
   extension [M[_]: Monad, T <: Time](time: M[T])
     @targetName("add")
     def +(time2: M[T])(using constructor: (Int, Int, Int) => M[T]): M[T] =
-      for
-        t  <- time
-        t2 <- time2
-        ct <- calculateSum(t, t2)
-      yield ct
+      extractAndPerform(time, time2): (t, t2) =>
+        calculateSum(t, t2)
+
+    @targetName("sub")
+    def -(time2: M[T])(using constructor: (Int, Int, Int) => M[T]): M[T] =
+      extractAndPerform(time, time2): (t, t2) =>
+        calculateSub(t, t2)
 
   /** Returns true if predicate on the two provided `ClockTime` is satisfied */
   private def checkCondition(
       t: Either[ClockTimeErrors, ClockTime],
       t2: Either[ClockTimeErrors, ClockTime]
   )(predicate: Int => Boolean): Boolean =
-    val res = extractAndPerform[Boolean](t, t2): (t, t2) =>
+    val res = extractAndPerform(t, t2): (t, t2) =>
       Right(predicate(summon[Ordering[ClockTime]].compare(t, t2)))
     res.getOrElse(false)
 
   extension (time: ClockTime)
     @targetName("add")
     def ++(time2: Either[ClockTimeErrors, ClockTime]): Either[ClockTimeErrors, ClockTime] =
-      for
-        t2  <- time2
-        sum <- calculateSumWithEither(time, t2)
-      yield sum
+      extractAndPerform(Right(time), time2): (t, t2) =>
+        calculateSum(t, t2)
 
     @targetName("greaterEquals")
     def >=(time2: ClockTime): Boolean =
@@ -174,34 +160,37 @@ object Times:
     def ===(time2: ClockTime): Boolean =
       summon[Ordering[ClockTime]].compare(time, time2) == 0
 
-  private def calculateSumWithEither(t: ClockTime, t2: ClockTime): Either[ClockTimeErrors, ClockTime] =
-    val minutesInHour = 60
-    val hoursInDay    = 24
-    val totalMinutes  = t.m + t2.m
-    val extraHours    = totalMinutes / minutesInHour
-    val minutes       = totalMinutes              % minutesInHour
-    val hours         = (t.h + t2.h + extraHours) % hoursInDay
-    ClockTime(hours, minutes)
-
   private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(using
       constructor: (Int, Int, Int) => M[T]
   ): M[T] =
-    val secondInMinutes, minutesInHour = 60
+    val secondsInMinute, minutesInHour = 60
     val hoursInDay                     = 24
     val ts                             = time1.s + time2.s
     val tm                             = time1.m + time2.m
     val th                             = time1.h + time2.h
-    val seconds                        = ts                  % secondInMinutes
-    val extraMinutes                   = ts / secondInMinutes
+    val seconds                        = ts                  % secondsInMinute
+    val extraMinutes                   = ts / secondsInMinute
     val minutes                        = (tm + extraMinutes) % minutesInHour
     val extraHours                     = (tm + extraMinutes) / minutesInHour
     val hours                          = (th + extraHours)   % hoursInDay
     constructor(hours, minutes, seconds)
 
-  private def calculateSub(t: ClockTime, t2: ClockTime): Option[ClockTime] =
-    val minutesInHour = 60
-    val hoursInDay    = 24
-    ((t.h, t2.h), (t.m, t2.m)) match
-      case ((h1, h2), (m1, m2)) if m1 < m2 && h1 < 1 => None
-      case ((h1, h2), (m1, m2)) if m1 < m2           => ClockTime(h1 - 1 - h2, m1 + minutesInHour - m2).toOption
-      case ((h1, h2), (m1, m2))                      => ClockTime(h1 - h2, m1 - m2).toOption
+  private def calculateSub[M[_]: Monad, T <: Time](time1: T, time2: T)(using
+      constructor: (Int, Int, Int) => M[T]
+  ): M[T] =
+    val secondsInMinute, minutesInHour = 60
+    val hoursInDay                     = 24
+
+    def normalizeWithBorrowing(h: Int, m: Int, s: Int): (Int, Int, Int) =
+      val (adjustedMinutes, normalizedSeconds) =
+        if (s < 0) (m - 1, s + secondsInMinute)
+        else (m, s)
+
+      val (adjustedHours, normalizedMinutes) =
+        if (adjustedMinutes < 0) (h - 1, adjustedMinutes + minutesInHour)
+        else (h, adjustedMinutes)
+
+      (adjustedHours, normalizedMinutes, normalizedSeconds)
+
+    val (h, m, s) = normalizeWithBorrowing(time1.h - time2.h, time1.m - time2.m, time1.s - time2.s)
+    constructor(h, m, s)

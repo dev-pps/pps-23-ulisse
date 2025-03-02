@@ -23,9 +23,9 @@ class TimesTest extends AnyWordSpec with Matchers:
       h(23).m(59) + h(0).m(1) should be(h(0).m(0))
 
     "be subtracted to another ClockTimes" in:
-      h(10).m(45).toOption - h(1).m(25).toOption shouldBe h(9).m(20).toOption
-      h(10).m(0).toOption - h(1).m(10).toOption shouldBe h(8).m(50).toOption
-      h(10).m(0).toOption - h(11).m(0).toOption shouldBe h(-1).m(0).toOption
+      h(10).m(45) - h(1).m(25) shouldBe h(9).m(20)
+      h(10).m(0) - h(1).m(10) shouldBe h(8).m(50)
+      h(10).m(0) - h(11).m(0) shouldBe h(-1).m(0)
 
     "comparable to other ClockTime" in:
       h(10).m(45) greaterEqThan h(10).m(45) should be(true)
@@ -53,9 +53,3 @@ class TimesTest extends AnyWordSpec with Matchers:
       given DefaultTimeStrategy = t => Time(t.h % 24, t.m % 60, 0)
       val defaultClockTime      = invalidClockTime.getOrDefault
       defaultClockTime.asTime shouldBe Time(2, 10, 0)
-//
-//    "be subtracted to another ClockTimes" in :
-//      ClockTime(10, 25) - ClockTime(1, 25) should be(ClockTime(11, 50))
-//      ClockTime(10, 59) - ClockTime(0, 1) should be(ClockTime(11, 0))
-//      ClockTime(24, 59) - ClockTime(0, 1) should be(ClockTime(1, 0))
-//      ClockTime(24, 59) - ClockTime(0, 1) should be(ClockTime(0, 0))
