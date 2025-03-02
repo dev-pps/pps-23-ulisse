@@ -12,14 +12,21 @@ import ulisse.entities.simulation.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.Actions
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.station.StationEnvironmentElement.*
-import ulisse.entities.timetable.{DynamicTimetable, Timetables, TrainStationTime}
+import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
+import ulisse.entities.timetable.{Timetables, TrainStationTime}
 import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.entities.train.TrainAgents
-import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentPerception, TrainAgentPerceptionData, TrainRouteInfo, TrainStationInfo}
+import ulisse.entities.train.TrainAgents.{
+  TrainAgent,
+  TrainAgentPerception,
+  TrainAgentPerceptionData,
+  TrainRouteInfo,
+  TrainStationInfo
+}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.Times
-import ulisse.entities.timetable.DynamicTimetable.*
+import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable.*
 import ulisse.utils.Times.{ClockTime, Time}
 
 import scala.collection.immutable.ListMap
@@ -243,8 +250,7 @@ object Environments:
       def findCurrentTimeTableFor(train: TrainAgent): Option[DynamicTimetable] =
         _timetables.get(train.name).flatMap(_.find(!_.completed))
 
-      def findRouteWithTravelDirection(route: (Station, Station))
-          : Option[(RouteEnvironmentElement, TrackDirection)] =
+      def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrackDirection)] =
         extension (r: Route)
           private def matchStations(departure: Station, arrival: Station): Boolean =
             r.departure.name == departure.name && r.arrival.name == arrival.name

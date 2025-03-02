@@ -12,9 +12,9 @@ import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 class TrackTest extends AnyWordSpec with Matchers:
   given minPermittedDistanceBetweenTrains: Double = 100.0
-  private val id        = 1
-  private val direction = Forward
-  private val track     = Track(id)
+  private val id                                  = 1
+  private val direction                           = Forward
+  private val track                               = Track(id)
 
   "A track" when:
     "created" should:
@@ -149,7 +149,9 @@ class TrackTest extends AnyWordSpec with Matchers:
       "be updated if the securityDistance is preserved" in:
         val movementDelta = 10
         val updatedTrainAgent3905 =
-          trainAgent3905.updateDistanceTravelled(trainAgent3905.lengthSize + minPermittedDistanceBetweenTrains + movementDelta)
+          trainAgent3905.updateDistanceTravelled(
+            trainAgent3905.lengthSize + minPermittedDistanceBetweenTrains + movementDelta
+          )
         val updatedTrainAgent3906 = trainAgent3906.updateDistanceTravelled(movementDelta)
         track.putTrain(trainAgent3905, direction).flatMap(_.updateTrain(updatedTrainAgent3905)).flatMap(
           _.putTrain(trainAgent3906, direction)

@@ -3,7 +3,7 @@ package ulisse.utils
 import cats.Id
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import ulisse.TestUtility.in
+import ulisse.Utils.TestUtility.in
 import ulisse.utils.Times.*
 import ulisse.utils.Times.FluentDeclaration.h
 

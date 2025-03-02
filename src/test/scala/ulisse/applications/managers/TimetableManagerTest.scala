@@ -5,7 +5,7 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
 import TimetableManagers.TimetableManagerErrors.{AcceptanceError, TimetableNotFound}
-import ulisse.TestUtility.in
+import ulisse.Utils.TestUtility.in
 import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.utils.Times.FluentDeclaration.h

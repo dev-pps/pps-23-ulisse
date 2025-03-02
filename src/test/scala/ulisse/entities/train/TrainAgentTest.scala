@@ -8,22 +8,22 @@ import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 object TrainAgentTest:
-  val defaultTechnology = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
-  val defaultWagon = Wagon(UseType.Passenger, 50)
+  val defaultTechnology  = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
+  val defaultWagon       = Wagon(UseType.Passenger, 50)
   val defaultWagonNumber = 5
-  val train3905 = makeTrain("3905")
-  val train3906 = makeTrain("3906")
-  val train3907 = makeTrain("3907")
-  val trainAgent3905 = makeTrainAgent(train3905)
-  val trainAgent3906 = makeTrainAgent(train3906)
-  val trainAgent3907 = makeTrainAgent(train3907)
-  
+  val train3905          = makeTrain("3905")
+  val train3906          = makeTrain("3906")
+  val train3907          = makeTrain("3907")
+  val trainAgent3905     = makeTrainAgent(train3905)
+  val trainAgent3906     = makeTrainAgent(train3906)
+  val trainAgent3907     = makeTrainAgent(train3907)
+
   private def makeTrain(name: String): Train =
     Train(name, defaultTechnology, defaultWagon, defaultWagonNumber)
 
   private def makeTrainAgent(train: Train): TrainAgent =
     TrainAgent(train)
-    
+
 class TrainAgentTest extends AnyWordSpec with Matchers:
 
   "TrainAgent" when:

@@ -13,7 +13,7 @@ import ulisse.entities.simulation.Environments.RailwayEnvironment
 import ulisse.entities.simulation.Actions
 import ulisse.entities.simulation.Actions.MoveBy
 import ulisse.entities.station.{Station, StationEnvironmentElement}
-import ulisse.entities.timetable.DynamicTimetable
+import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}

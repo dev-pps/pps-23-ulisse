@@ -5,6 +5,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.station.Station
+import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
