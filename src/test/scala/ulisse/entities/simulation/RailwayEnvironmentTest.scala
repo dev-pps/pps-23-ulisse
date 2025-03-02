@@ -10,6 +10,7 @@ import ulisse.entities.route.RouteTest.departureCoordinate
 import ulisse.entities.route.Routes.{Route, TypeRoute}
 import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.simulation.Environments.RailwayEnvironment
+import ulisse.entities.simulation.Simulations.Actions
 import ulisse.entities.simulation.Simulations.Actions.MoveBy
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetable
@@ -22,30 +23,48 @@ import ulisse.utils.Times.FluentDeclaration.h
 import scala.Seq
 
 class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
-  private val dt       = 1
-  private val movement = 10
-  private val stationA = Station("A", Coordinate(0, 0), 1)
+  private val dt        = 1
+  private val movement  = 10
+  private val stationA  = Station("A", Coordinate(0, 0), 1)
   private val stationA2 = Station("A", Coordinate(0, 0), 3)
-  private val stationB = Station("B", Coordinate(0, 1), 1)
-  private val stationC = Station("C", Coordinate(0, 2), 1)
-  private val stationD = Station("D", Coordinate(0, 3), 1)
-  private val stations = Seq(stationA, stationB, stationC, stationD)
+  private val stationB  = Station("B", Coordinate(0, 1), 1)
+  private val stationC  = Station("C", Coordinate(0, 2), 1)
+  private val stationD  = Station("D", Coordinate(0, 3), 1)
+  private val stations  = Seq(stationA, stationB, stationC, stationD)
 
   given minPermittedDistanceBetweenTrains: Double = 100.0
 
   private val defaultTechnology  = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
   private val defaultWagon       = Wagon(UseType.Passenger, 50)
   private val defaultWagonNumber = 5
-  private val train3905 = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber)
-  private val train39052 = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber + 1)
-  private val train3906 = Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber)
-  private val train3907 = Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber)
-  private val trains = Seq(train3905, train3906, train3907)
-  private val trainAgent3905 = spy(TrainAgent(train3905))
-  private val trainAgent39052 = spy(TrainAgent(train39052))
-  private val trainAgent3906 = spy(TrainAgent(train3906))
-  private val trainAgent3907 = spy(TrainAgent(train3907))
-  private val trainAgents    = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
+  private val train3905          = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber)
+  private val train39052         = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber + 1)
+  private val train3906          = Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber)
+  private val train3907          = Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber)
+  private val trains             = Seq(train3905, train3906, train3907)
+
+  private final case class FakeTrainAgent(train: Train, distanceTravelled: Double) extends TrainAgent:
+    export train.*
+
+    def distanceTravelled_=(newDistanceTravelled: Double): TrainAgent =
+      val minDistanceTravelled = 0.0
+      copy(distanceTravelled = math.max(minDistanceTravelled, newDistanceTravelled))
+
+    override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[Actions.SimulationAction] =
+      Some(MoveBy(pathLength))
+  private val trainAgent3905  = FakeTrainAgent(train3905, 0.0)
+  private val trainAgent39052 = FakeTrainAgent(train39052, 0.0)
+  private val trainAgent3906  = FakeTrainAgent(train3906, 0.0)
+  private val trainAgent3907  = FakeTrainAgent(train3907, 0.0)
+  private def mocked(train: Train): TrainAgent =
+    val trainAgent = mock[TrainAgent]
+    when(trainAgent.name).thenReturn(train.name)
+    when(trainAgent.length).thenReturn(train.length)
+    when(trainAgent.wagon).thenReturn(train.wagon)
+    when(trainAgent.maxSpeed).thenReturn(train.maxSpeed)
+    when(trainAgent.lengthSize).thenReturn(train.lengthSize)
+    trainAgent
+  private val trainAgents  = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
   val railsCount: Int      = 1
   val typeRoute: TypeRoute = TypeRoute.Normal
   val pathLength: Double =
@@ -131,7 +150,9 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
           trainAgents,
           timetables.map(DynamicTimetable(_))
         )
-        env.stations.map(s => (s.name, s.numberOfTracks)) should contain theSameElementsAs stations.map(s => (s.name, s.numberOfTracks))
+        env.stations.map(s => (s.name, s.numberOfTracks)) should contain theSameElementsAs stations.map(s =>
+          (s.name, s.numberOfTracks)
+        )
 
       "have all routes" in:
         env.routes should contain theSameElementsAs routes.map(RouteEnvironmentElement(
@@ -153,7 +174,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
 
       "have at least a subset of all trains associated with a timetable" in:
         val timetablesTrains = timetables.map(_.train).distinct
-        trains.filter(timetablesTrains.contains(_)).map(TrainAgent(_)) should contain allElementsOf env.agents
+        trains.filter(timetablesTrains.contains(_)).map(FakeTrainAgent(_, 0.0)) should contain allElementsOf env.agents
 
       "exclude in order duplicate trains" in:
         val env = RailwayEnvironment(
@@ -162,7 +183,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
           (trainAgents :+ trainAgent39052),
           timetables.map(DynamicTimetable(_))
         )
-        val trains = env.agents.collect({case t: TrainAgent => (t.name, t.length)})
+        val trains = env.agents.collect({ case t: TrainAgent => (t.name, t.length) })
         trains.filter(_._1 == train3905.name) shouldBe Seq((trainAgent3905.name, defaultWagonNumber))
 
       "have at least a subset of all timetables" in:
@@ -193,33 +214,42 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
             stationEE         <- env.stations.find(_.name == stationWithTrains._1.name)
           yield
             val stationEETrains = stationEE.containers.flatMap(_.trains).map(_.name)
-            stationWithTrains._2.toList.sortBy(_.name).take(stationEETrains.size).map(_.name) should contain theSameElementsAs stationEETrains
+            stationWithTrains._2.toList.sortBy(_.name).take(stationEETrains.size).map(
+              _.name
+            ) should contain theSameElementsAs stationEETrains
             stationEETrains should have size stationEE.containers.size
             stationEETrains
         env.timetables.map(_.train.name).distinct should contain theSameElementsAs allTrainsInStations.flatten.toList
 
     "doStep" should:
-      "move train" in:
-        val env = RailwayEnvironment(
-          stations.map(StationEnvironmentElement(_)),
-          routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
-          trainAgents,
-          timetables.map(DynamicTimetable(_))
-        )
-        env.agents.collect({case ta: TrainAgent => ta }).find(_.name == trainAgent3905.name) match
+      "move train into route" in:
+        env.agents.collect({ case ta: TrainAgent => ta }).find(_.name == trainAgent3905.name) match
           case Some(train) =>
             env.stations.flatMap(_.containers.flatMap(_.trains)).map(_.name).contains(trainAgent3905.name) shouldBe true
-            when(trainAgent3905.doStep(dt, env)).thenReturn(Some(MoveBy(movement)))
             val newEnv = env.doStep(dt)
-            println(routes.foreach(s => println(s.id)))
-            println(routeAB.id)
-            println(newEnv.routes.foreach(r => println(s"${r.id} ${r.departure} ${r.arrival}, $r")))
             (newEnv.stations.find(_.name == stationA.name), newEnv.routes.find(_.id == routeAB.id)) match
               case (Some(stationEE), Some(routeEE)) =>
-                println(routeEE)
-                println(stationEE)
                 stationEE.containers.flatMap(_.trains).map(_.name).contains(trainAgent3905.name) shouldBe false
-                routeEE.containers.flatMap(_.trains).map(_.name).contains(trainAgent3905.name) shouldBe true
+                val updatedAgent = routeEE.containers.flatMap(_.trains).find(_.name == trainAgent3905.name)
+                updatedAgent shouldBe defined
+                updatedAgent.map(_.distanceTravelled) shouldBe Some(0.0)
               case _ => fail()
           case None => fail()
 
+      "move train into station" in:
+        env.agents.collect({ case ta: TrainAgent => ta }).find(_.name == trainAgent3905.name) match
+          case Some(train) =>
+            when(trainAgent3905.doStep(dt, env)).thenReturn(Some(MoveBy(routeAB.length)))
+            val newEnv0 = env.doStep(dt)
+            when(trainAgent3905.doStep(dt, env)).thenReturn(Some(MoveBy(routeAB.length)))
+            val newEnv = newEnv0.doStep(dt)
+            println(newEnv)
+            (newEnv.stations.find(_.name == stationB.name), newEnv.routes.find(_.id == routeAB.id)) match
+              case (Some(stationEE), Some(routeEE)) =>
+                val updatedAgent = stationEE.containers.flatMap(_.trains).find(_.name == trainAgent3905.name)
+                updatedAgent shouldBe defined
+                updatedAgent.map(_.distanceTravelled) shouldBe Some(0.0)
+                routeEE.containers.flatMap(_.trains).map(_.name).contains(trainAgent3905.name) shouldBe false
+
+              case _ => fail()
+          case None => fail()
