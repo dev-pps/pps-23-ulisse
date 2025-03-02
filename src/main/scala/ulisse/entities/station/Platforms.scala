@@ -17,7 +17,7 @@ object Platforms:
 
   /** Defines a rail in a station. */
   trait Platform extends TrainAgentsContainer[Platform]:
-    /** Try to put train inside a platform */
+    /** Try to put train inside the platform */
     def putTrain(train: TrainAgent): Option[Platform]
   
     /** Check if the platform is available for a train to be put in */
