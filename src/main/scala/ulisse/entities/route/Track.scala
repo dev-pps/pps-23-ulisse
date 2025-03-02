@@ -12,16 +12,26 @@ import ulisse.utils.ValidationUtils.{validatePositive, validateRange, validateUn
 
 import scala.annotation.targetName
 
+/** A track is a TrainAgentsContainer that can hold multiple train at a times */
 trait Track extends TrainAgentsContainer[Track]:
+  /** Try to put train inside a track given the desired direction */
   def putTrain(train: TrainAgent, direction: TrainAgentsDirection): Option[Track]
+
+  /** Return the current direction of the track */
   def currentDirection: Option[TrainAgentsDirection]
+
+  /** Return the minimum distance allowed between trains in the track */
   def minPermittedDistanceBetweenTrains: Double
+
+  /** Check if the track is available for a train to be put in */
   def isAvailable(direction: TrainAgentsDirection): Boolean =
     trains.lastOption.forall(t =>
       t.distanceTravelled - t.lengthSize >= minPermittedDistanceBetweenTrains
     ) && currentDirection.getOrElse(direction) == direction
 
+/** Check if the track contains the train */
 object Track:
+
   enum TrainAgentsDirection:
     case Forward, Backward
 
