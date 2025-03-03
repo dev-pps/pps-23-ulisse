@@ -5,7 +5,7 @@ import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.AppState
 import ulisse.applications.event.SimulationEventQueue
 import ulisse.entities.route.RouteEnvironmentElement
-import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
+import ulisse.entities.simulation.data.{EngineState, SimulationData}
 import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
 import ulisse.entities.station.{Station, StationEnvironmentElement}

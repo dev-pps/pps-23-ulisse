@@ -4,7 +4,7 @@ import org.mockito.Mockito.verify
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.entities.simulation.Simulations.SimulationData
+import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.simulation.SimulationPage
 
 class SimulationNotificationAdapterTest extends AnyWordSpec with Matchers:

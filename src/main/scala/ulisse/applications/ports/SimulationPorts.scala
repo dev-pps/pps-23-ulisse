@@ -1,6 +1,6 @@
 package ulisse.applications.ports
 
-import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
+import ulisse.entities.simulation.data.{EngineState, SimulationData}
 import ulisse.utils.Times.{ClockTime, Time}
 
 import scala.concurrent.Future

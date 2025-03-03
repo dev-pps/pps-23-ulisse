@@ -1,7 +1,7 @@
 package ulisse.adapters.input
 
 import ulisse.applications.ports.SimulationPorts
-import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
+import ulisse.entities.simulation.data.{EngineState, SimulationData}
 
 import java.sql.Time
 import scala.concurrent.Future

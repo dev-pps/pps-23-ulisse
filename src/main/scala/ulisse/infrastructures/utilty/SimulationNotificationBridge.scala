@@ -1,6 +1,6 @@
 package ulisse.infrastructures.utilty
 
-import ulisse.entities.simulation.Simulations.SimulationData
+import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.simulation.SimulationPage
 
 trait SimulationNotificationAdapterRequirements:

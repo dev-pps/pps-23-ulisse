@@ -6,7 +6,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.useCases.SimulationService
-import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
+import ulisse.entities.simulation.data.{EngineState, SimulationData}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration

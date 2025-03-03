@@ -8,8 +8,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.applications.ports.UtilityPorts
-import ulisse.entities.simulation.Simulations.EngineState.*
-import ulisse.entities.simulation.Simulations.EngineState.Field.LastDelta
+import ulisse.entities.simulation.data.EngineState.*
+import ulisse.entities.simulation.data.EngineState.Field.LastDelta
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 
 class SimulationManagerTest extends AnyWordSpec with Matchers:
