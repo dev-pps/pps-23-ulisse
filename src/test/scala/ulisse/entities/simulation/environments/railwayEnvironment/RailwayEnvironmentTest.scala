@@ -10,11 +10,9 @@ import ulisse.entities.route.RouteEnvironmentElementTest.routeAB
 import ulisse.entities.route.RouteTest.departureCoordinate
 import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.route.Routes.{Route, TypeRoute}
-import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.{
-  routesEE,
-  stationsEE,
-  timetables
-}
+import ulisse.entities.route.Tracks.TrackDirection
+import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.{routesEE, stationsEE, timetables}
+import ulisse.entities.timetable.DynamicTimetableTest.*
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.station.StationTest.{stationA, stationB}
 import ulisse.entities.station.{Station, StationEnvironmentElement}
@@ -49,76 +47,89 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
 
   private val trainAgents = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
 
-  private val env = RailwayEnvironment(
-    Time(0, 0, 0),
-    ConfigurationData(
-      stationsEE,
-      routesEE,
-      trainAgents,
-      timetables
-    )
+  private val cd = ConfigurationData(
+    stationsEE,
+    routesEE,
+    trainAgents,
+    timetables
   )
+
+  private val env = RailwayEnvironment.default(cd)
+
+  extension (env: RailwayEnvironment)
+    private def doSteps(steps: Int): RailwayEnvironment =
+      (0 until steps).foldLeft(env)((e, _) => e.doStep(dt))
+
+  extension (agent: TrainAgent)
+    private def currentInfo(env: RailwayEnvironment, r: DynamicTimetable => Option[(Station, Station)]): Option[(DynamicTimetable, StationEnvironmentElement, RouteEnvironmentElement, TrackDirection)] =
+      for
+        currentTT <- env.findCurrentTimeTableFor(agent)
+        route <- r(currentTT)
+        _ = println(route)
+        see <- env.stations.find(_ == route._1)
+        (ree, dir) <- env.findRouteWithTravelDirection(route)
+      yield (currentTT, see, ree, dir)
+
+    private def completeCurrentTimetable(env: RailwayEnvironment): Option[RailwayEnvironment] =
+      env.findCurrentTimeTableFor(agent).map(tt => env.doSteps(tt.table.size + 2))
+
+  private def checkConfiguration(env: RailwayEnvironment, cd: ConfigurationData): Unit =
+    env.stations shouldBe cd.stations
+    env.routes shouldBe cd.routes
+    env.timetables shouldBe cd.timetables.values.flatten
 
   "RailwayEnvironment" when:
     "created" should:
+      val time = Time(8, 30, 0)
+      val env = RailwayEnvironment(time, cd)
+      "setup initial time" in:
+        env.time shouldBe time
       "maintain the configuration" in:
-        println("todo")
+        checkConfiguration(env, cd)
+
+    "created empty" should:
+      val env = RailwayEnvironment.empty()
+      "setup initial time" in:
+        env.time shouldBe Time(0, 0, 0)
+      "maintain the configuration" in:
+        checkConfiguration(env, ConfigurationData.empty())
+
+    "created default" should:
+      val env = RailwayEnvironment.default(cd)
+      "setup initial time" in:
+        env.time shouldBe Time(0, 0, 0)
+      "maintain the configuration" in:
+        checkConfiguration(env, cd)
 
     "doStep" should:
       "move train into route" in:
-        env.trains.find(_.name == trainAgent3905.name) match
-          case Some(train) =>
-            env.stations.flatMap(_.containers.flatMap(_.trains)).map(_.name).contains(trainAgent3905.name) shouldBe true
-            val newEnv = env.doStep(dt)
-            (newEnv.stations.find(_.name == stationA.name), newEnv.routes.find(_.id == routeAB.id)) match
-              case (Some(stationEE), Some(routeEE)) =>
-                stationEE.containers.flatMap(_.trains).map(_.name).contains(trainAgent3905.name) shouldBe false
-                val updatedAgent = routeEE.containers.flatMap(_.trains).find(_.name == trainAgent3905.name)
-                updatedAgent shouldBe defined
-                newEnv.findCurrentTimeTableFor(trainAgent3905).flatMap(_.currentRoute).flatMap(
-                  newEnv.findRouteWithTravelDirection
-                ).flatMap((ree, dir) =>
-                  routeEE.containers.find(_.contains(trainAgent3905)).flatMap(_.currentDirection).map(_ == dir)
-                ) shouldBe Some(true)
-                updatedAgent.map(_.distanceTravelled) shouldBe Some(0.0)
+        trainAgent3905.currentInfo(env.doStep(1), _.currentRoute) match
+          case Some(tt: DynamicTimetable, see: StationEnvironmentElement, ree: RouteEnvironmentElement, dir: TrackDirection) =>
+            tt.stationNr(0).map(_._1).contains(ree.departure) shouldBe true
+            tt.stationNr(1).map(_._1).contains(ree.arrival) shouldBe true
+            ree.departure shouldBe see
+            see.trains.contains(trainAgent3905) shouldBe false
+            ree.trains.contains(trainAgent3905) shouldBe true
+            ree.containers.find(_.contains(trainAgent3905)) match
+              case Some(container) =>
+                container.currentDirection shouldBe Some(dir)
+                container.trains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)
               case _ => fail()
-          case None => fail()
-
-      "move train into station" in:
-        env.trains.find(_.name == trainAgent3905.name) match
-          case Some(train) =>
-            val newEnv = env.doStep(dt).doStep(dt)
-            println(newEnv.timetables)
-            (newEnv.stations.find(_.name == stationB.name), newEnv.routes.find(_.id == routeAB.id)) match
-              case (Some(stationEE), Some(routeEE)) =>
-                println(stationEE.containers.flatMap(_.trains).map(_.name))
-                val updatedAgent = stationEE.containers.flatMap(_.trains).find(_.name == trainAgent3905.name)
-                updatedAgent shouldBe defined
-                updatedAgent.map(_.distanceTravelled) shouldBe Some(0.0)
-                routeEE.containers.flatMap(_.trains).map(_.name).contains(trainAgent3905.name) shouldBe false
-                routeEE.containers.foreach(_.currentDirection shouldBe None)
-              case _ => fail()
-          case None => fail()
-
-      "change schedule" in:
-        env.agents.collect({ case ta: TrainAgent => ta }).find(_.name == trainAgent3905.name) match
-          case Some(train) =>
-            val newEnv0 = env.doStep(dt).doStep(dt).doStep(dt).doStep(dt).doStep(dt)
-            println("lastStep")
-            val newEnv = newEnv0.doStep(dt)
-            val ctt = newEnv.findCurrentTimeTableFor(trainAgent3905).map(ctt =>
-              println(ctt.table)
-              println(ctt.effectiveTable)
-              println(ctt.currentRoute)
-              println(ctt.nextRoute)
-              println(ctt.completed)
-              ctt
-            )
-            newEnv.findCurrentTimeTableFor(trainAgent3905) shouldBe Some(DynamicTimetable(timetable2))
           case _ => fail()
 
+      "move train into station" in:
+        trainAgent3905.currentInfo(env.doSteps(2), _.nextRoute) match
+          case Some(tt: DynamicTimetable, see: StationEnvironmentElement, ree: RouteEnvironmentElement, dir: TrackDirection) =>
+            tt.stationNr(1).map(_._1).contains(ree.departure) shouldBe true
+            tt.stationNr(2).map(_._1).contains(ree.arrival) shouldBe true
+            ree.departure shouldBe see
+            see.trains.contains(trainAgent3905) shouldBe true
+            ree.trains.contains(trainAgent3905) shouldBe false
+            see.trains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)
+          case _ => fail()
+
+      "change schedule" in:
+        trainAgent3905.completeCurrentTimetable(env).flatMap(_.findCurrentTimeTableFor(trainAgent3905)) shouldBe Some(DynamicTimetable(timetable2))
+
       "complete schedules" in:
-        val newEnv = env.doStep(dt).doStep(dt).doStep(dt).doStep(dt).doStep(dt).doStep(dt).doStep(dt).doStep(dt).doStep(
-          dt
-        ).doStep(dt).doStep(dt).doStep(dt)
-        newEnv.findCurrentTimeTableFor(trainAgent3905) shouldBe None
+        trainAgent3905.completeCurrentTimetable(env).flatMap(trainAgent3905.completeCurrentTimetable).flatMap(_.findCurrentTimeTableFor(trainAgent3905)) shouldBe None

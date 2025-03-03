@@ -66,14 +66,7 @@ object RailwayEnvironment:
     )
 
   def empty(): RailwayEnvironment =
-    default(
-      ConfigurationData(
-        Seq[StationEnvironmentElement](),
-        Seq[RouteEnvironmentElement](),
-        Seq[TrainAgent](),
-        Seq[DynamicTimetable]()
-      )
-    )
+    default(ConfigurationData.empty())
 
   private final case class RailwayEnvironmentImpl(
       time: Id[Time],
