@@ -16,7 +16,6 @@ import ulisse.entities.train.TrainAgents.*
 import ulisse.utils.CollectionUtils.{updateWhen, updateWhenWithEffects}
 import ulisse.utils.Times.{ClockTime, Time}
 
-
 /** Simulation Environment for Railway simulations */
 trait RailwayEnvironment extends Environment[RailwayEnvironment]:
   /** simulation time */
@@ -49,8 +48,8 @@ trait RailwayEnvironment extends Environment[RailwayEnvironment]:
 
 object RailwayEnvironment:
   def apply(
-     startTime: Time,
-     configurationData: ConfigurationData
+      startTime: Time,
+      configurationData: ConfigurationData
   ): RailwayEnvironment =
     RailwayEnvironmentImpl(
       startTime,
@@ -58,8 +57,6 @@ object RailwayEnvironment:
       configurationData.routes,
       configurationData.timetables
     )
-
- 
 
   def empty(): RailwayEnvironment =
     apply(

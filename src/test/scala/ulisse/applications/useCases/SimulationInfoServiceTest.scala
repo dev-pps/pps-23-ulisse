@@ -48,11 +48,11 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
     RailwayEnvironment(
       Time(0, 0, 0),
       ConfigurationData(
-      Seq(stationEE),
-      Seq(routeEE),
-      Seq(mockedTrain),
-      Seq()
-      )   
+        Seq(stationEE),
+        Seq(routeEE),
+        Seq(mockedTrain),
+        Seq()
+      )
     )
   ))
 

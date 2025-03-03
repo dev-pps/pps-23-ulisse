@@ -18,10 +18,10 @@ object TrainAgentTest:
   val trainAgent3906     = makeTrainAgent(train3906)
   val trainAgent3907     = makeTrainAgent(train3907)
 
-  private def makeTrain(name: String): Train =
+  def makeTrain(name: String): Train =
     Train(name, defaultTechnology, defaultWagon, defaultWagonNumber)
 
-  private def makeTrainAgent(train: Train): TrainAgent =
+  def makeTrainAgent(train: Train): TrainAgent =
     TrainAgent(train)
 
 class TrainAgentTest extends AnyWordSpec with Matchers:
