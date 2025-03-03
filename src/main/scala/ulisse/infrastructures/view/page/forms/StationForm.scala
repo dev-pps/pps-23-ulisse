@@ -1,19 +1,17 @@
 package ulisse.infrastructures.view.page.forms
 
 import ulisse.infrastructures.view.common.Observers
-import ulisse.infrastructures.view.common.Observers.{Observable, Observer}
+import ulisse.infrastructures.view.common.Observers.{ClickObserver, Observer}
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.page.forms.Form.BaseForm
 import ulisse.infrastructures.view.page.forms.StationForm.StationFormData
 
-import scala.swing.event.MouseEvent
-
 /** Represents the station form of the application. */
 trait StationForm extends Form:
-  def attachCreationObserver(observer: Observer[StationFormData]): Unit
-  def attachDeletionObserver(observer: Observer[StationFormData]): Unit
+  def attachCreation(observer: ClickObserver[StationFormData]): Unit
+  def attachDeletion(observer: ClickObserver[StationFormData]): Unit
 
 /** Companion object of the [[StationForm]]. */
 object StationForm:
@@ -42,5 +40,4 @@ object StationForm:
     saveButton.attach(creationObservable.toObserver(_ => StationFormData(name.text, x.text, y.text, tracks.text)))
     deleteButton.attach(deletionObservable.toObserver(_ => StationFormData(name.text, x.text, y.text, tracks.text)))
 
-    export form._, creationObservable.attach as attachCreationObserver,
-      deletionObservable.attach as attachDeletionObserver
+    export form._, creationObservable.attachClick as attachCreation, deletionObservable.attachClick as attachDeletion

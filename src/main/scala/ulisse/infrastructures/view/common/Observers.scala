@@ -13,14 +13,17 @@ object Observers:
 
   /** Represents the observer of the pattern for release events. */
   trait ReleaseObserver[T]:
+    /** Called when the observer is released, given the data [[T]] of the event. */
     def onRelease(data: T): Unit = ()
 
   /** Represents the observer of the pattern for hover events. */
   trait HoverObserver[T]:
+    /** Called when the observer is hovered, given the data [[T]] of the event. */
     def onHover(data: T): Unit = ()
 
   /** Represents the observer of the pattern for exit events. */
   trait ExitObserver[T]:
+    /** Called when the observer is exited, given the data [[T]] of the event. */
     def onExit(data: T): Unit = ()
 
   /** Represents the observer of the pattern. */
@@ -122,7 +125,7 @@ object Observers:
     override def attachExit(observer: ExitObserver[T]): Unit = _exit = observer :: exits
     override def detachExit(observer: ExitObserver[T]): Unit = _exit = exits.filterNot(_ == observer)
 
-    override def notifyClick(data: T): Unit   = (observers ++ clicks).foreach(_.onClick(data))
-    override def notifyHover(data: T): Unit   = (observers ++ hovers).foreach(_.onHover(data))
-    override def notifyRelease(data: T): Unit = (observers ++ releases).foreach(_.onRelease(data))
-    override def notifyExit(data: T): Unit    = (observers ++ exits).foreach(_.onExit(data))
+    override def notifyClick(data: T): Unit   = (observers ++ clicks).foreach(_ onClick data)
+    override def notifyHover(data: T): Unit   = (observers ++ hovers).foreach(_ onHover data)
+    override def notifyRelease(data: T): Unit = (observers ++ releases).foreach(_ onRelease data)
+    override def notifyExit(data: T): Unit    = (observers ++ exits).foreach(_ onExit data)
