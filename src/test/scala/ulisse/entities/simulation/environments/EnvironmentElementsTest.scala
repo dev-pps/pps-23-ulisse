@@ -30,7 +30,10 @@ class EnvironmentElementsTest extends AnyWordSpec with Matchers:
 
   private trait TestTrainAgentEEWrapper extends TrainAgentEEWrapper[TestTrainAgentEEWrapper]
   private val train = mock[TrainAgent]
+  private val otherTrain = mock[TrainAgent]
   private val ee    = mock[TestTrainAgentEEWrapper]
+  private val tac1  = mock[TestTrainAgentsContainer]
+  private val tac2  = mock[TestTrainAgentsContainer]
 
   "TrainAgent" should:
     "be able to leave a TrainAgentEEWrapper" in:
@@ -48,3 +51,19 @@ class EnvironmentElementsTest extends AnyWordSpec with Matchers:
     "not be find in a Seq of TrainAgentEEWrapper if not present" in:
       when(ee.contains(train)).thenReturn(false)
       train.findIn(Seq(ee)) shouldBe None
+
+    "find all train in the environment" in:
+      when(tac1.trains).thenReturn(Seq(train))
+      when(tac2.trains).thenReturn(Seq(otherTrain))
+      when(ee.containers).thenReturn(Seq(tac1, tac2))
+      ee.trains shouldBe Seq(train, otherTrain)
+
+    "return empty list if the environment hasn't containers" in:
+      when(ee.containers).thenReturn(Seq())
+      ee.trains shouldBe Seq()
+
+    "return empty list if the environment hasn't trains" in:
+      when(tac1.trains).thenReturn(Seq())
+      when(tac2.trains).thenReturn(Seq())
+      when(ee.containers).thenReturn(Seq(tac1, tac2))
+      ee.trains shouldBe Seq()
