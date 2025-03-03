@@ -4,7 +4,8 @@ package ulisse.infrastructures.view.common
 object Observers:
 
   /** Creates an observable of the pattern. */
-  def createObservable[T]: Observable[T] = ObservableImpl(List.empty, List.empty, List.empty, List.empty, List.empty)
+  def createObservable[T]: Observable[T] =
+    ObservableImpl(List.empty, List.empty, List.empty, List.empty, List.empty, List.empty)
 
   /** Represents the observer for click events. */
   trait ClickObserver[T]:
@@ -26,8 +27,14 @@ object Observers:
     /** Called when the observer is exited, given the data [[T]] of the event. */
     def onExit(data: T): Unit = ()
 
+  /** Represents the observer of the pattern for move events. */
+  trait MovedObserver[T]:
+    /** Called when the observer is moved, given the data [[T]] of the event. */
+    def onMove(data: T): Unit = ()
+
   /** Represents the observer of the pattern. */
   trait Observer[T] extends ClickObserver[T] with ReleaseObserver[T] with HoverObserver[T] with ExitObserver[T]
+      with MovedObserver[T]
 
   /** Represents the observable of the pattern. */
   trait Observable[T]:
@@ -45,6 +52,9 @@ object Observers:
 
     /** Returns the list of exit observers. */
     def exits: List[ExitObserver[T]]
+
+    /** Returns the list of move observers. */
+    def moves: List[MovedObserver[T]]
 
     /** Attaches an observer to the observable. */
     def attach(observer: Observer[T]): Unit
@@ -76,6 +86,12 @@ object Observers:
     /** Detach an exit observer from the observable. */
     def detachExit(observer: ExitObserver[T]): Unit
 
+    /** Attach a move observer to the observable. */
+    def attachMove(observer: MovedObserver[T]): Unit
+
+    /** Detach a move observer from the observable. */
+    def detachMove(observer: MovedObserver[T]): Unit
+
     /** Notifies the observers that the observable is clicked, given the data [[T]] of the event. */
     def notifyClick(data: T): Unit
 
@@ -88,6 +104,9 @@ object Observers:
     /** Notifies the observers that the observable is exited, given the data [[T]] of the event. */
     def notifyExit(data: T): Unit
 
+    /** Notifies the observers that the observable is moved, given the data [[T]] of the event. */
+    def notifyMove(data: T): Unit
+
     /** Converts the observable of type [[T]] to an observer of type [[I]]. */
     def toObserver[I](newData: I => T): Observer[I] =
       new Observer[I]:
@@ -95,6 +114,7 @@ object Observers:
         override def onRelease(data: I): Unit = notifyRelease(newData(data))
         override def onHover(data: I): Unit   = notifyHover(newData(data))
         override def onExit(data: I): Unit    = notifyExit(newData(data))
+        override def onMove(data: I): Unit    = notifyMove(newData(data))
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class ObservableImpl[T](
@@ -102,13 +122,15 @@ object Observers:
       private var _click: List[ClickObserver[T]],
       private var _release: List[ReleaseObserver[T]],
       private var _hover: List[HoverObserver[T]],
-      private var _exit: List[ExitObserver[T]]
+      private var _exit: List[ExitObserver[T]],
+      private var _move: List[MovedObserver[T]]
   ) extends Observable[T]:
     override def observers: List[Observer[T]]       = _observers
     override def clicks: List[ClickObserver[T]]     = _click
     override def releases: List[ReleaseObserver[T]] = _release
     override def hovers: List[HoverObserver[T]]     = _hover
     override def exits: List[ExitObserver[T]]       = _exit
+    override def moves: List[MovedObserver[T]]      = _move
 
     override def attach(observer: Observer[T]): Unit = _observers = observer :: observers
     override def detach(observer: Observer[T]): Unit = _observers = observers.filterNot(_ == observer)
@@ -125,7 +147,11 @@ object Observers:
     override def attachExit(observer: ExitObserver[T]): Unit = _exit = observer :: exits
     override def detachExit(observer: ExitObserver[T]): Unit = _exit = exits.filterNot(_ == observer)
 
+    override def attachMove(observer: MovedObserver[T]): Unit = _move = observer :: moves
+    override def detachMove(observer: MovedObserver[T]): Unit = _move = moves.filterNot(_ == observer)
+
     override def notifyClick(data: T): Unit   = (observers ++ clicks).foreach(_ onClick data)
     override def notifyHover(data: T): Unit   = (observers ++ hovers).foreach(_ onHover data)
     override def notifyRelease(data: T): Unit = (observers ++ releases).foreach(_ onRelease data)
     override def notifyExit(data: T): Unit    = (observers ++ exits).foreach(_ onExit data)
+    override def notifyMove(data: T): Unit    = (observers ++ moves).foreach(_ onMove data)

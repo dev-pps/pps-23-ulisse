@@ -25,21 +25,20 @@ object MapPanel:
 
     private val image = DrawImages.createAt(ImagePath.station, new Point(500, 500))
 
-//    listenTo(mouseEvents: _*)
     attach(image.toObserver(data => data))
 
     export itemCollection.{attach as attachItem, detach as detachItem}
 
     reactions += {
-      case event.MouseMoved(_, point, _) =>
-//        itemCollection.onHover(point)
+      case event: event.MouseMoved =>
+        image.notifyHover(event)
         updateGraphics()
-      case event.MousePressed(_, point, _, _, _) =>
-        itemCollection.onClick(point)
-        updateGraphics()
-      case event.MouseReleased(_, point, _, _, _) =>
+//      case event.MousePressed(_, point, _, _, _) =>
+//        itemCollection.onClick(point)
+//        updateGraphics()
+//      case event.MouseReleased(_, point, _, _, _) =>
 //        itemCollection.onRelease(point)
-        updateGraphics()
+//        updateGraphics()
     }
 
     override def drawStation(stations: StationPorts.Input#SM): Unit = ()

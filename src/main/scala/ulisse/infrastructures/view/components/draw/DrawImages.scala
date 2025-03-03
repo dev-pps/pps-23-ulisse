@@ -89,7 +89,6 @@ object DrawImages:
           observable.notifyClick(data)
 
       override def notifyHover(data: MouseEvent): Unit =
-        println("hover")
         if data.point.hasCollided(this) then
           silhouetteColor.hoverColor(silhouettePalette)
           observable.notifyHover(data)
@@ -105,12 +104,13 @@ object DrawImages:
           observable.notifyExit(data)
 
       override def draw(g: Graphics2D, observer: ImageObserver): Unit =
-//        if silhouetteColor.current != Styles.transparentColor then
-        setupSilhouette(observer)
-        silhouette.foreach(silhouette =>
-          val (pos, size) = (center, dimension).scaleOf(scale)
-          g.drawImage(silhouette, pos.x, pos.y, size.width, size.height, observer)
-        )
+        if silhouetteColor.current != Styles.transparentColor then
+          silhouette.foreach(silhouette =>
+            println(s"${silhouetteColor.current}")
+            setupSilhouette(observer)
+            val (pos, size) = (center, dimension).scaleOf(scale)
+            g.drawImage(silhouette, pos.x, pos.y, size.width, size.height, observer)
+          )
         source.bufferImage.foreach(g.drawImage(_, center.x, center.y, dimension.width, dimension.height, observer))
 
       private def setupSilhouette(observer: ImageObserver): Unit =

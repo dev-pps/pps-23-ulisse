@@ -1,12 +1,11 @@
 package ulisse.infrastructures.view.components.decorators
 
 import ulisse.infrastructures.view.common.Observers
-import ulisse.infrastructures.view.components.styles.{CurrentColor, Styles}
 import ulisse.infrastructures.view.components.styles.Styles.EnhancedLookExtensions.*
-import ulisse.infrastructures.view.components.styles.Styles.Palette
+import ulisse.infrastructures.view.components.styles.{CurrentColor, Styles}
 
 import java.awt.geom.RoundRectangle2D
-import java.awt.{BasicStroke, Color, RenderingHints}
+import java.awt.{BasicStroke, RenderingHints}
 import scala.swing.*
 import scala.swing.event.MouseEvent
 
@@ -27,6 +26,7 @@ object SwingEnhancements:
       case e: event.MouseReleased => observable.notifyRelease(e)
       case e: event.MouseEntered  => observable.notifyHover(e)
       case e: event.MouseExited   => observable.notifyExit(e)
+      case e: event.MouseMoved    => observable.notifyHover(e)
     }
 
     /** Read-only property to get the mouse events of the component. */
