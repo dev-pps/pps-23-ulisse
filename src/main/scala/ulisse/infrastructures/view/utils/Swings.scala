@@ -10,6 +10,8 @@ import scala.swing.*
 /** Utility methods for Swing components */
 @SuppressWarnings(Array("org.wartremover.warts.Overloading"))
 object Swings:
+  /** Create an empty border with the given [[width]] and [[height]]. */
+  def createEmptyBorder(width: Int, height: Int): Border = BorderFactory.createEmptyBorder(height, width, height, width)
 
   /** Methods to perform arithmetic operations on [[Container]] objects */
   extension (a: Container)
@@ -20,9 +22,6 @@ object Swings:
       val x: Int            = b.location.x + (b.size.width - dialogWidth) / 2
       val y: Int            = b.location.y + (b.size.height - dialogHeight) / 2
       a.peer.setLocation(x, y)
-
-  /** Create an empty border with the given [[width]] and [[height]]. */
-  def createEmptyBorder(width: Int, height: Int): Border = BorderFactory.createEmptyBorder(height, width, height, width)
 
   /** Methods to perform arithmetic operations on [[Point]] objects */
   extension (point: Point)
@@ -73,3 +72,14 @@ object Swings:
     /** Draw the silhouette from the [[JImage]] object. */
     def drawSilhouette(image: DrawImage, scale: Float, color: Color, observer: ImageObserver): Unit =
       image.drawSilhouette(g, scale, color, observer)
+
+  /** Methods to perform arithmetic operations on a [[(Point, Dimension)]] object */
+  extension (shape: (Point, Dimension))
+    /** Scale the shape by the given [[scale]]. */
+    def scaleOf(scale: Float): (Point, Dimension) =
+      val (center, dimension) = shape
+      val scaleSize           = new Dimension((dimension.width * scale).toInt, (dimension.height * scale).toInt)
+      val newDimension        = scaleSize.plus(new Dimension(scaleSize.width % 2, scaleSize.height % 2))
+      val differentSize       = newDimension.minus(dimension)
+      val newPosition         = center.minus(new Point(differentSize.width / 2, differentSize.height / 2))
+      (newPosition, newDimension)
