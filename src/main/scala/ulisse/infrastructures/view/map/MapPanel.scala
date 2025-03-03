@@ -1,45 +1,50 @@
 package ulisse.infrastructures.view.map
 
+import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinate
 import ulisse.infrastructures.view.common.Observers
+import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
 
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
-import scala.math.BigDecimal.double2bigDecimal
 import scala.math.{abs, sqrt}
 import scala.swing.*
 
-object MapPanel:
-  def empty(): MapPanel = MapPanel()
+trait MapPanel extends Panel with EnhancedLook:
+  def drawStation(stations: StationPorts.Input#SM): Unit
 
-  case class MapPanel() extends Panel:
+object MapPanel:
+  def empty(): MapPanel = MapPanelImpl()
+
+  private case class MapPanelImpl() extends MapPanel:
     opaque = false
 
     private val itemCollection = MapItemsCollection()
     private val mapObservable  = Observers.createObservable[Point]
 
-    export mapObservable._, itemCollection.{attach as attachItem, detach as detachItem}
+    export itemCollection.{attach as attachItem, detach as detachItem}
 
-    listenTo(mouse.clicks, mouse.moves)
     reactions += {
       case event.MouseMoved(_, point, _) =>
-        mapObservable.notifyHover(point)
         itemCollection.onHover(point)
-        repaint()
+        updateGraphics()
       case event.MousePressed(_, point, _, _, _) =>
-        mapObservable.notifyClick(point)
         itemCollection.onClick(point)
-        repaint()
+        updateGraphics()
       case event.MouseReleased(_, point, _, _, _) =>
-        mapObservable.notifyRelease(point)
-        itemCollection.onRelease(point);
-        repaint()
+        itemCollection.onRelease(point)
+        updateGraphics()
     }
 
-    override def paintComponent(g: Graphics2D): Unit =
-      super.paintComponent(g)
-      g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+    override def drawStation(stations: StationPorts.Input#SM): Unit = ()
+
+    override protected def paintLook(g: Graphics2D): Unit =
       itemCollection.draw(g, peer)
+      super.paintLook(g)
+
+//    override protected def paintLook(g: Graphics2D): Unit =
+//      super.paintLook(g)
+//      itemCollection.draw(g, peer)
 
 //      points.foreach((p1, p2) =>
 //        g.setColor(java.awt.Color.BLACK)

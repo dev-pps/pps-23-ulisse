@@ -3,7 +3,8 @@ package ulisse.infrastructures.view.components.styles
 import ulisse.infrastructures.view.common.Themes
 import ulisse.infrastructures.view.common.Themes.{withAlpha, Theme}
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{CurrentColor, EnhancedLook}
-import ulisse.utils.{Pair, Swings}
+import ulisse.infrastructures.view.utils.Swings
+import ulisse.utils.Pair
 
 import java.awt.Color
 import javax.swing.border.Border as SwingBorder
