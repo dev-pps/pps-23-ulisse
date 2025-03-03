@@ -2,18 +2,19 @@ package ulisse.infrastructures.view.map
 
 import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.common.Observers
-import ulisse.infrastructures.view.components.draw.JImages.*
 import ulisse.infrastructures.view.common.Observers.Observable
+import ulisse.infrastructures.view.components.draw.DrawImages
+import ulisse.infrastructures.view.components.draw.DrawImages.DrawImage
 import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.utils.Pair
+import ulisse.infrastructures.view.utils.Swings.*
 
 import java.awt
 import java.awt.Color
 import java.awt.image.ImageObserver
-import scala.swing.{Graphics2D, Point}
+import scala.swing.{Dimension, Graphics2D, Point}
 
 trait MapItem extends Observable[Point]:
-  def center: Position
+  def center: Point
   def dimension: Dimension
   def hasCollided(point: Point): Boolean
 
@@ -25,10 +26,10 @@ trait MapItem extends Observable[Point]:
 
 object MapItem:
   def createSingleItem(imagePath: String, x: Int, y: Int): SingleItem =
-    SingleItem(imagePath, Pair(x, y), defaultSize)
+    SingleItem(imagePath, new Point(x, y), DrawImages.defaultSize)
 
-  sealed case class SingleItem(imagePath: String, pos: Position, dim: Dimension) extends MapItem:
-    private val image          = JImage.createWithPosition(imagePath, pos, dim)
+  sealed case class SingleItem(imagePath: String, pos: Point, dim: Dimension) extends MapItem:
+    private val image          = DrawImages.create(imagePath, pos, dim)
     private val itemObservable = Observers.createObservable[Point]
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))

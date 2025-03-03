@@ -25,9 +25,14 @@ object Pair:
 
   /** Methods to perform operations on a [[PairImpl]] of [[Numeric]] values. */
   extension [T: Numeric](pair: Pair[T])
+    /** Subtract other from the pair. */
     def minus(other: Pair[T])(using numeric: Numeric[T]): Pair[T] =
       PairImpl(numeric.minus(pair.a, other.a), numeric.minus(pair.b, other.b))
+
+    /** Add other to the pair. */
     def plus(other: Pair[T])(using numeric: Numeric[T]): Pair[T] =
       PairImpl(numeric.plus(pair.a, other.a), numeric.plus(pair.b, other.b))
+
+    /** Multiply other to the pair. */
     def times(other: Pair[T])(using numeric: Numeric[T]): Pair[T] =
       PairImpl(numeric.times(pair.a, other.a), numeric.times(pair.b, other.b))
