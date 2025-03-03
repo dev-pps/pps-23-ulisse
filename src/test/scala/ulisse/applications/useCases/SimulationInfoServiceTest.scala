@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
-import ulisse.applications.AppState
+import ulisse.applications.{AppState, EventQueue}
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
@@ -45,16 +45,17 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
 
   private val initialState = AppState().initSimulation((simulationManager, _, _, _, _) =>
     simulationManager.setupEnvironment(
-    RailwayEnvironment(
-      Time(0, 0, 0),
-      ConfigurationData(
-        Seq(stationEE),
-        Seq(routeEE),
-        Seq(mockedTrain),
-        Seq()
+      RailwayEnvironment(
+        Time(0, 0, 0),
+        ConfigurationData(
+          Seq(stationEE),
+          Seq(routeEE),
+          Seq(mockedTrain),
+          Seq()
+        )
       )
     )
-  ))
+  )
 
   private val eventQueue            = EventQueue()
   private val simulationInfoService = SimulationInfoService(eventQueue)

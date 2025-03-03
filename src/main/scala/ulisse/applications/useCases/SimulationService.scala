@@ -3,10 +3,11 @@ package ulisse.applications.useCases
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.AppState
+import ulisse.applications.event.SimulationEventQueue
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
 import ulisse.entities.simulation.agents.SimulationAgent
-import ulisse.entities.simulation.environments.RailwayEnvironment
+import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.TrainAgent
@@ -18,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 final case class SimulationService(
-    private val eventQueue: LinkedBlockingQueue[AppState => AppState],
+    private val eventQueue: SimulationEventQueue,
     private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
   private val minPermittedDistanceBetweenTrains: Double = 100.0
@@ -29,10 +30,11 @@ final case class SimulationService(
         val newSimulationManager = simulationManager.setupEnvironment(RailwayEnvironment(
           Time(0, 0, 0),
           ConfigurationData(
-          stationManager.stations.stations.map(StationEnvironmentElement(_)),
-          routeManager.routes.routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
-          trainManager.trains.trains.map(TrainAgent(_)),
-          timetableManager.tables.map(DynamicTimetable(_)))
+            stationManager.stations.map(StationEnvironmentElement(_)),
+            routeManager.routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
+            trainManager.trains.map(TrainAgent(_)),
+            timetableManager.tables.map(DynamicTimetable(_))
+          )
         ))
         p.success((newSimulationManager.engineState, newSimulationManager.simulationData))
         newSimulationManager
