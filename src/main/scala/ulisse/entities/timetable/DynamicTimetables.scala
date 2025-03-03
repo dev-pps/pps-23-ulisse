@@ -34,8 +34,14 @@ object DynamicTimetables:
 
     /** The next departure time */
     def nextDepartureTime: Option[ClockTime] =
-      val expectedDeparture = nextRoute.flatMap(nr => table(nr._1).departure)
-      if currentDelay.isDefined then expectedDeparture + currentDelay else expectedDeparture
+      calculateTimeWithDelay(nextRoute.flatMap(nr => table(nr._1).departure))
+
+    /** The next arrival time */
+    def nextArrivalTime: Option[ClockTime] =
+      calculateTimeWithDelay(currentRoute.flatMap(cr => table(cr._2).arriving))
+
+    private def calculateTimeWithDelay(time: Option[ClockTime]): Option[ClockTime] =
+      if currentDelay.isDefined then time + currentDelay else time
 
     /** Indicate if the scheduled is completed */
     def completed: Boolean = nextRoute.isEmpty && currentRoute.isEmpty
@@ -45,6 +51,13 @@ object DynamicTimetables:
 
     /** Update the current timetable state with a new departure time */
     def departureUpdate(time: ClockTime): Option[DynamicTimetable]
+
+    /** Defines equality for DynamicTimetables */
+    override def equals(that: Any): Boolean =
+      that match
+        case that: DynamicTimetable =>
+          effectiveTable == that.effectiveTable && super.equals(that)
+        case _ => super.equals(that)
 
   /** Factory for [[DynamicTimetable]] instances */
   object DynamicTimetable:
