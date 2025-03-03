@@ -4,7 +4,8 @@ import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.InputPortManager
 
 /** Represents the input adapter manager of the application. */
-trait InputAdapterManager
+trait InputAdapterManager:
+  val stationAdapter: StationEditorAdapter
 
 /** Companion object of the input adapter manager. */
 object InputAdapterManager:
