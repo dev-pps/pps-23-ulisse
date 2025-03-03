@@ -19,10 +19,9 @@ object EngineState:
   ) extends EngineState:
     override def lastUpdate_=(lastUpdate: Option[Double]): EngineState = copy(lastUpdate = lastUpdate)
     override def updateElapsedCycleTime(delta: Double): EngineState = copy(elapsedCycleTime = elapsedCycleTime + delta)
-    override def update(currentUpdate: Double): EngineState =
-      lastUpdate match
-        case Some(lastUpdate) =>
-          val deltaElapsed = currentUpdate - lastUpdate
-          EngineState(Some(currentUpdate), deltaElapsed, elapsedCycleTime + deltaElapsed)
-        case None =>
-          copy(lastUpdate = Some(currentUpdate))
+    override def update(currentUpdate: Double): EngineState = lastUpdate match
+      case Some(lastUpdate) =>
+        val deltaElapsed = currentUpdate - lastUpdate
+        copy(lastUpdate = Some(currentUpdate), deltaElapsed, elapsedCycleTime + deltaElapsed)
+      case None =>
+        copy(lastUpdate = Some(currentUpdate))
