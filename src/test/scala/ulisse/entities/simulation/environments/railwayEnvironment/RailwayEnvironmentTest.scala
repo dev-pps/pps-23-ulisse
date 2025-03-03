@@ -169,6 +169,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
         env.trains.find(_.name == trainAgent3905.name) match
           case Some(train) =>
             val newEnv = env.doStep(dt).doStep(dt)
+            println(newEnv.timetables)
             (newEnv.stations.find(_.name == stationB.name), newEnv.routes.find(_.id == routeAB.id)) match
               case (Some(stationEE), Some(routeEE)) =>
                 println(stationEE.containers.flatMap(_.trains).map(_.name))
