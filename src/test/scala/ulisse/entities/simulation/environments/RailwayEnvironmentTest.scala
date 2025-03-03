@@ -1,4 +1,4 @@
-package ulisse.entities.simulation
+package ulisse.entities.simulation.environments
 
 import org.mockito.Mockito.{spy, when}
 import org.scalatest.matchers.should.Matchers
@@ -7,9 +7,9 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.RouteTest.departureCoordinate
-import ulisse.entities.route.Routes.{Route, TypeRoute}
 import ulisse.entities.route.Routes.TypeRoute.AV
-import ulisse.entities.simulation.Environments.RailwayEnvironment
+import ulisse.entities.route.Routes.{Route, TypeRoute}
+import ulisse.entities.simulation.environments.RailwayEnvironment
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}

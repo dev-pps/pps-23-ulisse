@@ -4,9 +4,9 @@ import ulisse.applications.event.SimulationEventQueue
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.ports.SimulationPorts
 import ulisse.entities.route.RouteEnvironmentElement
-import ulisse.entities.simulation.Environments.RailwayEnvironment
-import ulisse.entities.simulation.SimulationAgent
 import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
+import ulisse.entities.simulation.agents.SimulationAgent
+import ulisse.entities.simulation.environments.RailwayEnvironment
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.TrainAgent

@@ -1,7 +1,7 @@
 package ulisse.entities.station
 
-import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
-import ulisse.entities.simulation.Environments
+import ulisse.entities.simulation.environments.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
+import ulisse.entities.simulation.environments.Environment
 import ulisse.entities.station.Platforms.Platform
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.*

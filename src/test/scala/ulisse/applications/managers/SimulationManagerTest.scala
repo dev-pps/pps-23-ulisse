@@ -8,7 +8,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.applications.ports.UtilityPorts
-import ulisse.entities.simulation.Environments.RailwayEnvironment
+import ulisse.entities.simulation.environments.RailwayEnvironment
 import ulisse.entities.simulation.Simulations.EngineState.*
 import ulisse.entities.simulation.Simulations.EngineState.Field.LastDelta
 

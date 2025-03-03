@@ -2,7 +2,7 @@ package ulisse.entities.station
 
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
-import ulisse.entities.simulation.EnvironmentElements.TrainAgentsContainer
+import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentsContainer
 import ulisse.entities.station.Platforms.Errors
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.Errors.BaseError
