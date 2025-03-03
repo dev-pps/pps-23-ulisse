@@ -1,4 +1,4 @@
-package ulisse.entities.simulation.environments
+package ulisse.entities.simulation.environments.railwayEnvironment
 
 import cats.Id
 import ulisse.entities.route.RouteEnvironmentElement
@@ -8,99 +8,68 @@ import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
 import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.EnvironmentElements.EnvironmentElement
+import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
+import ulisse.entities.simulation.environments.Environment
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
-import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentPerception, TrainAgentPerceptionData, TrainRouteInfo, TrainStationInfo}
+import ulisse.entities.train.TrainAgents.*
+import ulisse.utils.CollectionUtils.{updateWhen, updateWhenWithEffects}
 import ulisse.utils.Times.{ClockTime, Time}
-import ulisse.utils.CollectionUtils.updateWhenWithEffects
-import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
-import ulisse.utils.CollectionUtils.updateWhen
 
+
+/** Simulation Environment for Railway simulations */
 trait RailwayEnvironment extends Environment[RailwayEnvironment]:
+  /** simulation time */
   def time: Time
+
+  /** stations in the environment */
   def stations: Seq[StationEnvironmentElement]
+
+  /** routes in the environment */
   def routes: Seq[RouteEnvironmentElement]
-  override def environmentElements: List[EnvironmentElement] = (stations ++ routes).toList
+
+  /** timetables in the environment */
+  def timetables: Seq[DynamicTimetable]
+
+  /** environment elements in the environment */
+  override def environmentElements: List[EnvironmentElement] = (stations ++ routes ++ timetables).toList
+
+  /** trains in the environment */
   def trains: Seq[TrainAgent] =
     (stations.flatMap(_.containers.flatMap(_.trains)) ++ routes.flatMap(_.containers.flatMap(_.trains))).distinct
+
+  /** agents in the environment */
   override def agents: List[SimulationAgent[?]] = trains.toList
-  def timetables: Seq[DynamicTimetable]
+
+  /** find active timetable for an agent */
   def findCurrentTimeTableFor(train: TrainAgent): Option[DynamicTimetable]
+
+  /** find route with travel direction */
   def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrackDirection)]
 
 object RailwayEnvironment:
   def apply(
-             stationsEE: Seq[StationEnvironmentElement],
-             routesEE: Seq[RouteEnvironmentElement],
-             trains: Seq[TrainAgent],
-             dynamicTimetables: Seq[DynamicTimetable]
-           ): RailwayEnvironment =
-    val distinctStationsEE = stationsEE.distinctBy(_.name)
-    val distinctRoutesEE   = routesEE.distinctBy(_.id)
-    val distinctTrains     = trains.distinctBy(_.name)
-    val distinctDynamicTimetables = dynamicTimetables.distinctBy(table =>
-      (table.train.name, table.startStation.name, table.departureTime, table.table)
-    )
-    val sortedTimetablesByTrainId = orderedTimetablesByTrainId(distinctTrains, distinctDynamicTimetables)
-    val stationsEEInitialState    = sortedTimetablesByTrainId.putTrainsInInitialStations(distinctStationsEE)
+     startTime: Time,
+     configurationData: ConfigurationData
+  ): RailwayEnvironment =
     RailwayEnvironmentImpl(
-      Time(0, 0, 0),
-      stationsEEInitialState,
-      distinctRoutesEE,
-      sortedTimetablesByTrainId.filter(t =>
-        stationsEEInitialState.flatMap(_.containers).flatMap(_.trains).contains(t._1)
-      ).map(t => (t._1.name, t._2)).toMap
+      startTime,
+      configurationData.stations,
+      configurationData.routes,
+      configurationData.timetables
     )
 
-  private def orderedTimetablesByTrainId(
-                                          trains: Seq[TrainAgent],
-                                          timetables: Seq[DynamicTimetable]
-                                        ): List[(TrainAgent, Seq[DynamicTimetable])] =
-    def mapTrainsWithTimeTables(
-                                 trains: Seq[TrainAgent],
-                                 timetables: Seq[DynamicTimetable]
-                               ): Seq[(TrainAgent, DynamicTimetable)] =
-      timetables.flatMap: tt =>
-        trains.find(_.name == tt.train.name) match
-          case Some(trainAgent) => Some(trainAgent -> tt)
-          case _                => None
-
-    def groupByTrainId(timetables: Seq[(TrainAgent, DynamicTimetable)]): List[(TrainAgent, Seq[DynamicTimetable])] =
-      timetables.groupBy(_._1).view.mapValues(_.map(_._2)).toList
-
-    def sortTimetablesByDepartureTime(timetablesByTrainId: List[(TrainAgent, Seq[DynamicTimetable])])
-    : List[(TrainAgent, Seq[DynamicTimetable])] =
-      timetablesByTrainId.map(e => (e._1, e._2.sortBy(_.departureTime)))
-
-    sortTimetablesByDepartureTime(groupByTrainId(mapTrainsWithTimeTables(trains, timetables)).sortBy(_._1.name))
-
-  extension (sortedTimetablesByTrainId: List[(TrainAgent, Seq[DynamicTimetable])])
-    private def putTrainsInInitialStations(stationsEE: Seq[StationEnvironmentElement])
-    : Seq[StationEnvironmentElement] =
-
-      def takeFirstTimetableForTrains(timetablesByTrainId: List[(TrainAgent, Seq[DynamicTimetable])])
-      : List[(TrainAgent, Option[DynamicTimetable])] =
-        timetablesByTrainId.map(e => (e._1, e._2.headOption))
-
-      def updateStationEE(
-                           stationsEE: Seq[StationEnvironmentElement],
-                           timetable: DynamicTimetable,
-                           trainAgent: TrainAgent
-                         ): Option[Seq[StationEnvironmentElement]] =
-        stationsEE.updateWhenWithEffects(station => station.name == timetable.startStation.name)(
-          _.putTrain(trainAgent)
-        )
-
-      takeFirstTimetableForTrains(sortedTimetablesByTrainId).foldLeft(stationsEE)((stationsEE, tt) =>
-        tt._2.flatMap(updateStationEE(stationsEE, _, tt._1)).getOrElse(stationsEE)
-      )
+ 
 
   def empty(): RailwayEnvironment =
     apply(
-      Seq[StationEnvironmentElement](),
-      Seq[RouteEnvironmentElement](),
-      Seq[TrainAgent](),
-      Seq[DynamicTimetable]()
+      Time(0, 0, 0),
+      ConfigurationData(
+        Seq[StationEnvironmentElement](),
+        Seq[RouteEnvironmentElement](),
+        Seq[TrainAgent](),
+        Seq[DynamicTimetable]()
+      )
     )
 
   private def trainPerceptionInStation(train: TrainAgent, env: RailwayEnvironment): Option[TrainStationInfo] =
@@ -141,11 +110,11 @@ object RailwayEnvironment:
           }
 
   private final case class RailwayEnvironmentImpl(
-                                                   time: Id[Time],
-                                                   stations: Seq[StationEnvironmentElement],
-                                                   routes: Seq[RouteEnvironmentElement],
-                                                   _timetables: Map[String, Seq[DynamicTimetable]]
-                                                 ) extends RailwayEnvironment:
+      time: Id[Time],
+      stations: Seq[StationEnvironmentElement],
+      routes: Seq[RouteEnvironmentElement],
+      _timetables: Map[String, Seq[DynamicTimetable]]
+  ) extends RailwayEnvironment:
     def timetables: Seq[DynamicTimetable] = _timetables.values.flatten.toSeq
     def doStep(dt: Int): RailwayEnvironment =
       // Allow agents to be at the same time in more than an environment element
@@ -182,10 +151,10 @@ object RailwayEnvironment:
       )
 
     private def routeUpdateFunction(
-                                     route: RouteEnvironmentElement,
-                                     agent: TrainAgent,
-                                     time: Time
-                                   ): Option[RailwayEnvironmentImpl] =
+        route: RouteEnvironmentElement,
+        agent: TrainAgent,
+        time: Time
+    ): Option[RailwayEnvironmentImpl] =
       agent.distanceTravelled match
         case d if d >= route.length =>
           for
@@ -205,10 +174,10 @@ object RailwayEnvironment:
         case _ => route.updateTrain(agent).map(ree => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree)))
 
     private def stationUpdateFunction(
-                                       station: StationEnvironmentElement,
-                                       agent: TrainAgent,
-                                       time: Time
-                                     ): Option[RailwayEnvironmentImpl] =
+        station: StationEnvironmentElement,
+        agent: TrainAgent,
+        time: Time
+    ): Option[RailwayEnvironmentImpl] =
       for
         see <- station.removeTrain(agent)
         se = stations.updateWhen(_.name == see.name)(_ => see)
@@ -237,4 +206,3 @@ object RailwayEnvironment:
         case (Some(r), _) => Some((r, Forward))
         case (_, Some(r)) => Some((r, Backward))
         case _            => None
-

@@ -2,7 +2,6 @@ package ulisse.entities.simulation.agents
 
 import ulisse.entities.simulation.environments.Environment
 
-
 /** Contains the Perceptions objects used in the simulation */
 object Perceptions:
   /** Basic PerceptionData trait */
@@ -18,5 +17,5 @@ object Perceptions:
     /** Provided Perception type */
     type P <: Perception[?]
 
-    /** Provides a perception for the agent given the environment*/
+    /** Provides a perception for the agent given the environment */
     def perceptionFor(environment: E, agent: SA): Option[P]
