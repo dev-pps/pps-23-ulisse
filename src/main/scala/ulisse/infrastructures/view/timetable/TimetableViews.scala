@@ -1,24 +1,26 @@
 package ulisse.infrastructures.view.timetable
 
-import ulisse.infrastructures.view.components.JComponent
-import ulisse.infrastructures.view.components.JComponent.{JIconLabel, JTabbedPane}
+import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
+import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
 import ulisse.infrastructures.view.timetable.TimetableEditorTabView.EditorTab
 
 import scala.swing.{Component, FlowPanel, Label, MainFrame, ScrollPane}
 
 object TimetableViews:
 
-  extension (panes: Map[JIconLabel, Component])
-    def toTabbedPane: JTabbedPane =
-      val tabbedPane = JComponent.createTabbedPane(panes.keys.toList: _*)
+  extension (panes: Map[ComposedImageLabel, Component])
+    private def toTabbedPane: JTabbedPane =
+      val tabbedPane = ComposedSwing.createTabbedPane(panes.keys.toList: _*)
       panes.foreach((k, p) => tabbedPane.paneOf(k).contents += p)
       tabbedPane
 
   def timetableTabbedPane(): JTabbedPane =
-    val formIcon: JIconLabel  = JComponent.createIconLabel("icons/calendar_add_on.svg", "Create")
-    val formPane              = EditorTab(TimetableViewController())
-    val savedIcon: JIconLabel = JComponent.createIconLabel("icons/calendar_clock.svg", "Saved")
-    val savedPane             = FlowPanel(Label("Create timetable form"))
+    import scala.swing.Orientation
+    given orientation: Orientation.Value = Orientation.Vertical
+    val formIcon                         = ComposedImageLabel.createIcon("icons/calendar_add_on.svg", "Create")
+    val formPane                         = EditorTab(TimetableViewController())
+    val savedIcon                        = ComposedImageLabel.createIcon("icons/calendar_clock.svg", "Saved")
+    val savedPane                        = FlowPanel(Label("Create timetable form"))
 
     Map(
       formIcon  -> formPane,

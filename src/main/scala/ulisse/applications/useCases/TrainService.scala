@@ -23,7 +23,7 @@ final case class TrainService(eventQueue: TrainEventQueue) extends Input:
     )
     promise.future
 
-  def addTrain(
+  def createTrain(
       name: String,
       technologyName: String,
       wagonUseTypeName: String,

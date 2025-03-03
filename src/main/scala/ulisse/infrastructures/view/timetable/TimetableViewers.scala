@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.timetable
 
+import ulisse.infrastructures.view.components.ExtendedSwing.createSVGPanel
 import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.TimetableEntry
-import ulisse.infrastructures.view.components.ImagePanels.ImagePanel.createSVGPanel
 import ulisse.infrastructures.view.train.SwingUtils
 import ulisse.infrastructures.view.train.SwingUtils.headerLabel
 
@@ -58,5 +58,5 @@ object TimetableViewers:
     contents += heading
     contents += infos
     contents += new Label() {
-      contents += createSVGPanel("icons/arrow_down.svg", Color.BLACK)
+      contents += createSVGPanel("icons/arrow_down.svg")
     }
