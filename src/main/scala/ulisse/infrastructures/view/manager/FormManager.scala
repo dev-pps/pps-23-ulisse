@@ -1,13 +1,13 @@
 package ulisse.infrastructures.view.manager
 
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
-import ulisse.infrastructures.view.page.forms.Form
-import ulisse.infrastructures.view.page.forms.Form.{RouteForm, ScheduleForm, StationForm}
+import ulisse.infrastructures.view.page.forms.{Form, StationForm}
+import ulisse.infrastructures.view.page.forms.Form.{RouteForm, ScheduleForm}
 
 import scala.swing.{Component, Orientation}
 
 trait FormManager extends ComposedSwing:
-  def stationForm: Form
+  def stationForm: StationForm
   def routeForm: Form
   def scheduleForm: Form
 
@@ -25,13 +25,13 @@ object FormManager:
 
   private case class FormManagerImpl(stationForm: StationForm, routeForm: RouteForm, scheduleForm: ScheduleForm)
       extends FormManager:
-    def this() = this(Form.createStation(), Form.createRoute(), Form.createSchedule())
+    def this() = this(StationForm(), Form.createRoute(), Form.createSchedule())
     given orientation: Orientation.Value = Orientation.Horizontal
     private val station                  = ComposedImageLabel.createIcon("icons/station.svg", "station")
     private val route                    = ComposedImageLabel.createIcon("icons/route.svg", "route")
     private val schedule                 = ComposedImageLabel.createIcon("icons/menu/train.svg", "schedule")
 
     private val menu: BaseFormManager =
-      BaseFormManager(station, route, schedule)(stationForm, routeForm, routeForm)
+      BaseFormManager(station, route, schedule)(stationForm, routeForm, scheduleForm)
 
     export menu._

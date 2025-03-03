@@ -43,6 +43,14 @@ object Observers:
     /** Notifies the observers that the observable is exited, given the data [[T]] of the event. */
     def notifyExit(data: T): Unit
 
+    /** Converts the observable of type [[T]] to an observer of type [[I]]. */
+    def toObserver[I](newData: I => T): Observer[I] =
+      new Observer[I]:
+        override def onClick(data: I): Unit = notifyClick(newData(data))
+        override def onRelease(data: I): Unit = notifyRelease(newData(data))
+        override def onHover(data: I): Unit = notifyHover(newData(data))
+        override def onExit(data: I): Unit = notifyExit(newData(data))
+
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class ObservableImpl[T](private var list: List[Observer[T]]) extends Observable[T]:
     override def observers: List[Observer[T]] = list
