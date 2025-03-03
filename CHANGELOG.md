@@ -1,3 +1,25 @@
+## [1.16.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.15.0...v1.16.0) (2025-03-03)
+
+### Features
+
+* add methods in appStation to read manager ([9f41f51](https://github.com/dev-pps/pps-23-ulisse/commit/9f41f51dd2484f71497e91bc235d82d47ef5ccfd))
+* add methods in event queue to read manager ([3df8d68](https://github.com/dev-pps/pps-23-ulisse/commit/3df8d6821547ac08c7093fc13c71dfd08fad1b99))
+* add simulationManager in AppState ([bbd2d07](https://github.com/dev-pps/pps-23-ulisse/commit/bbd2d078c319d151105711e36f0e6a2fae98fcfe))
+* crate queue state ([2c6ccd3](https://github.com/dev-pps/pps-23-ulisse/commit/2c6ccd310823c941d33bb4609c824db0826e9af0))
+* create AppState ([7f6e45e](https://github.com/dev-pps/pps-23-ulisse/commit/7f6e45e6c00d75413d7f540003200848811360b4))
+* create appState and methods to update managers ([8c8d89f](https://github.com/dev-pps/pps-23-ulisse/commit/8c8d89f9a47283a2092befbc2205d09406e8cbb7))
+* create methods to update appstate ([893ae03](https://github.com/dev-pps/pps-23-ulisse/commit/893ae030f94c8333d021a6189c8f239b215ec689))
+* create methods to update event queue ([ca4882a](https://github.com/dev-pps/pps-23-ulisse/commit/ca4882abb07863f4767bffddcec97d0328da0b6a))
+* init app state ([ac0e5a4](https://github.com/dev-pps/pps-23-ulisse/commit/ac0e5a4432e9dea1b20811bb1ca637dadedfb34a))
+* updated route service with new event queue ([c725a93](https://github.com/dev-pps/pps-23-ulisse/commit/c725a932950e3c0ee3c7eb5e2cb84d56c56e3410))
+* updated simulation info service with new event queue ([35f62bd](https://github.com/dev-pps/pps-23-ulisse/commit/35f62bdcf60902a416112f00a9b40f151b890e7e))
+* updated station service with new event queue ([0cbb2d0](https://github.com/dev-pps/pps-23-ulisse/commit/0cbb2d021bcf487f63eaec2b9d7cc23db690d676))
+* updated timetable and train service with new event queue ([9f39364](https://github.com/dev-pps/pps-23-ulisse/commit/9f3936453950da54dd0e72a086fd9dd9ee5d9257))
+
+### Bug Fixes
+
+* remove creation function of station manager ([33617e8](https://github.com/dev-pps/pps-23-ulisse/commit/33617e85165580443bf360652bb1ff95900e88fe))
+
 ## [1.15.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.14.1...v1.15.0) (2025-03-01)
 
 ### Features
