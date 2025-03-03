@@ -73,3 +73,8 @@ object EnvironmentElements:
       /** Search the train in the provided list of environmentElement */
       def findIn(eeSeq: Seq[EE]): Option[EE] =
         eeSeq.find(_.contains(train))
+
+    extension [EE <: TrainAgentEEWrapper[EE]](ee: EE)
+      /** Find all TrainAgent in the environment */
+      def trains: Seq[TrainAgent] =
+        ee.containers.flatMap(_.trains)
