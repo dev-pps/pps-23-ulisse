@@ -78,3 +78,8 @@ object EnvironmentElements:
       /** Find all TrainAgent in the environment */
       def trains: Seq[TrainAgent] =
         ee.containers.flatMap(_.trains)
+
+    extension [EE <: TrainAgentEEWrapper[EE]](eeSeq: Seq[EE])
+      /** Find all TrainAgent in a sequence of environments */
+      def collectTrains: Seq[TrainAgent] =
+        eeSeq.flatMap(_.trains)
