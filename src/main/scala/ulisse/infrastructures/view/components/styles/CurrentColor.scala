@@ -15,12 +15,17 @@ final case class CurrentColor(private var _current: Color):
   /** Set the current color. */
   def current_=(color: Color): Unit = _current = color
 
-  private def hoverColor(palette: Styles.Palette): Unit = palette.hoverColor.foreach(current = _)
-  private def clickColor(palette: Styles.Palette): Unit = palette.clickColor.foreach(current = _)
-  private def exitColor(palette: Styles.Palette): Unit =
-    palette.hoverColor.foreach(_ => current = palette.background)
-  private def releaseColor(palette: Styles.Palette): Unit =
-    palette.clickColor.foreach(_ => current = palette.background)
+  /** Set the current color from the palette when the component is hovered. */
+  def hoverColor(palette: Styles.Palette): Unit = palette.hoverColor.foreach(current = _)
+
+  /** Set the current color from the palette when the component is clicked. */
+  def clickColor(palette: Styles.Palette): Unit = palette.clickColor.foreach(current = _)
+
+  /** Set the current color from the palette when the component is exited. */
+  def exitColor(palette: Styles.Palette): Unit = palette.hoverColor.foreach(_ => current = palette.background)
+
+  /** Set the current color from the palette when the component is released. */
+  def releaseColor(palette: Styles.Palette): Unit = palette.hoverColor.foreach(_ => current = palette.background)
 
   /** Initialize the color reactions of the component. */
   def initColorReactions(component: EnhancedLook, palette: () => Palette): Reactions.Reaction =

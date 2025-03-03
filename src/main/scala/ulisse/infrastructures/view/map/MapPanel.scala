@@ -2,13 +2,14 @@ package ulisse.infrastructures.view.map
 
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinate
-import ulisse.infrastructures.view.common.Observers
+import ulisse.infrastructures.view.common.{ImagePath, Observers}
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.components.draw.DrawImages
 
-import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import scala.math.{abs, sqrt}
 import scala.swing.*
+import scala.swing.event.MouseEvent
 
 trait MapPanel extends Panel with EnhancedLook:
   def drawStation(stations: StationPorts.Input#SM): Unit
@@ -22,23 +23,29 @@ object MapPanel:
     private val itemCollection = MapItemsCollection()
     private val mapObservable  = Observers.createObservable[Point]
 
+    private val image = DrawImages.createAt(ImagePath.station, new Point(500, 500))
+
+//    listenTo(mouseEvents: _*)
+    attach(image.toObserver(data => data))
+
     export itemCollection.{attach as attachItem, detach as detachItem}
 
     reactions += {
       case event.MouseMoved(_, point, _) =>
-        itemCollection.onHover(point)
+//        itemCollection.onHover(point)
         updateGraphics()
       case event.MousePressed(_, point, _, _, _) =>
         itemCollection.onClick(point)
         updateGraphics()
       case event.MouseReleased(_, point, _, _, _) =>
-        itemCollection.onRelease(point)
+//        itemCollection.onRelease(point)
         updateGraphics()
     }
 
     override def drawStation(stations: StationPorts.Input#SM): Unit = ()
 
     override protected def paintLook(g: Graphics2D): Unit =
+      image.draw(g, peer)
       itemCollection.draw(g, peer)
       super.paintLook(g)
 

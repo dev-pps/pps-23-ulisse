@@ -15,15 +15,15 @@ object MapItemsCollection:
     private val observable = Observers.createObservable[Point]
 
     def onClick(mousePoint: Point): Unit =
-      if mapItems.exists(_.hasCollided(mousePoint)) then
-        mapItems.foreach(_.onClick(mousePoint))
-      else
-        val item = MapItem.createSingleItem("station.png", mousePoint.x, mousePoint.y)
+//      if mapItems.exists(_.hasCollided(mousePoint)) then
+//        mapItems.foreach(_.onClick(mousePoint))
+//      else
+      val item = MapItem.createSingleItem("station.png", mousePoint.x, mousePoint.y)
 //        observable.observers.foreach(item.attach)
-        mapItems = mapItems.appended(item)
+      mapItems = mapItems.appended(item)
 
-    def onHover(mousePoint: Point): Unit   = mapItems.foreach(_.onHover(mousePoint))
-    def onRelease(mousePoint: Point): Unit = mapItems.foreach(_.onRelease(mousePoint))
+//    def onHover(mousePoint: Point): Unit   = mapItems.foreach(_.onHover(mousePoint))
+//    def onRelease(mousePoint: Point): Unit = mapItems.foreach(_.onRelease(mousePoint))
 
     def draw(g: Graphics2D, observer: ImageObserver): Unit = mapItems.foreach(_.drawItem(g, observer))
 
