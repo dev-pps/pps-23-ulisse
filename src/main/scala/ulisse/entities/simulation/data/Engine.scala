@@ -3,7 +3,6 @@ package ulisse.entities.simulation.data
 import ulisse.dsl.comparison.FieldsComparators.{Field, FieldComparator}
 
 trait Engine:
-
   def running: Boolean
   def running_=(running: Boolean): Engine
   def configuration: EngineConfiguration
@@ -11,8 +10,6 @@ trait Engine:
   def state: EngineState
   def state_=(state: EngineState): Engine
   def reset(): Engine
-  def update(currentUpdate: Double): Engine
-  def decreaseElapsedCycleTimeBy(delta: Double): Engine
 
 object Engine:
   def apply(running: Boolean, configuration: EngineConfiguration, state: EngineState): Engine =
@@ -47,19 +44,7 @@ object Engine:
       configuration: EngineConfiguration,
       state: EngineState
   ) extends Engine:
-    def reset(): Engine = Engine(false, configuration, EngineState.empty())
-
-    override def running_=(running: Boolean): Engine                         = copy(running = running)
+    def reset(): Engine                              = Engine(false, configuration, EngineState.empty())
+    override def running_=(running: Boolean): Engine = copy(running = running)
     override def configuration_=(configuration: EngineConfiguration): Engine = copy(configuration = configuration)
     override def state_=(state: EngineState): Engine                         = copy(state = state)
-    def decreaseElapsedCycleTimeBy(delta: Double): Engine =
-      copy(state = state.updateElapsedCycleTime(-delta))
-
-    def update(currentUpdate: Double): Engine =
-      state.lastUpdate match
-        case Some(lastUpdate) =>
-          val deltaElapsed = currentUpdate - lastUpdate
-          copy(state = EngineState(Some(currentUpdate), deltaElapsed, state.elapsedCycleTime + deltaElapsed))
-        case None =>
-          println(s"First update: $currentUpdate")
-          copy(state = state.lastUpdate = Some(currentUpdate))
