@@ -5,10 +5,10 @@ import ulisse.applications.useCases.{RouteService, SimulationService, StationSer
 
 /** Represents the input port manager of the application. */
 trait InputPortManager:
-  def stationPort: StationPorts.Input
-  def routePort: RoutePorts.Input
-  def trainPort: TrainPorts.Input
-  def timetablePort: TimetablePorts.Input
+  def station: StationPorts.Input
+  def route: RoutePorts.Input
+  def train: TrainPorts.Input
+  def timetable: TimetablePorts.Input
 
 object InputPortManager:
 
@@ -17,10 +17,10 @@ object InputPortManager:
 
   private case class InputPortManagerImpl(
       eventQueue: EventQueue,
-      stationPort: StationPorts.Input,
-      routePort: RoutePorts.Input,
-      trainPort: TrainPorts.Input,
-      timetablePort: TimetablePorts.Input
+      station: StationPorts.Input,
+      route: RoutePorts.Input,
+      train: TrainPorts.Input,
+      timetable: TimetablePorts.Input
   ) extends InputPortManager:
 
     def this(eventQueue: EventQueue) =
