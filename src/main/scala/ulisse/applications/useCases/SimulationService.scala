@@ -5,7 +5,7 @@ import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.AppState
 import ulisse.applications.event.SimulationEventQueue
 import ulisse.entities.route.RouteEnvironmentElement
-import ulisse.entities.simulation.data.{EngineState, SimulationData}
+import ulisse.entities.simulation.data.{Engine, SimulationData}
 import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
 import ulisse.entities.station.Station
@@ -24,8 +24,8 @@ final case class SimulationService(
     private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
   private val minPermittedDistanceBetweenTrains: Double = 100.0
-  override def initSimulation(): Future[(EngineState, SimulationData)] =
-    val p = Promise[(EngineState, SimulationData)]()
+  override def initSimulation(): Future[(Engine, SimulationData)] =
+    val p = Promise[(Engine, SimulationData)]()
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         val newSimulationManager = simulationManager.setupEnvironment(RailwayEnvironment(
@@ -43,8 +43,8 @@ final case class SimulationService(
     )
     p.future
 
-  override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Future[Option[EngineState]] = {
-    val p = Promise[Option[EngineState]]()
+  override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Future[Option[Engine]] = {
+    val p = Promise[Option[Engine]]()
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         simulationManager.setupEngine(stepSize, cyclesPerSecond) match
@@ -59,8 +59,8 @@ final case class SimulationService(
     p.future
   }
 
-  def start(): Future[EngineState] =
-    val p = Promise[EngineState]()
+  def start(): Future[Engine] =
+    val p = Promise[Engine]()
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         val newSimulationManager = simulationManager.start()
@@ -72,8 +72,8 @@ final case class SimulationService(
     )
     p.future
 
-  def stop(): Future[EngineState] =
-    val p = Promise[EngineState]()
+  def stop(): Future[Engine] =
+    val p = Promise[Engine]()
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         val newSimulationManager = simulationManager.stop()
@@ -83,8 +83,8 @@ final case class SimulationService(
     )
     p.future
 
-  def reset(): Future[EngineState] =
-    val p = Promise[EngineState]()
+  def reset(): Future[Engine] =
+    val p = Promise[Engine]()
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         val newSimulationManager = simulationManager.reset()

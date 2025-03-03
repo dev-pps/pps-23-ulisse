@@ -1,12 +1,12 @@
 package ulisse.applications.managers
 
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
-import ulisse.entities.simulation.data.{EngineState, SimulationData}
+import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.utils.Times.{ClockTime, Time}
 
 trait SimulationManager:
-  def engineState: EngineState
+  def engineState: Engine
   def simulationData: SimulationData
   def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Option[SimulationManager]
   def setupEnvironment(environment: RailwayEnvironment): SimulationManager
@@ -22,7 +22,7 @@ object SimulationManager:
       cyclesPerSecond: Option[Int]
   ): SimulationManager =
     SimulationManagerImpl(
-      EngineState.empty().copy(cyclesPerSecond = cyclesPerSecond),
+      Engine.emptyWithConfiguration(EngineConfiguration.withCyclesPerSecond(cyclesPerSecond)),
       SimulationData.empty(),
       notificationService,
       timeProvider
@@ -55,32 +55,32 @@ object SimulationManager:
           SimulationManagerImpl(engineState, simulationData, Some(notificationService), timeProvider)
 
   private case class SimulationManagerImpl(
-      engineState: EngineState,
+      engineState: Engine,
       simulationData: SimulationData,
       notificationService: Option[SimulationPorts.Output],
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ) extends SimulationManager:
     override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Option[SimulationManager] =
-      Some(copy(engineState.copy(cyclesPerSecond = cyclesPerSecond, stepSize = stepSize)))
+      Some(copy(engineState.configuration = EngineConfiguration(stepSize, cyclesPerSecond)))
     override def setupEnvironment(environment: RailwayEnvironment): SimulationManager =
       copy(simulationData = SimulationData.withEnvironment(environment))
     override def start(): SimulationManager =
-      copy(engineState.copy(true))
-    override def stop(): SimulationManager  = copy(engineState.copy(false))
+      copy(engineState.running = true)
+    override def stop(): SimulationManager  = copy(engineState.running = false)
     override def reset(): SimulationManager = copy(engineState.reset(), simulationData.reset())
     override def doStep(): SimulationManager =
-      def _updateSimulationData(engineData: EngineState, simulationData: SimulationData): SimulationData =
-        val newSimulationData = simulationData.increaseStepByOne().increaseSecondElapsedBy(engineData.lastDelta)
+      def _updateSimulationData(engineData: Engine, simulationData: SimulationData): SimulationData =
+        val newSimulationData = simulationData.increaseStepByOne().increaseSecondElapsedBy(engineData.state.lastDelta)
         for ns <- notificationService do ns.stepNotification(newSimulationData)
         newSimulationData
       val updatedEngineData = engineState.update(timeProvider.currentTimeMillis().toDouble)
-      updatedEngineData.cyclesPerSecond match
+      updatedEngineData.configuration.cyclesPerSecond match
         case Some(cps) =>
           val cycleTimeStep = calculateCycleTimeStep(cps)
           println(
-            s"Cycle Time Step: ${updatedEngineData}${updatedEngineData.elapsedCycleTime}, ${simulationData.secondElapsed}, ${updatedEngineData.lastDelta}"
+            s"Cycle Time Step: ${updatedEngineData}${updatedEngineData.state.elapsedCycleTime}, ${simulationData.secondElapsed}, ${updatedEngineData.state.lastDelta}"
           )
-          if updatedEngineData.elapsedCycleTime >= cycleTimeStep then
+          if updatedEngineData.state.elapsedCycleTime >= cycleTimeStep then
             println(
               "decrease cycle timeStep"
             )
@@ -89,7 +89,7 @@ object SimulationManager:
               _updateSimulationData(updatedEngineData, simulationData)
             )
           else
-            copy(updatedEngineData, simulationData.increaseSecondElapsedBy(updatedEngineData.lastDelta))
+            copy(updatedEngineData, simulationData.increaseSecondElapsedBy(updatedEngineData.state.lastDelta))
         case None =>
           println(
             s"newData $updatedEngineData"

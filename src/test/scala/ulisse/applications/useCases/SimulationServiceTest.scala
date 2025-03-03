@@ -7,7 +7,7 @@ import ulisse.Runner.runAll
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
 import ulisse.applications.{AppState, EventQueue}
-import ulisse.entities.simulation.data.EngineState
+import ulisse.entities.simulation.data.Engine
 import ulisse.entities.station.Station
 
 import java.util.concurrent.LinkedBlockingQueue
