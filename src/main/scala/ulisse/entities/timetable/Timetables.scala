@@ -46,6 +46,16 @@ object Timetables:
   trait Timetable extends PartialTimetable:
     def arrivingStation: Station
     def arrivingTime: Option[ClockTime]
+    override def equals(that: Any): Boolean =
+      that match
+        case that: Timetable =>
+          train == that.train &&
+          startStation == that.startStation &&
+          departureTime == that.departureTime &&
+          table == that.table &&
+          arrivingStation == that.arrivingStation &&
+          arrivingTime == that.arrivingTime
+        case _ => false
 
   /** ETA estimator strategy.
     * Method `ETA` requires previous station [[StationTime]], [[RailInfo]] and [[Train]] in order
