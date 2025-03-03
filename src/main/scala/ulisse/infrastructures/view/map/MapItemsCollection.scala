@@ -12,8 +12,7 @@ object MapItemsCollection:
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   case class MapItemsCollection(var mapItems: List[MapItem]) extends Observable[Point]:
-    private val observable                        = Observers.createObservable[Point]
-    override val observers: List[Observer[Point]] = observable.observers
+    private val observable = Observers.createObservable[Point]
 
     def onClick(mousePoint: Point): Unit =
       if mapItems.exists(_.hasCollided(mousePoint)) then
@@ -30,14 +29,16 @@ object MapItemsCollection:
 
     def refreshObserver(): Unit = ()
 
-    override def attach(observer: Observer[Point]): Unit =
-      observable.attach(observer)
-      mapItems.foreach(_.attach(observer))
-    override def detach(observer: Observer[Point]): Unit =
-      observable.detach(observer)
-      mapItems.foreach(_.detach(observer))
+    export observable._
 
-    override def notifyClick(data: Point): Unit   = mapItems.foreach(_.notifyClick(data))
-    override def notifyHover(data: Point): Unit   = mapItems.foreach(_.notifyHover(data))
-    override def notifyRelease(data: Point): Unit = mapItems.foreach(_.notifyRelease(data))
-    override def notifyExit(data: Point): Unit    = mapItems.foreach(_.notifyExit(data))
+//    override def attach(observer: Observer[Point]): Unit =
+//      observable.attach(observer)
+//      mapItems.foreach(_.attach(observer))
+//    override def detach(observer: Observer[Point]): Unit =
+//      observable.detach(observer)
+//      mapItems.foreach(_.detach(observer))
+//
+//    override def notifyClick(data: Point): Unit   = mapItems.foreach(_.notifyClick(data))
+//    override def notifyHover(data: Point): Unit   = mapItems.foreach(_.notifyHover(data))
+//    override def notifyRelease(data: Point): Unit = mapItems.foreach(_.notifyRelease(data))
+//    override def notifyExit(data: Point): Unit    = mapItems.foreach(_.notifyExit(data))
