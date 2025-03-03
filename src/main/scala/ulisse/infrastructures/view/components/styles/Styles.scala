@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.components.styles
 
 import ulisse.infrastructures.view.common.Themes
 import ulisse.infrastructures.view.common.Themes.{withAlpha, Theme}
-import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{CurrentColor, EnhancedLook}
+import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
 import ulisse.infrastructures.view.utils.Swings
 import ulisse.utils.Pair
 
@@ -44,6 +44,7 @@ object Styles:
   val formButtonPalette: Palette      = defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.click)
   val formTrueButtonPalette: Palette  = formButtonPalette.withClick(Theme.light.trueClick)
   val formFalseButtonPalette: Palette = formButtonPalette.withClick(Theme.light.falseClick)
+  val silhouettePalette: Palette      = transparentPalette.withHover(Theme.light.overlay).withClick(Theme.light.click)
 
   /** Default [[Rect]]. */
   val defaultRect: Rect         = Rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)
