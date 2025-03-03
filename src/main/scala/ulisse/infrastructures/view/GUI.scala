@@ -1,5 +1,6 @@
 package ulisse.infrastructures.view
 
+import ulisse.adapters.InputAdapterManager
 import ulisse.applications.InputPortManager
 import ulisse.infrastructures.view.manager.{FormManager, PageManager, WorkspaceManager}
 import ulisse.infrastructures.view.page.forms.Form
@@ -13,21 +14,15 @@ import scala.swing.{Dimension, MainFrame}
 trait GUI
 
 object GUI:
-  def apply(inputPortManager: InputPortManager): GUI = GUIImpl(inputPortManager)
+  def apply(adapterManager: InputAdapterManager): GUI = GUIImpl(adapterManager)
 
-  private case class GUIImpl(inputPortManager: InputPortManager) extends MainFrame, GUI:
+  private case class GUIImpl(adapterManager: InputAdapterManager) extends MainFrame, GUI:
     title = "Ulisse"
     preferredSize = new Dimension(1600, 1000)
 
-    private val stationForm  = Form.createStation()
-    private val routeForm    = Form.createRoute()
-    private val scheduleForm = Form.createSchedule()
-
-    private val mapFormManager = FormManager.createMap(stationForm, routeForm, scheduleForm)
-
-    private val simulationWorkspace = SimulationWorkspace()
-    private val mapWorkspace        = MapWorkspace(mapFormManager)
-    private val trainWorkspace      = TrainWorkspace()
+    private val simulationWorkspace = SimulationWorkspace(adapterManager)
+    private val mapWorkspace        = MapWorkspace(adapterManager)
+    private val trainWorkspace      = TrainWorkspace(adapterManager)
 
     private val menu             = Menu()
     private val dashboard        = Dashboard()

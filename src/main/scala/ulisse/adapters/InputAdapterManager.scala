@@ -2,11 +2,11 @@ package ulisse.adapters
 
 import ulisse.adapters.input.StationEditorAdapter
 import ulisse.applications.InputPortManager
-import ulisse.applications.ports.{RoutePorts, StationPorts, TimetablePorts, TrainPorts}
 
 /** Represents the input adapter manager of the application. */
 trait InputAdapterManager
 
+/** Companion object of the input adapter manager. */
 object InputAdapterManager:
 
   /** Creates a new instance of the input adapter manager. */

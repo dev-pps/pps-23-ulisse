@@ -12,8 +12,7 @@ trait FormManager extends ComposedSwing:
   def scheduleForm: Form
 
 object FormManager:
-  def createMap(stationForm: StationForm, routeForm: RouteForm, scheduleForm: ScheduleForm): FormManager =
-    FormManagerImpl(stationForm, routeForm, scheduleForm)
+  def createMap(): FormManager = new FormManagerImpl()
 
   private case class BaseFormManager(iconLabels: ComposedImageLabel*)(forms: Form*):
     private val page: Map[ComposedImageLabel, Form]   = iconLabels.zip(forms).toMap
@@ -26,6 +25,7 @@ object FormManager:
 
   private case class FormManagerImpl(stationForm: StationForm, routeForm: RouteForm, scheduleForm: ScheduleForm)
       extends FormManager:
+    def this() = this(Form.createStation(), Form.createRoute(), Form.createSchedule())
     given orientation: Orientation.Value = Orientation.Horizontal
     private val station                  = ComposedImageLabel.createIcon("icons/station.svg", "station")
     private val route                    = ComposedImageLabel.createIcon("icons/route.svg", "route")
