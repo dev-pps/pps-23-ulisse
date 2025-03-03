@@ -1,6 +1,9 @@
 package ulisse.applications.event
 
 import ulisse.applications.AppState
+import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.applications.managers.TimetableManagers.TimetableManager
+import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.entities.simulation.Simulations.SimulationData
 
@@ -12,10 +15,22 @@ trait SimulationEventQueue:
   def addReadSimulationEvent(update: SimulationData => Unit): Unit
 
   /** Add an event to create a simulation. */
-  def addCreateSimulationEvent(update: (SimulationManager, StationManager) => SimulationManager): Unit
+  def addCreateSimulationEvent(update: (
+      SimulationManager,
+      StationManager,
+      RouteManager,
+      TrainManager,
+      TimetableManager
+  ) => SimulationManager): Unit
 
   /** Add an event to update the simulation. */
-  def addUpdateSimulationEvent(update: (SimulationManager, StationManager) => SimulationManager): Unit =
+  def addUpdateSimulationEvent(update: (
+      SimulationManager,
+      StationManager,
+      RouteManager,
+      TrainManager,
+      TimetableManager
+  ) => SimulationManager): Unit =
     addCreateSimulationEvent(update)
 
   /** Add an event to delete the simulation. */
@@ -31,7 +46,13 @@ object SimulationEventQueue:
       extends SimulationEventQueue:
     override def addReadSimulationEvent(update: SimulationData => Unit): Unit = events.offer(_ readSimulation update)
 
-    override def addCreateSimulationEvent(update: (SimulationManager, StationManager) => SimulationManager): Unit =
+    override def addCreateSimulationEvent(update: (
+        SimulationManager,
+        StationManager,
+        RouteManager,
+        TrainManager,
+        TimetableManager
+    ) => SimulationManager): Unit =
       events.offer(_ initSimulation update)
 
     override def addDeleteSimulationEvent(update: SimulationManager => SimulationManager): Unit =

@@ -44,7 +44,9 @@ object AppStateTest:
       TimetableManager
   ) =
     (_, _, _, _) => (stationManager, routeManager, trainManager, timetableManager)
-  val initSimulation: (SimulationManager, StationManager) => SimulationManager = (_, _) => simulationManager
+  val initSimulation
+      : (SimulationManager, StationManager, RouteManager, TrainManager, TimetableManager) => SimulationManager =
+    (_, _, _, _, _) => simulationManager
 
 class AppStateTest extends AnyFlatSpec with Matchers:
   import AppStateTest.*

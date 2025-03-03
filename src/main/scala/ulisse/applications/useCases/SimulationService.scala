@@ -19,69 +19,82 @@ final case class SimulationService(
 
   override def initSimulation(): Future[(EngineState, SimulationData)] =
     val p = Promise[(EngineState, SimulationData)]()
-    eventQueue.addUpdateSimulationEvent((simulationManager, stationManager) => {      val newSimulationManager = appState.simulationManager.setupEnvironment(RailwayEnvironment(
-        appState.stationManager.stations,
-        appState.routeManager.routes,
-        appState.trainManager.trains,
-        appState.timetableManager.tables
-      ))
-      p.success((newSimulationManager.engineState, newSimulationManager.simulationData))
-      newSimulationManager
-    })
+    eventQueue.addUpdateSimulationEvent(
+      (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
+        val newSimulationManager = simulationManager.setupEnvironment(RailwayEnvironment(
+          stationManager.stations,
+          routeManager.routes,
+          trainManager.trains,
+          timetableManager.tables
+        ))
+        p.success((newSimulationManager.engineState, newSimulationManager.simulationData))
+        newSimulationManager
+      }
+    )
     p.future
 
   override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Future[Option[EngineState]] = {
     val p = Promise[Option[EngineState]]()
-    eventQueue.addUpdateSimulationEvent((simulationManager, stationManager) => {
-      simulationManager.setupEngine(stepSize, cyclesPerSecond) match
-        case Some(newSimulationManager) =>
-          p.success(Some(newSimulationManager.engineState))
-          newSimulationManager
-        case _ =>
-          p.success(None)
-          simulationManager
-    })
+    eventQueue.addUpdateSimulationEvent(
+      (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
+        simulationManager.setupEngine(stepSize, cyclesPerSecond) match
+          case Some(newSimulationManager) =>
+            p.success(Some(newSimulationManager.engineState))
+            newSimulationManager
+          case _ =>
+            p.success(None)
+            simulationManager
+      }
+    )
     p.future
   }
 
   def start(): Future[EngineState] =
     val p = Promise[EngineState]()
-    eventQueue.addUpdateSimulationEvent((simulationManager, _) => {
-      val newSimulationManager = simulationManager.start()
-      p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engineState })
-      println("Start1")
-      doStep()
-      newSimulationManager
-    })
+    eventQueue.addUpdateSimulationEvent(
+      (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
+        val newSimulationManager = simulationManager.start()
+        p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engineState })
+        println("Start1")
+        doStep()
+        newSimulationManager
+      }
+    )
     p.future
 
   def stop(): Future[EngineState] =
     val p = Promise[EngineState]()
-    eventQueue.addUpdateSimulationEvent((simulationManager, _) => {
-      val newSimulationManager = simulationManager.stop()
-      p.success({ println("[SimulationService]: Simulation Stopped"); newSimulationManager.engineState })
-      newSimulationManager
-    })
+    eventQueue.addUpdateSimulationEvent(
+      (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
+        val newSimulationManager = simulationManager.stop()
+        p.success({ println("[SimulationService]: Simulation Stopped"); newSimulationManager.engineState })
+        newSimulationManager
+      }
+    )
     p.future
 
   def reset(): Future[EngineState] =
     val p = Promise[EngineState]()
-    eventQueue.addUpdateSimulationEvent((simulationManager, _) => {
-      val newSimulationManager = simulationManager.reset()
-      p.success({ println("[SimulationService]: Simulation Reset"); newSimulationManager.engineState })
-      newSimulationManager
-    })
+    eventQueue.addUpdateSimulationEvent(
+      (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
+        val newSimulationManager = simulationManager.reset()
+        p.success({ println("[SimulationService]: Simulation Reset"); newSimulationManager.engineState })
+        newSimulationManager
+      }
+    )
     p.future
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   private def doStep(): Unit =
-    eventQueue.addUpdateSimulationEvent((simulationManager, _) => {
-      println("Start2")
-      if simulationManager.engineState.running then
-        println("Start3")
-        doStep()
-        simulationManager.doStep()
-      else
-        println("Start4")
-        simulationManager
-    })
+    eventQueue.addUpdateSimulationEvent(
+      (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
+        println("Start2")
+        if simulationManager.engineState.running then
+          println("Start3")
+          doStep()
+          simulationManager.doStep()
+        else
+          println("Start4")
+          simulationManager
+      }
+    )

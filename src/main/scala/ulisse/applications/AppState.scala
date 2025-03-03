@@ -92,7 +92,13 @@ trait AppState:
   ) => (StationManager, RouteManager, TrainManager, TimetableManager)): AppState
 
   /** update [[SimulationManager]], with a function that takes a [[SimulationManager]] and a [[StationManager]]. */
-  def initSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState
+  def initSimulation(update: (
+      SimulationManager,
+      StationManager,
+      RouteManager,
+      TrainManager,
+      TimetableManager
+  ) => SimulationManager): AppState
 
 object AppState:
   /** Create new application state with empty managers. */
@@ -166,5 +172,11 @@ object AppState:
         update(stationManager, routeManager, trainManager, timetableManager)
       copy(newStation, newRoute, newTrain, timetableManager = newTimetable)
 
-    override def initSimulation(update: (SimulationManager, StationManager) => SimulationManager): AppState =
-      copy(simulationManager = update(simulationManager, stationManager))
+    override def initSimulation(update: (
+        SimulationManager,
+        StationManager,
+        RouteManager,
+        TrainManager,
+        TimetableManager
+    ) => SimulationManager): AppState =
+      copy(simulationManager = update(simulationManager, stationManager, routeManager, trainManager, timetableManager))
