@@ -37,7 +37,7 @@ final case class SimulationService(
             timetableManager.tables.map(DynamicTimetable(_))
           )
         ))
-        p.success((newSimulationManager.engineState, newSimulationManager.simulationData))
+        p.success((newSimulationManager.engine, newSimulationManager.simulationData))
         newSimulationManager
       }
     )
@@ -49,7 +49,7 @@ final case class SimulationService(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         simulationManager.setupEngine(stepSize, cyclesPerSecond) match
           case Some(newSimulationManager) =>
-            p.success(Some(newSimulationManager.engineState))
+            p.success(Some(newSimulationManager.engine))
             newSimulationManager
           case _ =>
             p.success(None)
@@ -64,7 +64,7 @@ final case class SimulationService(
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         val newSimulationManager = simulationManager.start()
-        p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engineState })
+        p.success({ println("[SimulationService]: Simulation Started"); newSimulationManager.engine })
         println("Start1")
         doStep()
         newSimulationManager
@@ -77,7 +77,7 @@ final case class SimulationService(
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         val newSimulationManager = simulationManager.stop()
-        p.success({ println("[SimulationService]: Simulation Stopped"); newSimulationManager.engineState })
+        p.success({ println("[SimulationService]: Simulation Stopped"); newSimulationManager.engine })
         newSimulationManager
       }
     )
@@ -88,7 +88,7 @@ final case class SimulationService(
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         val newSimulationManager = simulationManager.reset()
-        p.success({ println("[SimulationService]: Simulation Reset"); newSimulationManager.engineState })
+        p.success({ println("[SimulationService]: Simulation Reset"); newSimulationManager.engine })
         newSimulationManager
       }
     )
@@ -99,7 +99,7 @@ final case class SimulationService(
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         println("Start2")
-        if simulationManager.engineState.running then
+        if simulationManager.engine.running then
           println("Start3")
           doStep()
           simulationManager.doStep()
