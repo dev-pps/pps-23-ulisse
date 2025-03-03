@@ -3,18 +3,24 @@ package ulisse.applications
 import ulisse.applications.ports.{RoutePorts, SimulationPorts, StationPorts, TimetablePorts, TrainPorts}
 import ulisse.applications.useCases.{RouteService, SimulationService, StationService, TimetableService, TrainService}
 
-trait InputPortManager
+/** Represents the input port manager of the application. */
+trait InputPortManager:
+  def stationPort: StationPorts.Input
+  def routePort: RoutePorts.Input
+  def trainPort: TrainPorts.Input
+  def timetablePort: TimetablePorts.Input
 
 object InputPortManager:
 
+  /** Creates a new instance of the input port manager. */
   def apply(eventQueue: EventQueue): InputPortManager = new InputPortManagerImpl(eventQueue)
 
   private case class InputPortManagerImpl(
       eventQueue: EventQueue,
-      stationService: StationPorts.Input,
-      routeService: RoutePorts.Input,
-      trainService: TrainPorts.Input,
-      timetableService: TimetablePorts.Input
+      stationPort: StationPorts.Input,
+      routePort: RoutePorts.Input,
+      trainPort: TrainPorts.Input,
+      timetablePort: TimetablePorts.Input
   ) extends InputPortManager:
 
     def this(eventQueue: EventQueue) =
