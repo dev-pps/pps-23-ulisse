@@ -1,7 +1,7 @@
 package ulisse.applications.managers
 
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
-import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
+import ulisse.entities.simulation.data.{Engine, EngineConfiguration, EngineState, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.utils.Times.{ClockTime, Time}
 
@@ -69,30 +69,33 @@ object SimulationManager:
     override def stop(): SimulationManager  = copy(engineState.running = false)
     override def reset(): SimulationManager = copy(engineState.reset(), simulationData.reset())
     override def doStep(): SimulationManager =
-      def _updateSimulationData(engineData: Engine, simulationData: SimulationData): SimulationData =
-        val newSimulationData = simulationData.increaseStepByOne().increaseSecondElapsedBy(engineData.state.lastDelta)
+      def _updateSimulationData(engineData: EngineState, simulationData: SimulationData): SimulationData =
+        val newSimulationData = simulationData.increaseStepByOne().increaseSecondElapsedBy(engineData.lastDelta)
         for ns <- notificationService do ns.stepNotification(newSimulationData)
         newSimulationData
-      val updatedEngineData = engineState.update(timeProvider.currentTimeMillis().toDouble)
-      updatedEngineData.configuration.cyclesPerSecond match
+      val updatedEngineData = engineState.state.update(timeProvider.currentTimeMillis().toDouble)
+      engineState.configuration.cyclesPerSecond match
         case Some(cps) =>
           val cycleTimeStep = calculateCycleTimeStep(cps)
           println(
-            s"Cycle Time Step: ${updatedEngineData}${updatedEngineData.state.elapsedCycleTime}, ${simulationData.secondElapsed}, ${updatedEngineData.state.lastDelta}"
+            s"Cycle Time Step: ${updatedEngineData}${updatedEngineData.elapsedCycleTime}, ${simulationData.secondElapsed}, ${updatedEngineData.lastDelta}"
           )
-          if updatedEngineData.state.elapsedCycleTime >= cycleTimeStep then
+          if updatedEngineData.elapsedCycleTime >= cycleTimeStep then
             println(
               "decrease cycle timeStep"
             )
             copy(
-              updatedEngineData.decreaseElapsedCycleTimeBy(cycleTimeStep),
+              engineState.state = updatedEngineData.updateElapsedCycleTime(-cycleTimeStep),
               _updateSimulationData(updatedEngineData, simulationData)
             )
           else
-            copy(updatedEngineData, simulationData.increaseSecondElapsedBy(updatedEngineData.state.lastDelta))
+            copy(
+              engineState.state = updatedEngineData,
+              simulationData.increaseSecondElapsedBy(updatedEngineData.lastDelta)
+            )
         case None =>
           println(
             s"newData $updatedEngineData"
           )
           val newSimData = _updateSimulationData(updatedEngineData, simulationData)
-          copy(engineState = updatedEngineData, simulationData = newSimData)
+          copy(engineState.state = updatedEngineData, simulationData = newSimData)
