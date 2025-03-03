@@ -69,8 +69,3 @@ final case class StationSettings():
   LazyList.continually(eventQueue.events.take()).scanLeft(initialState)((state, event) => event(state)).foreach(
     (appState: AppState) => println(s"Stations: ${appState.trainManager.trains}")
   )
-
-@main def testNewGraphicComponents(): Unit =
-  val list = LinkedBlockingQueue[RouteManager => RouteManager]()
-  val port = RouteService(eventQueue)
-  val map  = GUIView(port)
