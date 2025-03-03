@@ -10,9 +10,9 @@ import scala.swing.BorderPanel.Position.*
 trait GUIView
 
 object GUIView:
-  def apply(uiPort: Input): GUIView = GUIViewImpl(uiPort)
+  def apply(): GUIView = GUIViewImpl()
 
-  private case class GUIViewImpl(uiPort: Input) extends MainFrame, GUIView:
+  private case class GUIViewImpl() extends MainFrame, GUIView:
     title = "Map"
     visible = true
     preferredSize = new Dimension(1400, 1000)
