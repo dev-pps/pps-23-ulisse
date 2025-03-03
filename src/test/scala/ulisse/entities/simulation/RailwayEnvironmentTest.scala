@@ -10,8 +10,6 @@ import ulisse.entities.route.RouteTest.departureCoordinate
 import ulisse.entities.route.Routes.{Route, TypeRoute}
 import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.simulation.Environments.RailwayEnvironment
-import ulisse.entities.simulation.Actions
-import ulisse.entities.simulation.Actions.MoveBy
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
@@ -50,8 +48,8 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
       val minDistanceTravelled = 0.0
       copy(distanceTravelled = math.max(minDistanceTravelled, newDistanceTravelled))
 
-    override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[Actions.SimulationAction] =
-      Some(MoveBy(pathLength))
+    override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[TrainAgent] =
+      Some(copy(distanceTravelled = distanceTravelled + pathLength))
   private val trainAgent3905  = FakeTrainAgent(train3905, 0.0)
   private val trainAgent39052 = FakeTrainAgent(train39052, 0.0)
   private val trainAgent3906  = FakeTrainAgent(train3906, 0.0)
@@ -223,7 +221,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
 
     "doStep" should:
       "move train into route" in:
-        env.agents.collect({ case ta: TrainAgent => ta }).find(_.name == trainAgent3905.name) match
+        env.trains.find(_.name == trainAgent3905.name) match
           case Some(train) =>
             env.stations.flatMap(_.containers.flatMap(_.trains)).map(_.name).contains(trainAgent3905.name) shouldBe true
             val newEnv = env.doStep(dt)
@@ -242,11 +240,12 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
           case None => fail()
 
       "move train into station" in:
-        env.agents.collect({ case ta: TrainAgent => ta }).find(_.name == trainAgent3905.name) match
+        env.trains.find(_.name == trainAgent3905.name) match
           case Some(train) =>
             val newEnv = env.doStep(dt).doStep(dt)
             (newEnv.stations.find(_.name == stationB.name), newEnv.routes.find(_.id == routeAB.id)) match
               case (Some(stationEE), Some(routeEE)) =>
+                println(stationEE.containers.flatMap(_.trains).map(_.name))
                 val updatedAgent = stationEE.containers.flatMap(_.trains).find(_.name == trainAgent3905.name)
                 updatedAgent shouldBe defined
                 updatedAgent.map(_.distanceTravelled) shouldBe Some(0.0)
