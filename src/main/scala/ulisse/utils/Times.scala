@@ -78,25 +78,14 @@ object Times:
       override def s: Second    = ignoredSecondValue
 
   object FluentDeclaration:
-    /** ClockTime builder
-      * @param hours
-      *   hours
-      */
+    /** ClockTime builder that contains `hours` */
     case class HoursBuilder(hours: Int)
 
-    /** @param h
-      *   hours
-      * @return
-      *   ClockTime builder
-      */
+    /** ClockTime builder with given hours `h` */
     infix def h(h: Int): HoursBuilder = HoursBuilder(h)
 
     extension (hb: HoursBuilder)
-      /** @param minutes
-        *   minute
-        * @return
-        *   ClockTime with minutes and previous given hours
-        */
+      /** Returns ClockTime with `minutes` and previous given hours */
       def m(minutes: Int): Either[ClockTimeErrors, ClockTime] = ClockTime(hb.hours, minutes)
 
   /** Ordering implementation for ClockTime.

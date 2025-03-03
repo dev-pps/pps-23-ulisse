@@ -25,14 +25,14 @@ wartremoverErrors --= Seq(
 
 Test / fork := true
 Test / javaOptions ++= Seq(
-  "-Xmx2G"
+  "-Xmx4G"
 )
 
 enablePlugins(AssemblyPlugin)
 Compile / mainClass := Some("ulisse.infrastructures.view.Main")
 assembly / assemblyMergeStrategy := {
   case PathList("META-INF", _*) => MergeStrategy.discard
-  case _ => MergeStrategy.first
+  case _                        => MergeStrategy.first
 }
 assembly / assemblyJarName := "ulisse.jar"
 
@@ -51,6 +51,6 @@ lazy val root = (project in file("."))
       "io.cucumber"            %% "cucumber-scala"    % "8.25.1"   % Test,
       "com.tngtech.archunit"    % "archunit"          % "1.3.0"    % Test,
       "org.junit.jupiter"       % "junit-jupiter-api" % "5.10.3"   % Test
-      ),
+    ),
     Global / onLoad ~= (_ andThen ("hooks" :: _))
   )
