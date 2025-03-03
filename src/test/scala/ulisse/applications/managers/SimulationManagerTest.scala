@@ -8,8 +8,9 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.applications.ports.UtilityPorts
+import ulisse.dsl.comparison.FieldsComparators.compareTo
 import ulisse.entities.simulation.data.EngineState.*
-import ulisse.entities.simulation.data.EngineState.Field.LastDelta
+import ulisse.entities.simulation.data.EngineState
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 
 class SimulationManagerTest extends AnyWordSpec with Matchers:
@@ -52,7 +53,7 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
       setupTimeProvider()
       val manager       = SimulationManager.emptyBatchManager(timeProvider).start().doStep()
       val pausedManager = manager.stop()
-      pausedManager.engineState compareTo manager.engineState ignoring Field.Running shouldBeBoolean true
+      pausedManager.engineState compareTo manager.engineState ignoring EngineStateField.Running shouldBeBoolean true
       pausedManager.simulationData shouldBe manager.simulationData
 
     "clear state on reset" in:
@@ -66,8 +67,8 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
       setupTimeProvider()
       val manager        = SimulationManager.emptyBatchManager(timeProvider).start()
       val updatedManager = manager.doStep()
-      updatedManager.engineState compareTo manager.engineState ignoring Field.LastUpdate shouldBeBoolean true
-      updatedManager.engineState compareTo manager.engineState considering Field.LastUpdate shouldBeBoolean false
+      updatedManager.engineState compareTo manager.engineState ignoring EngineStateField.LastUpdate shouldBeBoolean true
+      updatedManager.engineState compareTo manager.engineState considering EngineStateField.LastUpdate shouldBeBoolean false
       updatedManager.simulationData.step shouldBe 1
 
   "BatchSimulationManager" should:
@@ -77,10 +78,10 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
         val realUpdate     = step - 1
         val manager        = SimulationManager.emptyBatchManager(timeProvider).start()
         val updatedManager = repeatDoStep(manager, step)
-        updatedManager.engineState compareTo manager.engineState ignoring (Field.LastUpdate, Field.LastDelta, Field.ElapsedCycleTime) shouldBeBoolean true
-        updatedManager.engineState compareTo manager.engineState considering Field.LastUpdate shouldBeBoolean false
-        updatedManager.engineState compareTo manager.engineState considering Field.LastDelta shouldBeBoolean false
-        updatedManager.engineState compareTo manager.engineState considering Field.ElapsedCycleTime shouldBeBoolean false
+        updatedManager.engineState compareTo manager.engineState ignoring (EngineStateField.LastUpdate, EngineStateField.LastDelta, EngineStateField.ElapsedCycleTime) shouldBeBoolean true
+        updatedManager.engineState compareTo manager.engineState considering EngineStateField.LastUpdate shouldBeBoolean false
+        updatedManager.engineState compareTo manager.engineState considering EngineStateField.LastDelta shouldBeBoolean false
+        updatedManager.engineState compareTo manager.engineState considering EngineStateField.ElapsedCycleTime shouldBeBoolean false
         updatedManager.engineState.lastUpdate shouldBe Some(startTime + realUpdate * timeIncrement)
         updatedManager.engineState.lastDelta shouldBe timeIncrement
         updatedManager.engineState.elapsedCycleTime shouldBe realUpdate * timeIncrement
@@ -97,10 +98,10 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
         val updatedManager = repeatDoStep(manager, step)
         val realUpdate     = step - 1
         val expectedStep   = (updatedManager.simulationData.secondElapsed / cycleTimeStep).toInt
-        updatedManager.engineState compareTo manager.engineState ignoring (Field.LastUpdate, Field.LastDelta, Field.ElapsedCycleTime) shouldBeBoolean true
-        updatedManager.engineState compareTo manager.engineState considering Field.LastUpdate shouldBeBoolean false
-        updatedManager.engineState compareTo manager.engineState considering Field.LastDelta shouldBeBoolean false
-        updatedManager.engineState compareTo manager.engineState considering Field.ElapsedCycleTime shouldBeBoolean realUpdate % (cycleTimeStep / timeIncrement) == 0
+        updatedManager.engineState compareTo manager.engineState ignoring (EngineStateField.LastUpdate, EngineStateField.LastDelta, EngineStateField.ElapsedCycleTime) shouldBeBoolean true
+        updatedManager.engineState compareTo manager.engineState considering EngineStateField.LastUpdate shouldBeBoolean false
+        updatedManager.engineState compareTo manager.engineState considering EngineStateField.LastDelta shouldBeBoolean false
+        updatedManager.engineState compareTo manager.engineState considering EngineStateField.ElapsedCycleTime shouldBeBoolean realUpdate % (cycleTimeStep / timeIncrement) == 0
         updatedManager.engineState.lastUpdate shouldBe Some(startTime + realUpdate * timeIncrement)
         updatedManager.engineState.lastDelta shouldBe timeIncrement
         updatedManager.engineState.elapsedCycleTime shouldBe realUpdate * timeIncrement - expectedStep * cycleTimeStep
