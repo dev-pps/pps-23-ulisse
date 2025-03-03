@@ -6,7 +6,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.useCases.SimulationService
-import ulisse.entities.simulation.data.{EngineState, SimulationData}
+import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
@@ -15,7 +15,7 @@ class SimulationPageAdapterTest extends AnyWordSpec with Matchers:
 
   private val mockedPort            = mock[SimulationPorts.Input]
   private val simulationPageAdapter = SimulationPageAdapter(mockedPort)
-  private val defaultEngineState    = EngineState.empty()
+  private val defaultEngineState    = Engine.empty()
   private val defaultSimulationData = SimulationData.empty()
 
   "SimulationPageAdapter" should:
@@ -27,9 +27,10 @@ class SimulationPageAdapterTest extends AnyWordSpec with Matchers:
       ) shouldBe (defaultEngineState, defaultSimulationData)
 
     "setup engine" in:
-      val stepSize           = 1
-      val cyclesPerSecond    = Some(1)
-      val updatedEngineState = defaultEngineState.copy(cyclesPerSecond = cyclesPerSecond, stepSize = stepSize)
+      val stepSize        = 1
+      val cyclesPerSecond = Some(1)
+      val updatedEngineState =
+        defaultEngineState.configuration = EngineConfiguration(cyclesPerSecond = cyclesPerSecond, stepSize = stepSize)
       when(mockedPort.setupEngine(stepSize, cyclesPerSecond)).thenReturn(Future.successful(updatedEngineState))
       Await.result(
         simulationPageAdapter.setupEngine(stepSize, cyclesPerSecond),
