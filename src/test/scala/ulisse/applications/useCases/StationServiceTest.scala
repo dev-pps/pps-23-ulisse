@@ -4,11 +4,12 @@ import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.Runner.runAll
-import ulisse.applications.AppState
+import ulisse.applications.{AppState, EventQueue}
 import ulisse.applications.managers.StationManager
 import ulisse.entities.Coordinate
 import ulisse.entities.Coordinate.*
 import ulisse.entities.station.Station
+import ulisse.entities.station.StationTest.{stationA, stationB}
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Await
