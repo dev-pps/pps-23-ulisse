@@ -65,13 +65,8 @@ object Swings:
 
   /** Methods to perform operations on a [[Graphics2D]] object */
   extension (g: Graphics2D)
-
     /** Draw the image from the [[JImage]] object. */
     def drawImage(image: DrawImage, observer: ImageObserver): Unit = image.draw(g, observer)
-
-    /** Draw the silhouette from the [[JImage]] object. */
-    def drawSilhouette(image: DrawImage, scale: Float, color: Color, observer: ImageObserver): Unit =
-      image.drawSilhouette(g, scale, color, observer)
 
   /** Methods to perform arithmetic operations on a [[(Point, Dimension)]] object */
   extension (shape: (Point, Dimension))
