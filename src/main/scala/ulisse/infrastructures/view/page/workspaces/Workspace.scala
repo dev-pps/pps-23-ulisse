@@ -1,4 +1,4 @@
-package ulisse.infrastructures.view.page
+package ulisse.infrastructures.view.page.workspaces
 
 import ulisse.applications.AppState
 import ulisse.infrastructures.view.components.ExtendedSwing
@@ -20,12 +20,12 @@ object Workspace:
   def createSimulation(): SimulationWorkspace = SimulationWorkspace()
 
   /** Creates a new instance of map workspace. */
-  def createMap(): MapWorkspace = MapWorkspace()
+  def createMap(formManager: FormManager): MapWorkspace = MapWorkspace(formManager)
 
   /** Creates a new instance of train workspace. */
   def createTrain(): TrainWorkspace = TrainWorkspace()
 
-  private case class BaseWorkspace() extends Workspace:
+  final case class BaseWorkspace() extends Workspace:
     private val mainPanel      = new ExtendedSwing.SLayeredPanel()
     val menuPanel: BorderPanel = BorderPanel().transparent()
     val workPanel: BorderPanel = BorderPanel().transparent()
@@ -44,10 +44,9 @@ object Workspace:
     export workspace.{component, revalidate}
 
   /** Represents the map workspace of the application. */
-  case class MapWorkspace() extends Workspace:
-    private val workspace   = BaseWorkspace()
-    private val mapPanel    = MapPanel.empty()
-    private val formManager = FormManager.createMap()
+  final case class MapWorkspace(formManager: FormManager) extends Workspace:
+    private val workspace = BaseWorkspace()
+    private val mapPanel  = MapPanel.empty()
 
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(formManager.component) = Position.East

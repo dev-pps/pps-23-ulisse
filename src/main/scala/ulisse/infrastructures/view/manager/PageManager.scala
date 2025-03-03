@@ -32,9 +32,6 @@ object PageManager:
   def apply(menu: Menu, dashboard: Dashboard, workspaceManager: WorkspaceManager): PageManager =
     PageManagerImpl(menu, dashboard, workspaceManager)
 
-  /** Creates a new instance of the page manager. */
-  def create(): PageManager = new PageManagerImpl()
-
   private case class NewButtonEvents(pageManager: PageManager) extends Observers.Observer[MouseEvent]:
     override def onClick(data: MouseEvent): Unit = pageManager.showDashboard()
 
@@ -49,7 +46,6 @@ object PageManager:
 
   private case class PageManagerImpl(menu: Menu, dashboard: Dashboard, workspaceManager: WorkspaceManager)
       extends PageManager:
-    def this() = this(Menu(), Dashboard(), WorkspaceManager())
 
     private val mainPanel = new ExtendedSwing.SLayeredPanel()
 

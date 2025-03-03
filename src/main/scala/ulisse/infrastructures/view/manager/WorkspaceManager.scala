@@ -1,8 +1,8 @@
 package ulisse.infrastructures.view.manager
 
 import ulisse.infrastructures.view.components.composed.ComposedSwing
-import ulisse.infrastructures.view.page.Workspace
-import ulisse.infrastructures.view.page.Workspace.{MapWorkspace, SimulationWorkspace, TrainWorkspace}
+import ulisse.infrastructures.view.page.workspaces.Workspace
+import ulisse.infrastructures.view.page.workspaces.Workspace.{MapWorkspace, SimulationWorkspace, TrainWorkspace}
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.BorderPanel.Position
@@ -21,15 +21,18 @@ trait WorkspaceManager extends ComposedSwing:
 
 object WorkspaceManager:
 
-  /** Creates a new instance of the workspace manager. */
-  def apply(): WorkspaceManager = WorkspaceManagerImpl()
+  /** Creates a new instance of the workspace manager with the given [[SimulationWorkspace]], [[MapWorkspace]], and [[TrainWorkspace]]. */
+  def apply(
+      simulationWorkspace: SimulationWorkspace,
+      mapWorkspace: MapWorkspace,
+      trainWorkspace: TrainWorkspace
+  ): WorkspaceManager =
+    WorkspaceManagerImpl(simulationWorkspace, mapWorkspace, trainWorkspace)
 
-  private case class WorkspaceManagerImpl() extends WorkspaceManager:
-    private val mainPanel                       = BorderPanel().transparent()
-    private val simulation: SimulationWorkspace = SimulationWorkspace()
-    private val map: MapWorkspace               = MapWorkspace()
-    private val train: TrainWorkspace           = TrainWorkspace()
-    private val workspaces                      = List(simulation, map, train)
+  private case class WorkspaceManagerImpl(simulation: SimulationWorkspace, map: MapWorkspace, train: TrainWorkspace)
+      extends WorkspaceManager:
+    private val mainPanel  = BorderPanel().transparent()
+    private val workspaces = List(simulation, map, train)
 
     showSimulation()
     showTrain()

@@ -1,10 +1,11 @@
-package ulisse.infrastructures.view.page
+package ulisse.infrastructures.view.page.forms
 
 import ulisse.infrastructures.view.common.Observers.Observer
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
+import ulisse.infrastructures.view.page.forms.Form
 
 import scala.swing.{Component, Orientation, Point}
 
