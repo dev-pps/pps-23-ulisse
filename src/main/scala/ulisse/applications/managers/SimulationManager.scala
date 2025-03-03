@@ -1,7 +1,7 @@
 package ulisse.applications.managers
 
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
-import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
+import ulisse.entities.simulation.data.{EngineState, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.utils.Times.{ClockTime, Time}
 

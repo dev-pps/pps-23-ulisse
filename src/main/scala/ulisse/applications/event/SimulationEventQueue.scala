@@ -5,7 +5,7 @@ import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
-import ulisse.entities.simulation.Simulations.SimulationData
+import ulisse.entities.simulation.data.SimulationData
 
 import java.util.concurrent.LinkedBlockingQueue
 

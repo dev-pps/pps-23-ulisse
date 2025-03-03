@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.simulation
 
 import ulisse.adapters.input.SimulationPageAdapter
-import ulisse.entities.simulation.Simulations.SimulationData
+import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.ExtendedSwing.SVGPanel
