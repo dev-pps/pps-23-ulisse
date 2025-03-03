@@ -55,7 +55,6 @@ object TrainAgents:
     def distanceTravelled_=(newDistanceTravelled: Double): TrainAgent
     def resetDistanceTravelled(): TrainAgent                       = distanceTravelled = (0)
     def updateDistanceTravelled(distanceDelta: Double): TrainAgent = distanceTravelled += distanceDelta
-    def matchId(otherTrain: TrainAgent): Boolean                   = name == otherTrain.name
 
   object TrainAgent:
     def apply(train: Train): TrainAgent = TrainAgentImpl(train, 0.0)

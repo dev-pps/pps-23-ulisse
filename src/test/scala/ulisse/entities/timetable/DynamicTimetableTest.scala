@@ -52,13 +52,13 @@ object DynamicTimetableTest:
   extension (tt: Timetable)
     def stationNr(n: Int): Option[(Station, TrainStationTime)] = tt match
       case dtt: DynamicTimetable => dtt.effectiveTable.drop(n).headOption
-      case _ => tt.table.drop(n).headOption
-      
+      case _                     => tt.table.drop(n).headOption
+
   extension (r: Option[(Station, Station)])
     def listify: Option[List[Station]] = r.map(t => List(t._1, t._2))
 
 class DynamicTimetableTest extends AnyWordSpec with Matchers:
-  
+
   extension (dtt: DynamicTimetable)
     def travel(nStations: Int, delay: Option[ClockTime]): Option[DynamicTimetable] =
       (0 until nStations).foldLeft(Option(dtt)) { (dtt, _) =>

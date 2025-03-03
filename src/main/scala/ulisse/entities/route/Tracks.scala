@@ -77,10 +77,10 @@ object Tracks:
           case _                                       => None
 
       override def updateTrain(train: TrainAgent): Option[Track] =
-        val updatedTrains = trains.updateWhen(train.matchId)(_ => train)
+        val updatedTrains = trains.updateWhen(_ == train)(_ => train)
         copy(trains = updatedTrains) when contains(train) && securityDistanceIsMaintained(updatedTrains)
 
       override def removeTrain(train: TrainAgent): Option[Track] =
-        (copy(trains = trains.drop(1)) when trains.headOption.exists(train.matchId)) match
+        (copy(trains = trains.drop(1)) when trains.headOption.contains(train)) match
           case Some(updatedTrack) if updatedTrack.isEmpty => Some(updatedTrack.copy(currentDirection = None))
           case other                                      => other
