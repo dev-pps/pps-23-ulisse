@@ -1,7 +1,8 @@
 package ulisse.infrastructures.view.manager
 
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
-import ulisse.infrastructures.view.page.Form
+import ulisse.infrastructures.view.page.forms.Form
+import ulisse.infrastructures.view.page.forms.Form.{RouteForm, ScheduleForm, StationForm}
 
 import scala.swing.{Component, Orientation}
 
@@ -11,7 +12,8 @@ trait FormManager extends ComposedSwing:
   def scheduleForm: Form
 
 object FormManager:
-  def createMap(): FormManagerImpl = FormManagerImpl()
+  def createMap(stationForm: StationForm, routeForm: RouteForm, scheduleForm: ScheduleForm): FormManager =
+    FormManagerImpl(stationForm, routeForm, scheduleForm)
 
   private case class BaseFormManager(iconLabels: ComposedImageLabel*)(forms: Form*):
     private val page: Map[ComposedImageLabel, Form]   = iconLabels.zip(forms).toMap
@@ -22,17 +24,14 @@ object FormManager:
     def pageOf(label: ComposedImageLabel): Form = page(label)
     def component[T >: Component]: T            = tabbedPane.component
 
-  case class FormManagerImpl() extends FormManager:
+  private case class FormManagerImpl(stationForm: StationForm, routeForm: RouteForm, scheduleForm: ScheduleForm)
+      extends FormManager:
     given orientation: Orientation.Value = Orientation.Horizontal
     private val station                  = ComposedImageLabel.createIcon("icons/station.svg", "station")
     private val route                    = ComposedImageLabel.createIcon("icons/route.svg", "route")
     private val schedule                 = ComposedImageLabel.createIcon("icons/menu/train.svg", "schedule")
 
     private val menu: BaseFormManager =
-      BaseFormManager(station, route, schedule)(Form.createStation(), Form.createRoute(), Form.createSchedule())
+      BaseFormManager(station, route, schedule)(stationForm, routeForm, routeForm)
 
     export menu._
-
-    override def stationForm: Form  = menu.pageOf(station)
-    override def routeForm: Form    = menu.pageOf(route)
-    override def scheduleForm: Form = menu.pageOf(schedule)
