@@ -10,17 +10,29 @@ import ulisse.utils.Times.FluentDeclaration.h
 import scala.language.postfixOps
 
 class TimesTest extends AnyWordSpec with Matchers:
+
+  "Time" when:
+    "Created" should:
+      "don't adapt to time format" in:
+        Time(0, 0, 100).s shouldBe 100
+        Time(0, 100, 0).m shouldBe 100
+        Time(100, 0, 0).h shouldBe 100
+
+    "Created from seconds" should:
+      "adapt to time format" in:
+        Time.secondsToOverflowTime(3661) shouldBe Time(1, 1, 1)
+        Time.secondsToOverflowTime(0) shouldBe Time(0, 0, 0)
+        Time.secondsToOverflowTime(59) shouldBe Time(0, 0, 59)
+        Time.secondsToOverflowTime(60) shouldBe Time(0, 1, 0)
+        Time.secondsToOverflowTime(3600) shouldBe Time(1, 0, 0)
+        Time.secondsToOverflowTime(100000) shouldBe Time(27, 46, 40)
+
   "Time" should:
     "be converted in seconds" in:
       Time(1, 1, 1).toSeconds shouldBe 1 * Time.minutesInHour * Time.secondsInMinute + 1 * Time.secondsInMinute + 1
       Time(0, 0, 0).toSeconds shouldBe 0
       Time(0, 0, 59).toSeconds shouldBe 59
       Time(0, 59, 0).toSeconds shouldBe 59 * Time.secondsInMinute
-      Time(
-        23,
-        59,
-        59
-      ).toSeconds shouldBe 23 * Time.minutesInHour * Time.secondsInMinute + 59 * Time.secondsInMinute + 59
 
     "be converted in minutes" in:
       Time(1, 1, 1).toMinutes shouldBe 1 * Time.minutesInHour + 1
@@ -41,12 +53,18 @@ class TimesTest extends AnyWordSpec with Matchers:
       h(10).m(59) + h(0).m(1) should be(h(11).m(0))
       h(0).m(59) + h(0).m(59) should be(h(1).m(58))
       h(23).m(59) + h(0).m(1) should be(h(0).m(0))
+      h(23).m(59) + h(23).m(59) should be(h(23).m(58))
 
-    "be subtracted to another ClockTimes" in:
-      Id(Time(0, 0, 0)) - Id(Time(0, 10, 5)) shouldBe Id(Time(0, -10, -5))
-      h(10).m(45) - h(1).m(25) shouldBe h(9).m(20)
-      h(10).m(0) - h(1).m(10) shouldBe h(8).m(50)
-      h(10).m(0) - h(11).m(0) shouldBe h(-1).m(0)
+    "be added with overflow to another ClockTimes" in:
+      Id(Time(23, 59, 0)) overflowSum Id(Time(0, 10, 5)) shouldBe Id(Time(24, 9, 5))
+      Id(Time(27, 0, 0)) overflowSum Id(Time(3, 1, 0)) shouldBe Id(Time(30, 1, 0))
+      h(10).m(45) overflowSum h(1).m(25) shouldBe h(12).m(10)
+
+    "be subtracted with underflow to another ClockTimes" in:
+      Id(Time(0, 0, 0)) underflowSub Id(Time(0, 10, 5)) shouldBe Id(Time(0, -10, -5))
+      h(10).m(45) underflowSub h(1).m(25) shouldBe h(9).m(20)
+      h(10).m(0) underflowSub h(1).m(10) shouldBe h(8).m(50)
+      h(10).m(0) underflowSub h(11).m(0) shouldBe h(-1).m(0)
 
     "comparable to other ClockTime" in:
       h(10).m(45) greaterEqThan h(10).m(45) should be(true)

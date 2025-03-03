@@ -63,7 +63,7 @@ object SimulationManager:
     override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Option[SimulationManager] =
       Some(copy(engineState.copy(cyclesPerSecond = cyclesPerSecond, stepSize = stepSize)))
     override def setupEnvironment(environment: RailwayEnvironment): SimulationManager =
-      copy(simulationData = simulationData.withEnvironment(environment))
+      copy(simulationData = SimulationData.withEnvironment(environment))
     override def start(): SimulationManager =
       copy(engineState.copy(true))
     override def stop(): SimulationManager  = copy(engineState.copy(false))
