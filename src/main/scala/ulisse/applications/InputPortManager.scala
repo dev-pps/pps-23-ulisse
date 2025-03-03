@@ -10,6 +10,7 @@ trait InputPortManager:
   def train: TrainPorts.Input
   def timetable: TimetablePorts.Input
 
+/** Companion object of the input port manager. */
 object InputPortManager:
 
   /** Creates a new instance of the input port manager. */

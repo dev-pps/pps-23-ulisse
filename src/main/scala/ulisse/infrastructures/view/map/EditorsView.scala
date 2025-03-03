@@ -12,10 +12,7 @@ final case class EditorsView():
   private val mapPark   = MapPanel.empty()
   private val menuPanel = ExtendedSwing.SBorderPanel()
 
-  private val stationForm   = Form.createStation()
-  private val routeForm     = Form.createRoute()
-  private val scheduleForm  = Form.createSchedule()
-  private val mapController = FormManager.createMap(stationForm, routeForm, scheduleForm)
+  private val mapController = FormManager.createMap()
 
   menuPanel.layout(mapController.component) = Position.East
   mainPane.add(mapPark)

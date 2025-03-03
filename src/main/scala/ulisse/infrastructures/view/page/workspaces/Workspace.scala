@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.page.workspaces
 
-import ulisse.applications.AppState
+import ulisse.adapters.InputAdapterManager
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.manager.FormManager
@@ -17,13 +17,13 @@ trait Workspace extends ComposedSwing:
 
 object Workspace:
   /** Creates a new instance of simulation workspace. */
-  def createSimulation(): SimulationWorkspace = SimulationWorkspace()
+  def createSimulation(adapterManager: InputAdapterManager): SimulationWorkspace = SimulationWorkspace(adapterManager)
 
   /** Creates a new instance of map workspace. */
-  def createMap(formManager: FormManager): MapWorkspace = MapWorkspace(formManager)
+  def createMap(adapterManager: InputAdapterManager): MapWorkspace = MapWorkspace(adapterManager)
 
   /** Creates a new instance of train workspace. */
-  def createTrain(): TrainWorkspace = TrainWorkspace()
+  def createTrain(adapterManager: InputAdapterManager): TrainWorkspace = TrainWorkspace(adapterManager)
 
   final case class BaseWorkspace() extends Workspace:
     private val mainPanel      = new ExtendedSwing.SLayeredPanel()
@@ -38,15 +38,16 @@ object Workspace:
     override def component[T >: Component]: T = mainPanel
 
   /** Represents the simulation workspace of the application. */
-  case class SimulationWorkspace() extends Workspace:
+  case class SimulationWorkspace(adapterManager: InputAdapterManager) extends Workspace:
     private val workspace = BaseWorkspace()
 
     export workspace.{component, revalidate}
 
   /** Represents the map workspace of the application. */
-  final case class MapWorkspace(formManager: FormManager) extends Workspace:
-    private val workspace = BaseWorkspace()
-    private val mapPanel  = MapPanel.empty()
+  final case class MapWorkspace(adapterManager: InputAdapterManager) extends Workspace:
+    private val workspace   = BaseWorkspace()
+    private val mapPanel    = MapPanel.empty()
+    private val formManager = FormManager.createMap()
 
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(formManager.component) = Position.East
@@ -55,7 +56,7 @@ object Workspace:
     export workspace.{component, revalidate}
 
   /** Represents the train workspace of the application. */
-  case class TrainWorkspace() extends Workspace:
+  case class TrainWorkspace(adapterManager: InputAdapterManager) extends Workspace:
     import ulisse.applications.ports.TrainPorts
     import ulisse.applications.useCases.TrainService
     import java.util.concurrent.LinkedBlockingQueue

@@ -11,7 +11,7 @@ object Main:
     val inputPortManager    = InputPortManager(eventQueue)
     val inputAdapterManager = InputAdapterManager(inputPortManager)
 
-    val map = GUI(inputPortManager)
+    val map = GUI(inputAdapterManager)
 
     val initialState = AppState()
     eventQueue.startProcessing(initialState)

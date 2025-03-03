@@ -36,6 +36,39 @@ object Form:
 
     def component[T >: Component]: T = mainPanel
 
+  case class StationForm() extends Form with Observer[Point]:
+    private val name      = ComposedSwing.createInfoTextField("Name")
+    private val latitude  = ComposedSwing.createInfoTextField("Latitude")
+    private val longitude = ComposedSwing.createInfoTextField("Longitude")
+    private val tracks    = ComposedSwing.createInfoTextField("Tracks")
+
+    private val form = BaseForm("Station", name, latitude, longitude, tracks)
+
+    private val saveButton = ExtendedSwing.SButton("Save")
+    saveButton.rect = Styles.formTrueButtonRect
+    saveButton.fontEffect = Styles.whiteFont
+
+    private val deleteButton = ExtendedSwing.SButton("Delete")
+    deleteButton.rect = Styles.formFalseButtonRect
+    deleteButton.fontEffect = Styles.whiteFont
+
+    buttonPanel.contents += saveButton
+    buttonPanel.contents += deleteButton
+
+    export form._
+
+    override def mapObserver: Observer[Point] = this
+
+    override def onClick(data: Point): Unit =
+      latitude.text_=(data.x.toString)
+      longitude.text_=(data.y.toString)
+
+    override def onHover(data: Point): Unit = ()
+
+    override def onRelease(data: Point): Unit = ()
+
+    override def onExit(data: Point): Unit = ()
+
   case class RouteForm() extends Form with Observer[Point]:
     private val departureStation = ComposedSwing.createInfoTextField("Departure Station")
     private val arrivalStation   = ComposedSwing.createInfoTextField("Arrival Station")
@@ -63,36 +96,6 @@ object Form:
       lastClick match
         case false => departureStation.text_=(s"position: ${data.x} - ${data.y}"); lastClick = true
         case true  => arrivalStation.text_=(s"position: ${data.x} - ${data.y}"); lastClick = false
-    override def onHover(data: Point): Unit   = ()
-    override def onRelease(data: Point): Unit = ()
-    override def onExit(data: Point): Unit    = ()
-
-  case class StationForm() extends Form with Observer[Point]:
-    private val name      = ComposedSwing.createInfoTextField("Name")
-    private val latitude  = ComposedSwing.createInfoTextField("Latitude")
-    private val longitude = ComposedSwing.createInfoTextField("Longitude")
-    private val tracks    = ComposedSwing.createInfoTextField("Tracks")
-
-    private val form = BaseForm("Station", name, latitude, longitude, tracks)
-
-    private val saveButton = ExtendedSwing.SButton("Save")
-    saveButton.rect = Styles.formTrueButtonRect
-    saveButton.fontEffect = Styles.whiteFont
-
-    private val deleteButton = ExtendedSwing.SButton("Delete")
-    deleteButton.rect = Styles.formFalseButtonRect
-    deleteButton.fontEffect = Styles.whiteFont
-
-    buttonPanel.contents += saveButton
-    buttonPanel.contents += deleteButton
-
-    export form._
-    override def mapObserver: Observer[Point] = this
-
-    override def onClick(data: Point): Unit =
-      latitude.text_=(data.x.toString)
-      longitude.text_=(data.y.toString)
-
     override def onHover(data: Point): Unit   = ()
     override def onRelease(data: Point): Unit = ()
     override def onExit(data: Point): Unit    = ()
