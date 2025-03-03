@@ -8,6 +8,7 @@ import ulisse.entities.simulation.environments.Environment
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.Timetables.Timetable
+import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given_PerceptionProvider_RailwayEnvironment_TrainAgent
 
 object TrainAgents:
   case class TrainAgentInfo(train: TrainAgent, timetables: List[DynamicTimetable])
@@ -44,7 +45,9 @@ object TrainAgents:
         trainAheadDistance: Option[Double],
         arrivalStationIsFree: Boolean
     ) extends TrainRouteInfo
-  trait TrainAgentPerception extends Perception[TrainAgentPerceptionData]
+  trait TrainAgentPerception[PD <: PerceptionData]                      extends Perception[PD]
+  case class TrainPerceptionInStation(perceptionData: TrainStationInfo) extends TrainAgentPerception[TrainStationInfo]
+  case class TrainPerceptionInRoute(perceptionData: TrainRouteInfo)     extends TrainAgentPerception[TrainRouteInfo]
 
   trait TrainAgent extends Train with SimulationAgent[TrainAgent]:
     override type E = RailwayEnvironment
@@ -63,5 +66,5 @@ object TrainAgents:
         val minDistanceTravelled = 0.0
         copy(distanceTravelled = math.max(minDistanceTravelled, newDistanceTravelled))
       override def doStep(dt: Int, simulationEnvironment: E): Option[TrainAgent] =
-        val perception: Option[TrainAgentPerception] = simulationEnvironment.perceptionFor[TrainAgent](this)
+        val perception: Option[TrainAgentPerception[?]] = simulationEnvironment.perceptionFor[TrainAgent](this)
         Some(this)

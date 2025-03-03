@@ -46,6 +46,7 @@ trait RailwayEnvironment extends Environment[RailwayEnvironment]:
   /** find route with travel direction */
   def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrackDirection)]
 
+/** Factory for [[RailwayEnvironment]] instances */
 object RailwayEnvironment:
   def apply(
       startTime: Time,
@@ -58,9 +59,14 @@ object RailwayEnvironment:
       configurationData.timetables
     )
 
-  def empty(): RailwayEnvironment =
+  def default(configurationData: ConfigurationData): RailwayEnvironment =
     apply(
       Time(0, 0, 0),
+      configurationData
+    )
+
+  def empty(): RailwayEnvironment =
+    default(
       ConfigurationData(
         Seq[StationEnvironmentElement](),
         Seq[RouteEnvironmentElement](),
@@ -68,43 +74,6 @@ object RailwayEnvironment:
         Seq[DynamicTimetable]()
       )
     )
-
-  private def trainPerceptionInStation(train: TrainAgent, env: RailwayEnvironment): Option[TrainStationInfo] =
-    for
-      currentDTT        <- env.findCurrentTimeTableFor(train)
-      nextDepartureTime <- currentDTT.nextDepartureTime
-      departureDelay = Id(nextDepartureTime) - Id(env.time)
-      nextRoute          <- currentDTT.nextRoute
-      (route, direction) <- env.findRouteWithTravelDirection(nextRoute)
-    yield TrainStationInfo(
-      hasToMove = departureDelay.toSeconds <= 0,
-      routeTrackIsFree = route.isAvailable(direction)
-    )
-
-  given PerceptionProvider[RailwayEnvironment, TrainAgent] with
-    type P = TrainAgentPerception
-    def perceptionFor(env: RailwayEnvironment, agent: TrainAgent): Option[P] =
-      if agent.findIn(env.stations).isDefined then
-        agent.findIn(env.stations).map: station =>
-          new TrainAgentPerception {
-            override def perceptionData: TrainAgentPerceptionData =
-              trainPerceptionInStation(agent, env).getOrElse(TrainStationInfo(false, false))
-          }
-      else
-        agent.findIn(env.routes).map: route =>
-          new TrainAgentPerception {
-            override def perceptionData: TrainAgentPerceptionData =
-              TrainRouteInfo(
-                routeTypology = route.typology,
-                routeLength = route.length,
-                trainAheadDistance = route.containers.flatMap(_.trains).find(
-                  _.distanceTravelled > agent.distanceTravelled
-                ).map(_.distanceTravelled - agent.distanceTravelled),
-                arrivalStationIsFree = env.findCurrentTimeTableFor(agent).flatMap(_.currentRoute).flatMap(cr =>
-                  env.stations.find(_.name == cr._2.name).map(_.isAvailable)
-                ).getOrElse(false)
-              )
-          }
 
   private final case class RailwayEnvironmentImpl(
       time: Id[Time],
@@ -118,7 +87,7 @@ object RailwayEnvironment:
       // that because an agent when enters a station doesn't leave immediately the route and vice versa
       // also for future improvements, an agent when crossing two rails will be in two rails at the same time
       // NOTE: For now agent will be in only one station or route
-      trains.map(a => a.doStep(dt, this)).foldLeft(this) { (env, updatedTrain) =>
+      trains.map(_.doStep(dt, this)).foldLeft(this) { (env, updatedTrain) =>
         updatedTrain match
           case Some(updatedTrain) =>
             // Update Idea: startByMovingAgent
@@ -132,20 +101,10 @@ object RailwayEnvironment:
       }
 
     private def updateEnvironmentWith(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
-      if agent.findIn(routes).isDefined then updateAgentOnRoute(agent, time)
-      else updateAgentInStation(agent, time)
-
-    private def updateAgentOnRoute(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
-      agent.findIn(routes).flatMap(r =>
-        println("ROUTE UPDATE FUNCTION")
-        routeUpdateFunction(r, agent, time)
-      )
-
-    private def updateAgentInStation(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
-      agent.findIn(stations).flatMap(s =>
-        println("STATION UPDATE FUNCTION")
-        stationUpdateFunction(s, agent, time)
-      )
+      (agent.findIn(routes), agent.findIn(stations)) match
+        case (Some(route), _)   => routeUpdateFunction(route, agent, time)
+        case (_, Some(station)) => stationUpdateFunction(station, agent, time)
+        case _                  => None
 
     private def routeUpdateFunction(
         route: RouteEnvironmentElement,
@@ -164,8 +123,9 @@ object RailwayEnvironment:
             _  = println(s"AU: ${utt.effectiveTable}]")
             dt = _timetables.map((k, v) => if v.contains(tt) then (k, v.updateWhen(_ == tt)(_ => utt)) else (k, v))
             currentRoute <- tt.currentRoute
-            see          <- stations.find(currentRoute._2.name == _.name)
-            usee         <- see.putTrain(agent.resetDistanceTravelled())
+
+            see  <- stations.find(currentRoute._2.name == _.name)
+            usee <- see.putTrain(agent.resetDistanceTravelled())
             se = stations.updateWhen(_.name == usee.name)(_ => usee)
           yield copy(stations = se, routes = re, _timetables = dt)
         case _ => route.updateTrain(agent).map(ree => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree)))
