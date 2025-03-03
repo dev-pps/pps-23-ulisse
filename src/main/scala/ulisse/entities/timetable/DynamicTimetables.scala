@@ -13,6 +13,8 @@ object DynamicTimetables:
   /** Timetable for Simulation */
   trait DynamicTimetable extends Timetable with EnvironmentElement:
     import DynamicTimetableUtils.*
+    /** The id of the timetable */
+    def id: Int = hashCode()
 
     /** The effective table used to store effective time info */
     def effectiveTable: List[(Station, TrainStationTime)]
@@ -58,6 +60,10 @@ object DynamicTimetables:
         case that: DynamicTimetable =>
           effectiveTable == that.effectiveTable && super.equals(that)
         case _ => super.equals(that)
+
+    /** Defines hashcode for DynamicTimetables */
+    override def hashCode: Int =
+      (table, train, departureTime, arrivingTime).##
 
   /** Factory for [[DynamicTimetable]] instances */
   object DynamicTimetable:

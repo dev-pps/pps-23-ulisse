@@ -4,7 +4,8 @@ import ulisse.entities.route.Routes.TypeRoute
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.simulation.agents.Perceptions.{Perception, PerceptionData}
 import ulisse.entities.simulation.agents.SimulationAgent
-import ulisse.entities.simulation.environments.{Environment, RailwayEnvironment}
+import ulisse.entities.simulation.environments.Environment
+import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.Timetables.Timetable
 

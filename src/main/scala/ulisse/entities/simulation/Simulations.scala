@@ -1,6 +1,6 @@
 package ulisse.entities.simulation
 
-import ulisse.entities.simulation.environments.RailwayEnvironment
+import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.utils.Times.{ClockTime, Time}
 
 object Simulations:

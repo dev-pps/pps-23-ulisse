@@ -8,10 +8,11 @@ import ulisse.Runner.runAll
 import ulisse.applications.AppState
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
-import ulisse.entities.simulation.environments.RailwayEnvironment
+import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentInfo}
 import ulisse.entities.train.Trains.Train
+import ulisse.utils.Times.Time
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Await
@@ -45,10 +46,13 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
   private val initialState = AppState().initSimulation((simulationManager, _, _, _, _) =>
     simulationManager.setupEnvironment(
     RailwayEnvironment(
+      Time(0, 0, 0),
+      ConfigurationData(
       Seq(stationEE),
       Seq(routeEE),
       Seq(mockedTrain),
       Seq()
+      )   
     )
   ))
 

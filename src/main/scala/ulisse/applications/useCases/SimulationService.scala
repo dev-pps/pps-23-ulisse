@@ -1,8 +1,8 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.event.SimulationEventQueue
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.ports.SimulationPorts
+import ulisse.applications.AppState
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.Simulations.{EngineState, SimulationData}
 import ulisse.entities.simulation.agents.SimulationAgent
@@ -18,7 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 
 final case class SimulationService(
-    private val eventQueue: SimulationEventQueue,
+    private val eventQueue: LinkedBlockingQueue[AppState => AppState],
     private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
   private val minPermittedDistanceBetweenTrains: Double = 100.0
@@ -27,10 +27,12 @@ final case class SimulationService(
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
         val newSimulationManager = simulationManager.setupEnvironment(RailwayEnvironment(
+          Time(0, 0, 0),
+          ConfigurationData(
           stationManager.stations.stations.map(StationEnvironmentElement(_)),
           routeManager.routes.routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
           trainManager.trains.trains.map(TrainAgent(_)),
-          timetableManager.tables.map(DynamicTimetable(_))
+          timetableManager.tables.map(DynamicTimetable(_)))
         ))
         p.success((newSimulationManager.engineState, newSimulationManager.simulationData))
         newSimulationManager
