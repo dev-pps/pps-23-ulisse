@@ -13,7 +13,7 @@ import java.awt.Color
 import java.awt.image.ImageObserver
 import scala.swing.{Dimension, Graphics2D, Point}
 
-trait MapItem extends Observable[Point]:
+trait MapItem:
   def center: Point
   def dimension: Dimension
   def hasCollided(point: Point): Boolean
@@ -26,10 +26,10 @@ trait MapItem extends Observable[Point]:
 
 object MapItem:
   def createSingleItem(imagePath: String, x: Int, y: Int): SingleItem =
-    SingleItem(imagePath, new Point(x, y), DrawImages.defaultSize)
+    SingleItem(imagePath, new Point(x, y), DrawImages.defaultDimension)
 
   sealed case class SingleItem(imagePath: String, pos: Point, dim: Dimension) extends MapItem:
-    private val image          = DrawImages.create(imagePath, pos, dim)
+    private val image          = DrawImages.createAt(imagePath, pos)
     private val itemObservable = Observers.createObservable[Point]
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
@@ -37,7 +37,7 @@ object MapItem:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var isSilhouetteShown: Boolean = false
 
-    export image._, itemObservable._
+    export image._
 
     override def hasCollided(point: Point): Boolean = point.hasCollided(image)
 

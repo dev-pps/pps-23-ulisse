@@ -19,7 +19,7 @@ object MapItemsCollection:
         mapItems.foreach(_.onClick(mousePoint))
       else
         val item = MapItem.createSingleItem("station.png", mousePoint.x, mousePoint.y)
-        observable.observers.foreach(item.attach)
+//        observable.observers.foreach(item.attach)
         mapItems = mapItems.appended(item)
 
     def onHover(mousePoint: Point): Unit   = mapItems.foreach(_.onHover(mousePoint))
