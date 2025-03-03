@@ -9,7 +9,6 @@ import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
 import ulisse.entities.simulation.EnvironmentElements.EnvironmentElement
 import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.simulation.Perceptions.PerceptionProvider
-import ulisse.entities.simulation.Actions
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.station.StationEnvironmentElement.*
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
@@ -36,8 +35,8 @@ object Environments:
     self: E =>
     def doStep(dt: Int): E
     def environmentElements: List[EnvironmentElement]
-    def agents: List[SimulationAgent]
-    def perceptionFor[A <: SimulationAgent](agent: A)(using provider: PerceptionProvider[E, A]): Option[provider.P] =
+    def agents: List[SimulationAgent[?]]
+    def perceptionFor[A <: SimulationAgent[A]](agent: A)(using provider: PerceptionProvider[E, A]): Option[provider.P] =
       provider.perceptionFor(this, agent)
 
   trait RailwayEnvironment extends Environment[RailwayEnvironment]:
@@ -47,7 +46,7 @@ object Environments:
     override def environmentElements: List[EnvironmentElement] = (stations ++ routes).toList
     def trains: Seq[TrainAgent] =
       (stations.flatMap(_.containers.flatMap(_.trains)) ++ routes.flatMap(_.containers.flatMap(_.trains))).distinct
-    override def agents: List[SimulationAgent] = trains.toList
+    override def agents: List[SimulationAgent[?]] = trains.toList
     def timetables: Seq[DynamicTimetable]
     def findCurrentTimeTableFor(train: TrainAgent): Option[DynamicTimetable]
     def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrackDirection)]
@@ -176,17 +175,16 @@ object Environments:
         // that because an agent when enters a station doesn't leave immediately the route and vice versa
         // also for future improvements, an agent when crossing two rails will be in two rails at the same time
         // NOTE: For now agent will be in only one station or route
-        val agentsWithActions = agents.map(a => a -> a.doStep(dt, this))
-        agentsWithActions.foldLeft(this) { (env, agentWithAction) =>
-          agentWithAction match
-            case (agent: TrainAgent, Some(Actions.MoveBy(d))) =>
+        trains.map(a => a.doStep(dt, this)).foldLeft(this) { (env, updatedTrain) =>
+          updatedTrain match
+            case Some(updatedTrain) =>
               // Update Idea: startByMovingAgent
               // If is already on a route,
               //  could remain completely on the route
               //  or enter the station and so leave the route
               // If is already on a station,
               //  could enter the route and so leave the station
-              env.updateEnvironmentWith(agent.updateDistanceTravelled(d), time + Time(0, 0, dt)).getOrElse(env)
+              env.updateEnvironmentWith(updatedTrain, time + Time(0, 0, dt)).getOrElse(env)
             case _ => this
         }
 
