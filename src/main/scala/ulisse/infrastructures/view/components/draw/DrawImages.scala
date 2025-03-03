@@ -2,8 +2,8 @@ package ulisse.infrastructures.view.components.draw
 
 import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.common.Observers.Observable
-import ulisse.infrastructures.view.components.styles.Images
 import ulisse.infrastructures.view.components.styles.Images.SourceImage
+import ulisse.infrastructures.view.components.styles.{Images, Styles}
 import ulisse.infrastructures.view.utils.Swings.*
 
 import java.awt.Color
@@ -54,6 +54,8 @@ object DrawImages:
 
       private val silhouette: Option[BufferedImage] =
         picture.bufferImage.map(image => BufferedImage(image.getWidth, image.getHeight, BufferedImage.TYPE_INT_ARGB))
+
+      private val palette: Styles.Palette = Styles.silhouettePalette
 
       override val center: Point = new Point(position.x - (dimension.width / 2), position.y - (dimension.height / 2))
       override val observable: Observable[MouseEvent] = Observers.createObservable[MouseEvent]
