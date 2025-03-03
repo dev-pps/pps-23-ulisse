@@ -27,6 +27,4 @@ object MapWorkspace:
     workspace.menuPanel.layout(formManager.component) = Position.East
     workspace.revalidate()
 
-    formManager.stationForm
-
     export workspace.{component, revalidate}
