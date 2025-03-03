@@ -2,7 +2,7 @@ package ulisse.entities.timetable
 
 import ulisse.entities.route.Routes.RouteType
 import ulisse.entities.station.Station
-import ulisse.entities.timetable.TrainStationTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
+import ulisse.entities.timetable.TrainStationTime.{ArrivingStationTime, AutoStationTime, DepartureStationTime}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Times.ClockTime
 import ulisse.utils.Times.FluentDeclaration.h
@@ -106,7 +106,7 @@ object Timetables:
         train,
         startStation,
         departureTime,
-        ListMap((startStation, StartScheduleTime(Some(departureTime))))
+        ListMap((startStation, DepartureStationTime(Some(departureTime))))
       )
 
     private case class TimetableBuilderImpl(
@@ -119,17 +119,17 @@ object Timetables:
       override def stopsIn(station: Station, waitTime: WaitTime)(railInfo: RailInfo): TimetableBuilder =
         insertStation(
           station,
-          AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), Some(waitTime))
+          AutoStationTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), Some(waitTime))
         )
 
       override def transitIn(station: Station)(railInfo: RailInfo): TimetableBuilder =
-        insertStation(station, AutoScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), None))
+        insertStation(station, AutoStationTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), None))
 
       override def arrivesTo(station: Station)(railInfo: RailInfo): Timetable =
         TimetableImpl(
           insertStation(
             station,
-            EndScheduleTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train))
+            ArrivingStationTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train))
           ).partialTimetable,
           station
         )

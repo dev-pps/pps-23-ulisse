@@ -7,7 +7,7 @@ import ulisse.Utils.TestUtility.in
 import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.route.Routes.RouteType
 import ulisse.entities.station.Station
-import ulisse.entities.timetable.TrainStationTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
+import ulisse.entities.timetable.TrainStationTime.{ArrivingStationTime, AutoStationTime, DepartureStationTime}
 import ulisse.entities.timetable.Timetables.{toWaitTime, RailInfo, Timetable, TimetableBuilder}
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.ClockTime
@@ -38,9 +38,9 @@ class TimetableTest extends AnyFlatSpec:
         .arrivesTo(stationC)(RailInfo(length = 15, typeRoute = AV))
 
     timeTableWithStops.table should be(ListMap(
-      stationA -> StartScheduleTime(h(9).m(0).toOption),
-      stationB -> AutoScheduleTime(arriving = h(9).m(2).toOption, waitTime = Some(5.toWaitTime)),
-      stationC -> EndScheduleTime(arriving = h(9).m(10).toOption)
+      stationA -> DepartureStationTime(h(9).m(0).toOption),
+      stationB -> AutoStationTime(arriving = h(9).m(2).toOption, waitTime = Some(5.toWaitTime)),
+      stationC -> ArrivingStationTime(arriving = h(9).m(10).toOption)
     ))
 
   "timetable" should "consider also station of transit in estimation of arriving time" in:
