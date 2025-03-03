@@ -9,7 +9,6 @@ import ulisse.infrastructures.view.components.draw.DrawImages
 import java.awt.geom.AffineTransform
 import scala.math.{abs, sqrt}
 import scala.swing.*
-import scala.swing.event.MouseEvent
 
 trait MapPanel extends Panel with EnhancedLook:
   def drawStation(stations: StationPorts.Input#SM): Unit
@@ -25,21 +24,12 @@ object MapPanel:
 
     private val image = DrawImages.createAt(ImagePath.station, new Point(500, 500))
 
-    attach(image.toObserver(data => data))
+    attachMove(image)
+    attachClick(image)
+    attachRelease(image)
 
     export itemCollection.{attach as attachItem, detach as detachItem}
 
-    reactions += {
-      case event: event.MouseMoved =>
-        image.notifyHover(event)
-        updateGraphics()
-//      case event.MousePressed(_, point, _, _, _) =>
-//        itemCollection.onClick(point)
-//        updateGraphics()
-//      case event.MouseReleased(_, point, _, _, _) =>
-//        itemCollection.onRelease(point)
-//        updateGraphics()
-    }
 
     override def drawStation(stations: StationPorts.Input#SM): Unit = ()
 

@@ -22,11 +22,11 @@ object SwingEnhancements:
     export observable._
 
     reactions += {
-      case e: event.MousePressed  => observable.notifyClick(e)
-      case e: event.MouseReleased => observable.notifyRelease(e)
-      case e: event.MouseEntered  => observable.notifyHover(e)
-      case e: event.MouseExited   => observable.notifyExit(e)
-      case e: event.MouseMoved    => observable.notifyHover(e)
+      case e: event.MousePressed  => observable.notifyClick(e); updateGraphics()
+      case e: event.MouseReleased => observable.notifyRelease(e); updateGraphics()
+      case e: event.MouseEntered  => observable.notifyHover(e); updateGraphics()
+      case e: event.MouseExited   => observable.notifyExit(e); updateGraphics()
+      case e: event.MouseMoved    => observable.notifyMove(e); updateGraphics()
     }
 
     /** Read-only property to get the mouse events of the component. */
