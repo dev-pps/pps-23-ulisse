@@ -1,3 +1,9 @@
+## [1.17.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.16.0...v1.17.0) (2025-03-03)
+
+### Features
+
+* **DynamicTimetable:** add impl ([e55b878](https://github.com/dev-pps/pps-23-ulisse/commit/e55b8780c202ee65aaf8a4a133491b3987b58618))
+
 ## [1.16.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.15.0...v1.16.0) (2025-03-03)
 
 ### Features
