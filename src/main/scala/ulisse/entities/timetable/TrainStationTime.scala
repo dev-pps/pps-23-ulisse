@@ -4,13 +4,15 @@ import ulisse.utils.Times.ClockTime
 import ulisse.utils.Times.FluentDeclaration.h
 
 private type WaitTime = Int
-//TODO: scala doc
+
+/** Represents time information about arriving, departure and wait time of train into a station. */
 trait TrainStationTime:
   def arriving: Option[ClockTime]
   def waitTime: Option[WaitTime]
   def departure: Option[ClockTime]
 
 object TrainStationTime:
+  /** Creates and returns [[TrainStationTime]] given `arriving`, `waitTime` and `departure` */
   def apply(arriving: Option[ClockTime], waitTime: Option[WaitTime], departure: Option[ClockTime]): TrainStationTime =
     TrainStationTimeImpl(arriving, waitTime, departure)
 
@@ -23,13 +25,16 @@ object TrainStationTime:
       departure: Option[ClockTime]
   ) extends TrainStationTime
 
-  def StartScheduleTime(departure: Option[ClockTime]): TrainStationTime =
+  /** Returns [[TrainStationTime]] with just `departure` time set. */
+  def DepartureStationTime(departure: Option[ClockTime]): TrainStationTime =
     TrainStationTime(arriving = None, waitTime = None, departure = departure)
 
-  def EndScheduleTime(arriving: Option[ClockTime]): TrainStationTime =
+  /** Returns [[TrainStationTime]] with just given `arriving` time set. */
+  def ArrivingStationTime(arriving: Option[ClockTime]): TrainStationTime =
     TrainStationTime(arriving = arriving, waitTime = None, departure = None)
 
-  def AutoScheduleTime(arriving: Option[ClockTime], waitTime: Option[WaitTime]): TrainStationTime =
+  /** Returns [[TrainStationTime]] with given `arriving` and `waitTime` and calculated departure time. */
+  def AutoStationTime(arriving: Option[ClockTime], waitTime: Option[WaitTime]): TrainStationTime =
     import ulisse.utils.Times.FluentDeclaration
     val departure =
       for
