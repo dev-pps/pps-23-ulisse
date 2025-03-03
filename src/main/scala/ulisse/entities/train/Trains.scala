@@ -55,6 +55,13 @@ object Trains:
       */
     def capacity: Int
 
+    /** Defines equality for Trains */
+    override def equals(that: Any): Boolean =
+      that match
+        case that: Train =>
+          name == that.name
+        case _ => false
+
   /** Factory for [[Trains.Train]] instances. */
   object Train:
     /** Creates train with a given name, technology type and wagons information.

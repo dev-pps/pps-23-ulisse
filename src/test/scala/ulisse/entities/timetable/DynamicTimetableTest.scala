@@ -10,7 +10,7 @@ import ulisse.entities.timetable.DynamicTimetableTest.{dynamicTimetable1, timeta
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.TestMockedEntities.railAV_10
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
-import ulisse.entities.train.TrainAgentTest.train3905
+import ulisse.entities.train.TrainAgentTest.{train3905, train3906, train3907}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
@@ -18,14 +18,7 @@ import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.{ClockTime, Time}
 
 object DynamicTimetableTest:
-  val timetable1: Timetable =
-    TimetableBuilder(
-      train = train3905,
-      startStation = stationA,
-      departureTime = h(8).m(0).getOrDefault
-    ).stopsIn(stationB, waitTime = 5)(railAV_10)
-      .transitIn(stationC)(railAV_10)
-      .arrivesTo(stationD)(railAV_10)
+  val timetable1: Timetable = defaultTimeTable(train3905)
 
   val timetable2: Timetable =
     TimetableBuilder(
@@ -36,8 +29,22 @@ object DynamicTimetableTest:
       .transitIn(stationB)(railAV_10)
       .arrivesTo(stationA)(railAV_10)
 
+  val timeTable3: Timetable = defaultTimeTable(train3906)
+  val timeTable4: Timetable = defaultTimeTable(train3907)
+
+  def defaultTimeTable(train: Train): Timetable =
+    TimetableBuilder(
+      train = train,
+      startStation = stationA,
+      departureTime = h(8).m(0).getOrDefault
+    ).stopsIn(stationB, waitTime = 5)(railAV_10)
+      .transitIn(stationC)(railAV_10)
+      .arrivesTo(stationD)(railAV_10)
+
   val dynamicTimetable1 = makeDynamicTimeTable(timetable1)
   val dynamicTimetable2 = makeDynamicTimeTable(timetable2)
+  val dynamicTimetable3 = makeDynamicTimeTable(timeTable3)
+  val dynamicTimetable4 = makeDynamicTimeTable(timeTable4)
 
   def makeDynamicTimeTable(tt: Timetable): DynamicTimetable = DynamicTimetable(tt)
 

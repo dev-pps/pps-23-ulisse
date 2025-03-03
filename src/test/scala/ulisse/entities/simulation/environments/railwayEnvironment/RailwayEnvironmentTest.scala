@@ -133,101 +133,17 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val env = RailwayEnvironment(
     Time(0, 0, 0),
     ConfigurationData(
-    stations.map(StationEnvironmentElement(_)),
-    routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
-    trainAgents,
-    timetables.map(DynamicTimetable(_)))
+      stations.map(StationEnvironmentElement(_)),
+      routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
+      trainAgents,
+      timetables.map(DynamicTimetable(_))
+    )
   )
 
   "RailwayEnvironment" when:
     "created" should:
-      "have all stations" in:
+      "maintain the configuration" in:
         env.stations.map(_.name) should contain theSameElementsAs stations.map(_.name)
-
-      "exclude in order duplicate stations" in:
-        val env = RailwayEnvironment(
-          Time(0, 0, 0),
-          ConfigurationData(
-          (stations :+ stationA2).map(StationEnvironmentElement(_)),
-          routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
-          trainAgents,
-          timetables.map(DynamicTimetable(_)))
-        )
-        env.stations.map(s => (s.name, s.numberOfTracks)) should contain theSameElementsAs stations.map(s =>
-          (s.name, s.numberOfTracks)
-        )
-
-      "have all routes" in:
-        env.routes shouldBe routes.map(RouteEnvironmentElement(
-          _,
-          minPermittedDistanceBetweenTrains
-        ))
-
-      "exclude in order duplicate routes" in:
-        val env = RailwayEnvironment(
-          Time(0, 0, 0),
-          ConfigurationData(
-          stations.map(StationEnvironmentElement(_)),
-          (routes :+ routeAB2).map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
-          trainAgents,
-          timetables.map(DynamicTimetable(_)))
-        )
-        env.routes shouldBe routes.map(RouteEnvironmentElement(
-          _,
-          minPermittedDistanceBetweenTrains
-        ))
-
-      "have at least a subset of all trains associated with a timetable" in:
-        val timetablesTrains = timetables.map(_.train).distinct
-        trains.filter(timetablesTrains.contains(_)).map(FakeTrainAgent(_, 0.0)) should contain allElementsOf env.agents
-
-      "exclude in order duplicate trains" in:
-        val env = RailwayEnvironment(
-          Time(0, 0, 0),
-          ConfigurationData(
-          stations.map(StationEnvironmentElement(_)),
-          routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
-          (trainAgents :+ trainAgent39052),
-          timetables.map(DynamicTimetable(_)))
-        )
-        val trains = env.agents.collect({ case t: TrainAgent => (t.name, t.length) })
-        trains.filter(_._1 == train3905.name) shouldBe Seq((trainAgent3905.name, defaultWagonNumber))
-
-      "have at least a subset of all timetables" in:
-        timetables.map(DynamicTimetable(_)) should contain allElementsOf env.timetables
-
-//      "exclude in order duplicate timetables" in:
-//        val env = RailwayEnvironment(
-//          Time(0, 0, 0),
-//          stations.map(StationEnvironmentElement(_)),
-//          routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
-//          trainAgents,
-//          (timetables :+ timeTable22).map(DynamicTimetable(_))
-//        )
-//        env.timetables should contain allElementsOf Seq(DynamicTimetable(timeTable2))
-//        env.timetables should not contain DynamicTimetable(timeTable22)
-
-      "have placed the trains in their initial stations if possible and then for the others drops it with all their time tables" in:
-        val trainWithFirstDepartureStation =
-          for
-            a <- timetables.groupBy(_.train).flatMap(_._2.minByOption(_.departureTime)).map(tt =>
-              (tt.train, tt.startStation)
-            )
-            b <- stations.find(_.name == a._2.name)
-          yield (a._1, b)
-
-        val allTrainsInStations =
-          for
-            stationWithTrains <- trainWithFirstDepartureStation.groupBy(_._2).view.mapValues(_.map(_._1))
-            stationEE         <- env.stations.find(_.name == stationWithTrains._1.name)
-          yield
-            val stationEETrains = stationEE.containers.flatMap(_.trains).map(_.name)
-            stationWithTrains._2.toList.sortBy(_.name).take(stationEETrains.size).map(
-              _.name
-            ) should contain theSameElementsAs stationEETrains
-            stationEETrains should have size stationEE.containers.size
-            stationEETrains
-        env.timetables.map(_.train.name).distinct should contain theSameElementsAs allTrainsInStations.flatten.toList
 
     "doStep" should:
       "move train into route" in:

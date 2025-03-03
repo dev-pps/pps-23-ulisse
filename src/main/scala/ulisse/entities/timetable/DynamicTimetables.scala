@@ -13,6 +13,7 @@ object DynamicTimetables:
   /** Timetable for Simulation */
   trait DynamicTimetable extends Timetable with EnvironmentElement:
     import DynamicTimetableUtils.*
+
     /** The id of the timetable */
     def id: Int = hashCode()
 

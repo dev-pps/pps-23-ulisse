@@ -29,12 +29,12 @@ class EnvironmentElementsTest extends AnyWordSpec with Matchers:
         List(-1, 0).foreach(id => TrainAgentsContainer.generateSequentialContainers(constructor, id) shouldBe List())
 
   private trait TestTrainAgentEEWrapper extends TrainAgentEEWrapper[TestTrainAgentEEWrapper]
-  private val train = mock[TrainAgent]
+  private val train      = mock[TrainAgent]
   private val otherTrain = mock[TrainAgent]
-  private val ee    = mock[TestTrainAgentEEWrapper]
-  private val ee2   = mock[TestTrainAgentEEWrapper]
-  private val tac  = mock[TestTrainAgentsContainer]
-  private val tac2  = mock[TestTrainAgentsContainer]
+  private val ee         = mock[TestTrainAgentEEWrapper]
+  private val ee2        = mock[TestTrainAgentEEWrapper]
+  private val tac        = mock[TestTrainAgentsContainer]
+  private val tac2       = mock[TestTrainAgentsContainer]
 
   "TrainAgent" should:
     "be able to leave a TrainAgentEEWrapper" in:
@@ -68,19 +68,19 @@ class EnvironmentElementsTest extends AnyWordSpec with Matchers:
       when(tac2.trains).thenReturn(Seq())
       when(ee.containers).thenReturn(Seq(tac, tac2))
       ee.trains shouldBe Seq()
-      
+
     "find all train in a Seq of environments" in:
       when(tac.trains).thenReturn(Seq(train))
       when(tac2.trains).thenReturn(Seq(otherTrain))
       when(ee.containers).thenReturn(Seq(tac))
       when(ee2.containers).thenReturn(Seq(tac2))
       Seq(ee, ee2).collectTrains shouldBe Seq(train, otherTrain)
-    
+
     "return empty list if the Seq of environments hasn't containers" in:
       when(ee.containers).thenReturn(Seq())
       when(ee2.containers).thenReturn(Seq())
       Seq(ee, ee2).collectTrains shouldBe Seq()
-      
+
     "return empty list if the Seq of environments hasn't trains" in:
       when(tac.trains).thenReturn(Seq())
       when(tac2.trains).thenReturn(Seq())
