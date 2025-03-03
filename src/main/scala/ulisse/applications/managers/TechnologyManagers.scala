@@ -22,39 +22,28 @@ object TechnologyManagers:
       */
     def add(technology: T): Either[TechErrors, TechnologyManager[T]]
 
-    /** Remove technology if exist
+    /** Removes technology given its `name` if exists.
       *
-      * @param name
-      *   Name of technology
-      * @return
-      *   Returns [[Right]] of updated `TechnologyManager` if technology is removed else [[Left]] of
-      *   [[TechnologyNotExists]] error
+      * Returns [[Right]] of updated `TechnologyManager` if technology is removed else [[Left]] of [[TechnologyNotExists]] error
       */
     def remove(name: String): Either[TechErrors, TechnologyManager[T]]
 
-    /** @return
-      *   List of saved technologies
-      */
+    /** Returns List of saved technologies */
     def technologiesList: List[T]
 
-    /** @param name
-      *   name of technology
-      */
+    /** Returns technology given its `name` */
     def getBy(name: String): Either[TechErrors, T]
 
   object TechnologyManager:
-    val defaultTrainTecnhology = List(TrainTechnology("AV", 300, 2.0, 1.0), TrainTechnology("Normal", 160, 1.0, 0.5))
 
-    /** @param technologies
-      *   Technologies saved
-      * @return
-      *   `TechnologyManager`
-      */
+    /** Returns `TechnologyManager` initialized with `technologies` */
     def apply[T <: Technology](technologies: List[T]): TechnologyManager[T] =
       TechnologyManagerImpl(technologies.map(t => (t.name, t)).toMap)
 
     /** Creates a [[TechnologyManager]] with default train technologies */
-    def createTrainTechnology(): TechnologyManager[TrainTechnology] = TechnologyManager(defaultTrainTecnhology)
+    def createTrainTechnology(): TechnologyManager[TrainTechnology] =
+      val defaultTrainTechnology = List(TrainTechnology("AV", 300, 2.0, 1.0), TrainTechnology("Normal", 160, 1.0, 0.5))
+      TechnologyManager(defaultTrainTechnology)
 
     /** Create an empty [[TechnologyManager]] with [[TrainTechnology]]. */
     def empy(): TechnologyManager[TrainTechnology] = TechnologyManager(List.empty)

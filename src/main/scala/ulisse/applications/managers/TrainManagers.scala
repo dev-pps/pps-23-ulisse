@@ -3,6 +3,7 @@ package ulisse.applications.managers
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist, ErrorValidation}
+import ulisse.utils.ValidationUtils
 
 import scala.util.Either
 
@@ -18,27 +19,14 @@ object TrainManagers:
         with TrainErrors
 
   trait TrainManager:
-    /** Add train to train collection.
+    /** Adds `train` to train collection.
       *
-      * @param train
-      *   train to be added
-      * @return
-      *   Returns [[Right]] of updated `TrainManager` if train is added else [[Left]] of
-      *   [[TrainErrors.TrainAlreadyExists]]
+      * Returns [[Right]] of updated `TrainManager` if train is added else [[Left]] of [[TrainErrors.TrainAlreadyExists]]
       */
     def addTrain(train: Train): Either[TrainErrors, TrainManager]
 
-    /** @param name
-      *   train name
-      * @param technology
-      *   train technology
-      * @param wagonTypeName
-      *   name of wagon type
-      * @param wagonCapacity
-      *   wagon capacity
-      * @param length
-      *   length of train (amount of wagons)
-      * @return
+    /** Creates new [[Train]] given its `name`, `technology`, `wagonTypeName`, `wagonCapacity` and `length` (amount of wagons)
+      *
       *   Returns [[Right]] of updated `TrainManager` if train is added else [[Left]] of
       *   [[TrainErrors.TrainAlreadyExists]]
       */
@@ -50,30 +38,16 @@ object TrainManagers:
         length: Int
     ): Either[TrainErrors, TrainManager]
 
-    /** Remove train from train collection.
+    /** Removes train from trains collection given its `name`.
       *
-      * @param name
-      *   train name to be removed
-      * @return
-      *   Returns [[Right]] of updated `TrainManager` if train is removed else [[Left]] of
+      * Returns [[Right]] of updated `TrainManager` if train is removed else [[Left]] of
       *   [[TrainErrors.TrainNotExists]]
       */
     def removeTrain(name: String): Either[TrainErrors, TrainManager]
 
-    /** Updates the information of the train that has the given name.
+    /** Updates the information of the train given its `name`.
       *
-      * @param name
-      *   Train name
-      * @param technology
-      *   Train technology
-      * @param wagonUseName
-      *   wagon use name
-      * @param wagonCapacity
-      *   wagon capacity
-      * @param length
-      *   train length (wagon amount)
-      * @return
-      *   Returns [[Right]] of updated `TrainManager` if train is updated else [[Left]] of [[TrainErrors]]
+      *  Returns [[Right]] of updated `TrainManager` if train is updated else [[Left]] of [[TrainErrors]]
       */
     def updateTrain(name: String)(
         technology: TrainTechnology,
@@ -82,27 +56,17 @@ object TrainManagers:
         length: Int
     ): Either[TrainErrors, TrainManager]
 
-    /** @return
-      *   Returns list of trains
-      */
+    /** Returns list of trains */
     def trains: List[Train]
 
-    /** @return
-      *   Returns List of wagons [[UseType]]
-      */
+    /** Returns List of wagons [[UseType]] */
     def wagonTypes: List[UseType]
 
   /** Companion object of the trait `TrainManager`.
-    *
-    * @see
-    *   [[TrainManager]] for more detailed behaviour definition.
+    * @see [[TrainManager]] for more detailed behaviour definition.
     */
   object TrainManager:
-    /** @param trains
-      *   Trains saved
-      * @return
-      *   TrainManager
-      */
+    /** Returns TrainManager initialized with `trains` */
     def apply(trains: List[Train]): TrainManager = DefaultManager(trains)
 
     /** Create [[TrainManager]] with empty list of trains. */
@@ -137,7 +101,7 @@ object TrainManagers:
 
       extension (value: Int)
         private def validatePositiveValue(name: String): Either[TrainErrors.NegativeValue, Int] =
-          if value > 0 then Right(value) else Left(TrainErrors.NegativeValue(name, value))
+          ValidationUtils.validatePositive(value, TrainErrors.NegativeValue(name, value))
 
       override def removeTrain(name: String): Either[TrainErrors, TrainManager] =
         findTrain(name)

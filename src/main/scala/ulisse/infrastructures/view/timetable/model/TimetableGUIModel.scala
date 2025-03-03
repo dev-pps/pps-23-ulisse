@@ -5,8 +5,8 @@ import scala.util.Random
 object TimetableGUIModel:
   trait TimetableEntry:
     def name: String
-    def arrivingTime: String
-    def departureTime: String
+    def arrivingTime: String  // Option
+    def departureTime: String // Option
     def waitMinutes: Option[Int]
 
   val mockedData: TableEntryData = TableEntryData("Station A", "9:00", "9:00", Some(3))
