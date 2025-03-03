@@ -1,8 +1,8 @@
 package ulisse.infrastructures.view.manager
 
 import ulisse.infrastructures.view.components.composed.ComposedSwing
-import ulisse.infrastructures.view.page.workspaces.Workspace
-import ulisse.infrastructures.view.page.workspaces.Workspace.{MapWorkspace, SimulationWorkspace, TrainWorkspace}
+import ulisse.infrastructures.view.page.workspaces.{MapWorkspace, Workspace}
+import ulisse.infrastructures.view.page.workspaces.Workspace.{SimulationWorkspace, TrainWorkspace}
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.BorderPanel.Position

@@ -2,7 +2,6 @@ package ulisse.infrastructures.view.map
 
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.manager.FormManager
-import ulisse.infrastructures.view.page.forms.Form
 
 import scala.swing.BorderPanel.Position
 

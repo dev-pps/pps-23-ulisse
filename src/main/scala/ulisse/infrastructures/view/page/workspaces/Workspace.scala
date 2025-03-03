@@ -8,7 +8,6 @@ import ulisse.infrastructures.view.map.MapPanel
 import ulisse.infrastructures.view.train.TrainEditorView
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
-import scala.swing.BorderPanel.Position
 import scala.swing.{BorderPanel, Component}
 
 /** Represents the workspace of the application. */
@@ -40,18 +39,6 @@ object Workspace:
   /** Represents the simulation workspace of the application. */
   case class SimulationWorkspace(adapterManager: InputAdapterManager) extends Workspace:
     private val workspace = BaseWorkspace()
-
-    export workspace.{component, revalidate}
-
-  /** Represents the map workspace of the application. */
-  final case class MapWorkspace(adapterManager: InputAdapterManager) extends Workspace:
-    private val workspace   = BaseWorkspace()
-    private val mapPanel    = MapPanel.empty()
-    private val formManager = FormManager.createMap()
-
-    workspace.workPanel.layout(mapPanel) = Position.Center
-    workspace.menuPanel.layout(formManager.component) = Position.East
-    workspace.revalidate()
 
     export workspace.{component, revalidate}
 

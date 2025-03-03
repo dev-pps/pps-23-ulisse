@@ -4,7 +4,8 @@ import ulisse.adapters.InputAdapterManager
 import ulisse.applications.InputPortManager
 import ulisse.infrastructures.view.manager.{FormManager, PageManager, WorkspaceManager}
 import ulisse.infrastructures.view.page.forms.Form
-import ulisse.infrastructures.view.page.workspaces.Workspace.{MapWorkspace, SimulationWorkspace, TrainWorkspace}
+import ulisse.infrastructures.view.page.workspaces.MapWorkspace
+import ulisse.infrastructures.view.page.workspaces.Workspace.{SimulationWorkspace, TrainWorkspace}
 import ulisse.infrastructures.view.page.{Dashboard, Menu}
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
