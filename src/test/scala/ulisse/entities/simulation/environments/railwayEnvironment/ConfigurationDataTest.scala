@@ -33,7 +33,7 @@ import ulisse.entities.station.StationEnvironmentElementTest.{
   stationD_EE
 }
 import ulisse.entities.station.StationTest.{stationA, stationB, stationC, stationD}
-import ulisse.entities.station.{Station, StationEnvironmentElement}
+import ulisse.entities.station.Station
 import ulisse.entities.timetable.DynamicTimetableTest.{
   dynamicTimetable1,
   dynamicTimetable2,
@@ -57,6 +57,7 @@ import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.Time
 import ulisse.Utils.TestUtility.getOrFail
+import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
 
 object ConfigurationDataTest:
   val stations    = Seq(stationA, stationB, stationC, stationD)

@@ -1,7 +1,7 @@
 package ulisse.utils
 
 import cats.syntax.all.*
-import cats.{Functor, Monad}
+import cats.{Functor, Id, Monad}
 import ulisse.utils.Errors.{BaseError, ErrorMessage}
 
 import scala.annotation.targetName
@@ -25,11 +25,14 @@ object Times:
 
   object Time:
     def apply(h: Hour, m: Minute, s: Second): Time = TimeImpl(h, m, s)
+    def secondsToOverflowTime(s: Second): Time     = Id(Time(0, 0, s)) overflowSum Time(0, 0, 0)
 
     val secondsInMinute, minutesInHour = 60
+    val hoursInDay                     = 24
     extension (time: Time)
       def toSeconds: Int = time.h * secondsInMinute * minutesInHour + time.m * secondsInMinute + time.s
       def toMinutes: Int = time.h * minutesInHour + time.m + time.s / secondsInMinute
+
     private case class TimeImpl(h: Hour, m: Minute, s: Second) extends Time
 
   trait ClockTime extends Time:
@@ -143,10 +146,13 @@ object Times:
       extractAndPerform(time, time2): (t, t2) =>
         calculateSum(t, t2)
 
-    @targetName("sub")
-    def -(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
+    def overflowSum(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
       extractAndPerform(time, time2): (t, t2) =>
-        calculateSub(t, t2)
+        calculateOverflowSum(t, t2)
+
+    def underflowSub(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
+      extractAndPerform(time, time2): (t, t2) =>
+        calculateUnderflowSub(t, t2)
 
   /** Returns true if predicate on the two provided `ClockTime` is satisfied */
   private def checkCondition(
@@ -175,19 +181,43 @@ object Times:
     def ===(time2: ClockTime): Boolean =
       summon[Ordering[ClockTime]].compare(time, time2) == 0
 
+  private trait TimeBuildStrategy:
+    def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int)
+
+  private given defaultStrategy: TimeBuildStrategy with
+    def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int) =
+      (
+        ((h % Time.hoursInDay) + Time.hoursInDay)           % Time.hoursInDay,
+        ((m % Time.minutesInHour) + Time.minutesInHour)     % Time.minutesInHour,
+        ((s % Time.secondsInMinute) + Time.secondsInMinute) % Time.secondsInMinute
+      )
+
+  private given overflowStrategy: TimeBuildStrategy with
+    def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int) = (h, m % Time.minutesInHour, s % Time.secondsInMinute)
+
   private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
       using constructor: TimeConstructor[M[T]]
   ): M[T] =
+    given TimeBuildStrategy = defaultStrategy
     buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
 
-  private def calculateSub[M[_]: Monad, T <: Time](time1: T, time2: T)(using constructor: TimeConstructor[M[T]]): M[T] =
+  private def calculateOverflowSum[M[_]: Monad, T <: Time](time1: T, time2: T)(using
+      constructor: TimeConstructor[M[T]]
+  ): M[T] =
+    given TimeBuildStrategy = overflowStrategy
+    buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
+
+  private def calculateUnderflowSub[M[_]: Monad, T <: Time](time1: T, time2: T)(using
+      constructor: TimeConstructor[M[T]]
+  ): M[T] =
+    given TimeBuildStrategy = overflowStrategy
     buildTimeFromSeconds(time1.toSeconds - time2.toSeconds)
 
   private def buildTimeFromSeconds[M[_]: Monad, T <: Time](seconds: Int)(using
       constructor: TimeConstructor[M[T]]
-  ): M[T] =
-    constructor.construct(
-      seconds / (Time.secondsInMinute * Time.minutesInHour) % 24,
-      (seconds / Time.secondsInMinute)                      % Time.minutesInHour,
-      seconds                                               % Time.secondsInMinute
-    )
+  )(using buildStrategy: TimeBuildStrategy): M[T] =
+    constructor.construct.tupled(buildStrategy.buildTimeValue(
+      seconds / (Time.secondsInMinute * Time.minutesInHour),
+      (seconds / Time.secondsInMinute),
+      seconds
+    ))

@@ -1,21 +1,38 @@
 package ulisse.entities.simulation.data
 
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
+import ulisse.utils.Times.Time
+
+trait SimulationData:
+  def step: Int
+  def secondElapsed: Double
+  def simulationEnvironment: RailwayEnvironment
+  def increaseStepByOne(): SimulationData
+  def increaseSecondElapsedBy(delta: Double): SimulationData
+  def reset(): SimulationData
 
 object SimulationData:
-  def empty(): SimulationData = SimulationData(0, 0, RailwayEnvironment.empty(), RailwayEnvironment.empty())
-  extension (simulationData: SimulationData)
-    def increaseStepByOne(): SimulationData = simulationData.copy(step = simulationData.step + 1)
-    def increaseSecondElapsedBy(delta: Double): SimulationData =
-      simulationData.copy(secondElapsed = simulationData.secondElapsed + delta)
+  def apply(step: Int, secondElapsed: Double, simulationEnvironment: RailwayEnvironment): SimulationData =
+    SimulationDataImpl(step, secondElapsed, simulationEnvironment, simulationEnvironment)
+  def withEnvironment(environment: RailwayEnvironment): SimulationData =
+    SimulationData(0, 0, environment)
+  def empty(): SimulationData = withEnvironment(RailwayEnvironment.empty())
 
-final case class SimulationData(
+  extension (simulationData: SimulationData)
+    def cumulativeDelay: Time =
+      Time.secondsToOverflowTime(
+        simulationData.simulationEnvironment
+          .timetables
+          .flatMap(_.currentDelay)
+          .map(_.toSeconds).sum
+      )
+
+private final case class SimulationDataImpl(
     step: Int,
     secondElapsed: Double,
-    private val initialSimulationEnvironment: RailwayEnvironment,
+    initialSimulationEnvironment: RailwayEnvironment,
     simulationEnvironment: RailwayEnvironment
-):
-  def withEnvironment(environment: RailwayEnvironment): SimulationData =
-    copy(initialSimulationEnvironment = environment, simulationEnvironment = environment)
-  def reset(): SimulationData =
-    copy(step = 0, secondElapsed = 0, simulationEnvironment = initialSimulationEnvironment)
+) extends SimulationData:
+  override def increaseStepByOne(): SimulationData                    = copy(step = step + 1)
+  override def increaseSecondElapsedBy(delta: Double): SimulationData = copy(secondElapsed = secondElapsed + delta)
+  override def reset(): SimulationData = SimulationData.withEnvironment(initialSimulationEnvironment)

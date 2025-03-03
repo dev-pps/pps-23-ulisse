@@ -19,7 +19,8 @@ import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationD
 import ulisse.entities.timetable.DynamicTimetableTest.*
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.station.StationTest.{stationA, stationB}
-import ulisse.entities.station.{Station, StationEnvironmentElement}
+import ulisse.entities.station.Station
+import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
 import ulisse.entities.timetable.DynamicTimetableTest.{timetable1, timetable2}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}

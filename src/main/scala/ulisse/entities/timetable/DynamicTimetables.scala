@@ -3,7 +3,7 @@ package ulisse.entities.timetable
 import ulisse.entities.simulation.environments.EnvironmentElements.EnvironmentElement
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.Timetables.{StationTime, Timetable}
-import ulisse.utils.Times.{-, ClockTime, InvalidHours, Time, given}
+import ulisse.utils.Times.{ClockTime, InvalidHours, Time, given}
 import ulisse.utils.CollectionUtils.updateWhen
 
 import scala.collection.immutable.ListMap
@@ -31,9 +31,11 @@ object DynamicTimetables:
     /** The current delay of the train */
     def currentDelay: Option[Time] =
       (currentRoute, nextRoute) match
-        case (Some((ds, _)), _) => effectiveTable.find(_._1 == ds).flatMap(_._2.departure) - table(ds).departure
-        case (_, Some((ds, _))) => effectiveTable.find(_._1 == ds).flatMap(_._2.arriving) - table(ds).arriving
-        case _                  => effectiveTable.lastOption.flatMap(_._2.arriving) - arrivingTime
+        case (Some((ds, _)), _) =>
+          effectiveTable.find(_._1 == ds).flatMap(_._2.departure) underflowSub table(ds).departure
+        case (_, Some((ds, _))) =>
+          effectiveTable.find(_._1 == ds).flatMap(_._2.arriving) underflowSub table(ds).arriving
+        case _ => effectiveTable.lastOption.flatMap(_._2.arriving) underflowSub arrivingTime
 
     /** The next departure time */
     def nextDepartureTime: Option[ClockTime] =
@@ -97,7 +99,7 @@ object DynamicTimetables:
           swti =>
             TrainStationTime(
               swti._2.arriving,
-              (Some(time) - expectedDepartureTime).map(_.toMinutes),
+              (Some(time) underflowSub expectedDepartureTime).map(_.toMinutes),
               Some(time)
             )
         )

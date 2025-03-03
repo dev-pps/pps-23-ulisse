@@ -8,7 +8,8 @@ import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.data.{EngineState, SimulationData}
 import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
-import ulisse.entities.station.{Station, StationEnvironmentElement}
+import ulisse.entities.station.Station
+import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.infrastructures.commons.TimeProviders.*

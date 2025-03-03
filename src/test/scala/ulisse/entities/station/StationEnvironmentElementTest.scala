@@ -3,8 +3,8 @@ package ulisse.entities.station
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
-import ulisse.entities.station.StationEnvironmentElement.*
 import ulisse.entities.station.StationEnvironmentElementTest.stationA_EE
+import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
 import ulisse.entities.station.StationTest.{numberOfTracks, stationA, stationB, stationC, stationD, stationE, stationF}
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906, trainAgent3907}
 import ulisse.entities.train.TrainAgents.TrainAgent
