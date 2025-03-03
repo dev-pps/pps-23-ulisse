@@ -114,20 +114,14 @@ object RailwayEnvironment:
       agent.distanceTravelled match
         case d if d >= route.length =>
           for
-            ree <- route.removeTrain(agent)
-            re = routes.updateWhen(_.id == ree.id)(_ => ree)
-            _  = println(s"REMOVE TRAIN FROM ROUTE")
-            tt  <- findCurrentTimeTableFor(agent)
-            ct  <- ClockTime(time.h, time.m).toOption
-            utt <- tt.arrivalUpdate(ct)
-            _  = println(s"AU: ${utt.effectiveTable}]")
-            dt = _timetables.map((k, v) => if v.contains(tt) then (k, v.updateWhen(_ == tt)(_ => utt)) else (k, v))
-            currentRoute <- tt.currentRoute
-
-            see  <- stations.find(currentRoute._2.name == _.name)
-            usee <- see.putTrain(agent.resetDistanceTravelled())
-            se = stations.updateWhen(_.name == usee.name)(_ => usee)
-          yield copy(stations = se, routes = re, _timetables = dt)
+            updatedRoute <- route.removeTrain(agent)
+            updatedRoutes = routes.updateWhen(_.id == updatedRoute.id)(_ => updatedRoute)
+            (updatedTimetables, currentRoute) <-
+              timetableUpdateFunction(_.arrivalUpdate(_), _.currentRoute, agent, time)
+            station        <- stations.find(currentRoute._2.name == _.name)
+            updatedStation <- station.putTrain(agent.resetDistanceTravelled())
+            updatedStations = stations.updateWhen(_.name == updatedStation.name)(_ => updatedStation)
+          yield copy(stations = updatedStations, routes = updatedRoutes, _timetables = updatedTimetables)
         case _ => route.updateTrain(agent).map(ree => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree)))
 
     private def stationUpdateFunction(
@@ -136,17 +130,30 @@ object RailwayEnvironment:
         time: Time
     ): Option[RailwayEnvironmentImpl] =
       for
-        see <- station.removeTrain(agent)
-        se = stations.updateWhen(_.name == see.name)(_ => see)
-        tt  <- findCurrentTimeTableFor(agent)
-        utt <- tt.departureUpdate(ClockTime(time.h, time.m).getOrDefault)
-        dt = _timetables.map((k, v) => if v.contains(tt) then (k, v.updateWhen(_ == tt)(_ => utt)) else (k, v))
-        nextRoute         <- tt.nextRoute
-        routeAndDirection <- findRouteWithTravelDirection(nextRoute)
-        ree               <- routes.find(routeAndDirection._1.id == _.id)
-        uree              <- ree.putTrain(agent.resetDistanceTravelled(), routeAndDirection._2)
-        re = routes.updateWhen(_.id == uree.id)(_ => uree)
-      yield copy(stations = se, routes = re, _timetables = dt)
+        updatedStation <- station.removeTrain(agent)
+        updatedStations = stations.updateWhen(_.name == updatedStation.name)(_ => updatedStation)
+        (updatedTimetables, nextRoute) <- timetableUpdateFunction(_.departureUpdate(_), _.nextRoute, agent, time)
+        routeAndDirection              <- findRouteWithTravelDirection(nextRoute)
+        route                          <- routes.find(routeAndDirection._1.id == _.id)
+        updatedRoute                   <- route.putTrain(agent.resetDistanceTravelled(), routeAndDirection._2)
+        updatedRoutes = routes.updateWhen(_.id == updatedRoute.id)(_ => updatedRoute)
+      yield copy(stations = updatedStations, routes = updatedRoutes, _timetables = updatedTimetables)
+
+    private def timetableUpdateFunction(
+        updateF: (DynamicTimetable, ClockTime) => Option[DynamicTimetable],
+        routeInfo: DynamicTimetable => Option[(Station, Station)],
+        agent: TrainAgent,
+        time: Time
+    ): Option[(Map[String, Seq[DynamicTimetable]], (Station, Station))] =
+      for
+        currentTimetable <- findCurrentTimeTableFor(agent)
+        currentClockTime <- ClockTime(time.h, time.m).toOption
+        updatedTimetable <- updateF(currentTimetable, currentClockTime)
+        updatedTimetables = _timetables.view.mapValues(
+          _.updateWhen(_ == currentTimetable)(_ => updatedTimetable)
+        ).toMap
+        info <- routeInfo(currentTimetable)
+      yield (updatedTimetables, info)
 
     def findCurrentTimeTableFor(train: TrainAgent): Option[DynamicTimetable] =
       _timetables.get(train.name).flatMap(_.find(!_.completed))

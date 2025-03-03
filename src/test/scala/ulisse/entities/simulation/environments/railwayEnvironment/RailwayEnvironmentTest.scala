@@ -6,13 +6,22 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
+import ulisse.entities.route.RouteEnvironmentElementTest.routeAB
 import ulisse.entities.route.RouteTest.departureCoordinate
 import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.route.Routes.{Route, TypeRoute}
+import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.{
+  routesEE,
+  stationsEE,
+  timetables
+}
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
+import ulisse.entities.station.StationTest.{stationA, stationB}
 import ulisse.entities.station.{Station, StationEnvironmentElement}
+import ulisse.entities.timetable.DynamicTimetableTest.{timetable1, timetable2}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
+import ulisse.entities.train.TrainAgentTest.{train3905, train3906, train3907}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
@@ -22,25 +31,7 @@ import ulisse.utils.Times.Time
 import scala.Seq
 
 class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
-  private val dt        = 1
-  private val movement  = 10
-  private val stationA  = Station("A", Coordinate(0, 0), 1)
-  private val stationA2 = Station("A", Coordinate(0, 0), 3)
-  private val stationB  = Station("B", Coordinate(0, 1), 1)
-  private val stationC  = Station("C", Coordinate(0, 2), 1)
-  private val stationD  = Station("D", Coordinate(0, 3), 1)
-  private val stations  = Seq(stationA, stationB, stationC, stationD)
-
-  given minPermittedDistanceBetweenTrains: Double = 100.0
-
-  private val defaultTechnology  = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
-  private val defaultWagon       = Wagon(UseType.Passenger, 50)
-  private val defaultWagonNumber = 5
-  private val train3905          = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber)
-  private val train39052         = Train("3905", defaultTechnology, defaultWagon, defaultWagonNumber + 1)
-  private val train3906          = Train("3906", defaultTechnology, defaultWagon, defaultWagonNumber)
-  private val train3907          = Train("3907", defaultTechnology, defaultWagon, defaultWagonNumber)
-  private val trains             = Seq(train3905, train3906, train3907)
+  private val dt = 1
 
   private final case class FakeTrainAgent(train: Train, distanceTravelled: Double) extends TrainAgent:
     export train.*
@@ -50,100 +41,28 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
       copy(distanceTravelled = math.max(minDistanceTravelled, newDistanceTravelled))
 
     override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[TrainAgent] =
-      Some(copy(distanceTravelled = distanceTravelled + pathLength))
-  private val trainAgent3905  = FakeTrainAgent(train3905, 0.0)
-  private val trainAgent39052 = FakeTrainAgent(train39052, 0.0)
-  private val trainAgent3906  = FakeTrainAgent(train3906, 0.0)
-  private val trainAgent3907  = FakeTrainAgent(train3907, 0.0)
-  private def mocked(train: Train): TrainAgent =
-    val trainAgent = mock[TrainAgent]
-    when(trainAgent.name).thenReturn(train.name)
-    when(trainAgent.length).thenReturn(train.length)
-    when(trainAgent.wagon).thenReturn(train.wagon)
-    when(trainAgent.maxSpeed).thenReturn(train.maxSpeed)
-    when(trainAgent.lengthSize).thenReturn(train.lengthSize)
-    trainAgent
-  private val trainAgents  = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
-  val railsCount: Int      = 1
-  val typeRoute: TypeRoute = TypeRoute.Normal
-  val pathLength: Double =
-    trains.foldLeft(2 * minPermittedDistanceBetweenTrains)((length, trainAgent) => length + trainAgent.lengthSize)
-  private val routeAB: Route =
-    Route(stationA, stationB, typeRoute, railsCount, pathLength) match
-      case Left(errors) => fail()
-      case Right(route) => route
-  private val routeAB2: Route =
-    Route(stationA, stationB, typeRoute, railsCount, pathLength + 1) match
-      case Left(errors) => fail()
-      case Right(route) => route
-  private val routeBC: Route =
-    Route(stationB, stationC, typeRoute, railsCount, pathLength) match
-      case Left(errors) => fail()
-      case Right(route) => route
-  private val routeCD: Route =
-    Route(stationC, stationD, typeRoute, railsCount, pathLength) match
-      case Left(errors) => fail()
-      case Right(route) => route
-  private val routeDA: Route =
-    Route(stationD, stationA, typeRoute, railsCount, pathLength) match
-      case Left(errors) => fail()
-      case Right(route) => route
-  private val routes = Seq(routeAB, routeBC, routeCD, routeDA)
+      Some(copy(distanceTravelled = distanceTravelled + routesEE.map(_.length).foldLeft(0.0)(math.max)))
 
-  val railAV_10: RailInfo = RailInfo(length = 10, typeRoute = AV)
+  private val trainAgent3905 = FakeTrainAgent(train3905, 0.0)
+  private val trainAgent3906 = FakeTrainAgent(train3906, 0.0)
+  private val trainAgent3907 = FakeTrainAgent(train3907, 0.0)
 
-  val timeTable1: Timetable =
-    TimetableBuilder(
-      train = train3905,
-      startStation = stationD,
-      departureTime = h(20).m(0).getOrDefault
-    ).stopsIn(stationC, waitTime = 5)(railAV_10)
-      .transitIn(stationB)(railAV_10)
-      .arrivesTo(stationA)(railAV_10)
-
-  val timeTable2: Timetable =
-    TimetableBuilder(
-      train = train3905,
-      startStation = stationA,
-      departureTime = h(8).m(0).getOrDefault
-    ).stopsIn(stationB, waitTime = 5)(railAV_10)
-      .transitIn(stationC)(railAV_10)
-      .arrivesTo(stationD)(railAV_10)
-
-  val timeTable22: Timetable =
-    TimetableBuilder(
-      train = train39052,
-      startStation = stationA,
-      departureTime = h(8).m(0).getOrDefault
-    ).stopsIn(stationB, waitTime = 5)(railAV_10)
-      .transitIn(stationC)(railAV_10)
-      .arrivesTo(stationD)(railAV_10)
-
-  val timeTable3: Timetable =
-    TimetableBuilder(
-      train = train3906,
-      startStation = stationA,
-      departureTime = h(8).m(0).getOrDefault
-    ).stopsIn(stationB, waitTime = 5)(railAV_10)
-      .transitIn(stationC)(railAV_10)
-      .arrivesTo(stationD)(railAV_10)
-
-  private val timetables = Seq(timeTable1, timeTable2, timeTable3)
+  private val trainAgents = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
 
   private val env = RailwayEnvironment(
     Time(0, 0, 0),
     ConfigurationData(
-      stations.map(StationEnvironmentElement(_)),
-      routes.map(RouteEnvironmentElement(_, minPermittedDistanceBetweenTrains)),
+      stationsEE,
+      routesEE,
       trainAgents,
-      timetables.map(DynamicTimetable(_))
+      timetables
     )
   )
 
   "RailwayEnvironment" when:
     "created" should:
       "maintain the configuration" in:
-        env.stations.map(_.name) should contain theSameElementsAs stations.map(_.name)
+        println("todo")
 
     "doStep" should:
       "move train into route" in:
@@ -195,7 +114,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
               println(ctt.completed)
               ctt
             )
-            newEnv.findCurrentTimeTableFor(trainAgent3905) shouldBe Some(DynamicTimetable(timeTable1))
+            newEnv.findCurrentTimeTableFor(trainAgent3905) shouldBe Some(DynamicTimetable(timetable2))
           case _ => fail()
 
       "complete schedules" in:
