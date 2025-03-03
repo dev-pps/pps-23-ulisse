@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.components.draw
 
 import ulisse.infrastructures.view.common.Observers
-import ulisse.infrastructures.view.common.Observers.Observable
+import ulisse.infrastructures.view.common.Observers.{ClickObserver, MovedObserver, Observable, ReleaseObserver}
 import ulisse.infrastructures.view.components.styles.Images.SourceImage
 import ulisse.infrastructures.view.components.styles.{CurrentColor, Images, Styles}
 import ulisse.infrastructures.view.utils.Swings.*
@@ -18,10 +18,10 @@ object DrawImages:
   val defaultDimension: Dimension = new Dimension(30, 30)
 
   /** Default scale for silhouette. */
-  val defaultScaleSilhouette: Float = 1.4f
+  private val defaultScaleSilhouette: Float = 1.4f
 
   /** Represent a generic image. */
-  trait DrawImage extends Observable[MouseEvent]:
+  trait DrawImage extends ClickObserver[MouseEvent] with ReleaseObserver[MouseEvent] with MovedObserver[MouseEvent]:
     /** Center of the image. */
     val center: Point
 
@@ -64,14 +64,11 @@ object DrawImages:
       private val silhouette: Option[BufferedImage] =
         source.bufferImage.map(image => BufferedImage(image.getWidth, image.getHeight, BufferedImage.TYPE_INT_ARGB))
 
-      private var _scale: Float                      = defaultScaleSilhouette
-      private var isSilhouetteShown: Boolean         = false
-      private var _silhouettePalette: Styles.Palette = Styles.silhouettePalette
-      private val silhouetteColor: CurrentColor      = CurrentColor(_silhouettePalette.background)
       override val center: Point = new Point(position.x - (dimension.width / 2), position.y - (dimension.height / 2))
       override val observable: Observable[MouseEvent] = Observers.createObservable[MouseEvent]
-
-      export observable.{notifyClick => _, notifyExit => _, notifyHover => _, notifyRelease => _, _}
+      private var _scale: Float                       = defaultScaleSilhouette
+      private var _silhouettePalette: Styles.Palette  = Styles.silhouettePalette
+      private val silhouetteColor: CurrentColor       = CurrentColor(_silhouettePalette.background)
 
       override def scale: Float = _scale
 
@@ -83,30 +80,27 @@ object DrawImages:
         _silhouettePalette = palette
         silhouetteColor.current = palette.background
 
-      override def notifyClick(data: MouseEvent): Unit =
+      override def onMove(data: MouseEvent): Unit =
+        if data.point.hasCollided(this) then
+          silhouetteColor.hoverColor(silhouettePalette)
+          observable.notifyHover(data)
+        else
+          silhouetteColor.exitColor(silhouettePalette)
+          observable.notifyExit(data)
+
+      override def onClick(data: MouseEvent): Unit =
         if data.point.hasCollided(this) then
           silhouetteColor.clickColor(silhouettePalette)
           observable.notifyClick(data)
 
-      override def notifyHover(data: MouseEvent): Unit =
-        if data.point.hasCollided(this) then
-          silhouetteColor.hoverColor(silhouettePalette)
-          observable.notifyHover(data)
-
-      override def notifyRelease(data: MouseEvent): Unit =
+      override def onRelease(data: MouseEvent): Unit =
         if data.point.hasCollided(this) then
           silhouetteColor.releaseColor(silhouettePalette)
           observable.notifyRelease(data)
 
-      override def notifyExit(data: MouseEvent): Unit =
-        if data.point.hasCollided(this) then
-          silhouetteColor.exitColor(silhouettePalette)
-          observable.notifyExit(data)
-
       override def draw(g: Graphics2D, observer: ImageObserver): Unit =
         if silhouetteColor.current != Styles.transparentColor then
           silhouette.foreach(silhouette =>
-            println(s"${silhouetteColor.current}")
             setupSilhouette(observer)
             val (pos, size) = (center, dimension).scaleOf(scale)
             g.drawImage(silhouette, pos.x, pos.y, size.width, size.height, observer)
