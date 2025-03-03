@@ -1,4 +1,4 @@
-package ulisse.entities.simulation
+package ulisse.entities.simulation.environments
 
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhenWithEffects

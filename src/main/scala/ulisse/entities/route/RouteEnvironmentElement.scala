@@ -3,8 +3,8 @@ package ulisse.entities.route
 import ulisse.entities
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.route.Tracks.{Track, TrackDirection}
-import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
-import ulisse.entities.simulation.Environments
+import ulisse.entities.simulation.environments.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
+import ulisse.entities.simulation.environments.Environment
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.*

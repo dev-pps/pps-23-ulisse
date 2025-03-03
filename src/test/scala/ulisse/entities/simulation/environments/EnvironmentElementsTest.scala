@@ -1,11 +1,11 @@
-package ulisse.entities.simulation
+package ulisse.entities.simulation.environments
 
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.entities.simulation.EnvironmentElements.TrainAgentEEWrapper.{findIn, leave}
-import ulisse.entities.simulation.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
+import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.{findIn, leave}
+import ulisse.entities.simulation.environments.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
 import ulisse.entities.train.TrainAgents.TrainAgent
 
 class EnvironmentElementsTest extends AnyWordSpec with Matchers:

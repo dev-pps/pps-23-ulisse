@@ -3,7 +3,7 @@ package ulisse.entities.station
 import cats.data.{Chain, NonEmptyChain}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import ulisse.entities.simulation.EnvironmentElements.TrainAgentsContainer
+import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentsContainer
 import ulisse.entities.station.Platforms.Platform
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906}
 import ulisse.entities.train.TrainAgents.TrainAgent
