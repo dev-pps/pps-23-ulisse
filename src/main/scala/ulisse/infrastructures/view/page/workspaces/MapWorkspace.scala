@@ -13,7 +13,9 @@ trait MapWorkspace extends Workspace
 /** Companion object of the [[MapWorkspace]]. */
 object MapWorkspace:
 
-  def apply(adapterManager: InputAdapterManager): MapWorkspace = MapWorkspaceImpl(adapterManager)
+  /** Creates a new instance of map workspace. */
+  def apply(adapterManager: InputAdapterManager): MapWorkspace =
+    MapWorkspaceImpl(adapterManager)
 
   /** Represents the map workspace of the application. */
   private final case class MapWorkspaceImpl(adapterManager: InputAdapterManager) extends MapWorkspace:
@@ -24,5 +26,7 @@ object MapWorkspace:
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(formManager.component) = Position.East
     workspace.revalidate()
+
+    formManager.stationForm
 
     export workspace.{component, revalidate}

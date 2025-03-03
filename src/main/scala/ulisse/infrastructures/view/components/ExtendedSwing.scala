@@ -2,6 +2,7 @@ package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.components.decorators.ImageEffects.{PictureEffect, SVGEffect}
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, FontEffect, ShapeEffect}
+import ulisse.infrastructures.view.components.styles.Styles
 
 import java.awt.FlowLayout
 import javax.swing.JLayeredPane
@@ -50,6 +51,13 @@ object ExtendedSwing:
   case class PicturePanel() extends Panel with PictureEffect
 
   case class SVGPanel() extends Panel with SVGEffect
+
+  /** Creates a button for the form, with the given text and rect. */
+  def createFormButtonWith(text: String, rect: Styles.Rect): SButton =
+    val button = SButton(text)
+    button.rect = rect
+    button.fontEffect = Styles.whiteFont
+    button
 
   case class SButton(label: String) extends Button(label) with ShapeEffect with FontEffect:
     focusPainted = false
