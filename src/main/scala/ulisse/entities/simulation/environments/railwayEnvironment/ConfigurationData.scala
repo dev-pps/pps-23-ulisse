@@ -10,7 +10,7 @@ trait ConfigurationData:
   def stations: Seq[StationEnvironmentElement]
   def routes: Seq[RouteEnvironmentElement]
   def timetables: Map[String, Seq[DynamicTimetable]]
-  
+
 object ConfigurationData:
   def apply(
       stations: Seq[StationEnvironmentElement],
@@ -21,7 +21,7 @@ object ConfigurationData:
     val sortedTimetablesByTrainId = orderedTimetablesByTrainId(trains.distinctBy(_.name),  timetables.distinctBy(_.id))
     val stationsEEInitialState = sortedTimetablesByTrainId.putTrainsInInitialStations(stations.distinctBy(_.name))
     val sortedTT = sortedTimetablesByTrainId.filter(t =>
-      stationsEEInitialState.flatMap(_.containers).flatMap(_.trains).contains(t._1)
+      stationsEEInitialState.collectTrains.contains(t._1)
     ).map(t => (t._1.name, t._2)).toMap
     ConfigurationDataImpl(stationsEEInitialState, routes.distinctBy(_.id), sortedTT)
 
@@ -66,7 +66,7 @@ object ConfigurationData:
       takeFirstTimetableForTrains(sortedTimetablesByTrainId).foldLeft(stationsEE)((stationsEE, tt) =>
         tt._2.flatMap(updateStationEE(stationsEE, _, tt._1)).getOrElse(stationsEE)
       )
-      
+
   private final case class ConfigurationDataImpl(
       stations: Seq[StationEnvironmentElement],
       routes: Seq[RouteEnvironmentElement],

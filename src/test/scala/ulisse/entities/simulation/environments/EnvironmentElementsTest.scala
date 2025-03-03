@@ -32,7 +32,8 @@ class EnvironmentElementsTest extends AnyWordSpec with Matchers:
   private val train = mock[TrainAgent]
   private val otherTrain = mock[TrainAgent]
   private val ee    = mock[TestTrainAgentEEWrapper]
-  private val tac1  = mock[TestTrainAgentsContainer]
+  private val ee2   = mock[TestTrainAgentEEWrapper]
+  private val tac  = mock[TestTrainAgentsContainer]
   private val tac2  = mock[TestTrainAgentsContainer]
 
   "TrainAgent" should:
@@ -53,9 +54,9 @@ class EnvironmentElementsTest extends AnyWordSpec with Matchers:
       train.findIn(Seq(ee)) shouldBe None
 
     "find all train in the environment" in:
-      when(tac1.trains).thenReturn(Seq(train))
+      when(tac.trains).thenReturn(Seq(train))
       when(tac2.trains).thenReturn(Seq(otherTrain))
-      when(ee.containers).thenReturn(Seq(tac1, tac2))
+      when(ee.containers).thenReturn(Seq(tac, tac2))
       ee.trains shouldBe Seq(train, otherTrain)
 
     "return empty list if the environment hasn't containers" in:
@@ -63,7 +64,26 @@ class EnvironmentElementsTest extends AnyWordSpec with Matchers:
       ee.trains shouldBe Seq()
 
     "return empty list if the environment hasn't trains" in:
-      when(tac1.trains).thenReturn(Seq())
+      when(tac.trains).thenReturn(Seq())
       when(tac2.trains).thenReturn(Seq())
-      when(ee.containers).thenReturn(Seq(tac1, tac2))
+      when(ee.containers).thenReturn(Seq(tac, tac2))
       ee.trains shouldBe Seq()
+      
+    "find all train in a Seq of environments" in:
+      when(tac.trains).thenReturn(Seq(train))
+      when(tac2.trains).thenReturn(Seq(otherTrain))
+      when(ee.containers).thenReturn(Seq(tac))
+      when(ee2.containers).thenReturn(Seq(tac2))
+      Seq(ee, ee2).collectTrains shouldBe Seq(train, otherTrain)
+    
+    "return empty list if the Seq of environments hasn't containers" in:
+      when(ee.containers).thenReturn(Seq())
+      when(ee2.containers).thenReturn(Seq())
+      Seq(ee, ee2).collectTrains shouldBe Seq()
+      
+    "return empty list if the Seq of environments hasn't trains" in:
+      when(tac.trains).thenReturn(Seq())
+      when(tac2.trains).thenReturn(Seq())
+      when(ee.containers).thenReturn(Seq(tac))
+      when(ee2.containers).thenReturn(Seq(tac2))
+      Seq(ee, ee2).collectTrains shouldBe Seq()
