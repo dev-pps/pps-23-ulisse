@@ -17,7 +17,7 @@ object EnvironmentElements:
     def trains: Seq[TrainAgent]
     def updateTrain(train: TrainAgent): Option[TAC]
     def removeTrain(train: TrainAgent): Option[TAC]
-    def contains(train: TrainAgent): Boolean = trains.exists(train.matchId)
+    def contains(train: TrainAgent): Boolean = trains.contains(train)
     def isEmpty: Boolean                     = trains.isEmpty
 
   /** Companion object for TrainAgentsContainer */

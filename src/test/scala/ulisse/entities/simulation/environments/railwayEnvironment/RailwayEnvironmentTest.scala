@@ -11,7 +11,11 @@ import ulisse.entities.route.RouteTest.departureCoordinate
 import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.route.Routes.{Route, TypeRoute}
 import ulisse.entities.route.Tracks.TrackDirection
-import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.{routesEE, stationsEE, timetables}
+import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.{
+  routesEE,
+  stationsEE,
+  timetables
+}
 import ulisse.entities.timetable.DynamicTimetableTest.*
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.station.StationTest.{stationA, stationB}
@@ -61,12 +65,15 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
       (0 until steps).foldLeft(env)((e, _) => e.doStep(dt))
 
   extension (agent: TrainAgent)
-    private def currentInfo(env: RailwayEnvironment, r: DynamicTimetable => Option[(Station, Station)]): Option[(DynamicTimetable, StationEnvironmentElement, RouteEnvironmentElement, TrackDirection)] =
+    private def currentInfo(
+        env: RailwayEnvironment,
+        r: DynamicTimetable => Option[(Station, Station)]
+    ): Option[(DynamicTimetable, StationEnvironmentElement, RouteEnvironmentElement, TrackDirection)] =
       for
         currentTT <- env.findCurrentTimeTableFor(agent)
-        route <- r(currentTT)
+        route     <- r(currentTT)
         _ = println(route)
-        see <- env.stations.find(_ == route._1)
+        see        <- env.stations.find(_ == route._1)
         (ree, dir) <- env.findRouteWithTravelDirection(route)
       yield (currentTT, see, ree, dir)
 
@@ -81,7 +88,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   "RailwayEnvironment" when:
     "created" should:
       val time = Time(8, 30, 0)
-      val env = RailwayEnvironment(time, cd)
+      val env  = RailwayEnvironment(time, cd)
       "setup initial time" in:
         env.time shouldBe time
       "maintain the configuration" in:
@@ -104,7 +111,12 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
     "doStep" should:
       "move train into route" in:
         trainAgent3905.currentInfo(env.doStep(1), _.currentRoute) match
-          case Some(tt: DynamicTimetable, see: StationEnvironmentElement, ree: RouteEnvironmentElement, dir: TrackDirection) =>
+          case Some(
+                tt: DynamicTimetable,
+                see: StationEnvironmentElement,
+                ree: RouteEnvironmentElement,
+                dir: TrackDirection
+              ) =>
             tt.stationNr(0).map(_._1).contains(ree.departure) shouldBe true
             tt.stationNr(1).map(_._1).contains(ree.arrival) shouldBe true
             ree.departure shouldBe see
@@ -119,7 +131,12 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
 
       "move train into station" in:
         trainAgent3905.currentInfo(env.doSteps(2), _.nextRoute) match
-          case Some(tt: DynamicTimetable, see: StationEnvironmentElement, ree: RouteEnvironmentElement, dir: TrackDirection) =>
+          case Some(
+                tt: DynamicTimetable,
+                see: StationEnvironmentElement,
+                ree: RouteEnvironmentElement,
+                dir: TrackDirection
+              ) =>
             tt.stationNr(1).map(_._1).contains(ree.departure) shouldBe true
             tt.stationNr(2).map(_._1).contains(ree.arrival) shouldBe true
             ree.departure shouldBe see
@@ -129,7 +146,11 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
           case _ => fail()
 
       "change schedule" in:
-        trainAgent3905.completeCurrentTimetable(env).flatMap(_.findCurrentTimeTableFor(trainAgent3905)) shouldBe Some(DynamicTimetable(timetable2))
+        trainAgent3905.completeCurrentTimetable(env).flatMap(_.findCurrentTimeTableFor(trainAgent3905)) shouldBe Some(
+          DynamicTimetable(timetable2)
+        )
 
       "complete schedules" in:
-        trainAgent3905.completeCurrentTimetable(env).flatMap(trainAgent3905.completeCurrentTimetable).flatMap(_.findCurrentTimeTableFor(trainAgent3905)) shouldBe None
+        trainAgent3905.completeCurrentTimetable(env).flatMap(trainAgent3905.completeCurrentTimetable).flatMap(
+          _.findCurrentTimeTableFor(trainAgent3905)
+        ) shouldBe None

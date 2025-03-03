@@ -142,7 +142,7 @@ class ConfigurationDataTest extends AnyWordSpec with Matchers:
           Seq(dynamicTimetable2, dynamicTimetable4, dynamicTimetable3, dynamicTimetable1)
         )
         cd.timetables.flatMap(_._2) shouldBe Seq(dynamicTimetable1, dynamicTimetable2, dynamicTimetable3)
-    
+
     "created empty" should:
       "have no stations" in:
         ConfigurationData.empty().stations.isEmpty shouldBe true
