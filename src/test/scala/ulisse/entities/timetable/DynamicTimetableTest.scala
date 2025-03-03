@@ -16,6 +16,7 @@ import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.{ClockTime, Time}
+import ulisse.entities.timetable.DynamicTimetableTest.*
 
 object DynamicTimetableTest:
   val timetable1: Timetable = defaultTimeTable(train3905)
@@ -48,16 +49,16 @@ object DynamicTimetableTest:
 
   def makeDynamicTimeTable(tt: Timetable): DynamicTimetable = DynamicTimetable(tt)
 
-class DynamicTimetableTest extends AnyWordSpec with Matchers:
-
-  extension (r: Option[(Station, Station)])
-    private def listify: Option[List[Station]] = r.map(t => List(t._1, t._2))
-
   extension (tt: Timetable)
     def stationNr(n: Int): Option[(Station, TrainStationTime)] = tt match
       case dtt: DynamicTimetable => dtt.effectiveTable.drop(n).headOption
-      case _                     => tt.table.drop(n).headOption
+      case _ => tt.table.drop(n).headOption
+      
+  extension (r: Option[(Station, Station)])
+    def listify: Option[List[Station]] = r.map(t => List(t._1, t._2))
 
+class DynamicTimetableTest extends AnyWordSpec with Matchers:
+  
   extension (dtt: DynamicTimetable)
     def travel(nStations: Int, delay: Option[ClockTime]): Option[DynamicTimetable] =
       (0 until nStations).foldLeft(Option(dtt)) { (dtt, _) =>

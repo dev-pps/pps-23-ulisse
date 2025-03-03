@@ -25,6 +25,9 @@ object ConfigurationData:
     ).map(t => (t._1.name, t._2)).toMap
     ConfigurationDataImpl(stationsEEInitialState, routes.distinctBy(_.id), sortedTimetables)
 
+  def empty(): ConfigurationData =
+    ConfigurationDataImpl(Seq.empty, Seq.empty, Map.empty)
+
   private def orderedTimetablesByTrainId(
       trains: Seq[TrainAgent],
       timetables: Seq[DynamicTimetable]
