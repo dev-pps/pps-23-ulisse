@@ -1,8 +1,8 @@
 package ulisse.infrastructures.view.manager
 
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
-import ulisse.infrastructures.view.page.forms.{Form, StationForm}
-import ulisse.infrastructures.view.page.forms.Form.{RouteForm, ScheduleForm}
+import ulisse.infrastructures.view.page.forms.Form.ScheduleForm
+import ulisse.infrastructures.view.page.forms.{Form, RouteForm, StationForm}
 
 import scala.swing.{Component, Orientation}
 

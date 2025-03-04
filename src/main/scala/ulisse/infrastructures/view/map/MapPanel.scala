@@ -14,7 +14,7 @@ import scala.swing.*
 /** Represent the map panel. */
 trait MapPanel extends Panel with EnhancedLook:
   /** Attach the station form to the map panel. */
-  def attachStationForm(event: ClickObserver[MapElement[Station]]): Unit
+  def attachClickStation(event: ClickObserver[MapElement[Station]]): Unit
 
   /** Draw the station on the screen. */
   def uploadStation(newStations: StationPorts.Input#SM): Unit
@@ -27,7 +27,7 @@ object MapPanel:
   private case class MapPanelImpl() extends MapPanel:
     private val stations = MapElements[Station](observable)
 
-    def attachStationForm(event: ClickObserver[MapElement[Station]]): Unit =
+    def attachClickStation(event: ClickObserver[MapElement[Station]]): Unit =
       stations.attachClick(event)
 
     override def uploadStation(newStations: StationPorts.Input#SM): Unit =
