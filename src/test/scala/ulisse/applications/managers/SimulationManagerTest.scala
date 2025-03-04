@@ -20,6 +20,7 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
   private val timeProvider  = mock[UtilityPorts.Output.TimeProviderPort]
   private val startTime     = 10L
   private val timeIncrement = 5L
+  private val sm            = SimulationManager.defaultBatchManager(timeProvider)
   private def setupTimeProvider(): Unit =
     val timeIterator = LazyList.iterate(startTime)(_ + timeIncrement).iterator
     when(timeProvider.currentTimeMillis()).thenAnswer((_: InvocationOnMock) => timeIterator.next())
@@ -83,17 +84,17 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
         newManager.simulationData.simulationEnvironment shouldBe environment
 
     "be running after starting simulation" in:
-      SimulationManager.defaultBatchManager(timeProvider).start().engine.running shouldBe true
+      sm.start().engine.running shouldBe true
 
     "not be running after stopping simulation" in:
-      SimulationManager.defaultBatchManager(timeProvider).start().stop().engine.running shouldBe false
+      sm.start().stop().engine.running shouldBe false
 
     "be running after restarting simulation" in:
-      SimulationManager.defaultBatchManager(timeProvider).start().stop().start().engine.running shouldBe true
+      sm.start().stop().start().engine.running shouldBe true
 
     "not be running after resetting simulation" in:
-      SimulationManager.defaultBatchManager(timeProvider).start().reset().engine.running shouldBe false
-      SimulationManager.defaultBatchManager(timeProvider).start().stop().reset().engine.running shouldBe false
+      sm.start().reset().engine.running shouldBe false
+      sm.start().stop().reset().engine.running shouldBe false
 
     "preserve state on stop" in:
       setupTimeProvider()
