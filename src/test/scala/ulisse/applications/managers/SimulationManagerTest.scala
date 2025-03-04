@@ -10,7 +10,7 @@ import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.applications.ports.UtilityPorts
 import ulisse.dsl.comparison.FieldsComparators.compareTo
 import ulisse.entities.simulation.data.Engine.*
-import ulisse.entities.simulation.data.Engine
+import ulisse.entities.simulation.data.{Engine, EngineConfiguration}
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 
 class SimulationManagerTest extends AnyWordSpec with Matchers:
@@ -34,38 +34,38 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
 
   "SimulationManager" should:
     "not be running when created" in:
-      SimulationManager.emptyBatchManager(timeProvider).engine.running shouldBe false
+      SimulationManager.defaultBatchManager(timeProvider).engine.running shouldBe false
 
     "be running after starting simulation" in:
-      SimulationManager.emptyBatchManager(timeProvider).start().engine.running shouldBe true
+      SimulationManager.defaultBatchManager(timeProvider).start().engine.running shouldBe true
 
     "not be running after stopping simulation" in:
-      SimulationManager.emptyBatchManager(timeProvider).start().stop().engine.running shouldBe false
+      SimulationManager.defaultBatchManager(timeProvider).start().stop().engine.running shouldBe false
 
     "be running after restarting simulation" in:
-      SimulationManager.emptyBatchManager(timeProvider).start().stop().start().engine.running shouldBe true
+      SimulationManager.defaultBatchManager(timeProvider).start().stop().start().engine.running shouldBe true
 
     "not be running after resetting simulation" in:
-      SimulationManager.emptyBatchManager(timeProvider).start().reset().engine.running shouldBe false
-      SimulationManager.emptyBatchManager(timeProvider).start().stop().reset().engine.running shouldBe false
+      SimulationManager.defaultBatchManager(timeProvider).start().reset().engine.running shouldBe false
+      SimulationManager.defaultBatchManager(timeProvider).start().stop().reset().engine.running shouldBe false
 
     "preserve state on stop" in:
       setupTimeProvider()
-      val manager       = SimulationManager.emptyBatchManager(timeProvider).start().doStep()
+      val manager       = SimulationManager.defaultBatchManager(timeProvider).start().doStep()
       val pausedManager = manager.stop()
       pausedManager.engine compareTo manager.engine ignoring EngineStateField.Running shouldBeBoolean true
       pausedManager.simulationData shouldBe manager.simulationData
 
     "clear state on reset" in:
       setupTimeProvider()
-      val manager      = SimulationManager.emptyBatchManager(timeProvider)
+      val manager      = SimulationManager.defaultBatchManager(timeProvider)
       val resetManager = manager.start().doStep().reset()
       resetManager.engine shouldBe manager.engine
       resetManager.simulationData shouldBe manager.simulationData
 
     "update state on step" in:
       setupTimeProvider()
-      val manager        = SimulationManager.emptyBatchManager(timeProvider).start()
+      val manager        = SimulationManager.defaultBatchManager(timeProvider).start()
       val updatedManager = manager.doStep()
       updatedManager.engine compareTo manager.engine ignoring EngineStateField.LastUpdate shouldBeBoolean true
       updatedManager.engine compareTo manager.engine considering EngineStateField.LastUpdate shouldBeBoolean false
@@ -76,7 +76,7 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
       for step <- 2 to 100 do
         setupTimeProvider()
         val realUpdate     = step - 1
-        val manager        = SimulationManager.emptyBatchManager(timeProvider).start()
+        val manager        = SimulationManager.defaultBatchManager(timeProvider).start()
         val updatedManager = repeatDoStep(manager, step)
         updatedManager.engine compareTo manager.engine ignoring (EngineStateField.LastUpdate, EngineStateField.LastDelta, EngineStateField.ElapsedCycleTime) shouldBeBoolean true
         updatedManager.engine compareTo manager.engine considering EngineStateField.LastUpdate shouldBeBoolean false
@@ -94,7 +94,7 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
       val cycleTimeStep = SimulationManager.calculateCycleTimeStep(cps)
       for step <- 2 to 100 do
         setupTimeProvider()
-        val manager        = SimulationManager.emptyTimedManager(timeProvider, cps).start()
+        val manager        = SimulationManager.configuredManager(timeProvider, EngineConfiguration.withCps(cps)).start()
         val updatedManager = repeatDoStep(manager, step)
         val realUpdate     = step - 1
         val expectedStep   = (updatedManager.simulationData.secondElapsed / cycleTimeStep).toInt

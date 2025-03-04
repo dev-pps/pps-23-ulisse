@@ -15,46 +15,38 @@ trait SimulationManager:
   def stop(): SimulationManager
   def reset(): SimulationManager
   def doStep(): SimulationManager
+  def withNotificationService(notificationService: Option[SimulationPorts.Output]): SimulationManager
 
 object SimulationManager:
   def apply(
       notificationService: Option[SimulationPorts.Output],
       timeProvider: UtilityPorts.Output.TimeProviderPort,
-      cyclesPerSecond: Option[Int]
+      engineConfiguration: EngineConfiguration
   ): SimulationManager =
     SimulationManagerImpl(
-      Engine.emptyWithConfiguration(EngineConfiguration.withCyclesPerSecond(cyclesPerSecond)),
+      Engine.emptyWithConfiguration(engineConfiguration),
       SimulationData.empty(),
       notificationService,
       timeProvider
     )
 
+  def configuredManager(
+      timeProvider: UtilityPorts.Output.TimeProviderPort,
+      engineConfiguration: EngineConfiguration
+  ): SimulationManager =
+    SimulationManager(None, timeProvider, engineConfiguration)
+
+  def defaultTimedManager(
+      timeProvider: UtilityPorts.Output.TimeProviderPort
+  ): SimulationManager = SimulationManager(None, timeProvider, EngineConfiguration.defaultTimed())
+
+  def defaultBatchManager(
+      timeProvider: UtilityPorts.Output.TimeProviderPort
+  ): SimulationManager = SimulationManager(None, timeProvider, EngineConfiguration.defaultBatch())
+
   /** Calculate how often a cycle should occur in milliseconds. */
   def calculateCycleTimeStep(cps: Int): Double =
     1.0 / cps * 1000
-
-  def timedManager(
-      notificationService: SimulationPorts.Output,
-      timeProvider: UtilityPorts.Output.TimeProviderPort,
-      cyclesPerSecond: Int
-  ): SimulationManager = apply(Some(notificationService), timeProvider, Some(cyclesPerSecond))
-
-  def emptyTimedManager(timeProvider: UtilityPorts.Output.TimeProviderPort, cyclesPerSecond: Int): SimulationManager =
-    apply(None, timeProvider, Some(cyclesPerSecond))
-
-  def batchManager(
-      notificationService: SimulationPorts.Output,
-      timeProvider: UtilityPorts.Output.TimeProviderPort
-  ): SimulationManager = apply(Some(notificationService), timeProvider, None)
-
-  def emptyBatchManager(timeProvider: UtilityPorts.Output.TimeProviderPort): SimulationManager =
-    apply(None, timeProvider, None)
-
-  extension (simulationManager: SimulationManager)
-    def withNotificationService(notificationService: SimulationPorts.Output): SimulationManager =
-      simulationManager match
-        case SimulationManagerImpl(engineState, simulationData, _, timeProvider) =>
-          SimulationManagerImpl(engineState, simulationData, Some(notificationService), timeProvider)
 
   private case class SimulationManagerImpl(
       engine: Engine,
@@ -63,14 +55,17 @@ object SimulationManager:
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ) extends SimulationManager:
     override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Option[SimulationManager] =
-      Some(copy(engine.configuration = EngineConfiguration(stepSize, cyclesPerSecond)))
+      EngineConfiguration.createCheckedConfiguration(stepSize, cyclesPerSecond).map(ec =>
+        copy(engine.configuration = ec)
+      )
     override def setupEnvironment(environment: RailwayEnvironment): SimulationManager =
       copy(simulationData = SimulationData.withEnvironment(environment))
     override def start(): SimulationManager =
       copy(engine.running = true)
     override def stop(): SimulationManager  = copy(engine.running = false)
     override def reset(): SimulationManager = copy(engine.reset(), simulationData.reset())
-
+    override def withNotificationService(notificationService: Option[SimulationPorts.Output]): SimulationManager =
+      copy(notificationService = notificationService)
     private def updateSimulationData(engineData: EngineState): SimulationData =
       simulationData
         .increaseStepByOne()

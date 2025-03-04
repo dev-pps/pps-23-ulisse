@@ -6,10 +6,11 @@ import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager, TimetableManagers}
-import ulisse.entities.simulation.data.SimulationData
+import ulisse.entities.simulation.data.{EngineConfiguration, SimulationData}
 import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 
+import java.lang.module.Configuration
 import scala.compiletime.{erasedValue, summonInline}
 
 /** Application state that contains all managers. */
@@ -118,7 +119,7 @@ object AppState:
       TrainManager.empty(),
       TechnologyManager.empy(),
       TimetableManagers.empty(),
-      SimulationManager.emptyBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
+      SimulationManager.defaultBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
     )
 
     override def updateStation(update: StationManager => StationManager): AppState =
