@@ -17,7 +17,8 @@ given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
 import scala.swing.BorderPanel.Position
 
 /** Represents the map workspace of the application. */
-trait MapWorkspace extends Workspace
+trait MapWorkspace extends Workspace:
+  val mapPanel: MapPanel
 
 /** Companion object of the [[MapWorkspace]]. */
 object MapWorkspace:
@@ -33,7 +34,7 @@ object MapWorkspace:
       val future = adapter.onOkClick(data.name, data.x, data.y, data.tracks, Option.empty)
       future.onComplete(_ map:
         case Left(error)     => println(error)
-        case Right(stations) => println(stations)
+        case Right(stations) => workspace.mapPanel.drawStation(stations)
       )
 
   /** Represents the deletion station event. */
@@ -44,8 +45,9 @@ object MapWorkspace:
   /** Represents the map workspace of the application. */
   private final case class MapWorkspaceImpl(adapterManager: InputAdapterManager) extends MapWorkspace:
     private val workspace   = BaseWorkspace()
-    private val mapPanel    = MapPanel.empty()
     private val formManager = FormManager.createMap()
+
+    override val mapPanel: MapPanel = MapPanel()
 
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(formManager.component) = Position.East

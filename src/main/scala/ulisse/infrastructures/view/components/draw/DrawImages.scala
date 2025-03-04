@@ -15,7 +15,7 @@ object DrawImages:
   export DrawImage._
 
   /** Default dimension for images. */
-  val defaultDimension: Dimension = new Dimension(30, 30)
+  private val defaultDimension: Dimension = new Dimension(30, 30)
 
   /** Default scale for silhouette. */
   private val defaultScaleSilhouette: Float = 1.4f
@@ -45,6 +45,18 @@ object DrawImages:
 
     /** Draw the image on the screen. */
     def draw(g: Graphics2D, observer: ImageObserver): Unit
+
+    /** Attach the image to the observable. */
+    def attachOn(observable: Observable[MouseEvent]): Unit =
+      observable.attachMove(this)
+      observable.attachClick(this)
+      observable.attachRelease(this)
+
+    /** Detach the image from the observable. */
+    def detachFrom(observable: Observable[MouseEvent]): Unit =
+      observable.detachMove(this)
+      observable.detachClick(this)
+      observable.detachRelease(this)
 
   /** Companion object for [[DrawImage]]. */
   object DrawImage:

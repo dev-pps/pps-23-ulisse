@@ -2,40 +2,33 @@ package ulisse.infrastructures.view.map
 
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinate
-import ulisse.infrastructures.view.common.{ImagePath, Observers}
+import ulisse.entities.station.Station
+import ulisse.infrastructures.view.common.ImagePath
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
-import ulisse.infrastructures.view.components.draw.DrawImages
 
 import java.awt.geom.AffineTransform
 import scala.math.{abs, sqrt}
 import scala.swing.*
 
+/** Represent the map panel. */
 trait MapPanel extends Panel with EnhancedLook:
-  def drawStation(stations: StationPorts.Input#SM): Unit
+  /** Draw the station on the screen. */
+  def drawStation(newStations: StationPorts.Input#SM): Unit
 
+/** Companion object for [[MapPanel]]. */
 object MapPanel:
-  def empty(): MapPanel = MapPanelImpl()
+  /** Create a new [[MapPanel]]. */
+  def apply(): MapPanel = MapPanelImpl()
 
   private case class MapPanelImpl() extends MapPanel:
-    opaque = false
+    private val stations = MapElements[Station](observable)
 
-    private val itemCollection = MapItemsCollection()
-    private val mapObservable  = Observers.createObservable[Point]
-
-    private val image = DrawImages.createAt(ImagePath.station, new Point(500, 500))
-
-    attachMove(image)
-    attachClick(image)
-    attachRelease(image)
-
-    export itemCollection.{attach as attachItem, detach as detachItem}
-
-
-    override def drawStation(stations: StationPorts.Input#SM): Unit = ()
+    override def drawStation(newStations: StationPorts.Input#SM): Unit =
+      stations.update(newStations.map(MapElement.createStation(_, ImagePath.station)))
+      updateGraphics()
 
     override protected def paintLook(g: Graphics2D): Unit =
-      image.draw(g, peer)
-      itemCollection.draw(g, peer)
+      stations.draw(g, peer)
       super.paintLook(g)
 
 //    override protected def paintLook(g: Graphics2D): Unit =
