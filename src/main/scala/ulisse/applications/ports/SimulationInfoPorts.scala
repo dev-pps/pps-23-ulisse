@@ -2,16 +2,21 @@ package ulisse.applications.ports
 
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
-import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
+import ulisse.entities.station.StationEnvironments.{StationEnvironmentElement, StationEnvironmentInfo}
 import ulisse.entities.station.Station
 import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentInfo}
 import ulisse.entities.train.Trains.Train
 
 import scala.concurrent.Future
 
+/** Ports for Simulation Info */
 object SimulationInfoPorts:
   trait Input:
-    def stationInfo(s: Station): Future[Option[StationEnvironmentElement]]
+    /** Get station info */
+    def stationInfo(s: Station): Future[Option[StationEnvironmentInfo]]
+
+    /** Get route info */
     def routeInfo(r: Route): Future[Option[RouteEnvironmentElement]]
-    // TODO timetables are not really implemented => default empty list
+
+    /** Get train info */
     def trainInfo(t: Train): Future[Option[TrainAgentInfo]]

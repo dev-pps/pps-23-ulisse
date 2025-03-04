@@ -3,7 +3,7 @@ package ulisse.applications
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.applications.event.SimulationEventData
+import ulisse.applications.event.SimulationManagers
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
@@ -45,7 +45,7 @@ object AppStateTest:
       TimetableManager
   ) =
     (_, _, _, _) => (stationManager, routeManager, trainManager, timetableManager)
-  val initSimulation: SimulationEventData => SimulationManager = _ => simulationManager
+  val initSimulation: SimulationManagers => SimulationManager = _ => simulationManager
 
 class AppStateTest extends AnyFlatSpec with Matchers:
   import AppStateTest.*
@@ -73,7 +73,7 @@ class AppStateTest extends AnyFlatSpec with Matchers:
 
   "read simulation manager" should "be a function that not update manager" in:
     val initSimulationManager = appState.simulationManager
-    appState.readSimulation(_ => ())
+    appState.readSimulationData(_ => ())
     appState.simulationManager mustBe initSimulationManager
 
   "update station manager" should "update manager" in:

@@ -6,9 +6,10 @@ import ulisse.entities.station.Platforms.Platform
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.{given_Conversion_Option_Option, when}
+import ulisse.utils.Times.Time
 
 object StationEnvironments:
-  final case class StationEnvironmentInfo(stationEnvironmentElement: StationEnvironmentElement, cumulativeDelay: Double)
+  final case class StationEnvironmentInfo(stationEnvironmentElement: StationEnvironmentElement, cumulativeDelay: Time)
 
   /** Defines a station for simulation. */
   trait StationEnvironmentElement extends Station with TrainAgentEEWrapper[StationEnvironmentElement]:

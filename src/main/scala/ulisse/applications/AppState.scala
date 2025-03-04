@@ -1,7 +1,7 @@
 package ulisse.applications
 
 import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
-import ulisse.applications.event.SimulationEventData
+import ulisse.applications.event.SimulationManagers
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
@@ -49,7 +49,7 @@ trait AppState:
   def readTimetable(read: TimetableManager => Unit): AppState = { read(timetableManager); this }
 
   /** Read [[SimulationManager]]. */
-  def readSimulation(read: SimulationData => Unit): AppState = { read(simulationManager.simulationData); this }
+  def readSimulationData(read: SimulationData => Unit): AppState = { read(simulationManager.simulationData); this }
 
   /** Update [[StationManager]]. */
   def updateStation(update: StationManager => StationManager): AppState
@@ -94,7 +94,7 @@ trait AppState:
   ) => (StationManager, RouteManager, TrainManager, TimetableManager)): AppState
 
   /** update [[SimulationManager]], with a function that takes a [[SimulationManager]] and a [[StationManager]]. */
-  def initSimulation(update: SimulationEventData => SimulationManager): AppState
+  def initSimulation(update: SimulationManagers => SimulationManager): AppState
 
 object AppState:
   /** Create new application state with empty managers. */
@@ -168,7 +168,7 @@ object AppState:
         update(stationManager, routeManager, trainManager, timetableManager)
       copy(newStation, newRoute, newTrain, timetableManager = newTimetable)
 
-    override def initSimulation(update: SimulationEventData => SimulationManager): AppState =
+    override def initSimulation(update: SimulationManagers => SimulationManager): AppState =
       copy(simulationManager =
-        update(SimulationEventData(simulationManager, stationManager, routeManager, trainManager, timetableManager))
+        update(SimulationManagers(simulationManager, stationManager, routeManager, trainManager, timetableManager))
       )

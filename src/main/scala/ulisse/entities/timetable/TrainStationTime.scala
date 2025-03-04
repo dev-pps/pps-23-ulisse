@@ -14,6 +14,9 @@ object TrainStationTime:
   def apply(arriving: Option[ClockTime], waitTime: Option[WaitTime], departure: Option[ClockTime]): TrainStationTime =
     TrainStationTimeImpl(arriving, waitTime, departure)
 
+  def unapply(arg: TrainStationTime): Option[(Option[ClockTime], Option[WaitTime], Option[ClockTime])] =
+    Some((arg.arriving, arg.waitTime, arg.departure))
+
   private case class TrainStationTimeImpl(
       arriving: Option[ClockTime],
       waitTime: Option[WaitTime],

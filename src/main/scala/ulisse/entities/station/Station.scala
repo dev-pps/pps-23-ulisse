@@ -8,17 +8,15 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
 
 /** Defines a `Station`, a place where trains can stop. */
 trait Station:
-  val id: Int = hashCode()
-  val name: String
-  val coordinate: Coordinate
-  val numberOfTracks: Int
+  def id: Int = hashCode()
+  def name: String
+  def coordinate: Coordinate
+  def numberOfTracks: Int
 
   override def equals(that: Any): Boolean =
     that match
       case s: Station =>
-        id == s.id &&
-        name == s.name &&
-        coordinate == s.coordinate
+        id == s.id
       case _ => false
 
   override def hashCode(): Int = (name, coordinate).##
