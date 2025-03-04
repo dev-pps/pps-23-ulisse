@@ -1,7 +1,6 @@
 package ulisse.applications.ports
 
 import ulisse.entities.simulation.data.{Engine, SimulationData}
-import ulisse.utils.Times.{ClockTime, Time}
 
 import scala.concurrent.Future
 
@@ -10,7 +9,7 @@ object SimulationPorts:
   trait Output:
     /** Notify that a step has been completed */
     def stepNotification(data: SimulationData): Unit
-    
+
     /** Notify that the simulation has ended */
     def simulationEnded(data: SimulationData): Unit
 

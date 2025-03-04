@@ -36,10 +36,10 @@ object SimulationEventQueue:
 
   private case class SimulationEventQueueImpl(events: LinkedBlockingQueue[AppState => AppState])
       extends SimulationEventQueue:
-    
+
     override def readSimulationEnvironment(update: RailwayEnvironment => Unit): Unit =
       events.offer(_ readSimulationData (sd => update(sd.simulationEnvironment)))
-      
+
     override def setupSimulationManager(update: SimulationManagers => SimulationManager): Unit =
       events.offer(_ setupSimulation update)
 

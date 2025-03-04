@@ -9,15 +9,19 @@ import ulisse.infrastructures.view.simulation.SimulationPage
 
 class SimulationNotificationAdapterTest extends AnyWordSpec with Matchers:
 
-  private val simulationData                = mock[SimulationData]
-  private val mockedSimulationPage          = mock[SimulationPage]
-  private val simulationNotificationAdapter = SimulationNotificationAdapter(mockedSimulationPage)
+  private val simulationData            = mock[SimulationData]
+  private val mockedSimulationPage      = mock[SimulationPage]
+  private val otherMockedSimulationPage = mock[SimulationPage]
+  private val simulationNotificationAdapter =
+    SimulationNotificationAdapter(mockedSimulationPage, otherMockedSimulationPage)
 
   "SimulationNotificationAdapter" should:
-    "call updateData on SimulationPage when stepNotification is triggered" in:
+    "call updateData on every SimulationPage when stepNotification is triggered" in:
       simulationNotificationAdapter.stepNotification(simulationData)
       verify(mockedSimulationPage).updateData(simulationData)
+      verify(otherMockedSimulationPage).updateData(simulationData)
 
-    "call endSimulation on SimulationPage when simulationEnded is triggered" in:
+    "call endSimulation on every SimulationPage when simulationEnded is triggered" in:
       simulationNotificationAdapter.simulationEnded(simulationData)
       verify(mockedSimulationPage).endSimulation(simulationData)
+      verify(otherMockedSimulationPage).endSimulation(simulationData)
