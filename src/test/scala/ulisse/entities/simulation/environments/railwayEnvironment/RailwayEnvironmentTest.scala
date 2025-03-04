@@ -31,7 +31,6 @@ import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.Time
 
 import scala.Seq
-
 class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val dt = 1
 
