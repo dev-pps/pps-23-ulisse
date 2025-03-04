@@ -4,6 +4,7 @@ import cats.data.NonEmptyChain
 import cats.syntax.all.*
 import ulisse.entities.Technology
 import ulisse.entities.station.Station
+import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.ErrorMessage
 import ulisse.utils.ValidationUtils.*
 
@@ -20,14 +21,22 @@ object Routes:
 
   /** Errors that can be generated during route creation */
   enum Errors(val text: String) extends ErrorMessage(text):
-    case FewRails     extends Errors("Rails count must be greater than 0")
+    /** Rails count must be greater than 0 */
+    case FewRails extends Errors("Rails count must be greater than 0")
+
+    /** Rails count must be less */
     case TooManyRails extends Errors("Rails count must be less")
-    case TooShort     extends Errors("Route length must be greater than 0")
+
+    /** Route already exist */
+    case TooShort extends Errors("Route length must be greater than 0")
 
   /** Type of route */
   enum RouteType(val technology: Technology):
+    /** Normal route */
     case Normal extends RouteType(Technology("Normal", 100))
-    case AV     extends RouteType(Technology("AV", 300))
+
+    /** High-speed route */
+    case AV extends RouteType(Technology("AV", 300))
 
   /** Represent a route between two stations */
   trait Route:
@@ -48,6 +57,22 @@ object Routes:
 
     /** Length of route */
     val length: Double
+
+    /** Check if a station is the departure station */
+    def isDeparture(station: Station): Boolean = departure equals station
+
+    /** Check if a station is the arrival station */
+    def isArrival(station: Station): Boolean = arrival equals station
+
+    /** Check if route is between two stations */
+    def isPath(other: Station, arrival: Station): Boolean =
+      (this.departure equals departure) && (this.arrival equals arrival)
+
+    /** Check if route is of a certain type */
+    def isTechnology(technology: Technology): Boolean = typology.technology equals technology
+
+    /** Check if route is of a certain train technology */
+    def isTrainTechnologyAcceptable(train: Train): Boolean = train.techType isCompatible typology.technology
 
     /** Update departure station */
     def withDeparture(departure: Station): Either[RouteError, Route]
@@ -70,7 +95,7 @@ object Routes:
 
     /** Check if two routes are equals */
     def checkAllField(other: Route): Boolean =
-      departure.equals(other.departure) && arrival.equals(other.arrival) && typology == other.typology &&
+      (departure equals other.departure) && (arrival equals other.arrival) && typology == other.typology &&
         railsCount == other.railsCount && length == other.length
 
   /** Companion object of [[Route]] */
@@ -84,7 +109,7 @@ object Routes:
     }
 
     private def validateLength(length: Double, departure: Station, arrival: Station): Either[RouteError, Double] =
-      length.validateChain((_ >= departure.coordinate.distance(arrival.coordinate), Errors.TooShort))
+      length.validateChain((_ >= (departure.coordinate distance arrival.coordinate), Errors.TooShort))
 
     private def validateRoute(
         departure: Station,
