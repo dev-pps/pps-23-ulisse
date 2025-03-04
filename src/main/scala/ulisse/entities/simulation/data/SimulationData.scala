@@ -15,11 +15,11 @@ trait SimulationData:
 object SimulationData:
   def apply(step: Int, secondElapsed: Double, simulationEnvironment: RailwayEnvironment): SimulationData =
     SimulationDataImpl(step, secondElapsed, simulationEnvironment, simulationEnvironment)
-  def withEnvironment(environment: RailwayEnvironment): SimulationData =
-    SimulationData(0, 0, environment)
-  def empty(): SimulationData = withEnvironment(RailwayEnvironment.empty())
+  def empty(): SimulationData = SimulationData(0, 0, RailwayEnvironment.empty())
 
   extension (simulationData: SimulationData)
+    def withEnvironment(environment: RailwayEnvironment): SimulationData =
+      SimulationData(simulationData.step, simulationData.secondElapsed, environment)
     def cumulativeDelay: Time =
       Time.secondsToOverflowTime(
         simulationData.simulationEnvironment
@@ -53,4 +53,4 @@ private final case class SimulationDataImpl(
 ) extends SimulationData:
   override def increaseStepByOne(): SimulationData                    = copy(step = step + 1)
   override def increaseSecondElapsedBy(delta: Double): SimulationData = copy(secondElapsed = secondElapsed + delta)
-  override def reset(): SimulationData = SimulationData.withEnvironment(initialSimulationEnvironment)
+  override def reset(): SimulationData = SimulationData.empty().withEnvironment(initialSimulationEnvironment)
