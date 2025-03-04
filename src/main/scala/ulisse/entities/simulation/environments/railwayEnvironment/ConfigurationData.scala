@@ -29,6 +29,10 @@ object ConfigurationData:
   def empty(): ConfigurationData =
     ConfigurationDataImpl(Seq.empty, Seq.empty, Map.empty)
 
+  extension (configurationData: ConfigurationData)
+    def trains: Seq[TrainAgent] =
+      configurationData.stations.collectTrains ++ configurationData.routes.collectTrains
+
   private def orderedTimetablesByTrainId(
       trains: Seq[TrainAgent],
       timetables: Seq[DynamicTimetable]

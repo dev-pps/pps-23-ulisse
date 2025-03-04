@@ -21,13 +21,13 @@ final case class SimulationManagers(
 /** Event queue to update the simulation. */
 trait SimulationEventQueue:
   /** Add an event to read simulation environment. */
-  def readSimulationEnvironment(update: RailwayEnvironment => Unit): Unit
+  def addReadSimulationEnvironmentEvent(update: RailwayEnvironment => Unit): Unit
 
   /** Add an event to create a simulation. */
-  def setupSimulationManager(update: SimulationManagers => SimulationManager): Unit
+  def addSetupSimulationManagerEvent(update: SimulationManagers => SimulationManager): Unit
 
   /** Add an event to update the simulation. */
-  def updateSimulationManager(update: SimulationManager => SimulationManager): Unit
+  def addUpdateSimulationManagerEvent(update: SimulationManager => SimulationManager): Unit
 
 /** Companion object for the [[SimulationEventQueue]] trait. */
 object SimulationEventQueue:
@@ -37,11 +37,11 @@ object SimulationEventQueue:
   private case class SimulationEventQueueImpl(events: LinkedBlockingQueue[AppState => AppState])
       extends SimulationEventQueue:
 
-    override def readSimulationEnvironment(update: RailwayEnvironment => Unit): Unit =
+    override def addReadSimulationEnvironmentEvent(update: RailwayEnvironment => Unit): Unit =
       events.offer(_ readSimulationData (sd => update(sd.simulationEnvironment)))
 
-    override def setupSimulationManager(update: SimulationManagers => SimulationManager): Unit =
+    override def addSetupSimulationManagerEvent(update: SimulationManagers => SimulationManager): Unit =
       events.offer(_ setupSimulation update)
 
-    override def updateSimulationManager(update: SimulationManager => SimulationManager): Unit =
+    override def addUpdateSimulationManagerEvent(update: SimulationManager => SimulationManager): Unit =
       events.offer(_ updateSimulation update)

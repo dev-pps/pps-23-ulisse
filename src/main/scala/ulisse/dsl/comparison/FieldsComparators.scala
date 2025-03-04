@@ -7,13 +7,13 @@ object FieldsComparators:
     def values: Seq[T]
 
   trait FieldComparator[T <: Field[T, O], O <: Any]:
-    def compare(engines: List[O], ignoredFields: Seq[T]): Boolean
+    def compare(objects: List[O], ignoredFields: Seq[T]): Boolean
 
   given [T <: Field[T, O], O <: Any]: Conversion[ComparisonBuilder[T, O], Boolean] with
     def apply(builder: ComparisonBuilder[T, O]): Boolean =
       builder.compare
 
-  case class ComparisonBuilder[T <: Field[T, O], O <: Any](engines: List[O], ignoredFields: Seq[T])(using
+  case class ComparisonBuilder[T <: Field[T, O], O <: Any](objects: List[O], ignoredFields: Seq[T])(using
       fieldComparator: FieldComparator[T, O]
   ):
     def ignoring(field: T, fields: T*): ComparisonBuilder[T, O] =
@@ -22,12 +22,12 @@ object FieldsComparators:
     def considering(field: T, fields: T*): ComparisonBuilder[T, O] =
       copy(ignoredFields = field.values.filterNot((fields :+ field).contains).toIndexedSeq)
 
-    def andTo(nextEngine: O): ComparisonBuilder[T, O] =
-      copy(engines = nextEngine +: engines)
+    def andTo(nextObj: O): ComparisonBuilder[T, O] =
+      copy(objects = nextObj +: objects)
 
     def compare: Boolean =
-      fieldComparator.compare(engines, ignoredFields)
+      fieldComparator.compare(objects, ignoredFields)
 
-  extension [T <: Field[T, O], O <: Any](engineState: O)
-    def compareTo(otherEngineState: O)(using fieldComparator: FieldComparator[T, O]): ComparisonBuilder[T, O] =
-      ComparisonBuilder(List(engineState, otherEngineState), Seq[T]())
+  extension [T <: Field[T, O], O <: Any](obj: O)
+    def compareTo(otherObj: O)(using fieldComparator: FieldComparator[T, O]): ComparisonBuilder[T, O] =
+      ComparisonBuilder(List(obj, otherObj), Seq[T]())

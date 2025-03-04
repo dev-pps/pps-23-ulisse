@@ -92,16 +92,16 @@ class EventQueueTest extends AnyFlatSpec with Matchers:
     states.lastOption mustBe Some(initialState.updateTimetable(updateTimetable))
 
   "add read simulation event" should "update simulation manager" in:
-    eventQueue.readSimulationEnvironment(_ => ())
+    eventQueue.addReadSimulationEnvironmentEvent(_ => ())
     val states = updateState()
     states.lastOption mustBe Some(initialState)
 
   "add create simulation event" should "update simulation manager" in:
-    eventQueue.setupSimulationManager(setupSimulation)
+    eventQueue.addSetupSimulationManagerEvent(setupSimulation)
     val states = updateState()
     states.lastOption mustBe Some(initialState.setupSimulation(setupSimulation))
 
   "add update simulation event" should "update simulation manager" in:
-    eventQueue.updateSimulationManager(updateSimulation)
+    eventQueue.addUpdateSimulationManagerEvent(updateSimulation)
     val states = updateState()
     states.lastOption mustBe Some(initialState.setupSimulation(setupSimulation))

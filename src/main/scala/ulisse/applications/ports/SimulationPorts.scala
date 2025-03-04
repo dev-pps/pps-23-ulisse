@@ -30,4 +30,4 @@ object SimulationPorts:
     def stop(): Future[Engine]
 
     /** Reset simulation environment to the initialized state maintaining the engine configuration */
-    def reset(): Future[Engine]
+    def reset(): Future[(Engine, SimulationData)]
