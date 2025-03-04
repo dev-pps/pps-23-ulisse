@@ -48,7 +48,7 @@ object SimulationManager:
   def calculateCycleTimeStep(cps: Int): Double =
     1.0 / cps * 1000
 
-  private case class SimulationManagerImpl(
+  private[this] case class SimulationManagerImpl(
       engine: Engine,
       simulationData: SimulationData,
       notificationService: Option[SimulationPorts.Output],
