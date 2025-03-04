@@ -5,13 +5,13 @@ import ulisse.adapters.input.StationEditorAdapter
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.manager.FormManager
 import ulisse.infrastructures.view.map.MapPanel
+import ulisse.infrastructures.view.page.forms.Form.RouteForm
 import ulisse.infrastructures.view.page.forms.StationForm
 import ulisse.infrastructures.view.page.forms.StationForm.StationFormData
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 
 import scala.concurrent.ExecutionContext
 import scala.swing.Swing
-import scala.swing.event.MouseEvent
 
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
   Swing.onEDT(runnable.run())
@@ -20,7 +20,14 @@ import scala.swing.BorderPanel.Position
 
 /** Represents the map workspace of the application. */
 trait MapWorkspace extends Workspace:
+  /** The map panel of the workspace. */
   val mapPanel: MapPanel
+
+  /** The station form of the workspace. */
+  val stationForm: StationForm
+
+  /** The route form of the workspace. */
+  val routeForm: RouteForm
 
 /** Companion object of the [[MapWorkspace]]. */
 object MapWorkspace:
@@ -35,8 +42,10 @@ object MapWorkspace:
     override def onClick(data: StationFormData): Unit =
       val future = adapter.onOkClick(data.name, data.x, data.y, data.tracks, Option.empty)
       future.onComplete(_ map:
-        case Left(error)     => println(error)
-        case Right(stations) => workspace.mapPanel.drawStation(stations)
+        case Left(error) => println(error)
+        case Right(stations) =>
+          workspace.mapPanel.uploadStation(stations)
+          workspace.mapPanel.attachStationForm(StationForm.TakeStationFromMapEvent(workspace.stationForm))
       )
 
   /** Represents the deletion station event. */
@@ -49,7 +58,9 @@ object MapWorkspace:
     private val workspace   = BaseWorkspace()
     private val formManager = FormManager.createMap()
 
-    override val mapPanel: MapPanel = MapPanel()
+    override val mapPanel: MapPanel       = MapPanel()
+    override val stationForm: StationForm = formManager.stationForm
+    override val routeForm: RouteForm     = formManager.routeForm
 
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(formManager.component) = Position.East
