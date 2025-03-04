@@ -4,12 +4,13 @@ import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.TrainAgent
+import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.updateWhenWithEffects
 
 trait ConfigurationData:
   def stations: Seq[StationEnvironmentElement]
   def routes: Seq[RouteEnvironmentElement]
-  def timetables: Map[String, Seq[DynamicTimetable]]
+  def timetables: Map[Train, Seq[DynamicTimetable]]
 
 object ConfigurationData:
   def apply(
@@ -20,9 +21,9 @@ object ConfigurationData:
   ): ConfigurationData =
     val sortedTimetablesByTrainId = orderedTimetablesByTrainId(trains.distinctBy(_.name), timetables.distinctBy(_.id))
     val stationsEEInitialState    = sortedTimetablesByTrainId.putTrainsInInitialStations(stations.distinctBy(_.name))
-    val sortedTimetables = sortedTimetablesByTrainId.filter(t =>
+    val sortedTimetables: Map[Train, Seq[DynamicTimetable]] = sortedTimetablesByTrainId.filter(t =>
       stationsEEInitialState.collectTrains.contains(t._1)
-    ).map(t => (t._1.name, t._2)).toMap
+    ).toMap
     ConfigurationDataImpl(stationsEEInitialState, routes.distinctBy(_.id), sortedTimetables)
 
   def empty(): ConfigurationData =
@@ -73,5 +74,5 @@ object ConfigurationData:
   private final case class ConfigurationDataImpl(
       stations: Seq[StationEnvironmentElement],
       routes: Seq[RouteEnvironmentElement],
-      timetables: Map[String, Seq[DynamicTimetable]]
+      timetables: Map[Train, Seq[DynamicTimetable]]
   ) extends ConfigurationData

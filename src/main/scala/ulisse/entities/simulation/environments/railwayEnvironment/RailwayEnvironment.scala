@@ -14,6 +14,7 @@ import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.*
+import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.{updateWhen, updateWhenWithEffects}
 import ulisse.utils.Times.{ClockTime, Time}
 
@@ -28,8 +29,11 @@ trait RailwayEnvironment extends Environment[RailwayEnvironment]:
   /** routes in the environment */
   def routes: Seq[RouteEnvironmentElement]
 
+  /** ordered timetables by departure time grouped by train */
+  def timetablesByTrain: Map[Train, Seq[DynamicTimetable]]
+
   /** timetables in the environment */
-  def timetables: Seq[DynamicTimetable]
+  def timetables: Seq[DynamicTimetable] = timetablesByTrain.values.flatten.toSeq
 
   /** environment elements in the environment */
   override def environmentElements: List[EnvironmentElement] = (stations ++ routes ++ timetables).toList
@@ -82,9 +86,8 @@ object RailwayEnvironment:
       time: Id[Time],
       stations: Seq[StationEnvironmentElement],
       routes: Seq[RouteEnvironmentElement],
-      _timetables: Map[String, Seq[DynamicTimetable]]
+      timetablesByTrain: Map[Train, Seq[DynamicTimetable]]
   ) extends RailwayEnvironment:
-    def timetables: Seq[DynamicTimetable] = _timetables.values.flatten.toSeq
     def doStep(dt: Int): RailwayEnvironment =
       // Allow agents to be at the same time in more than an environment element
       // that because an agent when enters a station doesn't leave immediately the route and vice versa
@@ -124,7 +127,7 @@ object RailwayEnvironment:
             station        <- stations.find(currentRoute._2.name == _.name)
             updatedStation <- station.putTrain(agent.resetDistanceTravelled())
             updatedStations = stations.updateWhen(_.name == updatedStation.name)(_ => updatedStation)
-          yield copy(stations = updatedStations, routes = updatedRoutes, _timetables = updatedTimetables)
+          yield copy(stations = updatedStations, routes = updatedRoutes, timetablesByTrain = updatedTimetables)
         case _ => route.updateTrain(agent).map(ree => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree)))
 
     private def stationUpdateFunction(
@@ -140,26 +143,26 @@ object RailwayEnvironment:
         route                          <- routes.find(routeAndDirection._1.id == _.id)
         updatedRoute                   <- route.putTrain(agent.resetDistanceTravelled(), routeAndDirection._2)
         updatedRoutes = routes.updateWhen(_.id == updatedRoute.id)(_ => updatedRoute)
-      yield copy(stations = updatedStations, routes = updatedRoutes, _timetables = updatedTimetables)
+      yield copy(stations = updatedStations, routes = updatedRoutes, timetablesByTrain = updatedTimetables)
 
     private def timetableUpdateFunction(
         updateF: (DynamicTimetable, ClockTime) => Option[DynamicTimetable],
         routeInfo: DynamicTimetable => Option[(Station, Station)],
         agent: TrainAgent,
         time: Time
-    ): Option[(Map[String, Seq[DynamicTimetable]], (Station, Station))] =
+    ): Option[(Map[Train, Seq[DynamicTimetable]], (Station, Station))] =
       for
         currentTimetable <- findCurrentTimeTableFor(agent)
         currentClockTime <- ClockTime(time.h, time.m).toOption
         updatedTimetable <- updateF(currentTimetable, currentClockTime)
-        updatedTimetables = _timetables.view.mapValues(
+        updatedTimetables = timetablesByTrain.view.mapValues(
           _.updateWhen(_ == currentTimetable)(_ => updatedTimetable)
         ).toMap
         info <- routeInfo(currentTimetable)
       yield (updatedTimetables, info)
 
     def findCurrentTimeTableFor(train: TrainAgent): Option[DynamicTimetable] =
-      _timetables.get(train.name).flatMap(_.find(!_.completed))
+      timetablesByTrain(train).find(!_.completed)
 
     def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrackDirection)] =
       extension (r: Route)
