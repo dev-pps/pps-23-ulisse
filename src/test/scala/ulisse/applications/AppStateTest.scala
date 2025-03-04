@@ -3,6 +3,7 @@ package ulisse.applications
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar.mock
+import ulisse.applications.event.SimulationEventData
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
@@ -44,9 +45,7 @@ object AppStateTest:
       TimetableManager
   ) =
     (_, _, _, _) => (stationManager, routeManager, trainManager, timetableManager)
-  val initSimulation
-      : (SimulationManager, StationManager, RouteManager, TrainManager, TimetableManager) => SimulationManager =
-    (_, _, _, _, _) => simulationManager
+  val initSimulation: SimulationEventData => SimulationManager = _ => simulationManager
 
 class AppStateTest extends AnyFlatSpec with Matchers:
   import AppStateTest.*

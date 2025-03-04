@@ -94,6 +94,13 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
       "maintain the configuration" in:
         checkConfiguration(env, cd)
 
+    "created auto" should:
+      val env = RailwayEnvironment.auto(cd)
+      "setup initial time" in:
+        env.time.toSeconds shouldBe cd.timetables.values.flatten.map(_.departureTime.toSeconds).foldLeft(0)(math.min)
+      "maintain the configuration" in:
+        checkConfiguration(env, cd)
+
     "created empty" should:
       val env = RailwayEnvironment.empty()
       "setup initial time" in:

@@ -26,6 +26,7 @@ object Times:
   object Time:
     def apply(h: Hour, m: Minute, s: Second): Time = TimeImpl(h, m, s)
     def secondsToOverflowTime(s: Second): Time     = Id(Time(0, 0, s)) overflowSum Time(0, 0, 0)
+    def secondsToTime(s: Second): Time             = Id(Time(0, 0, s)) + Time(0, 0, 0)
 
     val secondsInMinute, minutesInHour = 60
     val hoursInDay                     = 24

@@ -20,6 +20,14 @@ class TimesTest extends AnyWordSpec with Matchers:
 
     "Created from seconds" should:
       "adapt to time format" in:
+        Time.secondsToTime(3661) shouldBe Time(1, 1, 1)
+        Time.secondsToTime(0) shouldBe Time(0, 0, 0)
+        Time.secondsToTime(59) shouldBe Time(0, 0, 59)
+        Time.secondsToTime(60) shouldBe Time(0, 1, 0)
+        Time.secondsToTime(3600) shouldBe Time(1, 0, 0)
+        Time.secondsToTime(100000) shouldBe Time(3, 46, 40)
+
+      "adapt to time format with overflow" in:
         Time.secondsToOverflowTime(3661) shouldBe Time(1, 1, 1)
         Time.secondsToOverflowTime(0) shouldBe Time(0, 0, 0)
         Time.secondsToOverflowTime(59) shouldBe Time(0, 0, 59)

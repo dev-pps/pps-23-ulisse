@@ -60,6 +60,15 @@ object RailwayEnvironment:
       configurationData.timetables
     )
 
+  def auto(
+      configurationData: ConfigurationData
+  ): RailwayEnvironment =
+    apply(
+      Time.secondsToTime(
+        configurationData.timetables.values.flatten.map(_.departureTime.toSeconds).foldLeft(0)(math.min)
+      ),
+      configurationData
+    )
   def default(configurationData: ConfigurationData): RailwayEnvironment =
     apply(
       Time(0, 0, 0),
