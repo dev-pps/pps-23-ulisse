@@ -3,7 +3,7 @@ package ulisse.applications.useCases
 import cats.syntax.either.*
 import ulisse.applications.event.RouteEventQueue
 import ulisse.applications.managers.RouteManagers
-import ulisse.applications.managers.RouteManagers.{Errors, RouteManager}
+import ulisse.applications.managers.RouteManagers.Errors
 import ulisse.applications.ports.RoutePorts
 import ulisse.entities.route.Routes.Route
 
@@ -35,8 +35,5 @@ object RouteService:
 
     override def delete(route: Route): Future[Either[Errors, List[Route]]] =
       val promise = Promise[Either[Errors, List[Route]]]()
-      eventQueue.addDeleteRouteEvent((routeManager, timetableManager) => {
-        val updatedManager = routeManager.delete(route)
-        (Services.updateManager(promise, routeManager, updatedManager, _.routes), timetableManager)
-      })
+      eventQueue.addDeleteRouteEvent((routeManager, timetableManager) => (routeManager.delete(route), timetableManager))
       promise.future

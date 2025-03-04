@@ -24,14 +24,7 @@ object RouteManagers:
 
   /** Manages the routes of the train network. */
   trait RouteManager:
-    // Station update
-    // delete from station
     // modify from station
-
-    // Filter
-    // route from departure station
-    // route from arrival station
-    // route that contain a specific station
 
     /** Bank of routes */
     opaque type Bank = Map[IdRoute, Route]
@@ -67,10 +60,19 @@ object RouteManagers:
     def modify(oldRoute: Route, newRoute: Route): Either[Errors, RouteManager]
 
     /** Delete a route by its identifier */
-    def deleteBy(id: IdRoute): Either[Errors, RouteManager]
+    def deleteBy(id: IdRoute): RouteManager
 
     /** Delete a route */
-    def delete(route: Route): Either[Errors, RouteManager] = deleteBy(route.id)
+    def delete(route: Route): RouteManager = deleteBy(route.id)
+
+    /** Delete all the routes that depart from a specific station. */
+    def deleteByDeparture(station: Station): RouteManager
+
+    /** Delete all the routes that arrive at a specific station. */
+    def deleteByArrival(station: Station): RouteManager
+
+    /** Delete all the routes that contain this station, either as departure or arrival. */
+    def deleteByStation(station: Station): RouteManager = deleteByArrival(station) deleteByArrival station
 
   /** Companion object of [[RouteManager]] */
   object RouteManager:
@@ -86,6 +88,7 @@ object RouteManagers:
 
     private case class RouteManagerImpl(manager: Map[IdRoute, Route]) extends RouteManager:
       export manager.size
+
       override def routes: List[Route]                        = manager.values.toList
       override def contains(route: Route): Boolean            = manager contains route.id
       override def findBy(id: IdRoute): Either[Errors, Route] = manager get id toRight Errors.NotFound
@@ -100,5 +103,9 @@ object RouteManagers:
           case (_, Right(_))    => Errors.AlreadyExist.asLeft
           case (_, _)           => copy(manager - oldRoute.id + (newRoute.id -> newRoute)).asRight
 
-      override def deleteBy(id: IdRoute): Either[Errors, RouteManager] =
-        findBy(id).map(_ => copy(manager - id).asRight).getOrElse(Errors.NotExist.asLeft)
+      override def deleteBy(id: IdRoute): RouteManager = copy(manager - id)
+
+      override def deleteByDeparture(station: Station): RouteManager =
+        copy(manager filterNot (_._2 isDeparture station))
+
+      override def deleteByArrival(station: Station): RouteManager = copy(manager filterNot (_._2 isArrival station))

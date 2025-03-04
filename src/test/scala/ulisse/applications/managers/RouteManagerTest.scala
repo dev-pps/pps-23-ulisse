@@ -50,28 +50,6 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
         case Right(newRoute) => newRoute mustBe route
         case _               => fail("Route not found")
 
-  "find route from departure station" should "be contains in routeManager" in:
-    for route <- validateRoute
-    yield singleElementManager findByDeparture route.departure mustBe List(route)
-
-  "find route from departure station that not exist" should "be empty" in:
-    for route <- validateRoute
-    yield singleElementManager findByDeparture route.arrival mustBe List.empty[Route]
-
-  "find route from arrival station" should "be contains in routeManager" in:
-    for route <- validateRoute
-    yield singleElementManager findByArrival route.arrival mustBe List(route)
-
-  "find route from arrival station that not exist" should "be empty" in:
-    for route <- validateRoute
-    yield singleElementManager findByArrival route.departure mustBe List.empty[Route]
-
-  "find route from path" should "be contains in routeManager" in:
-    for route <- validateRoute
-    yield
-      singleElementManager findByPath (route.departure, route.arrival) mustBe List(route)
-      singleElementManager findByPath (route.arrival, route.departure) mustBe List(route)
-
   "save equal route" should "launch already exist error" in:
     for equalRoute <- validateEqualRoute
     yield singleElementManager save equalRoute match
@@ -116,16 +94,52 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
   "delete route that non exist" should "launch not exist error" in:
     for route <- validateRoute
     yield
-      emptyManager deleteBy route.id mustBe emptyManager.delete(route)
-      emptyManager deleteBy route.id mustBe Errors.NotExist.asLeft[RouteManager]
+      val newManager = emptyManager deleteBy route.id
+      newManager mustBe emptyManager.delete(route)
+      newManager mustBe emptyManager
 
   "delete route that exist" should "have size 0" in:
     for route <- validateRoute
     yield
-      singleElementManager deleteBy route.id mustBe (singleElementManager delete route)
-      singleElementManager deleteBy route.id match
-        case Left(error) => fail(error.msg)
-        case Right(newManager) =>
-          newManager contains route mustBe false
-          (newManager findBy route.id).isLeft mustBe true
-          newManager.size mustBe (singleElementManager.size - 1)
+      val newManager = singleElementManager deleteBy route.id
+      newManager.size mustBe (singleElementManager.size - 1)
+      newManager mustBe (singleElementManager delete route)
+      newManager contains route mustBe false
+
+  "find route from departure station" should "be contains in routeManager" in:
+    for route <- validateRoute
+    yield singleElementManager findByDeparture route.departure mustBe List(route)
+
+  "find route from departure station that not exist" should "be empty" in:
+    for route <- validateRoute
+    yield singleElementManager findByDeparture route.arrival mustBe List.empty[Route]
+
+  "find route from arrival station" should "be contains in routeManager" in:
+    for route <- validateRoute
+    yield singleElementManager findByArrival route.arrival mustBe List(route)
+
+  "find route from arrival station that not exist" should "be empty" in:
+    for route <- validateRoute
+    yield singleElementManager findByArrival route.departure mustBe List.empty[Route]
+
+  "find route from path" should "be contains in routeManager" in:
+    for route <- validateRoute
+    yield
+      singleElementManager findByPath (route.departure, route.arrival) mustBe List(route)
+      singleElementManager findByPath (route.arrival, route.departure) mustBe List(route)
+
+  "delete route from departure station" should "be empty" in:
+    for route <- validateRoute
+    yield singleElementManager deleteByDeparture departure mustBe emptyManager
+
+  "delete route form departure station that not exist" should "be empty" in:
+    for route <- validateRoute
+    yield singleElementManager deleteByDeparture arrival mustBe singleElementManager
+
+  "delete route from arrival station" should "be empty" in:
+    for route <- validateRoute
+    yield singleElementManager deleteByArrival arrival mustBe emptyManager
+
+  "delete route form arrival station that not exist" should "be empty" in:
+    for route <- validateRoute
+    yield singleElementManager deleteByArrival departure mustBe singleElementManager
