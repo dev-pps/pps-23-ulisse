@@ -35,5 +35,8 @@ object RouteService:
 
     override def delete(route: Route): Future[Either[Errors, List[Route]]] =
       val promise = Promise[Either[Errors, List[Route]]]()
-      eventQueue.addDeleteRouteEvent((routeManager, timetableManager) => (routeManager.delete(route), timetableManager))
+      eventQueue.addDeleteRouteEvent((routeManager, timetableManager) => {
+        val updatedManager = routeManager.delete(route)
+        (Services.updateManager(promise, routeManager, updatedManager, _.routes), timetableManager)
+      })
       promise.future
