@@ -26,6 +26,7 @@ object MapElements:
       extends MapElements[T]:
 
     override def update(newElements: Seq[MapElement[T]]): Unit =
+      elements.foreach(_.image detachFrom map)
       elements = newElements.toList
       elements.foreach(_.image attachOn map)
 

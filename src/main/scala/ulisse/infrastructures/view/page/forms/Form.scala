@@ -17,7 +17,7 @@ object Form:
   def createStation(): StationForm   = StationForm()
   def createSchedule(): ScheduleForm = ScheduleForm()
 
-  final case class BaseForm(title: String, fields: ComposedSwing.JInfoTextField*):
+  final case class BaseForm(title: String, fields: ComposedSwing.InfoTextField*):
     private val mainPanel: ExtendedSwing.SBoxPanel    = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     private val insertForm: ComposedSwing.JInsertForm = ComposedSwing.createInsertForm(title, fields: _*)
     private val space                                 = 10

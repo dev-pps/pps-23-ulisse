@@ -22,8 +22,8 @@ trait ComposedSwing:
   def hide(): Unit = component.visible = false
 
 object ComposedSwing:
-  /** Creates a [[JInfoTextField]] from a [[title]]. */
-  def createInfoTextField(text: String): JInfoTextField = JInfoTextField(text)
+  /** Creates a [[InfoTextField]] from a [[title]]. */
+  def createInfoTextField(text: String): InfoTextField = InfoTextField(text)
 
   /** Creates a [[JNavBar]] from a list of [[SVGIconLabel]]. */
   def createNavbar(JIconLabel: ComposedImageLabel*): JNavBar = JNavBar(JIconLabel: _*)
@@ -31,8 +31,8 @@ object ComposedSwing:
   /** Creates a [[JTabbedPane]] from a list of [[SVGIconLabel]]. */
   def createTabbedPane(JIconLabel: ComposedImageLabel*): JTabbedPane = JTabbedPane(JIconLabel: _*)
 
-  /** Creates a [[JInsertForm]] from a [[title]] and a list of [[JInfoTextField]]. */
-  def createInsertForm(title: String, JInfoTextField: JInfoTextField*): JInsertForm =
+  /** Creates a [[JInsertForm]] from a [[title]] and a list of [[InfoTextField]]. */
+  def createInsertForm(title: String, JInfoTextField: InfoTextField*): JInsertForm =
     JInsertForm(title, JInfoTextField: _*)
 
   /** Creates a [[JToggleIconButton]] from an on and off icon path. */
@@ -40,7 +40,7 @@ object ComposedSwing:
     JToggleIconButton(onIconPath, offIconPath)
 
   /** Represents a text field with a [[title]] */
-  case class JInfoTextField(title: String) extends ComposedSwing:
+  case class InfoTextField(title: String) extends ComposedSwing:
     private val colum               = 15
     private val textFieldPadding    = Styles.createPadding(10, 5)
     private val textFieldBackground = Theme.light.background.withAlpha(50)
@@ -114,7 +114,7 @@ object ComposedSwing:
     def paneOf(label: ComposedImageLabel): ExtendedSwing.SFlowPanel = pages(label)
     override def component[T >: Component]: T                       = mainPanel
 
-  case class JInsertForm(title: String, infoTextField: JInfoTextField*) extends ComposedSwing:
+  case class JInsertForm(title: String, infoTextField: InfoTextField*) extends ComposedSwing:
     private val mainPanel = ExtendedSwing.SBorderPanel()
     private val formPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     val titleLabel        = ExtendedSwing.SLabel(title)
