@@ -20,21 +20,14 @@ final case class SimulationManagers(
 
 /** Event queue to update the simulation. */
 trait SimulationEventQueue:
-  /** Add an event to read a simulation. */
-  def readSimulationData(update: SimulationData => Unit): Unit
-
   /** Add an event to read simulation environment. */
   def readSimulationEnvironment(update: RailwayEnvironment => Unit): Unit
 
   /** Add an event to create a simulation. */
-  def addCreateSimulationEvent(update: SimulationManagers => SimulationManager): Unit
+  def setupSimulationManager(update: SimulationManagers => SimulationManager): Unit
 
   /** Add an event to update the simulation. */
-  def addUpdateSimulationEvent(update: SimulationManagers => SimulationManager): Unit =
-    addCreateSimulationEvent(update)
-
-  /** Add an event to delete the simulation. */
-  def addDeleteSimulationEvent(update: SimulationManager => SimulationManager): Unit
+  def updateSimulationManager(update: SimulationManager => SimulationManager): Unit
 
 /** Companion object for the [[SimulationEventQueue]] trait. */
 object SimulationEventQueue:
@@ -43,12 +36,12 @@ object SimulationEventQueue:
 
   private case class SimulationEventQueueImpl(events: LinkedBlockingQueue[AppState => AppState])
       extends SimulationEventQueue:
-    override def readSimulationData(update: SimulationData => Unit): Unit = events.offer(_ readSimulationData update)
-
+    
     override def readSimulationEnvironment(update: RailwayEnvironment => Unit): Unit =
       events.offer(_ readSimulationData (sd => update(sd.simulationEnvironment)))
-    override def addCreateSimulationEvent(update: SimulationManagers => SimulationManager): Unit =
-      events.offer(_ initSimulation update)
+      
+    override def setupSimulationManager(update: SimulationManagers => SimulationManager): Unit =
+      events.offer(_ setupSimulation update)
 
-    override def addDeleteSimulationEvent(update: SimulationManager => SimulationManager): Unit =
+    override def updateSimulationManager(update: SimulationManager => SimulationManager): Unit =
       events.offer(_ updateSimulation update)
