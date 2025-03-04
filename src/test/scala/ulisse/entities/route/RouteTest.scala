@@ -28,7 +28,7 @@ class RouteTest extends AnyFlatSpec with Matchers:
 
   "create routes" should "set core parameters: typology, railsCount, path" in:
     validateRoute match
-      case Left(errors) => fail(s"${errors.mkStringErrors}")
+      case Left(errors) => fail(errors.mkStringErrors)
       case Right(route) =>
         route.departure mustBe departure
         route.arrival mustBe arrival
@@ -86,7 +86,7 @@ class RouteTest extends AnyFlatSpec with Matchers:
       val changeRouteDeparture: ValidationRoute = route withDeparture newDeparture
 
       changeRouteDeparture match
-        case Left(errors) => fail(s"${errors.mkStringErrors}")
+        case Left(errors) => fail(errors.mkStringErrors)
         case Right(newRoute) =>
           route.departure must not be newDeparture
           newRoute.departure mustBe newDeparture
@@ -98,7 +98,7 @@ class RouteTest extends AnyFlatSpec with Matchers:
       val changeRouteArrival: ValidationRoute = route withArrival newArrival
 
       changeRouteArrival match
-        case Left(errors) => fail(s"${errors.mkStringErrors}")
+        case Left(errors) => fail(errors.mkStringErrors)
         case Right(newRoute) =>
           route.arrival must not be newArrival
           newRoute.arrival mustBe newArrival
@@ -118,7 +118,7 @@ class RouteTest extends AnyFlatSpec with Matchers:
       val changeRouteRailsCount: ValidationRoute = route withRailsCount newRailsCount
 
       changeRouteRailsCount match
-        case Left(errors) => fail(s"${errors.mkStringErrors}")
+        case Left(errors) => fail(errors.mkStringErrors)
         case Right(newRoute) =>
           route.railsCount must not be newRailsCount
           newRoute.railsCount mustBe newRailsCount
@@ -130,7 +130,7 @@ class RouteTest extends AnyFlatSpec with Matchers:
       val changeRouteLength: ValidationRoute = route withLength newLength
 
       changeRouteLength match
-        case Left(errors) => fail(s"${errors.mkStringErrors}")
+        case Left(errors) => fail(errors.mkStringErrors)
         case Right(newRoute) =>
           route.length must not be newLength
           newRoute.length mustBe newLength

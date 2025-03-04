@@ -14,14 +14,14 @@ object RouteManagerTest:
 
   val emptyManager: RouteManager = RouteManager.empty()
   val singleElementManager: RouteManager =
-    validateRoute.map(route => RouteManager.createOf(List(route))).getOrElse(emptyManager)
+    validateRoute.map(route => RouteManager.createOf(List(route))) getOrElse emptyManager
 
 class RouteManagerTest extends AnyFlatSpec with Matchers:
   import RouteManagerTest.*
 
   "create empty routeManager" should "have size 0" in:
     val zeroSize = 0
-    emptyManager.size must be(zeroSize)
+    emptyManager.size mustBe zeroSize
 
   "check route to test manager" should "be empty" in:
     for
@@ -29,87 +29,103 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
       equalRoute     <- validateEqualRoute
       differentRoute <- validateDifferentRoute
     yield
-      route must be(equalRoute)
+      route mustBe equalRoute
       route must not be differentRoute
-      route.checkAllField(equalRoute) must be(false)
-      route.checkAllField(differentRoute) must be(false)
+      route checkAllField equalRoute mustBe false
+      route checkAllField differentRoute mustBe false
 
   "save new routes in empty route manager" should "be contains in routeManager" in:
-    for
-      route <- validateRoute
-    yield emptyManager.save(route) match
-      case Left(error) => fail(s"${error.msg}")
+    for route <- validateRoute
+    yield emptyManager save route match
+      case Left(error) => fail(error.msg)
       case Right(manager) =>
-        manager.size must be(emptyManager.size + 1)
-        manager.contains(route) must be(true)
+        manager.size mustBe (emptyManager.size + 1)
+        manager contains route mustBe true
 
   "find route from manager that" should "contains" in:
-    for
-      route <- validateRoute
+    for route <- validateRoute
     yield
-      singleElementManager.findBy(route.id) must be(singleElementManager.find(route))
-      singleElementManager.findBy(route.id) match
-        case Right(newRoute) => newRoute must be(route)
+      singleElementManager findBy route.id mustBe (singleElementManager find route)
+      singleElementManager findBy route.id match
+        case Right(newRoute) => newRoute mustBe route
         case _               => fail("Route not found")
 
+  "find route from departure station" should "be contains in routeManager" in:
+    for route <- validateRoute
+    yield singleElementManager findByDeparture route.departure mustBe List(route)
+
+  "find route from departure station that not exist" should "be empty" in:
+    for route <- validateRoute
+    yield singleElementManager findByDeparture route.arrival mustBe List.empty[Route]
+
+  "find route from arrival station" should "be contains in routeManager" in:
+    for route <- validateRoute
+    yield singleElementManager findByArrival route.arrival mustBe List(route)
+
+  "find route from arrival station that not exist" should "be empty" in:
+    for route <- validateRoute
+    yield singleElementManager findByArrival route.departure mustBe List.empty[Route]
+
+  "find route from path" should "be contains in routeManager" in:
+    for route <- validateRoute
+    yield
+      singleElementManager findByPath (route.departure, route.arrival) mustBe List(route)
+      singleElementManager findByPath (route.arrival, route.departure) mustBe List(route)
+
   "save equal route" should "launch already exist error" in:
-    for
-      equalRoute <- validateEqualRoute
-    yield singleElementManager.save(equalRoute) match
-      case Left(errors) => errors must be(RouteManagers.Errors.AlreadyExist)
+    for equalRoute <- validateEqualRoute
+    yield singleElementManager save equalRoute match
+      case Left(errors) => errors mustBe RouteManagers.Errors.AlreadyExist
       case _            => fail("Route already exist")
 
   "save other different routes" should "have two element" in:
-    for
-      differentRoute <- validateDifferentRoute
-    yield singleElementManager.save(differentRoute) match
+    for differentRoute <- validateDifferentRoute
+    yield singleElementManager save differentRoute match
       case Left(error) => fail(error.msg)
       case Right(newRouteManager) =>
-        newRouteManager.size must be(singleElementManager.size + 1)
-        newRouteManager.contains(differentRoute) must be(true)
+        newRouteManager.size mustBe (singleElementManager.size + 1)
+        newRouteManager contains differentRoute mustBe true
 
   "modify route that not found" should "launch not found error" in:
     for
       route          <- validateRoute
       differentRoute <- validateDifferentRoute
-    yield emptyManager.modify(route, differentRoute) must be(Errors.NotFound.asLeft[RouteManager])
+    yield emptyManager modify (route, differentRoute) mustBe Errors.NotFound.asLeft[RouteManager]
 
   "modify route in a route that not exist" should "apply modify" in:
     for
       route      <- validateRoute
       equalRoute <- validateEqualRoute
-    yield singleElementManager.modify(route, equalRoute) match
-      case Left(error) => fail(s"${error.msg}")
+    yield singleElementManager modify (route, equalRoute) match
+      case Left(error) => fail(error.msg)
       case Right(newManager) =>
-        newManager.size must be(singleElementManager.size)
-        newManager.find(equalRoute) match
-          case Left(error)      => fail(s"${error.msg}")
-          case Right(findRoute) => findRoute.checkAllField(equalRoute) must be(true)
+        newManager.size mustBe singleElementManager.size
+        newManager find equalRoute match
+          case Left(error)      => fail(error.msg)
+          case Right(findRoute) => findRoute checkAllField equalRoute mustBe true
 
   "modify route in equals of a other route" should "launch already exit error" in:
     for
       route          <- validateRoute
       differentRoute <- validateDifferentRoute
-    yield singleElementManager.save(differentRoute) match
-      case Left(errors) => fail(s"${errors.msg}")
+    yield singleElementManager save differentRoute match
+      case Left(errors) => fail(errors.msg)
       case Right(newManager) =>
-        newManager.modify(differentRoute, route) must be(Errors.AlreadyExist.asLeft[RouteManager])
+        newManager modify (differentRoute, route) mustBe Errors.AlreadyExist.asLeft[RouteManager]
 
   "delete route that non exist" should "launch not exist error" in:
-    for
-      route <- validateRoute
+    for route <- validateRoute
     yield
-      emptyManager.deleteBy(route.id) must be(emptyManager.delete(route))
-      emptyManager.deleteBy(route.id) must be(Errors.NotExist.asLeft[RouteManager])
+      emptyManager deleteBy route.id mustBe emptyManager.delete(route)
+      emptyManager deleteBy route.id mustBe Errors.NotExist.asLeft[RouteManager]
 
   "delete route that exist" should "have size 0" in:
-    for
-      route <- validateRoute
+    for route <- validateRoute
     yield
-      singleElementManager.deleteBy(route.id) must be(singleElementManager.delete(route))
-      singleElementManager.deleteBy(route.id) match
-        case Left(error) => fail(s"${error.msg}")
+      singleElementManager deleteBy route.id mustBe (singleElementManager delete route)
+      singleElementManager deleteBy route.id match
+        case Left(error) => fail(error.msg)
         case Right(newManager) =>
-          newManager.contains(route) must be(false)
-          newManager.findBy(route.id).isLeft must be(true)
-          newManager.size must be(singleElementManager.size - 1)
+          newManager contains route mustBe false
+          (newManager findBy route.id).isLeft mustBe true
+          newManager.size mustBe (singleElementManager.size - 1)
