@@ -25,6 +25,7 @@ import ulisse.entities.train.TrainAgentTest.trainAgent3905
 import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.entities.simulation.data.Engine.EngineStateField.Running
+import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.annotation.tailrec
@@ -34,20 +35,15 @@ import scala.concurrent.duration.Duration
 class SimulationServiceTest extends AnyWordSpec with Matchers:
 
   private val notificationService = mock[SimulationPorts.Output]
-  private val configurationData = ConfigurationData(
-    Seq(stationA_EE, stationB_EE),
-    Seq(routeAB_EE),
-    Seq(trainAgent3905),
-    Seq(dynamicTimetable1)
-  )
+
   private val stationManager: StationManager = mock[StationManager]
-  when(stationManager.stations).thenReturn(configurationData.stations)
+  when(stationManager.stations).thenReturn(simpleConfigurationData.stations)
   private val routeManager: RouteManager = mock[RouteManager]
-  when(routeManager.routes).thenReturn(configurationData.routes)
+  when(routeManager.routes).thenReturn(simpleConfigurationData.routes)
   private val trainManager: TrainManager = mock[TrainManager]
-  when(trainManager.trains).thenReturn(configurationData.trains.toList)
+  when(trainManager.trains).thenReturn(simpleConfigurationData.trains.toList)
   private val timetableManager: TimetableManager = mock[TimetableManager]
-  when(timetableManager.tables).thenReturn(configurationData.timetables.values.flatten.toSeq)
+  when(timetableManager.tables).thenReturn(simpleConfigurationData.timetables.values.flatten.toSeq)
 
   private val initialState = AppState().updateStation(_ => stationManager)
     .updateRoute(_ => routeManager)
@@ -68,7 +64,7 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
   private def evaluateSettings(engine: Engine, simulationData: SimulationData): Unit =
     engine shouldBe Engine.emptyWithConfiguration(EngineConfiguration.defaultBatch())
     simulationData compareTo SimulationData.empty() ignoring SimulationEnvironment shouldBeBoolean true
-    simulationData.simulationEnvironment shouldBe RailwayEnvironment.auto(configurationData)
+    simulationData.simulationEnvironment shouldBe RailwayEnvironment.auto(simpleConfigurationData)
 
   "SimulationService" should:
     "init simulation" in:

@@ -37,7 +37,12 @@ object ConfigurationDataTest:
   val routesEE    = routes.map(makeRouteEE)
   val trainAgents = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
   val timetables  = Seq(dynamicTimetable1, dynamicTimetable2, dynamicTimetable3)
-
+  val simpleConfigurationData = ConfigurationData(
+    Seq(stationA_EE, stationB_EE),
+    Seq(routeAB_EE),
+    Seq(trainAgent3905),
+    Seq(dynamicTimetable1)
+  )
 class ConfigurationDataTest extends AnyWordSpec with Matchers:
   private val cd = ConfigurationData(stationsEE, routesEE, trainAgents, timetables)
 

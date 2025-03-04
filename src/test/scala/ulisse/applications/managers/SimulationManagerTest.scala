@@ -10,7 +10,9 @@ import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.applications.ports.UtilityPorts
 import ulisse.dsl.comparison.FieldsComparators.compareTo
 import ulisse.entities.simulation.data.Engine.*
-import ulisse.entities.simulation.data.{Engine, EngineConfiguration}
+import ulisse.entities.simulation.data.SimulationData.SimulationDataField.SimulationEnvironment
+import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
+import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 
 class SimulationManagerTest extends AnyWordSpec with Matchers:
@@ -32,9 +34,53 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
       timeProvider.currentTimeMillis() shouldBe startTime + timeIncrement
       timeProvider.currentTimeMillis() shouldBe startTime + 2 * timeIncrement
 
-  "SimulationManager" should:
-    "not be running when created" in:
-      SimulationManager.defaultBatchManager(timeProvider).engine.running shouldBe false
+  def checkBaseConfiguration(sm: SimulationManager, ec: EngineConfiguration): Unit =
+    sm.engine shouldBe Engine.emptyWithConfiguration(ec)
+    sm.simulationData shouldBe SimulationData.empty()
+  private val ec = EngineConfiguration(10, Some(10))
+
+  "SimulationManager" when:
+    "created" should:
+      "have base configuration" in:
+        checkBaseConfiguration(SimulationManager(None, timeProvider, ec), ec)
+
+    "configured" should:
+      "have base configuration" in:
+        checkBaseConfiguration(SimulationManager(None, timeProvider, ec), ec)
+
+    "defaultTimed" should:
+      "have default timed configuration" in:
+        checkBaseConfiguration(SimulationManager.defaultTimedManager(timeProvider), EngineConfiguration.defaultTimed())
+
+    "defaultBatch" should:
+      "have default batch configuration" in:
+        checkBaseConfiguration(SimulationManager.defaultBatchManager(timeProvider), EngineConfiguration.defaultBatch())
+
+    "calculated cycle time step" should:
+      "be 1000 ms for 1 cps" in:
+        SimulationManager.calculateCycleTimeStep(1) shouldBe 1000.0
+      "be 500 ms for 2 cps" in:
+        SimulationManager.calculateCycleTimeStep(2) shouldBe 500.0
+      "be 100 ms for 10 cps" in:
+        SimulationManager.calculateCycleTimeStep(10) shouldBe 100.0
+
+    "setup engine" should:
+      "update configuration" in:
+        val manager = SimulationManager.defaultBatchManager(timeProvider)
+        manager.setupEngine(10, Some(10)) match
+          case Some(newManager) =>
+            newManager.engine.configuration shouldBe EngineConfiguration(10, Some(10))
+            newManager.simulationData shouldBe manager.simulationData
+          case _ => fail()
+
+    "setup environment" should:
+      "update environment" in:
+        val manager     = SimulationManager.defaultBatchManager(timeProvider)
+        val environment = RailwayEnvironment.auto(simpleConfigurationData)
+        val newManager  = manager.setupEnvironment(environment)
+        newManager.engine shouldBe manager.engine
+        newManager.simulationData compareTo manager.simulationData ignoring SimulationEnvironment shouldBeBoolean true
+        newManager.simulationData.simulationEnvironment shouldBe environment
 
     "be running after starting simulation" in:
       SimulationManager.defaultBatchManager(timeProvider).start().engine.running shouldBe true
