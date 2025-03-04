@@ -11,7 +11,7 @@ import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.entities.train.Trains.Train
 
 object TrainAgents:
-  case class TrainAgentInfo(train: TrainAgent, timetables: List[DynamicTimetable])
+  case class TrainAgentInfo(train: TrainAgent, timetables: Seq[DynamicTimetable])
   sealed trait TrainAgentPerceptionData extends PerceptionData
 
   sealed trait TrainStationInfo extends TrainAgentPerceptionData:
