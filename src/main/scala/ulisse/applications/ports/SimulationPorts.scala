@@ -8,7 +8,10 @@ import scala.concurrent.Future
 object SimulationPorts:
 
   trait Output:
+    /** Notify that a step has been completed */
     def stepNotification(data: SimulationData): Unit
+    
+    /** Notify that the simulation has ended */
     def simulationEnded(data: SimulationData): Unit
 
   trait Input:
