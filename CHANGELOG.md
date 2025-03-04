@@ -1,3 +1,21 @@
+## [1.18.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.17.0...v1.18.0) (2025-03-04)
+
+### Features
+
+* **ClockTime:** setup generic sum ([71eea51](https://github.com/dev-pps/pps-23-ulisse/commit/71eea51c59829c2e232cfef5b99a1e3205244e6f))
+* **ConfigurationData:** implement and improve all test ([a50773e](https://github.com/dev-pps/pps-23-ulisse/commit/a50773e7f8ad4018cb011fd14b8d5108b5145653))
+* **DynamicTimetable:** complete timetable and sccumulate delays ([b61ea88](https://github.com/dev-pps/pps-23-ulisse/commit/b61ea88c6448263da4fc206afdd3c61359e53cc4))
+* **DynamicTimetable:** update arrival time ([d940096](https://github.com/dev-pps/pps-23-ulisse/commit/d940096ef830962dd1b08b8ea0c9661a79a3bd50))
+* **DynamicTimetable:** update departure time ([294c5d8](https://github.com/dev-pps/pps-23-ulisse/commit/294c5d8d94a589d64f59b8b1c02cf3bff8039c1f))
+* **RailwayEnvironment:** arrive in station ([5e9e410](https://github.com/dev-pps/pps-23-ulisse/commit/5e9e410fc90c80862143ea438b0452323ad33a7e))
+* **RailwayEnvironment:** put trains in initial stations ([6933c44](https://github.com/dev-pps/pps-23-ulisse/commit/6933c44727a43adbefb0d50746f63c408108336f))
+* **Time:** allow negative time on subtraction for early arrival ([40eea2c](https://github.com/dev-pps/pps-23-ulisse/commit/40eea2c6b97d84ec73a8121ca5e4509ef02eaa50))
+* **TrainAgentsPerceptions:** setup perceptions ([f9f2af2](https://github.com/dev-pps/pps-23-ulisse/commit/f9f2af2387e109e966ad6e86c49e6e8a2affdeb6))
+
+### Bug Fixes
+
+* **DinamicTimetable:** depart before arrive and adjust currentDelay ([0f02b0a](https://github.com/dev-pps/pps-23-ulisse/commit/0f02b0a71d8c6656bc902adc107a35cfa5addf28))
+
 ## [1.17.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.16.0...v1.17.0) (2025-03-03)
 
 ### Features
