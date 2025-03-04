@@ -8,7 +8,7 @@ import scala.swing.{Component, Orientation}
 
 trait FormManager extends ComposedSwing:
   def stationForm: StationForm
-  def routeForm: Form
+  def routeForm: RouteForm
   def scheduleForm: Form
 
 object FormManager:

@@ -4,6 +4,7 @@ import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.common.ImagePath
+import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
 
 import java.awt.geom.AffineTransform
@@ -12,8 +13,11 @@ import scala.swing.*
 
 /** Represent the map panel. */
 trait MapPanel extends Panel with EnhancedLook:
+  /** Attach the station form to the map panel. */
+  def attachStationForm(event: ClickObserver[MapElement[Station]]): Unit
+
   /** Draw the station on the screen. */
-  def drawStation(newStations: StationPorts.Input#SM): Unit
+  def uploadStation(newStations: StationPorts.Input#SM): Unit
 
 /** Companion object for [[MapPanel]]. */
 object MapPanel:
@@ -23,9 +27,11 @@ object MapPanel:
   private case class MapPanelImpl() extends MapPanel:
     private val stations = MapElements[Station](observable)
 
-    override def drawStation(newStations: StationPorts.Input#SM): Unit =
+    def attachStationForm(event: ClickObserver[MapElement[Station]]): Unit =
+      stations.attachClick(event)
+
+    override def uploadStation(newStations: StationPorts.Input#SM): Unit =
       stations.update(newStations.map(MapElement.createStation(_, ImagePath.station)))
-      println(s"count = ${observable.clicks}")
       updateGraphics()
 
     override protected def paintLook(g: Graphics2D): Unit =

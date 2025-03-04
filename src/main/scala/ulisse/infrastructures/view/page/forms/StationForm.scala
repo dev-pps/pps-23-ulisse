@@ -1,11 +1,12 @@
 package ulisse.infrastructures.view.page.forms
 
+import ulisse.entities.station.Station
 import ulisse.infrastructures.view.common.Observers
-import ulisse.infrastructures.view.common.Observers.{ClickObserver, Observer}
+import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.infrastructures.view.map.MapPanel
+import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.page.forms.Form.BaseForm
 import ulisse.infrastructures.view.page.forms.StationForm.StationFormData
 
@@ -13,11 +14,17 @@ import scala.swing.event.MouseEvent
 
 /** Represents the station form of the application. */
 trait StationForm extends Form:
+  /** The name field of the form. */
+  val name: ComposedSwing.InfoTextField
+
   /** The x field of the form. */
   val xField: ComposedSwing.InfoTextField
 
   /** The y field of the form. */
   val yField: ComposedSwing.InfoTextField
+
+  /** The tracks field of the form. */
+  val tracks: ComposedSwing.InfoTextField
 
   /** Attach the creation observer to the form. */
   def attachCreation(observer: ClickObserver[StationFormData]): Unit
@@ -40,14 +47,22 @@ object StationForm:
       stationForm.xField.text = data.point.x.toString
       stationForm.yField.text = data.point.y.toString
 
-  private case class StationFormImpl() extends StationForm:
-    private val name         = ComposedSwing.createInfoTextField("Name")
-    private val tracks       = ComposedSwing.createInfoTextField("Tracks")
-    private val saveButton   = ExtendedSwing.createFormButtonWith("Save", Styles.formTrueButtonRect)
-    private val deleteButton = ExtendedSwing.createFormButtonWith("Delete", Styles.formFalseButtonRect)
+  /** Represents the take station from map event. */
+  final case class TakeStationFromMapEvent(stationForm: StationForm) extends ClickObserver[MapElement[Station]]:
+    override def onClick(data: MapElement[Station]): Unit =
+      stationForm.name.text = data.element.name
+      stationForm.xField.text = data.element.coordinate.x.toString
+      stationForm.yField.text = data.element.coordinate.y.toString
+      stationForm.tracks.text = data.element.numberOfTracks.toString
 
+  private case class StationFormImpl() extends StationForm:
+    override val name: ComposedSwing.InfoTextField   = ComposedSwing.createInfoTextField("Name")
     override val xField: ComposedSwing.InfoTextField = ComposedSwing.createInfoTextField("x")
     override val yField: ComposedSwing.InfoTextField = ComposedSwing.createInfoTextField("y")
+    override val tracks: ComposedSwing.InfoTextField = ComposedSwing.createInfoTextField("Tracks")
+
+    private val saveButton   = ExtendedSwing.createFormButtonWith("Save", Styles.formTrueButtonRect)
+    private val deleteButton = ExtendedSwing.createFormButtonWith("Delete", Styles.formFalseButtonRect)
 
     private val form = BaseForm("Station", name, xField, yField, tracks)
 

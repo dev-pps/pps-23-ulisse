@@ -62,11 +62,23 @@ object Observers:
     /** Detaches an observer from the observable. */
     def detach(observer: Observer[T]): Unit
 
+    /** Detach all observers from the observable. */
+    def detachAll(): Unit =
+      observers.foreach(detach)
+      detachAllClicks()
+      detachAllReleases()
+      detachAllHovers()
+      detachAllExits()
+      detachAllMoves()
+
     /** Attach a click observer to the observable. */
     def attachClick(observer: ClickObserver[T]): Unit
 
     /** Detach a click observer from the observable. */
     def detachClick(observer: ClickObserver[T]): Unit
+
+    /** Detach all click observers from the observable. */
+    def detachAllClicks(): Unit = clicks.foreach(detachClick)
 
     /** Attach a release observer to the observable. */
     def attachRelease(observer: ReleaseObserver[T]): Unit
@@ -74,11 +86,17 @@ object Observers:
     /** Detach a release observer from the observable. */
     def detachRelease(observer: ReleaseObserver[T]): Unit
 
+    /** Detach all release observers from the observable. */
+    def detachAllReleases(): Unit = releases.foreach(detachRelease)
+
     /** Attach a hover observer to the observable. */
     def attachHover(observer: HoverObserver[T]): Unit
 
     /** Detach a hover observer from the observable. */
     def detachHover(observer: HoverObserver[T]): Unit
+
+    /** Detach all hover observers from the observable. */
+    def detachAllHovers(): Unit = hovers.foreach(detachHover)
 
     /** Attach an exit observer to the observable. */
     def attachExit(observer: ExitObserver[T]): Unit
@@ -86,11 +104,17 @@ object Observers:
     /** Detach an exit observer from the observable. */
     def detachExit(observer: ExitObserver[T]): Unit
 
+    /** Detach all exit observers from the observable. */
+    def detachAllExits(): Unit = exits.foreach(detachExit)
+
     /** Attach a move observer to the observable. */
     def attachMove(observer: MovedObserver[T]): Unit
 
     /** Detach a move observer from the observable. */
     def detachMove(observer: MovedObserver[T]): Unit
+
+    /** Detach all move observers from the observable. */
+    def detachAllMoves(): Unit = moves.foreach(detachMove)
 
     /** Notifies the observers that the observable is clicked, given the data [[T]] of the event. */
     def notifyClick(data: T): Unit

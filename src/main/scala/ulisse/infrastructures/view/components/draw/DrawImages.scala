@@ -21,7 +21,8 @@ object DrawImages:
   private val defaultScaleSilhouette: Float = 1.4f
 
   /** Represent a generic image. */
-  trait DrawImage extends ClickObserver[MouseEvent] with ReleaseObserver[MouseEvent] with MovedObserver[MouseEvent]:
+  trait DrawImage extends Observable[MouseEvent] with ClickObserver[MouseEvent] with ReleaseObserver[MouseEvent]
+      with MovedObserver[MouseEvent]:
     /** Center of the image. */
     val center: Point
 
@@ -82,6 +83,8 @@ object DrawImages:
       private var _silhouettePalette: Styles.Palette  = Styles.silhouettePalette
       private val silhouetteColor: CurrentColor       = CurrentColor(_silhouettePalette.background)
 
+      export observable._
+
       override def scale: Float = _scale
 
       override def scale_=(value: Float): Unit = _scale = value
@@ -96,6 +99,7 @@ object DrawImages:
         if data.point.hasCollided(this) then
           silhouetteColor.hoverColor(silhouettePalette)
           observable.notifyHover(data)
+          observable.notifyMove(data)
         else
           silhouetteColor.exitColor(silhouettePalette)
           observable.notifyExit(data)
