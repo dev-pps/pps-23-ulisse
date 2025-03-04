@@ -1,6 +1,6 @@
 package ulisse.entities.simulation.environments.railwayEnvironment
 
-import org.mockito.Mockito.{spy, when}
+import org.mockito.Mockito.{ spy, when }
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -8,26 +8,21 @@ import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.RouteEnvironmentElementTest.routeAB
 import ulisse.entities.route.RouteTest.departureCoordinate
-import ulisse.entities.route.Routes.TypeRoute.AV
-import ulisse.entities.route.Routes.{Route, TypeRoute}
+import ulisse.entities.route.Routes.RouteType.AV
+import ulisse.entities.route.Routes.{ Route, RouteType }
 import ulisse.entities.route.Tracks.TrackDirection
-import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.{
-  routesEE,
-  stationsEE,
-  timetables
-}
-import ulisse.entities.timetable.DynamicTimetableTest.*
+import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.{ routesEE, stationsEE, timetables }
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
-import ulisse.entities.station.StationTest.{stationA, stationB}
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
-import ulisse.entities.timetable.DynamicTimetableTest.{timetable1, timetable2}
+import ulisse.entities.station.StationTest.{ stationA, stationB }
+import ulisse.entities.timetable.DynamicTimetableTest.*
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
-import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
-import ulisse.entities.train.TrainAgentTest.{train3905, train3906, train3907}
+import ulisse.entities.timetable.Timetables.{ RailInfo, Timetable, TimetableBuilder }
+import ulisse.entities.train.TrainAgentTest.{ train3905, train3906, train3907 }
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons.{UseType, Wagon}
+import ulisse.entities.train.Trains.{ Train, TrainTechnology }
+import ulisse.entities.train.Wagons.{ UseType, Wagon }
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.Time
 

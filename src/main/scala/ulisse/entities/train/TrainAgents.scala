@@ -1,14 +1,14 @@
 package ulisse.entities.train
 
-import ulisse.entities.route.Routes.TypeRoute
-import ulisse.entities.train.Trains.Train
-import ulisse.entities.simulation.agents.Perceptions.{Perception, PerceptionData}
+import ulisse.entities.route.Routes.RouteType
+import ulisse.entities.simulation.agents.Perceptions.{ Perception, PerceptionData }
 import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.Environment
+import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given_PerceptionProvider_RailwayEnvironment_TrainAgent
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.Timetables.Timetable
-import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given_PerceptionProvider_RailwayEnvironment_TrainAgent
+import ulisse.entities.train.Trains.Train
 
 object TrainAgents:
   case class TrainAgentInfo(train: TrainAgent, timetables: List[DynamicTimetable])
@@ -26,21 +26,21 @@ object TrainAgents:
         extends TrainStationInfo
 
   sealed trait TrainRouteInfo extends TrainAgentPerceptionData:
-    def routeTypology: TypeRoute
+    def routeTypology: RouteType
     def routeLength: Double
     def trainAheadDistance: Option[Double]
     def arrivalStationIsFree: Boolean
 
   object TrainRouteInfo:
     def apply(
-        routeTypology: TypeRoute,
+        routeTypology: RouteType,
         routeLength: Double,
         trainAheadDistance: Option[Double],
         arrivalStationIsFree: Boolean
     ): TrainRouteInfo = TrainRouteInfoImpl(routeTypology, routeLength, trainAheadDistance, arrivalStationIsFree)
 
     private final case class TrainRouteInfoImpl(
-        routeTypology: TypeRoute,
+        routeTypology: RouteType,
         routeLength: Double,
         trainAheadDistance: Option[Double],
         arrivalStationIsFree: Boolean

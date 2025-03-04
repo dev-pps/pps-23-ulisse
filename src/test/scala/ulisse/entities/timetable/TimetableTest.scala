@@ -3,8 +3,9 @@ package ulisse.entities.timetable
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
-import ulisse.entities.route.Routes.TypeRoute.AV
-import ulisse.entities.route.Routes.TypeRoute
+import ulisse.Utils.TestUtility.in
+import ulisse.entities.route.Routes.RouteType.AV
+import ulisse.entities.route.Routes.RouteType
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.TrainStationTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
 import ulisse.entities.timetable.Timetables.{toWaitTime, RailInfo, Timetable, TimetableBuilder}

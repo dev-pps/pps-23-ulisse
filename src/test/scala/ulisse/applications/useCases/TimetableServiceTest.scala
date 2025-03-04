@@ -9,17 +9,18 @@ import ulisse.applications.ports.TimetablePorts
 import ulisse.applications.ports.TimetablePorts.RequestResult
 import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{GenericError, InvalidStation, UnavailableTracks}
 import ulisse.entities.route.Routes
+import ulisse.entities.route.Routes.RouteError
 import ulisse.entities.timetable.Timetables
 import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.utils.Times.FluentDeclaration.h
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
-  import ulisse.entities.timetable.TestMockedEntities.{stationA, stationB, stationC, stationD, AV1000Train, AV800Train}
-  def TestEnvironment(): Either[NonEmptyChain[Routes.Errors], TimetableTestEnvironment.TestEnvConfig] =
+  import ulisse.entities.timetable.TestMockedEntities.*
+  def TestEnvironment(): Either[RouteError, TimetableTestEnvironment.TestEnvConfig] =
     TimetableTestEnvironment()
 
   Feature("User can create train timetables"):

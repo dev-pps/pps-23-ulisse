@@ -10,7 +10,7 @@ import ulisse.entities.route.Routes.*
 object RouteManagerTest:
   val validateRoute: ValidationRoute          = Route(departure, arrival, typeRoute, railsCount, pathLength)
   val validateEqualRoute: ValidationRoute     = Route(departure, arrival, typeRoute, railsCount, pathLength + 100d)
-  val validateDifferentRoute: ValidationRoute = Route(departure, arrival, TypeRoute.AV, railsCount, pathLength)
+  val validateDifferentRoute: ValidationRoute = Route(departure, arrival, RouteType.AV, railsCount, pathLength)
 
   val emptyManager: RouteManager = RouteManager.empty()
   val singleElementManager: RouteManager =
