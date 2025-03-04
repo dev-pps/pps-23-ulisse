@@ -84,6 +84,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
     env.stations shouldBe cd.stations
     env.routes shouldBe cd.routes
     env.timetables shouldBe cd.timetables.values.flatten
+    env.timetablesByTrain shouldBe cd.timetables
 
   "RailwayEnvironment" when:
     "created" should:
