@@ -25,6 +25,7 @@ object MapPanel:
 
     override def drawStation(newStations: StationPorts.Input#SM): Unit =
       stations.update(newStations.map(MapElement.createStation(_, ImagePath.station)))
+      println(s"count = ${observable.clicks}")
       updateGraphics()
 
     override protected def paintLook(g: Graphics2D): Unit =

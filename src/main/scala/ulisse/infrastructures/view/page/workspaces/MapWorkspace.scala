@@ -5,11 +5,13 @@ import ulisse.adapters.input.StationEditorAdapter
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.manager.FormManager
 import ulisse.infrastructures.view.map.MapPanel
+import ulisse.infrastructures.view.page.forms.StationForm
 import ulisse.infrastructures.view.page.forms.StationForm.StationFormData
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 
 import scala.concurrent.ExecutionContext
 import scala.swing.Swing
+import scala.swing.event.MouseEvent
 
 given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
   Swing.onEDT(runnable.run())
@@ -55,5 +57,7 @@ object MapWorkspace:
 
     formManager.stationForm.attachCreation(CreationStationEvent(adapterManager.stationAdapter, this))
     formManager.stationForm.attachDeletion(DeletionStationEvent(adapterManager.stationAdapter, this))
+
+    mapPanel.attachClick(StationForm.TakePointFomMapEvent(formManager.stationForm))
 
     export workspace.{component, revalidate}
