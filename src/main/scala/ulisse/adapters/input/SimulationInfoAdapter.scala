@@ -11,6 +11,4 @@ import ulisse.entities.train.Trains.Train
 import scala.concurrent.Future
 
 final case class SimulationInfoAdapter(private val simulationInfoPort: SimulationInfoPorts.Input):
-  def stationInfo(s: Station): Future[Option[StationEnvironmentElement]] = simulationInfoPort.stationInfo(s)
-  def routeInfo(r: Route): Future[Option[RouteEnvironmentElement]]       = simulationInfoPort.routeInfo(r)
-  def trainInfo(t: Train): Future[Option[TrainAgentInfo]]                = simulationInfoPort.trainInfo(t)
+  export simulationInfoPort.*
