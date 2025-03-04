@@ -6,9 +6,9 @@ import org.scalatest.matchers.should.Matchers
 import scala.math.{pow, sqrt}
 
 class CoordinateTest extends AnyFlatSpec with Matchers:
-  val x          = 0
-  val y          = 0
-  val coordinate = Coordinate(x, y)
+  val x                      = 0
+  val y                      = 0
+  val coordinate: Coordinate = Coordinate(x, y)
 
   "create coordinates" should "set x and y" in:
     coordinate.x should be(x)
@@ -35,3 +35,17 @@ class CoordinateTest extends AnyFlatSpec with Matchers:
     val other = Coordinate(x1, y1)
     val angle = math.atan2(y1.toDouble - y.toDouble, x1.toDouble - x.toDouble)
     coordinate.angle(other) should be(angle)
+
+  "add coordinates" should "sum x and y" in:
+    val x1    = x + 2
+    val y1    = y + 2
+    val other = Coordinate(x1, y1)
+    val sum   = Coordinate(x + x1, y + y1)
+    coordinate + other should be(sum)
+
+  "subtract coordinates" should "subtract x and y" in:
+    val x1    = x + 2
+    val y1    = y + 2
+    val other = Coordinate(x1, y1)
+    val diff  = Coordinate(x - x1, y - y1)
+    coordinate - other should be(diff)
