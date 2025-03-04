@@ -2,6 +2,7 @@ package ulisse.applications.managers
 
 import cats.syntax.either.*
 import ulisse.entities.route.Routes.{IdRoute, Route}
+import ulisse.entities.station.Station
 import ulisse.utils.Errors.ErrorMessage
 
 import scala.collection.immutable.Map
@@ -23,9 +24,11 @@ object RouteManagers:
 
   /** Manages the routes of the train network. */
   trait RouteManager:
-    // delete from train
-    // modify from train
-    // route accept a specific train: Train => Boolean
+    // Station update
+    // delete from station
+    // modify from station
+
+    // Filter
     // route from departure station
     // route from arrival station
     // route that contain a specific station
@@ -47,6 +50,15 @@ object RouteManagers:
 
     /** Find a route */
     def find(route: Route): Either[Errors, Route] = findBy(route.id)
+
+    /** Find all the routes that depart from a specific station. */
+    def findByDeparture(station: Station): List[Route] = routes filter (_ isDeparture station)
+
+    /** Find all the routes that arrive at a specific station. */
+    def findByArrival(station: Station): List[Route] = routes filter (_ isArrival station)
+
+    /** Find all the routes that contain a specific path. */
+    def findByPath(a: Station, b: Station): List[Route] = routes filter (_ isPath (a, b))
 
     /** Save a route */
     def save(route: Route): Either[Errors, RouteManager]
@@ -83,7 +95,7 @@ object RouteManagers:
 
       override def modify(oldRoute: Route, newRoute: Route): Either[Errors, RouteManager] =
         val managerWithoutOldRoute = copy(manager - oldRoute.id)
-        (findBy(oldRoute.id), managerWithoutOldRoute.findBy(newRoute.id)) match
+        (findBy(oldRoute.id), managerWithoutOldRoute findBy newRoute.id) match
           case (Left(error), _) => error.asLeft
           case (_, Right(_))    => Errors.AlreadyExist.asLeft
           case (_, _)           => copy(manager - oldRoute.id + (newRoute.id -> newRoute)).asRight
