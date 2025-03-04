@@ -1,16 +1,23 @@
 package ulisse.infrastructures.view.page.forms
 
+import ulisse.adapters.input.StationEditorAdapter
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.infrastructures.view.map.MapElement
+import ulisse.infrastructures.view.manager.FormManager
+import ulisse.infrastructures.view.map.{MapElement, MapPanel}
 import ulisse.infrastructures.view.page.forms.Form.BaseForm
 import ulisse.infrastructures.view.page.forms.StationForm.StationFormData
 
+import scala.concurrent.ExecutionContext
+import scala.swing.Swing
 import scala.swing.event.MouseEvent
+
+given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
+  Swing.onEDT(runnable.run())
 
 /** Represents the station form of the application. */
 trait StationForm extends Form:
@@ -40,6 +47,24 @@ object StationForm:
 
   /** Represents the station form data. */
   final case class StationFormData(name: String, x: String, y: String, tracks: String)
+
+  /** Represents the creation station event. */
+  final case class CreationStationEvent(adapter: StationEditorAdapter, forms: FormManager, map: MapPanel)
+      extends ClickObserver[StationFormData]:
+    override def onClick(data: StationFormData): Unit =
+      val future = adapter.onOkClick(data.name, data.x, data.y, data.tracks, Option.empty)
+      future.onComplete(_ map:
+        case Left(error) => println(error)
+        case Right(stations) =>
+          map.uploadStation(stations)
+          map.attachClickStation(StationForm.TakeStationFromMapEvent(forms.stationForm))
+          map.attachClickStation(RouteForm.TakeStationFromMapEvent(forms.routeForm))
+      )
+
+  /** Represents the deletion station event. */
+  final case class DeletionStationEvent(adapter: StationEditorAdapter, form: StationForm, map: MapPanel)
+      extends ClickObserver[StationFormData]:
+    override def onClick(data: StationFormData): Unit = ()
 
   /** Represents the take point from map event. */
   final case class TakePointFomMapEvent(stationForm: StationForm) extends ClickObserver[MouseEvent]:
