@@ -1,5 +1,6 @@
 package ulisse.entities.simulation.data
 
+import ulisse.dsl.comparison.FieldsComparators.{Field, FieldComparator}
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.utils.Times.Time
 
@@ -26,6 +27,23 @@ object SimulationData:
           .flatMap(_.currentDelay)
           .map(_.toSeconds).sum
       )
+
+  given FieldComparator[SimulationDataField, SimulationData] with
+    def compare(simulationsData: List[SimulationData], ignoredFields: Seq[SimulationDataField]): Boolean =
+      val fieldsToCompare = SimulationDataField.values.filterNot(ignoredFields.contains)
+      simulationsData match
+        case firstSimulationData :: tail => tail.forall: otherSimulationData =>
+            fieldsToCompare.forall:
+              case SimulationDataField.Step => firstSimulationData.step == otherSimulationData.step
+              case SimulationDataField.SecondElapsed =>
+                firstSimulationData.secondElapsed == otherSimulationData.secondElapsed
+              case SimulationDataField.SimulationEnvironment =>
+                firstSimulationData.simulationEnvironment == otherSimulationData.simulationEnvironment
+        case _ => false
+
+  enum SimulationDataField extends Field[SimulationDataField, SimulationData]:
+    case Step, SecondElapsed, SimulationEnvironment
+    def values: Seq[SimulationDataField] = SimulationDataField.values.toSeq
 
 private final case class SimulationDataImpl(
     step: Int,

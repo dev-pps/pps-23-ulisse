@@ -21,7 +21,7 @@ final case class SimulationService(
   val minPermittedDistanceBetweenTrains: Double = 100.0
   override def initSimulation(): Future[(Engine, SimulationData)] =
     val p = Promise[(Engine, SimulationData)]()
-    eventQueue.setupSimulationManager(simulationManagers =>
+    eventQueue.addSetupSimulationManagerEvent(simulationManagers =>
       simulationManagers.simulationManager.reset().setupEnvironment(RailwayEnvironment.auto(
         ConfigurationData(
           simulationManagers.stationManager.stations.map(StationEnvironmentElement(_)),
@@ -35,7 +35,7 @@ final case class SimulationService(
 
   override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Future[Option[Engine]] = {
     val p = Promise[Option[Engine]]()
-    eventQueue.updateSimulationManager(simulationManager =>
+    eventQueue.addUpdateSimulationManagerEvent(simulationManager =>
       val newSimulationManager = simulationManager.setupEngine(stepSize, cyclesPerSecond)
       p.success(newSimulationManager.map(_.engine))
       newSimulationManager.getOrElse(simulationManager)
@@ -45,22 +45,22 @@ final case class SimulationService(
 
   def start(): Future[Engine] =
     val p = Promise[Engine]()
-    eventQueue.updateSimulationManager(_.start().tap(sm => { p.success(sm.engine); doStep() }))
+    eventQueue.addUpdateSimulationManagerEvent(_.start().tap(sm => { p.success(sm.engine); doStep() }))
     p.future
 
   def stop(): Future[Engine] =
     val p = Promise[Engine]()
-    eventQueue.updateSimulationManager(_.stop().tap(sm => p.success(sm.engine)))
+    eventQueue.addUpdateSimulationManagerEvent(_.stop().tap(sm => p.success(sm.engine)))
     p.future
 
-  def reset(): Future[Engine] =
-    val p = Promise[Engine]()
-    eventQueue.updateSimulationManager(_.reset().tap(sm => p.success(sm.engine)))
+  def reset(): Future[(Engine, SimulationData)] =
+    val p = Promise[(Engine, SimulationData)]()
+    eventQueue.addUpdateSimulationManagerEvent(_.reset().tap(sm => p.success(sm.engine, sm.simulationData)))
     p.future
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   private def doStep(): Unit =
-    eventQueue.updateSimulationManager {
+    eventQueue.addUpdateSimulationManagerEvent {
       case sm: SimulationManager if sm.engine.running => doStep(); sm.doStep()
       case sm                                         => sm
     }

@@ -17,7 +17,7 @@ final case class SimulationInfoService(private val eventQueue: SimulationEventQu
 
   override def stationInfo(s: Station): Future[Option[StationEnvironmentInfo]] =
     val p = Promise[Option[StationEnvironmentInfo]]
-    eventQueue.readSimulationEnvironment(env =>
+    eventQueue.addReadSimulationEnvironmentEvent(env =>
       (
         env.stations.find(_ == s),
         Time.secondsToOverflowTime(env.timetables.flatMap(_.delayIn(s)).foldLeft(0)(_ + _.toSeconds))
@@ -29,14 +29,14 @@ final case class SimulationInfoService(private val eventQueue: SimulationEventQu
 
   override def routeInfo(r: Route): Future[Option[RouteEnvironmentElement]] =
     val p = Promise[Option[RouteEnvironmentElement]]
-    eventQueue.readSimulationEnvironment(env =>
+    eventQueue.addReadSimulationEnvironmentEvent(env =>
       p.success(env.routes.find(_ === r))
     )
     p.future
 
   override def trainInfo(t: Train): Future[Option[TrainAgentInfo]] =
     val p = Promise[Option[TrainAgentInfo]]
-    eventQueue.readSimulationEnvironment(env => {
+    eventQueue.addReadSimulationEnvironmentEvent(env => {
       (env.trains.find(_ == t), env.timetablesByTrain.find(_._1 == t)) match
         case (Some(t), Some(tt)) => p.success(Some(TrainAgentInfo(t, tt._2)))
         case _                   => p.success(None)

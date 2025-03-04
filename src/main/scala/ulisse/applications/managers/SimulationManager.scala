@@ -70,6 +70,7 @@ object SimulationManager:
       simulationData
         .increaseStepByOne()
         .increaseSecondElapsedBy(engineData.lastDelta)
+        .
         .tap(nsd => notificationService.foreach(_.stepNotification(nsd)))
 
     private def updateManager(es: EngineState => EngineState, sd: EngineState => SimulationData)(using
