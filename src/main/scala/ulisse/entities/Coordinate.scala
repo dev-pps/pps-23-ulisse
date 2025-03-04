@@ -32,6 +32,12 @@ trait Coordinate:
   def angle(coordinate: Coordinate): Double =
     atan2(coordinate.y.toDouble - y.toDouble, coordinate.x.toDouble - x.toDouble)
 
+  /** Adds two coordinates. */
+  def +(that: Coordinate): Coordinate = Coordinate(x + that.x, y + that.y)
+
+  /** Subtracts two coordinates. */
+  def -(that: Coordinate): Coordinate = Coordinate(x - that.x, y - that.y)
+
 /** Companion object for `Coordinate`. Provides methods to create and manipulate coordinates. */
 object Coordinate:
 
