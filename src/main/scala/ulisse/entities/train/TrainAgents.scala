@@ -73,9 +73,9 @@ object TrainAgents:
         val minDistanceTravelled = 0.0
         copy(distanceTravelled = math.max(minDistanceTravelled, newDistanceTravelled))
 
-      // todo: modificare il tipo di ritorno con TrainAgent invece di `Option[Actions.SimulationAction]`
       override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[TrainAgent] =
         val perception: Option[TrainAgentPerception[?]] = simulationEnvironment.perceptionFor[TrainAgent](this)
+
         // TODO: aggiornare anche env
         // in env la prima cosa che fa dopo aver fatto do step è aggiornare l'agente con l'azione nuova
         // --> diventerebbe che viene sostituito direttamente con l'agente restituito da doStep
