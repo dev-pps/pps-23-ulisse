@@ -1,6 +1,7 @@
 package ulisse.applications
 
 import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
+import ulisse.applications.event.SimulationEventData
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
@@ -93,13 +94,7 @@ trait AppState:
   ) => (StationManager, RouteManager, TrainManager, TimetableManager)): AppState
 
   /** update [[SimulationManager]], with a function that takes a [[SimulationManager]] and a [[StationManager]]. */
-  def initSimulation(update: (
-      SimulationManager,
-      StationManager,
-      RouteManager,
-      TrainManager,
-      TimetableManager
-  ) => SimulationManager): AppState
+  def initSimulation(update: SimulationEventData => SimulationManager): AppState
 
 object AppState:
   /** Create new application state with empty managers. */
@@ -173,11 +168,7 @@ object AppState:
         update(stationManager, routeManager, trainManager, timetableManager)
       copy(newStation, newRoute, newTrain, timetableManager = newTimetable)
 
-    override def initSimulation(update: (
-        SimulationManager,
-        StationManager,
-        RouteManager,
-        TrainManager,
-        TimetableManager
-    ) => SimulationManager): AppState =
-      copy(simulationManager = update(simulationManager, stationManager, routeManager, trainManager, timetableManager))
+    override def initSimulation(update: SimulationEventData => SimulationManager): AppState =
+      copy(simulationManager =
+        update(SimulationEventData(simulationManager, stationManager, routeManager, trainManager, timetableManager))
+      )

@@ -9,28 +9,24 @@ import ulisse.entities.simulation.data.SimulationData
 
 import java.util.concurrent.LinkedBlockingQueue
 
+final case class SimulationEventData(
+    simulationManager: SimulationManager,
+    stationManager: StationManager,
+    routeManager: RouteManager,
+    trainManager: TrainManager,
+    timetableManager: TimetableManager
+)
+
 /** Event queue to update the simulation. */
 trait SimulationEventQueue:
   /** Add an event to read a simulation. */
   def addReadSimulationEvent(update: SimulationData => Unit): Unit
 
   /** Add an event to create a simulation. */
-  def addCreateSimulationEvent(update: (
-      SimulationManager,
-      StationManager,
-      RouteManager,
-      TrainManager,
-      TimetableManager
-  ) => SimulationManager): Unit
+  def addCreateSimulationEvent(update: SimulationEventData => SimulationManager): Unit
 
   /** Add an event to update the simulation. */
-  def addUpdateSimulationEvent(update: (
-      SimulationManager,
-      StationManager,
-      RouteManager,
-      TrainManager,
-      TimetableManager
-  ) => SimulationManager): Unit =
+  def addUpdateSimulationEvent(update: SimulationEventData => SimulationManager): Unit =
     addCreateSimulationEvent(update)
 
   /** Add an event to delete the simulation. */
@@ -46,13 +42,7 @@ object SimulationEventQueue:
       extends SimulationEventQueue:
     override def addReadSimulationEvent(update: SimulationData => Unit): Unit = events.offer(_ readSimulation update)
 
-    override def addCreateSimulationEvent(update: (
-        SimulationManager,
-        StationManager,
-        RouteManager,
-        TrainManager,
-        TimetableManager
-    ) => SimulationManager): Unit =
+    override def addCreateSimulationEvent(update: SimulationEventData => SimulationManager): Unit =
       events.offer(_ initSimulation update)
 
     override def addDeleteSimulationEvent(update: SimulationManager => SimulationManager): Unit =
