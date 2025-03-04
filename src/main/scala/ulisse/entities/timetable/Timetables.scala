@@ -1,6 +1,6 @@
 package ulisse.entities.timetable
 
-import ulisse.entities.route.Routes.TypeRoute
+import ulisse.entities.route.Routes.RouteType
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.TrainStationTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
 import ulisse.entities.train.Trains.Train
@@ -16,8 +16,8 @@ object Timetables:
   private type StationTime = TrainStationTime
   private type WaitTime    = Int
 
-  /** Rail info `length` and [[TypeRoute]] used to estimate `ScheduleTime` of station. */
-  case class RailInfo(length: Length, typeRoute: TypeRoute)
+  /** Rail info `length` and [[RouteType]] used to estimate `ScheduleTime` of station. */
+  case class RailInfo(length: Length, typeRoute: RouteType)
 
   extension (i: Int)
     def toWaitTime: WaitTime = i

@@ -3,7 +3,7 @@ package ulisse.entities.timetable
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
-import ulisse.entities.route.Routes.TypeRoute.AV
+import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationTest.{stationA, stationB, stationC, stationD}
 import ulisse.entities.timetable.DynamicTimetableTest.{dynamicTimetable1, timetable1, timetable2}

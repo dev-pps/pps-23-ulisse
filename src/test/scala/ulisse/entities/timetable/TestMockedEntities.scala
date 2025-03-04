@@ -4,7 +4,7 @@ import ulisse.applications.AppState
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.entities.Coordinate
-import ulisse.entities.route.Routes.TypeRoute.AV
+import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.Timetables.RailInfo
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
