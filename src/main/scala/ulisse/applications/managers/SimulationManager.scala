@@ -59,7 +59,7 @@ object SimulationManager:
         copy(engine.configuration = ec)
       )
     override def setupEnvironment(environment: RailwayEnvironment): SimulationManager =
-      copy(simulationData = SimulationData.empty().withEnvironment(environment))
+      copy(simulationData = SimulationData.withEnvironment(environment))
     override def start(): SimulationManager =
       copy(engine.running = true)
     override def stop(): SimulationManager  = copy(engine.running = false)
@@ -70,7 +70,7 @@ object SimulationManager:
       simulationData
         .increaseStepByOne()
         .increaseSecondElapsedBy(engineData.lastDelta)
-        .withEnvironment(simulationData.simulationEnvironment.doStep(engine.configuration.stepSize))
+        .simulationEnvironment_=(simulationData.simulationEnvironment.doStep(engine.configuration.stepSize))
         .tap(nsd => notificationService.foreach(_.stepNotification(nsd)))
 
     private def updateManager(es: EngineState => EngineState, sd: EngineState => SimulationData)(using
