@@ -28,7 +28,7 @@ final case class SimulationService(
     val p = Promise[(Engine, SimulationData)]()
     eventQueue.addUpdateSimulationEvent(
       (simulationManager, stationManager, routeManager, trainManager, timetableManager) => {
-        val newSimulationManager = simulationManager.setupEnvironment(RailwayEnvironment(
+        val newSimulationManager = simulationManager.reset().setupEnvironment(RailwayEnvironment(
           Time(0, 0, 0),
           ConfigurationData(
             stationManager.stations.map(StationEnvironmentElement(_)),
