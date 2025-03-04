@@ -1,5 +1,6 @@
 package ulisse.infrastructures.view.utils
 
+import ulisse.entities.Coordinate
 import ulisse.infrastructures.view.components.draw.DrawImages.DrawImage
 
 import java.awt.image.ImageObserver
@@ -13,7 +14,12 @@ object Swings:
   /** Create an empty border with the given [[width]] and [[height]]. */
   def createEmptyBorder(width: Int, height: Int): Border = BorderFactory.createEmptyBorder(height, width, height, width)
 
-  /** Methods to perform arithmetic operations on [[Container]] objects */
+  /** Methods to adapt the [[Coordinate]] object in the [[Point]] object. */
+  extension (coordinate: Coordinate)
+    /** Transform the [[Coordinate]] to a [[Point]] object. */
+    def toPoint: Point = new Point(coordinate.x, coordinate.y)
+
+  /** Methods to improve the [[Container]] object. */
   extension (a: Container)
     /** Center the [[Container]] in the [[Container]] [[b]]. */
     def centerOf(b: Container): Unit =
