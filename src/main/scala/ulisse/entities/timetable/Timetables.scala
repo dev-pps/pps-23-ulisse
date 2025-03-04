@@ -4,7 +4,7 @@ import ulisse.entities.route.Routes.TypeRoute
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.TrainStationTime.{AutoScheduleTime, EndScheduleTime, StartScheduleTime}
 import ulisse.entities.train.Trains.Train
-import ulisse.utils.Times.{ClockTime, ClockTimeErrors, Time}
+import ulisse.utils.Times.ClockTime
 import ulisse.utils.Times.FluentDeclaration.h
 
 import scala.collection.immutable.ListMap
