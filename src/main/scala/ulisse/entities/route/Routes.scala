@@ -21,6 +21,9 @@ object Routes:
 
   /** Errors that can be generated during route creation */
   enum Errors(val text: String) extends ErrorMessage(text):
+    /** Departure and arrival station must be different */
+    case SameStation extends Errors("Departure and arrival station must be different")
+
     /** Rails count must be greater than 0 */
     case FewRails extends Errors("Rails count must be greater than 0")
 
@@ -64,9 +67,14 @@ object Routes:
     /** Check if a station is the arrival station */
     def isArrival(station: Station): Boolean = arrival equals station
 
+    /** Check if route is in the right direction, [[departure]] equals a and [[arrival]] equals b */
+    def isRightDirection(a: Station, b: Station): Boolean = (departure equals a) && (arrival equals b)
+
+    /** Check if route is in the reverse direction, [[departure]] equals b and [[arrival]] equals a */
+    def isReverseDirection(a: Station, b: Station): Boolean = (departure equals b) && (arrival equals a)
+
     /** Check if route is between two stations */
-    def isPath(other: Station, arrival: Station): Boolean =
-      (this.departure equals departure) && (this.arrival equals arrival)
+    def isPath(a: Station, b: Station): Boolean = isRightDirection(a, b) || isReverseDirection(a, b)
 
     /** Check if route is of a certain type */
     def isTechnology(technology: Technology): Boolean = typology.technology equals technology
@@ -111,6 +119,9 @@ object Routes:
     private def validateLength(length: Double, departure: Station, arrival: Station): Either[RouteError, Double] =
       length.validateChain((_ >= (departure.coordinate distance arrival.coordinate), Errors.TooShort))
 
+    private def validateStation(departure: Station, arrival: Station): Either[RouteError, Station] =
+      departure.validateChain((_ != arrival, Errors.SameStation))
+
     private def validateRoute(
         departure: Station,
         arrival: Station,
@@ -119,9 +130,11 @@ object Routes:
         length: Double
     ): Either[RouteError, Route] =
       (
+        validateStation(departure, arrival),
+        validateStation(arrival, departure),
         validateRailsCount(railsCount, departure, arrival),
         validateLength(length, departure, arrival)
-      ).mapN(RouteImpl(departure, arrival, typeRoute, _, _))
+      ).mapN(RouteImpl(_, _, typeRoute, _, _))
 
     /** Create a new route between two stations */
     def apply(

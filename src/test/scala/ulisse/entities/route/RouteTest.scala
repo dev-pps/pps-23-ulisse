@@ -1,5 +1,6 @@
 package ulisse.entities.route
 
+import cats.data.Chain
 import org.mockito.Mockito.when
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
@@ -61,6 +62,22 @@ class RouteTest extends AnyFlatSpec with Matchers:
       route          <- validateRoute
       differentRoute <- Route(departure, arrival, RouteType.AV, railsCount, pathLength + 100)
     yield route checkAllField differentRoute mustBe false
+
+  "create route with same departure and arrival" should "launch error" in:
+    val sameStation: ValidationRoute = Route(departure, departure, typeRoute, railsCount, pathLength)
+    sameStation mustBe Left(Chain(Routes.Errors.SameStation))
+
+  "create route with few rails" should "launch error" in:
+    val fewRails: ValidationRoute = Route(departure, arrival, typeRoute, 0, pathLength)
+    fewRails mustBe Left(Chain(Routes.Errors.FewRails))
+
+  "create route with too many rails" should "launch error" in:
+    val tooManyRails: ValidationRoute = Route(departure, arrival, typeRoute, 3, pathLength)
+    tooManyRails mustBe Left(Chain(Routes.Errors.TooManyRails))
+
+  "create route with too short path" should "launch error" in:
+    val tooShortPath: ValidationRoute = Route(departure, arrival, typeRoute, railsCount, pathLength - 1)
+    tooShortPath mustBe Left(Chain(Routes.Errors.TooShort))
 
   "route with departure" should "change routes departure" in:
     for route <- validateRoute
@@ -134,13 +151,33 @@ class RouteTest extends AnyFlatSpec with Matchers:
     for route <- validateRoute
     yield route isArrival departure mustBe false
 
+  "check right direction of route" should "be equals" in:
+    for route <- validateRoute
+    yield route isRightDirection (departure, arrival) mustBe true
+
+  "check right direction of route with reverse direction" should "be different" in:
+    for route <- validateRoute
+    yield route isRightDirection (arrival, departure) mustBe false
+
+  "check reverse direction of route" should "be equals" in:
+    for route <- validateRoute
+    yield route isReverseDirection (arrival, departure) mustBe true
+
+  "check reverse direction of route with right direction" should "be different" in:
+    for route <- validateRoute
+    yield route isReverseDirection (departure, arrival) mustBe false
+
   "check path of route" should "be equals" in:
     for route <- validateRoute
     yield route isPath (departure, arrival) mustBe true
 
-  "check path of route with different arrival" should "be different" in:
+  "check path all combinations of stations" should "be equals" in:
     for route <- validateRoute
-    yield route isPath (departure, departure) mustBe false
+    yield
+      route isPath (departure, arrival) mustBe true
+      route isPath (arrival, departure) mustBe true
+      route isPath (departure, departure) mustBe false
+      route isPath (arrival, arrival) mustBe false
 
   "check technology of route" should "be equals" in:
     for route <- validateRoute
