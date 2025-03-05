@@ -19,7 +19,9 @@ final case class SimulationInfoService(private val eventQueue: SimulationEventQu
   override def stationInfo(s: Station): Future[Option[StationEnvironmentInfo]] =
     val p = Promise[Option[StationEnvironmentInfo]]
     eventQueue.addReadSimulationEnvironmentEvent(env =>
-      p.success(env.stations.find(_ == s).map(see => StationEnvironmentInfo(see, env.cumulativeDelayIn(see), env.averageDelayIn(see))))
+      p.success(env.stations.find(_ == s).map(see =>
+        StationEnvironmentInfo(see, env.cumulativeDelayIn(see), env.averageDelayIn(see))
+      ))
     )
     p.future
 

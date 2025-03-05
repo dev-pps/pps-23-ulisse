@@ -4,6 +4,8 @@ import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, EngineState, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.utils.Times.{ClockTime, Time}
+
+import scala.collection.immutable.{AbstractSeq, LinearSeq}
 import scala.util.chaining.scalaUtilChainingOps
 
 trait SimulationManager:
@@ -48,7 +50,7 @@ object SimulationManager:
   def calculateCycleTimeStep(cps: Int): Double =
     1.0 / cps * 1000
 
-  private[this] case class SimulationManagerImpl(
+  private case class SimulationManagerImpl(
       engine: Engine,
       simulationData: SimulationData,
       notificationService: Option[SimulationPorts.Output],
@@ -81,10 +83,19 @@ object SimulationManager:
     private def increaseSecondElapsedData(engineState: EngineState): SimulationData =
       simulationData.increaseSecondElapsedBy(engineState.lastDelta)
 
-    override def doStep(): SimulationManager =
-      given updatedEngineState: EngineState = engine.state.update(timeProvider.currentTimeMillis().toDouble)
+    private def updateSimulation(using engineState: EngineState): SimulationManager =
       engine.configuration.cyclesPerSecond.map(calculateCycleTimeStep) match
-        case Some(cycleTimeStep) if updatedEngineState.elapsedCycleTime >= cycleTimeStep =>
+        case Some(cycleTimeStep) if engineState.elapsedCycleTime >= cycleTimeStep =>
           updateManager(_.updateElapsedCycleTime(-cycleTimeStep), updateSimulationData)
         case Some(_) => updateManager(identity, increaseSecondElapsedData)
         case _       => updateManager(identity, updateSimulationData)
+
+    private def evaluateTermination(simulationManager: SimulationManager): SimulationManager =
+      if simulationData.simulationEnvironment.timetables.forall(_.completed) then
+        notificationService.foreach(_.simulationEnded(simulationData))
+        simulationManager.stop()
+      else simulationManager
+
+    override def doStep(): SimulationManager =
+      given updatedEngineState: EngineState = engine.state.update(timeProvider.currentTimeMillis().toDouble)
+      evaluateTermination(updateSimulation)

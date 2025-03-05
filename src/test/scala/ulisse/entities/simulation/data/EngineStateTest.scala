@@ -5,10 +5,10 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.simulation.data.EngineState.{defaultElapsedCycleTime, defaultLastDelta, defaultLastUpdate}
 
 class EngineStateTest extends AnyWordSpec with Matchers:
-  private val lastUpdate = 1.0
-  private val lastDelta = 2.0
+  private val lastUpdate       = 1.0
+  private val lastDelta        = 2.0
   private val elapsedCycleTime = 3.0
-  private val engineState = EngineState(Some(lastUpdate), lastDelta, elapsedCycleTime)
+  private val engineState      = EngineState(Some(lastUpdate), lastDelta, elapsedCycleTime)
 
   "Engine state" when:
     "created" should:
@@ -35,7 +35,7 @@ class EngineStateTest extends AnyWordSpec with Matchers:
     "updated" should:
       "set last update when is none" in:
         val currentUpdate = 6.0
-        val engineState = EngineState.empty()
+        val engineState   = EngineState.empty()
         engineState.update(currentUpdate).lastUpdate shouldBe Some(currentUpdate)
 
       "set last update when current update is greater or equal than last update" in:
@@ -43,12 +43,12 @@ class EngineStateTest extends AnyWordSpec with Matchers:
         engineState.update(currentUpdate).lastUpdate shouldBe Some(currentUpdate)
 
       "update lastDelta when current update is greater or equal than last update" in:
-        val deltaElapsed = 1.0
+        val deltaElapsed  = 1.0
         val currentUpdate = lastUpdate + deltaElapsed
         engineState.update(currentUpdate).lastDelta shouldBe deltaElapsed
 
       "update elapsed cycle time when current update is greater or equal than last update" in:
-        val deltaElapsed = 1.0
+        val deltaElapsed  = 1.0
         val currentUpdate = lastUpdate + deltaElapsed
         engineState.update(currentUpdate).elapsedCycleTime shouldBe elapsedCycleTime + deltaElapsed
 

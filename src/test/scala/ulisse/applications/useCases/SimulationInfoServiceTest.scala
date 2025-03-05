@@ -49,7 +49,7 @@ class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
         updateState()
         Await.result(stationInfoResult, Duration.Inf) match
           case Some(StationEnvironmentInfo(s, ct, at)) => (s, ct, at) shouldBe (stationA, Id(delay) + Id(delay), delay)
-          case None                               => fail()
+          case None                                    => fail()
 
       "return station info" in:
         checkStationInfoWithDelay(Time(0, 0, 0))

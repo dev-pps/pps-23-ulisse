@@ -6,8 +6,8 @@ import ulisse.entities.simulation.data.EngineConfiguration.{defaultCyclesPerSeco
 
 class EngineConfigurationTest extends AnyWordSpec with Matchers:
 
-  private val stepSize = 10
-  private val cyclesPerSecond = 2
+  private val stepSize            = 10
+  private val cyclesPerSecond     = 2
   private val engineConfiguration = EngineConfiguration(stepSize, Some(cyclesPerSecond))
 
   "EngineConfiguration" when:
@@ -56,6 +56,6 @@ class EngineConfigurationTest extends AnyWordSpec with Matchers:
 
     "empty" should:
       "have no step size and no cycles per second" in:
-          val engineConfiguration = EngineConfiguration.empty()
-          engineConfiguration.stepSize shouldBe 0
-          engineConfiguration.cyclesPerSecond shouldBe None
+        val engineConfiguration = EngineConfiguration.empty()
+        engineConfiguration.stepSize shouldBe 0
+        engineConfiguration.cyclesPerSecond shouldBe None
