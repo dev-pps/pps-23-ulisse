@@ -19,12 +19,12 @@ object RouteTest:
   val railsCount: Int             = 2
   val departure: Station          = Station("Rimini", departureCoordinate, railsCount)
   val arrival: Station            = Station("Cesena", arrivalCoordinate, railsCount)
-  val typeRoute: RouteType        = RouteType.Normal
+  val routeType: RouteType        = RouteType.Normal
   val pathLength: Double          = departureCoordinate.distance(arrivalCoordinate)
 
 class RouteTest extends AnyFlatSpec with Matchers:
   import RouteTest.*
-  val validateRoute: ValidationRoute = Route(departure, arrival, typeRoute, railsCount, pathLength)
+  val validateRoute: ValidationRoute = Route(departure, arrival, routeType, railsCount, pathLength)
 
   "create routes" should "set core parameters: typology, railsCount, path" in:
     validateRoute match
@@ -32,26 +32,26 @@ class RouteTest extends AnyFlatSpec with Matchers:
       case Right(route) =>
         route.departure mustBe departure
         route.arrival mustBe arrival
-        route.typology mustBe typeRoute
+        route.typology mustBe routeType
         route.railsCount mustBe railsCount
         route.length mustBe pathLength
 
   "check equals routes" should "be same typology and path and the others parameters different" in:
-    val equalRoute: ValidationRoute = Route(departure, arrival, typeRoute, railsCount - 1, pathLength + 1)
+    val equalRoute: ValidationRoute = Route(departure, arrival, routeType, railsCount - 1, pathLength + 1)
     validateRoute mustBe equalRoute
 
   "check different routes" should "have different departure or arrival station or typology " in:
     val stationTracks: Int                     = 2
     val newDeparture: Station                  = Station("Firenze", departureCoordinate, stationTracks)
     val newArrival: Station                    = Station("Bologna", arrivalCoordinate, stationTracks)
-    val routeWithNewDeparture: ValidationRoute = Route(newDeparture, arrival, typeRoute, railsCount, pathLength)
-    val routeWithNewArrival: ValidationRoute   = Route(departure, newArrival, typeRoute, railsCount, pathLength)
+    val routeWithNewDeparture: ValidationRoute = Route(newDeparture, arrival, routeType, railsCount, pathLength)
+    val routeWithNewArrival: ValidationRoute   = Route(departure, newArrival, routeType, railsCount, pathLength)
     val createRouteByType: RouteType => Either[RouteError, Route] = Route(departure, arrival, _, railsCount, pathLength)
 
     validateRoute must not be routeWithNewDeparture
     validateRoute must not be routeWithNewArrival
 
-    RouteType.values filter (!_.canEqual(typeRoute)) foreach (validateRoute must not be createRouteByType(_))
+    RouteType.values filter (!_.canEqual(routeType)) foreach (validateRoute must not be createRouteByType(_))
 
   "check all fields from equal route" should "be equals" in:
     for route <- validateRoute
@@ -63,42 +63,12 @@ class RouteTest extends AnyFlatSpec with Matchers:
       differentRoute <- Route(departure, arrival, RouteType.AV, railsCount, pathLength + 100)
     yield route checkAllField differentRoute mustBe false
 
-  "create route with same departure and arrival" should "launch error" in:
-    val error                        = Left(Chain(Routes.Errors.SameStation))
-    val sameStation: ValidationRoute = Route(departure, departure, typeRoute, railsCount, pathLength)
-    sameStation mustBe error
-    validateRoute.foreach(_ withArrival departure mustBe error)
-    validateRoute.foreach(_ withDeparture arrival mustBe error)
-
-  "create route with few rails" should "launch error" in:
-    val error                     = Left(Chain(Routes.Errors.FewRails))
-    val newRailsCount             = 0
-    val fewRails: ValidationRoute = Route(departure, arrival, typeRoute, newRailsCount, pathLength)
-    fewRails mustBe error
-    validateRoute.foreach(_ withRailsCount newRailsCount mustBe error)
-
-  "create route with too many rails" should "launch error" in:
-    val error                         = Left(Chain(Routes.Errors.TooManyRails))
-    val newRailsCount                 = 3
-    val tooManyRails: ValidationRoute = Route(departure, arrival, typeRoute, newRailsCount, pathLength)
-    tooManyRails mustBe error
-    validateRoute.foreach(_ withRailsCount newRailsCount mustBe error)
-
-  "create route with too short path" should "launch error" in:
-    val error                         = Left(Chain(Routes.Errors.TooShort))
-    val newLength                     = pathLength - 1
-    val tooShortPath: ValidationRoute = Route(departure, arrival, typeRoute, railsCount, newLength)
-    tooShortPath mustBe error
-    validateRoute.foreach(_ withLength newLength mustBe error)
-
   "route with departure" should "change routes departure" in:
     val newDeparture: Station = Station("Firenze", departure.coordinate, 2)
     for
       route                <- validateRoute
       changeRouteDeparture <- route withDeparture newDeparture
-    yield
-      route.departure must not be newDeparture
-      changeRouteDeparture.departure mustBe newDeparture
+    yield changeRouteDeparture.departure mustBe newDeparture
 
   "route with automatic departure" should "change routes departure" in:
     val newDeparture: Station = Station("Firenze", departure.coordinate, 2)
@@ -113,9 +83,7 @@ class RouteTest extends AnyFlatSpec with Matchers:
     for
       route              <- validateRoute
       changeRouteArrival <- route withArrival newArrival
-    yield
-      route.arrival must not be newArrival
-      changeRouteArrival.arrival mustBe newArrival
+    yield changeRouteArrival.arrival mustBe newArrival
 
   "route with automatic arrival" should "change routes arrival" in:
     val newArrival: Station = Station("Bologna", arrival.coordinate, 2)
@@ -128,28 +96,49 @@ class RouteTest extends AnyFlatSpec with Matchers:
   "route with typology" should "change routes typology" in:
     val newTypology: RouteType = RouteType.AV
     for route <- validateRoute
-    yield
-      val changeRouteTypology = route withTypology newTypology
-      route.typology must not be newTypology
-      changeRouteTypology.typology mustBe newTypology
+    yield (route withTypology newTypology).typology mustBe newTypology
 
   "route with rails count" should "change routes rails count" in:
     val newRailsCount: Int = railsCount - 1
     for
       route                 <- validateRoute
       changeRouteRailsCount <- route withRailsCount newRailsCount
-    yield
-      route.railsCount must not be newRailsCount
-      changeRouteRailsCount.railsCount mustBe newRailsCount
+    yield changeRouteRailsCount.railsCount mustBe newRailsCount
 
   "route with length" should "change routes length" in:
     val newLength: Double = pathLength + 50.0d
     for
       route             <- validateRoute
       changeRouteLength <- route withLength newLength
-    yield
-      route.length must not be newLength
-      changeRouteLength.length mustBe newLength
+    yield changeRouteLength.length mustBe newLength
+
+  "create route with same departure and arrival" should "launch error" in:
+    val error                        = Left(Chain(Routes.Errors.SameStation))
+    val sameStation: ValidationRoute = Route(departure, departure, routeType, railsCount, pathLength)
+    sameStation mustBe error
+    validateRoute.foreach(_ withArrival departure mustBe error)
+    validateRoute.foreach(_ withDeparture arrival mustBe error)
+
+  "create route with few rails" should "launch error" in:
+    val error                     = Left(Chain(Routes.Errors.FewRails))
+    val newRailsCount             = 0
+    val fewRails: ValidationRoute = Route(departure, arrival, routeType, newRailsCount, pathLength)
+    fewRails mustBe error
+    validateRoute.foreach(_ withRailsCount newRailsCount mustBe error)
+
+  "create route with too many rails" should "launch error" in:
+    val error                         = Left(Chain(Routes.Errors.TooManyRails))
+    val newRailsCount                 = 3
+    val tooManyRails: ValidationRoute = Route(departure, arrival, routeType, newRailsCount, pathLength)
+    tooManyRails mustBe error
+    validateRoute.foreach(_ withRailsCount newRailsCount mustBe error)
+
+  "create route with too short path" should "launch error" in:
+    val error                         = Left(Chain(Routes.Errors.TooShort))
+    val newLength                     = pathLength - 1
+    val tooShortPath: ValidationRoute = Route(departure, arrival, routeType, railsCount, newLength)
+    tooShortPath mustBe error
+    validateRoute.foreach(_ withLength newLength mustBe error)
 
   "check departure station" should "be equals" in:
     for route <- validateRoute
@@ -203,18 +192,18 @@ class RouteTest extends AnyFlatSpec with Matchers:
     for route <- validateRoute
     yield route isTechnology RouteType.AV.technology mustBe false
 
-  "check train technology acceptable" should "be equals" in:
-    val technology = RouteType.Normal.technology
-    val train      = mock[Train]
-    when(train.techType).thenReturn(TrainTechnology(technology.name, technology.maxSpeed, 0, 0))
+  private def mockTrainWithTechnologyMaxSpeed(maxSpeed: Int): Train =
+    val train           = mock[Train]
+    val trainTechnology = TrainTechnology("Test", maxSpeed, 0, 0)
+    when(train.techType) thenReturn trainTechnology
+    train
 
+  "check train technology acceptable" should "be equals" in:
+    val train = mockTrainWithTechnologyMaxSpeed(routeType.technology.maxSpeed - 1)
     for route <- validateRoute
-    yield route isTrainTechnologyAcceptable train mustBe true
+    yield route acceptTrainTechnology train mustBe true
 
   "check train technology not acceptable" should "be different" in:
-    val technology = RouteType.AV.technology
-    val train      = mock[Train]
-    when(train.techType) thenReturn TrainTechnology(technology.name, technology.maxSpeed + 50, 0, 0)
-
+    val train = mockTrainWithTechnologyMaxSpeed(routeType.technology.maxSpeed + 1)
     for route <- validateRoute
-    yield route isTrainTechnologyAcceptable train mustBe false
+    yield route acceptTrainTechnology train mustBe false

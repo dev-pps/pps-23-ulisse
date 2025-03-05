@@ -8,8 +8,8 @@ import ulisse.entities.route.Routes.*
 import ulisse.entities.station.Station
 
 object RouteManagerTest:
-  val validateRoute: ValidationRoute          = Route(departure, arrival, typeRoute, railsCount, pathLength)
-  val validateEqualRoute: ValidationRoute     = Route(departure, arrival, typeRoute, railsCount, pathLength + 100d)
+  val validateRoute: ValidationRoute          = Route(departure, arrival, routeType, railsCount, pathLength)
+  val validateEqualRoute: ValidationRoute     = Route(departure, arrival, routeType, railsCount, pathLength + 100d)
   val validateDifferentRoute: ValidationRoute = Route(departure, arrival, RouteType.AV, railsCount, pathLength)
 
   val emptyManager: RouteManager = RouteManager.empty()
@@ -89,7 +89,7 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
       updateManager  <- singleElementManager save differentRoute
     yield updateManager modify (route, differentRoute) mustBe Left(Errors.AlreadyExist)
 
-  "modify departure station in a route" should "be contains in routeManager" in:
+  "modify automatic departure station in a route" should "be contains in routeManager" in:
     val newDeparture = Station("New Departure", departure.coordinate, 3)
     val newManager   = singleElementManager modifyAutomaticByDeparture (departure, newDeparture)
     for
@@ -99,7 +99,7 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
       newManager.size mustBe singleElementManager.size
       route changeAutomaticDeparture newDeparture mustBe newRoute
 
-  "modify arrival station in a route" should "be contains in routeManager" in:
+  "modify automatic arrival station in a route" should "be contains in routeManager" in:
     val newArrival = Station("New Arrival", arrival.coordinate, 3)
     val newManager = singleElementManager modifyAutomaticByArrival (arrival, newArrival)
     for
@@ -110,30 +110,30 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
       route changeAutomaticArrival newArrival mustBe newRoute
 
   "modify automatic station in a route" should "be contains in routeManager" in:
-    val newDeparture = Station("New Departure", departure.coordinate, 3)
-    val newArrival   = Station("New Arrival", arrival.coordinate, 3)
-    val newManager   = singleElementManager modifyAutomaticByStation (departure, newDeparture)
-    val newManager1  = singleElementManager modifyAutomaticByStation (arrival, newArrival)
+    val newDeparture              = Station("New Departure", departure.coordinate, 3)
+    val newArrival                = Station("New Arrival", arrival.coordinate, 3)
+    val newManagerChangeDeparture = singleElementManager modifyAutomaticByStation (departure, newDeparture)
+    val newManagerChangeArrival   = singleElementManager modifyAutomaticByStation (arrival, newArrival)
     for
-      route     <- validateRoute
-      newRoute  <- newManager find route
-      newRoute1 <- newManager1 find route
+      route             <- validateRoute
+      newDepartureRoute <- newManagerChangeDeparture find route
+      newArrivalRoute   <- newManagerChangeArrival find route
     yield
-      newManager.size mustBe singleElementManager.size
-      route changeAutomaticDeparture newDeparture mustBe newRoute
-      route changeAutomaticArrival newArrival mustBe newRoute1
+      newManagerChangeDeparture.size mustBe singleElementManager.size
+      route changeAutomaticDeparture newDeparture mustBe newDepartureRoute
+      route changeAutomaticArrival newArrival mustBe newArrivalRoute
 
   "delete route that non exist" should "launch not exist error" in:
     for route <- validateRoute
     yield
       emptyManager.deleteBy(route.id) mustBe emptyManager.delete(route)
-      emptyManager.deleteBy(route.id) mustBe Left(Errors.NotExist)
+      emptyManager.delete(route) mustBe Left(Errors.NotExist)
 
   "delete route that exist" should "have size 0" in:
     for route <- validateRoute
     yield
       singleElementManager.deleteBy(route.id) mustBe singleElementManager.delete(route)
-      singleElementManager.deleteBy(route.id) mustBe Right(emptyManager)
+      singleElementManager.delete(route) mustBe Right(emptyManager)
 
   "find route from departure station" should "be contains in routeManager" in:
     singleElementManager findByDeparture departure mustBe Right(singleElementManager.routes)

@@ -9,19 +9,24 @@ import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.RouteEnvironmentElementTest.*
 import ulisse.entities.route.Routes.RouteType.AV
-import ulisse.entities.route.Routes.{ Route, RouteType }
+import ulisse.entities.route.Routes.{Route, RouteType}
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.*
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationEnvironmentElementTest.*
 import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
-import ulisse.entities.station.StationTest.{ stationA, stationB, stationC, stationD }
-import ulisse.entities.timetable.DynamicTimetableTest.{ dynamicTimetable1, dynamicTimetable2, dynamicTimetable3, dynamicTimetable4 }
+import ulisse.entities.station.StationTest.{stationA, stationB, stationC, stationD}
+import ulisse.entities.timetable.DynamicTimetableTest.{
+  dynamicTimetable1,
+  dynamicTimetable2,
+  dynamicTimetable3,
+  dynamicTimetable4
+}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
-import ulisse.entities.timetable.Timetables.{ RailInfo, Timetable, TimetableBuilder }
+import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.entities.train.TrainAgentTest.*
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.entities.train.Trains.{ Train, TrainTechnology }
-import ulisse.entities.train.Wagons.{ UseType, Wagon }
+import ulisse.entities.train.Trains.{Train, TrainTechnology}
+import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.Time
 
