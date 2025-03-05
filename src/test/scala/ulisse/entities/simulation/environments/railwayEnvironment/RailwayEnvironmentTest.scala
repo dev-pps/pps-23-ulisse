@@ -32,7 +32,8 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
     export state.motionData
     override def resetDistanceTravelled: TrainAgent =
       FakeTrainAgent(train, state.reset())
-    override def updateDistanceTravelled(distanceDelta: Double): TrainAgent = this
+    override def updateDistanceTravelled(distanceDelta: Double): TrainAgent =
+      this.copy(train, state.withOffsetDistance(distanceDelta))
     override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): TrainAgent =
       updateDistanceTravelled(routesEE.map(_.length).foldLeft(0.0)(math.max))
 
