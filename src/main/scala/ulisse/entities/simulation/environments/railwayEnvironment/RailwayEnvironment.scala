@@ -94,16 +94,13 @@ object RailwayEnvironment:
       // also for future improvements, an agent when crossing two rails will be in two rails at the same time
       // NOTE: For now agent will be in only one station or route
       trains.map(_.doStep(dt, this)).foldLeft(this) { (env, updatedTrain) =>
-        updatedTrain match
-          case Some(updatedTrain) =>
-            // Update Idea: startByMovingAgent
-            // If is already on a route,
-            //  could remain completely on the route
-            //  or enter the station and so leave the route
-            // If is already on a station,
-            //  could enter the route and so leave the station
-            env.updateEnvironmentWith(updatedTrain, time + Time(0, 0, dt)).getOrElse(env)
-          case _ => this
+        // Update Idea: startByMovingAgent
+        // If is already on a route,
+        //  could remain completely on the route
+        //  or enter the station and so leave the route
+        // If is already on a station,
+        //  could enter the route and so leave the station
+        env.updateEnvironmentWith(updatedTrain, time + Time(0, 0, dt)).getOrElse(env)
       }
 
     private def updateEnvironmentWith(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
@@ -125,7 +122,7 @@ object RailwayEnvironment:
             (updatedTimetables, currentRoute) <-
               timetableUpdateFunction(_.arrivalUpdate(_), _.currentRoute, agent, time)
             station        <- stations.find(currentRoute._2.name == _.name)
-            updatedStation <- station.putTrain(agent.resetDistanceTravelled())
+            updatedStation <- station.putTrain(agent.resetDistanceTravelled)
             updatedStations = stations.updateWhen(_.name == updatedStation.name)(_ => updatedStation)
           yield copy(stations = updatedStations, routes = updatedRoutes, timetablesByTrain = updatedTimetables)
         case _ => route.updateTrain(agent).map(ree => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree)))
@@ -141,7 +138,7 @@ object RailwayEnvironment:
         (updatedTimetables, nextRoute) <- timetableUpdateFunction(_.departureUpdate(_), _.nextRoute, agent, time)
         routeAndDirection              <- findRouteWithTravelDirection(nextRoute)
         route                          <- routes.find(routeAndDirection._1.id == _.id)
-        updatedRoute                   <- route.putTrain(agent.resetDistanceTravelled(), routeAndDirection._2)
+        updatedRoute                   <- route.putTrain(agent.resetDistanceTravelled, routeAndDirection._2)
         updatedRoutes = routes.updateWhen(_.id == updatedRoute.id)(_ => updatedRoute)
       yield copy(stations = updatedStations, routes = updatedRoutes, timetablesByTrain = updatedTimetables)
 
