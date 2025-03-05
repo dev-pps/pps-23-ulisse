@@ -71,7 +71,7 @@ object SimulationManager:
     private def updateSimulationData(engineData: EngineState): SimulationData =
       simulationData
         .increaseStepByOne()
-        .increaseSecondElapsedBy(engineData.lastDelta)
+        .increaseMillisecondsElapsedBy(engineData.lastDelta)
         .simulationEnvironment_=(simulationData.simulationEnvironment.doStep(engine.configuration.stepSize))
         .tap(nsd => notificationService.foreach(_.stepNotification(nsd)))
 
@@ -81,7 +81,7 @@ object SimulationManager:
       copy(engine.state = es(engineState), sd(engineState))
 
     private def increaseSecondElapsedData(engineState: EngineState): SimulationData =
-      simulationData.increaseSecondElapsedBy(engineState.lastDelta)
+      simulationData.increaseMillisecondsElapsedBy(engineState.lastDelta)
 
     private def updateSimulation(using engineState: EngineState): SimulationManager =
       engine.configuration.cyclesPerSecond.map(calculateCycleTimeStep) match

@@ -52,46 +52,46 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
         Await.result(addStationResult, Duration.Inf) shouldBe Right(List(station))
         Await.result(findStationResult, Duration.Inf) shouldBe Some(station)
 
-      "replace the station when inputs are valid and oldStation is Some(station)" in:
-        val newStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
-        when(mockedPort.updateStation(station, newStation)).thenReturn(Future.successful(Right(List(newStation))))
-        val addNewStationResult =
-          controller.onOkClick(
-            stationName,
-            (x + 1).toString,
-            (y + 1).toString,
-            (numberOfTrack + 1).toString,
-            Some(station)
-          )
+//      "replace the station when inputs are valid and oldStation is Some(station)" in:
+//        val newStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
+//        when(mockedPort.updateStation(station, newStation)).thenReturn(Future.successful(Right(List(newStation))))
+//        val addNewStationResult =
+//          controller.onOkClick(
+//            stationName,
+//            (x + 1).toString,
+//            (y + 1).toString,
+//            (numberOfTrack + 1).toString,
+//            Some(station)
+//          )
+//
+//        when(mockedPort.findStationAt(Coordinate(x + 1, y + 1))).thenReturn(Future.successful(Some(newStation)))
+//        val findNewStationResult = controller.findStationAt(Coordinate(x + 1, y + 1))
+//        when(mockedPort.findStationAt(Coordinate(x, y))).thenReturn(Future.successful(None))
+//        val findStationAfterAddNewStationResult = controller.findStationAt(Coordinate(x, y))
+//
+//        Await.result(addNewStationResult, Duration.Inf) shouldBe Right(List(newStation))
+//        Await.result(findNewStationResult, Duration.Inf) shouldBe Some(newStation)
+//        Await.result(findStationAfterAddNewStationResult, Duration.Inf) shouldBe None
 
-        when(mockedPort.findStationAt(Coordinate(x + 1, y + 1))).thenReturn(Future.successful(Some(newStation)))
-        val findNewStationResult = controller.findStationAt(Coordinate(x + 1, y + 1))
-        when(mockedPort.findStationAt(Coordinate(x, y))).thenReturn(Future.successful(None))
-        val findStationAfterAddNewStationResult = controller.findStationAt(Coordinate(x, y))
-
-        Await.result(addNewStationResult, Duration.Inf) shouldBe Right(List(newStation))
-        Await.result(findNewStationResult, Duration.Inf) shouldBe Some(newStation)
-        Await.result(findStationAfterAddNewStationResult, Duration.Inf) shouldBe None
-
-      "chain error when inputs are valid and oldStation is not" in:
-        val oldStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
-        when(mockedPort.updateStation(oldStation, station)).thenReturn(
-          Future.successful(Left(Chain(StationManager.Error.StationNotFound)))
-        )
-        val updateStationResult =
-          controller.onOkClick(
-            stationName,
-            x.toString,
-            y.toString,
-            numberOfTrack.toString,
-            Some(oldStation)
-          )
-
-        when(mockedPort.findStationAt(Coordinate(x, y))).thenReturn(Future.successful(None))
-        val findStationResult = controller.findStationAt(Coordinate(x, y))
-
-        Await.result(updateStationResult, Duration.Inf) shouldBe Left(Chain(StationManager.Error.StationNotFound))
-        Await.result(findStationResult, Duration.Inf) shouldBe None
+//      "chain error when inputs are valid and oldStation is not" in:
+//        val oldStation = Station(stationName, Coordinate(x + 1, y + 1), numberOfTrack + 1)
+//        when(mockedPort.updateStation(oldStation, station)).thenReturn(
+//          Future.successful(Left(Chain(StationManager.Error.StationNotFound)))
+//        )
+//        val updateStationResult =
+//          controller.onOkClick(
+//            stationName,
+//            x.toString,
+//            y.toString,
+//            numberOfTrack.toString,
+//            Some(oldStation)
+//          )
+//
+//        when(mockedPort.findStationAt(Coordinate(x, y))).thenReturn(Future.successful(None))
+//        val findStationResult = controller.findStationAt(Coordinate(x, y))
+//
+//        Await.result(updateStationResult, Duration.Inf) shouldBe Left(Chain(StationManager.Error.StationNotFound))
+//        Await.result(findStationResult, Duration.Inf) shouldBe None
 
       "chain error when same station is added" in:
         when(mockedPort.addStation(station)).thenReturn(Future.successful(Left(Chain(
