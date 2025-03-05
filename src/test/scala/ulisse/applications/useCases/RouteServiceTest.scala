@@ -3,12 +3,10 @@ package ulisse.applications.useCases
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.Runner.runAll
-import ulisse.applications.{AppState, EventQueue}
 import ulisse.applications.managers.RouteManagerTest.*
-import ulisse.applications.managers.RouteManagers.RouteManager
+import ulisse.applications.{AppState, EventQueue}
 import ulisse.entities.route.RouteTest
 
-import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
@@ -20,10 +18,10 @@ class RouteServiceTest extends AnyFlatSpec with Matchers:
   private def updateState() = runAll(initState, eventQueue.events)
 
   "save route on service" should "add a valid route to the route manager" in:
-    validateRoute.foreach(route =>
-      val result = routeService.save(route)
+    validateRoute foreach (route =>
+      val result = routeService save route
       updateState()
-      Await.result(result, Duration.Inf) must be(Right(List(route)))
+      Await result (result, Duration.Inf) must be(Right(List(route)))
     )
 
   "save two different route on service" should "add two valid route to the route manager" in:
@@ -31,25 +29,25 @@ class RouteServiceTest extends AnyFlatSpec with Matchers:
       route          <- validateRoute
       differentRoute <- validateDifferentRoute
     yield
-      val firstSaveResult  = routeService.save(route)
-      val secondSaveResult = routeService.save(differentRoute)
+      val firstSaveResult  = routeService save route
+      val secondSaveResult = routeService save differentRoute
       updateState()
-      Await.result(secondSaveResult, Duration.Inf) must be(Right(List(route, differentRoute)))
+      Await result (secondSaveResult, Duration.Inf) must be(Right(List(route, differentRoute)))
 
   "modify route on service" should "modify a route in the route manager" in:
     for
       route      <- validateRoute
       equalRoute <- validateEqualRoute
     yield
-      val saveResult   = routeService.save(route)
-      val modifyResult = routeService.modify(route, equalRoute)
+      val saveResult   = routeService save route
+      val modifyResult = routeService modify (route, equalRoute)
       updateState()
-      Await.result(modifyResult, Duration.Inf) must be(Right(List(equalRoute)))
+      Await result (modifyResult, Duration.Inf) must be(Right(List(equalRoute)))
 
   "delete route on service" should "delete a route in the route manager" in:
-    validateRoute.foreach(route =>
-      val saveResult   = routeService.save(route)
-      val deleteResult = routeService.delete(route)
+    validateRoute foreach (route =>
+      val saveResult   = routeService save route
+      val deleteResult = routeService delete route
       updateState()
-      Await.result(deleteResult, Duration.Inf) must be(Right(List.empty[RouteTest]))
+      Await result (deleteResult, Duration.Inf) must be(Right(List.empty[RouteTest]))
     )
