@@ -5,6 +5,7 @@ import org.scalatest.matchers.must.Matchers
 import ulisse.applications.managers.RouteManagers.{Errors, RouteManager}
 import ulisse.entities.route.RouteTest.*
 import ulisse.entities.route.Routes.*
+import ulisse.entities.station.Station
 
 object RouteManagerTest:
   val validateRoute: ValidationRoute          = Route(departure, arrival, typeRoute, railsCount, pathLength)
@@ -13,7 +14,7 @@ object RouteManagerTest:
 
   val emptyManager: RouteManager = RouteManager.empty()
   val singleElementManager: RouteManager =
-    validateRoute.map(route => RouteManager.createOf(List(route))) getOrElse emptyManager
+    validateRoute map (route => RouteManager.createOf(List(route))) getOrElse emptyManager
 
 class RouteManagerTest extends AnyFlatSpec with Matchers:
   import RouteManagerTest.*
@@ -87,6 +88,40 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
       differentRoute <- validateDifferentRoute
       updateManager  <- singleElementManager save differentRoute
     yield updateManager modify (route, differentRoute) mustBe Left(Errors.AlreadyExist)
+
+  "modify departure station in a route" should "be contains in routeManager" in:
+    val newDeparture = Station("New Departure", departure.coordinate, 3)
+    val newManager   = singleElementManager modifyAutomaticByDeparture (departure, newDeparture)
+    for
+      route    <- validateRoute
+      newRoute <- newManager find route
+    yield
+      newManager.size mustBe singleElementManager.size
+      route changeAutomaticDeparture newDeparture mustBe newRoute
+
+  "modify arrival station in a route" should "be contains in routeManager" in:
+    val newArrival = Station("New Arrival", arrival.coordinate, 3)
+    val newManager = singleElementManager modifyAutomaticByArrival (arrival, newArrival)
+    for
+      route    <- validateRoute
+      newRoute <- newManager find route
+    yield
+      newManager.size mustBe singleElementManager.size
+      route changeAutomaticArrival newArrival mustBe newRoute
+
+  "modify automatic station in a route" should "be contains in routeManager" in:
+    val newDeparture = Station("New Departure", departure.coordinate, 3)
+    val newArrival   = Station("New Arrival", arrival.coordinate, 3)
+    val newManager   = singleElementManager modifyAutomaticByStation (departure, newDeparture)
+    val newManager1  = singleElementManager modifyAutomaticByStation (arrival, newArrival)
+    for
+      route     <- validateRoute
+      newRoute  <- newManager find route
+      newRoute1 <- newManager1 find route
+    yield
+      newManager.size mustBe singleElementManager.size
+      route changeAutomaticDeparture newDeparture mustBe newRoute
+      route changeAutomaticArrival newArrival mustBe newRoute1
 
   "delete route that non exist" should "launch not exist error" in:
     for route <- validateRoute
