@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.entities.route.RouteEnvironmentElement
-import ulisse.entities.route.Routes.TypeRoute.AV
+import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.route.Tracks.{Track, TrackDirection}
 import ulisse.entities.train.TrainAgents.{
   TrainAgent,

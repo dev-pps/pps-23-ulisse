@@ -13,6 +13,21 @@ object Statistics:
     def delayInCurrentTimetable: Option[Time]             = currentDynamicTimetable.flatMap(_.currentDelay)
 
   extension (environment: RailwayEnvironment)
+    def stationsLoad: Double =
+      trainsInStations.toDouble / environment.stations.map(_.numberOfTracks).sum
+
+    def trainsOnRoutes: Int =
+      environment.routes.collectTrains.size
+
+    def trainsInStations: Int =
+      environment.stations.collectTrains.size
+
+    def percTrainsOnRoutes: Double =
+      trainsOnRoutes.toDouble / environment.trains.size
+
+    def percTrainsInStations: Double =
+      trainsInStations.toDouble / environment.trains.size
+
     def cumulativeDelay: Time =
       Time.secondsToOverflowTime(
         environment
