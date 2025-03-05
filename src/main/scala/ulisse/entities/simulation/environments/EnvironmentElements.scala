@@ -6,23 +6,28 @@ import ulisse.utils.OptionUtils.{given_Conversion_Option_Option, when}
 
 /** Contains the EnvironmentElements objects used in the simulation */
 object EnvironmentElements:
-
   /** Represents an element of the simulation environment */
   trait EnvironmentElement
 
   /** A data structure that contains trains */
   trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
     self: TAC =>
+    /** The id of the container */
     def id: Int
+    /** The list of trains */
     def trains: Seq[TrainAgent]
+    /** Try to update the train in the container if it's present */
     def updateTrain(train: TrainAgent): Option[TAC]
+    /** Try to remove the train from the container if it's present */
     def removeTrain(train: TrainAgent): Option[TAC]
+    /** Check if the provided train is present inside the container */
     def contains(train: TrainAgent): Boolean = trains.contains(train)
+    /** Check if the container is empty */
     def isEmpty: Boolean                     = trains.isEmpty
 
   /** Companion object for TrainAgentsContainer */
   object TrainAgentsContainer:
-    /** Creates a List of `TrainAgentContainer[?]` instance. If the specified numberOfContainers is not positive an empty List is returned */
+    /** Creates a List of `TrainAgentContainer[?]` instances. If the specified numberOfContainers is not positive an empty List is returned */
     def generateSequentialContainers[TAC <: TrainAgentsContainer[?]](
         constructor: Int => TAC,
         numberOfContainers: Int
