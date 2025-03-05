@@ -70,7 +70,9 @@ object Tracks:
       override def putTrain(train: TrainAgent, direction: TrackDirection): Option[Track] =
         (
           currentDirection,
-          copy(trains = trains :+ train) when isAvailable(direction) && !contains(train) && train.distanceTravelled == 0
+          copy(trains = trains :+ train) when isAvailable(direction) && !contains(
+            train
+          ) && train.distanceTravelled == 0
         ) match
           case (Some(`direction`), Some(updatedTrack)) => Some(updatedTrack)
           case (None, Some(updatedTrack))              => Some(updatedTrack.copy(currentDirection = Some(direction)))
