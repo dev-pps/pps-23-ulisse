@@ -10,5 +10,6 @@ import ulisse.entities.train.Trains.Train
 
 import scala.concurrent.Future
 
+/** Adapter for the SimulationInfoPorts.Input port. */
 final case class SimulationInfoAdapter(private val simulationInfoPort: SimulationInfoPorts.Input):
   export simulationInfoPort.*
