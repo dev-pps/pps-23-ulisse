@@ -1,3 +1,10 @@
+## [1.19.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.18.0...v1.19.0) (2025-03-05)
+
+### Features
+
+* **ClockTime:** add oveflow operation ([f4bb625](https://github.com/dev-pps/pps-23-ulisse/commit/f4bb625cf51c314a7e6242285ca6f6f546b2236d))
+* **FieldsComparators:** make a generic dsl to compare object fields ([b8761a6](https://github.com/dev-pps/pps-23-ulisse/commit/b8761a6bc47ac9e3382e6de782583e6a9ab862c1))
+
 ## [1.18.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.17.0...v1.18.0) (2025-03-04)
 
 ### Features
