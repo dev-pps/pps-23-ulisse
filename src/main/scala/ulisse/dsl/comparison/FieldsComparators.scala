@@ -12,7 +12,7 @@ object FieldsComparators:
       val fieldsToCompare = fields.filterNot(ignoredFields.contains)
       objects match
         case firstObject :: tail => tail.forall: otherObject =>
-          fieldsToCompare.forall(_compare(firstObject, otherObject, _))
+            fieldsToCompare.forall(_compare(firstObject, otherObject, _))
         case _ => false
     protected def _compare(obj: O, otherObj: O, field: T): Boolean
 

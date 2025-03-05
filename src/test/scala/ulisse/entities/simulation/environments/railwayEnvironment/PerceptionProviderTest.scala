@@ -8,7 +8,14 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.TypeRoute.AV
 import ulisse.entities.route.Tracks.{Track, TrackDirection}
-import ulisse.entities.train.TrainAgents.{TrainAgent, TrainAgentPerception, TrainPerceptionInRoute, TrainPerceptionInStation, TrainRouteInfo, TrainStationInfo}
+import ulisse.entities.train.TrainAgents.{
+  TrainAgent,
+  TrainAgentPerception,
+  TrainPerceptionInRoute,
+  TrainPerceptionInStation,
+  TrainRouteInfo,
+  TrainStationInfo
+}
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
@@ -17,19 +24,19 @@ import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.utils.Times.{ClockTime, Time}
 class PerceptionProviderTest extends AnyWordSpec with Matchers:
 
-  private val mockStationA       = mock[StationEnvironmentElement]
-  private val mockStationB       = mock[StationEnvironmentElement]
-  private val see                = mock[StationEnvironmentElement]
+  private val mockStationA = mock[StationEnvironmentElement]
+  private val mockStationB = mock[StationEnvironmentElement]
+  private val see          = mock[StationEnvironmentElement]
 
-  private val mockedTrack       = mock[Track]
-  private val trainAgent         = mock[TrainAgent]
+  private val mockedTrack = mock[Track]
+  private val trainAgent  = mock[TrainAgent]
   when(trainAgent.distanceTravelled).thenReturn(0.0)
   when(mockedTrack.contains(trainAgent)).thenReturn(true)
   private val otherTrainAgent = mock[TrainAgent]
 
-  private val ree                = mock[RouteEnvironmentElement]
-  private val routeTypology      = AV
-  private val routeLength = 100.0
+  private val ree           = mock[RouteEnvironmentElement]
+  private val routeTypology = AV
+  private val routeLength   = 100.0
   when(ree.typology).thenReturn(routeTypology)
   when(ree.length).thenReturn(routeLength)
 
@@ -174,10 +181,10 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
 
     "return a perception for a train in a route" should:
       "provide a default perception when hasn't a current timetable" in:
-          trainInRouteWithTimeTable(None)
-          perceptionProvider.perceptionFor(railwayEnvironment, trainAgent) shouldBe Some(
-            TrainPerceptionInRoute(TrainRouteInfo(routeTypology, routeLength, None, false))
-          )
+        trainInRouteWithTimeTable(None)
+        perceptionProvider.perceptionFor(railwayEnvironment, trainAgent) shouldBe Some(
+          TrainPerceptionInRoute(TrainRouteInfo(routeTypology, routeLength, None, false))
+        )
 
       "provide a default perception when hasn't a current route" in:
         trainInRouteWithTimeTable(Some(dtt))
@@ -186,7 +193,7 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
           TrainPerceptionInRoute(TrainRouteInfo(routeTypology, routeLength, None, false))
         )
 
-      "provide a default perception when hasn't an arrival station" in :
+      "provide a default perception when hasn't an arrival station" in:
         trainInRouteWithTimeTable(Some(dtt))
         when(dtt.currentRoute).thenReturn(Some((mockStationA, mockStationB)))
         when(mockStationB.id).thenReturn(1)
@@ -213,7 +220,7 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
           TrainPerceptionInRoute(TrainRouteInfo(routeTypology, routeLength, None, false))
         )
 
-      "provide a perception when there is a train ahead" in :
+      "provide a perception when there is a train ahead" in:
         val distanceTrainAhead = 10.0
         trainInRouteWithStationInfoAndTrainAhead(false, distanceTrainAhead)
         perceptionProvider.perceptionFor(railwayEnvironment, trainAgent) shouldBe Some(

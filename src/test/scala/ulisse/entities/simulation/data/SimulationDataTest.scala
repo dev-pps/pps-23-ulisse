@@ -7,11 +7,11 @@ import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnviron
 import ulisse.utils.Times.Time
 
 class SimulationDataTest extends AnyWordSpec with Matchers:
-  private val step = 10
-  private val secondElapsed = 2
-  private val railwayEnvironment = RailwayEnvironment(Time(10,0,0),simpleConfigurationData)
+  private val step                    = 10
+  private val secondElapsed           = 2
+  private val railwayEnvironment      = RailwayEnvironment(Time(10, 0, 0), simpleConfigurationData)
   private val otherRailwayEnvironment = RailwayEnvironment.auto(simpleConfigurationData)
-  private val simulationData = SimulationData(step, secondElapsed, railwayEnvironment)
+  private val simulationData          = SimulationData(step, secondElapsed, railwayEnvironment)
 
   "Simulation data" when:
     "created" should:
@@ -50,6 +50,7 @@ class SimulationDataTest extends AnyWordSpec with Matchers:
 
   "reset" should:
     "reset simulation data" in:
-      val newSimulationData = simulationData.increaseStepByOne().increaseSecondElapsedBy(10).simulationEnvironment_=(otherRailwayEnvironment).reset()
+      val newSimulationData = simulationData.increaseStepByOne().increaseSecondElapsedBy(10).simulationEnvironment_=(
+        otherRailwayEnvironment
+      ).reset()
       newSimulationData shouldBe SimulationData.withEnvironment(railwayEnvironment)
-

@@ -16,9 +16,9 @@ object Statistics:
 
     def averageDelay: Time =
       Time.secondsToOverflowTime(
-          cumulativeDelay.toSeconds
+        cumulativeDelay.toSeconds
           /
-          environment.timetables.count(_.currentDelay.isDefined)
+            environment.timetables.count(_.currentDelay.isDefined)
       )
 
     def cumulativeDelayIn(see: StationEnvironmentElement): Time =
@@ -33,7 +33,5 @@ object Statistics:
       Time.secondsToOverflowTime(
         cumulativeDelayIn(see).toSeconds
           /
-        environment.timetables.count(_.delayIn(see).isDefined)
+            environment.timetables.count(_.delayIn(see).isDefined)
       )
-
-

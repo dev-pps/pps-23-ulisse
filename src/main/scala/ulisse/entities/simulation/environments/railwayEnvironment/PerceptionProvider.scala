@@ -45,7 +45,7 @@ object PerceptionProvider:
         arrivalStation <- env.stations.find(_.id == currentRoute._2.id)
       yield arrivalStation.isAvailable
     TrainRouteInfo(route.typology, route.length, trainAheadDistance, arrivalStationIsFree.getOrElse(false))
-  
+
   /** Provide perception for TrainAgent in RailwayEnvironment */
   given PerceptionProvider[RailwayEnvironment, TrainAgent] with
     type P = TrainAgentPerception[?]
