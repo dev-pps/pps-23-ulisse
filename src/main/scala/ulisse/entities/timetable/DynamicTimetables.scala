@@ -39,7 +39,6 @@ object DynamicTimetables:
         case _ => effectiveTable.lastOption.flatMap(_._2.arriving) underflowSub arrivingTime
 
     def delayIn(station: Station): Option[Time] =
-      println("delayIn")
       (table.get(station), effectiveTable.find(_._1 == station).map(_._2)) match
         case (Some(TrainStationTime(_, _, Some(departure))), Some(TrainStationTime(_, _, Some(effectiveDeparture)))) =>
           Some(Id(effectiveDeparture) underflowSub departure)

@@ -10,6 +10,7 @@ import ulisse.entities.train.TrainAgents.TrainAgentInfo
 import ulisse.entities.train.Trains
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Times.Time
+import ulisse.entities.simulation.data.Statistics.*
 
 import scala.concurrent.{Future, Promise}
 
@@ -18,12 +19,7 @@ final case class SimulationInfoService(private val eventQueue: SimulationEventQu
   override def stationInfo(s: Station): Future[Option[StationEnvironmentInfo]] =
     val p = Promise[Option[StationEnvironmentInfo]]
     eventQueue.addReadSimulationEnvironmentEvent(env =>
-      (
-        env.stations.find(_ == s),
-        Time.secondsToOverflowTime(env.timetables.flatMap(_.delayIn(s)).foldLeft(0)(_ + _.toSeconds))
-      ) match
-        case (Some(see), t) => p.success(Some(StationEnvironmentInfo(see, t)))
-        case _              => p.success(None)
+      p.success(env.stations.find(_ == s).map(see => StationEnvironmentInfo(see, env.cumulativeDelayIn(see), env.averageDelayIn(see))))
     )
     p.future
 
