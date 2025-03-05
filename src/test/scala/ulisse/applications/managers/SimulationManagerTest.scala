@@ -1,6 +1,6 @@
 package ulisse.applications.managers
 
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{spy, when}
 import org.mockito.invocation.InvocationOnMock
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -14,13 +14,18 @@ import ulisse.entities.simulation.data.SimulationData.SimulationDataField.Simula
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
+import ulisse.entities.timetable.DynamicTimetableTest.dynamicTimetable1
 
 class SimulationManagerTest extends AnyWordSpec with Matchers:
-
+  private val sdtt = spy(dynamicTimetable1)
+  when(sdtt.completed).thenReturn(false)
+  private val mockedEnv = mock[RailwayEnvironment]
+  when(mockedEnv.doStep(1)).thenReturn(mockedEnv)
+  when(mockedEnv.timetables).thenReturn(Seq(sdtt))
   private val timeProvider  = mock[UtilityPorts.Output.TimeProviderPort]
   private val startTime     = 10L
   private val timeIncrement = 5L
-  private val sm            = SimulationManager.defaultBatchManager(timeProvider)
+  private val sm            = SimulationManager.defaultBatchManager(timeProvider).setupEnvironment(mockedEnv)
   private def setupTimeProvider(): Unit =
     val timeIterator = LazyList.iterate(startTime)(_ + timeIncrement).iterator
     when(timeProvider.currentTimeMillis()).thenAnswer((_: InvocationOnMock) => timeIterator.next())
@@ -112,7 +117,7 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
 
     "update state on step" in:
       setupTimeProvider()
-      val manager        = SimulationManager.defaultBatchManager(timeProvider).start()
+      val manager        = SimulationManager.defaultBatchManager(timeProvider).setupEnvironment(mockedEnv).start()
       val updatedManager = manager.doStep()
       updatedManager.engine compareTo manager.engine ignoring EngineStateField.LastUpdate shouldBeBoolean true
       updatedManager.engine compareTo manager.engine considering EngineStateField.LastUpdate shouldBeBoolean false
@@ -123,7 +128,7 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
       for step <- 2 to 100 do
         setupTimeProvider()
         val realUpdate     = step - 1
-        val manager        = SimulationManager.defaultBatchManager(timeProvider).start()
+        val manager        = SimulationManager.defaultBatchManager(timeProvider).setupEnvironment(mockedEnv).start()
         val updatedManager = repeatDoStep(manager, step)
         updatedManager.engine compareTo manager.engine ignoring (EngineStateField.LastUpdate, EngineStateField.LastDelta, EngineStateField.ElapsedCycleTime) shouldBeBoolean true
         updatedManager.engine compareTo manager.engine considering EngineStateField.LastUpdate shouldBeBoolean false
@@ -141,7 +146,10 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
       val cycleTimeStep = SimulationManager.calculateCycleTimeStep(cps)
       for step <- 2 to 100 do
         setupTimeProvider()
-        val manager        = SimulationManager.configuredManager(timeProvider, EngineConfiguration.withCps(cps)).start()
+        val manager = SimulationManager.configuredManager(
+          timeProvider,
+          EngineConfiguration.withCps(cps)
+        ).setupEnvironment(mockedEnv).start()
         val updatedManager = repeatDoStep(manager, step)
         val realUpdate     = step - 1
         val expectedStep   = (updatedManager.simulationData.secondElapsed / cycleTimeStep).toInt
