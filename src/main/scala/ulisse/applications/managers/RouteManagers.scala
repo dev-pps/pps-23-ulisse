@@ -21,10 +21,11 @@ object RouteManagers:
     /** Route not found */
     case NotFound extends Errors("Route not found")
 
+    /** Invalid station */
+    case InvalidStation extends Errors("Invalid station")
+
   /** Manages the routes of the train network. */
   trait RouteManager:
-    // modify from station
-
     /** Bank of routes */
     opaque type Bank = Map[IdRoute, Route]
 
@@ -60,6 +61,16 @@ object RouteManagers:
 
     /** Modify a route */
     def modify(oldRoute: Route, newRoute: Route): Either[Errors, RouteManager]
+
+    /** Modify all routes that depart from a specific station, modifying values of the route. */
+    def modifyAutomaticByDeparture(oldStation: Station, newStation: Station): RouteManager
+
+    /** Modify all routes that arrive at a specific station, modifying values of the route. */
+    def modifyAutomaticByArrival(oldStation: Station, newStation: Station): RouteManager
+
+    /** Modify all routes that contain a specific station, modifying values of the route. */
+    def modifyAutomaticByStation(oldStation: Station, newStation: Station): RouteManager =
+      modifyAutomaticByDeparture(oldStation, newStation) modifyAutomaticByArrival (oldStation, newStation)
 
     /** Delete a route by its identifier */
     def deleteBy(id: IdRoute): Either[Errors, RouteManager]
@@ -106,17 +117,25 @@ object RouteManagers:
           case (_, Right(_))    => Errors.AlreadyExist.asLeft
           case (_, _)           => copy(manager - oldRoute.id + (newRoute.id -> newRoute)).asRight
 
+      override def modifyAutomaticByDeparture(oldStation: Station, newStation: Station): RouteManager =
+        copy(manager -- (routes filter (_ isDeparture oldStation) map (_.id)) ++
+          routes.filter(_ isDeparture oldStation).map(route => route.id -> (route changeAutomaticDeparture newStation)))
+
+      override def modifyAutomaticByArrival(oldStation: Station, newStation: Station): RouteManager =
+        copy(manager -- (routes filter (_ isArrival oldStation) map (_.id)) ++
+          routes.filter(_ isArrival oldStation).map(route => route.id -> (route changeAutomaticArrival newStation)))
+
       override def deleteBy(id: IdRoute): Either[Errors, RouteManager] =
         findBy(id).map(_ => copy(manager - id).asRight).getOrElse(Errors.NotExist.asLeft)
-
-      private def deleteByStation(find: Station => Either[Errors, List[Route]])
-          : Station => Either[Errors, RouteManager] = station =>
-        find(station) flatMap (_.foldLeft[Either[Errors, RouteManager]](this.asRight)((acc, route) =>
-          acc flatMap (_ delete route)
-        ))
 
       override def deleteByDeparture(station: Station): Either[Errors, RouteManager] =
         deleteByStation(findByDeparture)(station)
 
       override def deleteByArrival(station: Station): Either[Errors, RouteManager] =
         deleteByStation(findByArrival)(station)
+
+      private def deleteByStation(find: Station => Either[Errors, List[Route]])
+          : Station => Either[Errors, RouteManager] = station =>
+        find(station) flatMap (_.foldLeft[Either[Errors, RouteManager]](this.asRight)((acc, route) =>
+          acc flatMap (_ delete route)
+        ))
