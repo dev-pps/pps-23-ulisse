@@ -1,7 +1,7 @@
 package ulisse.entities.simulation.environments.railwayEnvironment
 
 import cats.Id
-import ulisse.entities.route.RouteEnvironmentElement
+import ulisse.entities.route.{RouteEnvironment, RouteEnvironmentElement}
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.route.Tracks.TrackDirection
 import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
@@ -60,7 +60,7 @@ object RailwayEnvironment:
     RailwayEnvironmentImpl(
       startTime,
       configurationData.stations,
-      configurationData.routes,
+      RouteEnvironment(configurationData),
       configurationData.timetables
     )
 
@@ -85,9 +85,10 @@ object RailwayEnvironment:
   private final case class RailwayEnvironmentImpl(
       time: Id[Time],
       stations: Seq[StationEnvironmentElement],
-      routes: Seq[RouteEnvironmentElement],
+      routeEnvironment: RouteEnvironment,
       timetablesByTrain: Map[Train, Seq[DynamicTimetable]]
   ) extends RailwayEnvironment:
+    export routeEnvironment.routes
     def doStep(dt: Int): RailwayEnvironment =
       // Allow agents to be at the same time in more than an environment element
       // that because an agent when enters a station doesn't leave immediately the route and vice versa
@@ -117,15 +118,18 @@ object RailwayEnvironment:
       agent.motionData.distanceTravelled match
         case d if d >= route.length =>
           for
-            updatedRoute <- route.removeTrain(agent)
-            updatedRoutes = routes.updateWhen(_.id == updatedRoute.id)(_ => updatedRoute)
+            updatedRoutes <- routeEnvironment.removeTrain(agent)
             (updatedTimetables, currentRoute) <-
               timetableUpdateFunction(_.arrivalUpdate(_), _.currentRoute, agent, time)
             station        <- stations.find(currentRoute._2.name == _.name)
             updatedStation <- station.putTrain(agent.resetDistanceTravelled)
             updatedStations = stations.updateWhen(_.name == updatedStation.name)(_ => updatedStation)
-          yield copy(stations = updatedStations, routes = updatedRoutes, timetablesByTrain = updatedTimetables)
-        case _ => route.updateTrain(agent).map(ree => copy(routes = routes.updateWhen(_.id == ree.id)(_ => ree)))
+          yield copy(
+            stations = updatedStations,
+            routeEnvironment = updatedRoutes,
+            timetablesByTrain = updatedTimetables
+          )
+        case _ => routeEnvironment.updateTrain(agent).map(updatedRoutes => copy(routeEnvironment = updatedRoutes))
 
     private def stationUpdateFunction(
         station: StationEnvironmentElement,
@@ -136,11 +140,8 @@ object RailwayEnvironment:
         updatedStation <- station.removeTrain(agent)
         updatedStations = stations.updateWhen(_.name == updatedStation.name)(_ => updatedStation)
         (updatedTimetables, nextRoute) <- timetableUpdateFunction(_.departureUpdate(_), _.nextRoute, agent, time)
-        routeAndDirection              <- findRouteWithTravelDirection(nextRoute)
-        route                          <- routes.find(routeAndDirection._1.id == _.id)
-        updatedRoute                   <- route.putTrain(agent.resetDistanceTravelled, routeAndDirection._2)
-        updatedRoutes = routes.updateWhen(_.id == updatedRoute.id)(_ => updatedRoute)
-      yield copy(stations = updatedStations, routes = updatedRoutes, timetablesByTrain = updatedTimetables)
+        updatedRoutes                  <- routeEnvironment.putTrain(agent, nextRoute)
+      yield copy(stations = updatedStations, routeEnvironment = updatedRoutes, timetablesByTrain = updatedTimetables)
 
     private def timetableUpdateFunction(
         updateF: (DynamicTimetable, ClockTime) => Option[DynamicTimetable],
