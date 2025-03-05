@@ -3,8 +3,7 @@ package ulisse.entities.route
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
 import ulisse.entities.Technology
-import ulisse.entities.route.Routes.Route.validateAndCreateRoute
-import ulisse.entities.route.Routes.Route.isValidateRoute
+import ulisse.entities.route.Routes.Route.{isValidateRoute, validateAndCreateRoute}
 import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.ErrorMessage
@@ -177,6 +176,10 @@ object Routes:
         length: Double
     ): Either[RouteError, Route] = validateAndCreateRoute(departure, arrival, typeRoute, railsCount, length)
 
+    /** Deconstruct a route into its components. */
+    def unapply(route: Route): (Station, Station, RouteType, Int, Double) =
+      (route.departure, route.arrival, route.typology, route.railsCount, route.length)
+
     private case class RouteImpl(
         departure: Station,
         arrival: Station,
@@ -216,3 +219,5 @@ object Routes:
           case _            => false
 
       override def hashCode(): Int = departure.hashCode() + arrival.hashCode() + typology.hashCode()
+
+      override def toString: String = s"Route($departure, $arrival, $typology, $railsCount, $length)"
