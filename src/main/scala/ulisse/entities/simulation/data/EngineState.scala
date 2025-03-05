@@ -27,10 +27,10 @@ object EngineState:
   /** Create a new Engine state, allowing only non negative lastUpdate and positive lastDelta and elapsedCycleTime, otherwise substitute the wrong values with defaults*/
   def apply(lastUpdate: Option[Double], lastDelta: Double, elapsedCycleTime: Double): EngineState =
     EngineStateImpl(lastUpdate.filter(_ > 0), math.max(defaultLastDelta, lastDelta), math.max(defaultElapsedCycleTime, elapsedCycleTime))
-  
+
   /** Create a new Engine state with default values */
   def empty(): EngineState = EngineState(defaultLastUpdate, defaultLastDelta, defaultElapsedCycleTime)
-  
+
   private final case class EngineStateImpl(
       lastUpdate: Option[Double],
       lastDelta: Double,
