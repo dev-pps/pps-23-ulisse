@@ -1,3 +1,9 @@
+## [1.22.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.21.0...v1.22.0) (2025-03-05)
+
+### Features
+
+* create services manager ([f6eed48](https://github.com/dev-pps/pps-23-ulisse/commit/f6eed480607ebf03ccb8626c4468e44f420f023a))
+
 ## [1.21.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.20.0...v1.21.0) (2025-03-05)
 
 ### Features
