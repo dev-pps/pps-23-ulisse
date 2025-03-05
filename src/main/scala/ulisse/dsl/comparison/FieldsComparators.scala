@@ -7,7 +7,14 @@ object FieldsComparators:
     def values: Seq[T]
 
   trait FieldComparator[T <: Field[T, O], O <: Any]:
-    def compare(objects: List[O], ignoredFields: Seq[T]): Boolean
+    def fields: Seq[T]
+    final def compare(objects: List[O], ignoredFields: Seq[T]): Boolean =
+      val fieldsToCompare = fields.filterNot(ignoredFields.contains)
+      objects match
+        case firstObject :: tail => tail.forall: otherObject =>
+          fieldsToCompare.forall(_compare(firstObject, otherObject, _))
+        case _ => false
+    protected def _compare(obj: O, otherObj: O, field: T): Boolean
 
   given [T <: Field[T, O], O <: Any]: Conversion[ComparisonBuilder[T, O], Boolean] with
     def apply(builder: ComparisonBuilder[T, O]): Boolean =

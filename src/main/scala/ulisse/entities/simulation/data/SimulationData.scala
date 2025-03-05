@@ -15,33 +15,19 @@ trait SimulationData:
 
 object SimulationData:
   def apply(step: Int, secondElapsed: Double, simulationEnvironment: RailwayEnvironment): SimulationData =
-    SimulationDataImpl(step, secondElapsed, simulationEnvironment, simulationEnvironment)
+    SimulationDataImpl(math.max(0, step), math.max(0, secondElapsed), simulationEnvironment, simulationEnvironment)
   def withEnvironment(environment: RailwayEnvironment): SimulationData =
     SimulationData(0, 0, environment)
   def empty(): SimulationData = withEnvironment(RailwayEnvironment.empty())
 
-  extension (simulationData: SimulationData)
-    def cumulativeDelay: Time =
-      Time.secondsToOverflowTime(
-        simulationData.simulationEnvironment
-          .timetables
-          .flatMap(_.currentDelay)
-          .map(_.toSeconds).sum
-      )
-
   given FieldComparator[SimulationDataField, SimulationData] with
-    def compare(simulationsData: List[SimulationData], ignoredFields: Seq[SimulationDataField]): Boolean =
-      val fieldsToCompare = SimulationDataField.values.filterNot(ignoredFields.contains)
-      simulationsData match
-        case firstSimulationData :: tail => tail.forall: otherSimulationData =>
-            fieldsToCompare.forall:
-              case SimulationDataField.Step => firstSimulationData.step == otherSimulationData.step
-              case SimulationDataField.SecondElapsed =>
-                firstSimulationData.secondElapsed == otherSimulationData.secondElapsed
-              case SimulationDataField.SimulationEnvironment =>
-                firstSimulationData.simulationEnvironment == otherSimulationData.simulationEnvironment
-        case _ => false
-
+    def fields: Seq[SimulationDataField] = SimulationDataField.values.toSeq
+    def _compare(obj: SimulationData, otherObj: SimulationData, field: SimulationDataField): Boolean =
+        field match
+            case SimulationDataField.Step => obj.step == otherObj.step
+            case SimulationDataField.SecondElapsed => obj.secondElapsed == otherObj.secondElapsed
+            case SimulationDataField.SimulationEnvironment => obj.simulationEnvironment == otherObj.simulationEnvironment
+  
   enum SimulationDataField extends Field[SimulationDataField, SimulationData]:
     case Step, SecondElapsed, SimulationEnvironment
     def values: Seq[SimulationDataField] = SimulationDataField.values.toSeq
