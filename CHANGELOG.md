@@ -1,3 +1,20 @@
+## [1.20.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.19.0...v1.20.0) (2025-03-05)
+
+### Features
+
+* added timetable saved view, some fix TimetableFormController ([fde4e01](https://github.com/dev-pps/pps-23-ulisse/commit/fde4e01d1eea178e322f3e73755de6592bebb372))
+* InfoTextFields exposes text ([3ab2d3e](https://github.com/dev-pps/pps-23-ulisse/commit/3ab2d3e5f7074b5b7c2303e8b171ae290d36f153))
+* init developing timetable gui components, fixed train view panel ([1cb9d91](https://github.com/dev-pps/pps-23-ulisse/commit/1cb9d91b45b9eb7cdbe3cef4ed1802771e6e840f))
+* init train timetable GUI form using swing, mocked model ([8de5905](https://github.com/dev-pps/pps-23-ulisse/commit/8de5905c7731d683ebb22eef9d78e716ca36f035))
+* setted up TimetableForm, clear btn moved ([0501686](https://github.com/dev-pps/pps-23-ulisse/commit/0501686ac05419b45fd2af5e5ccabaf03aaa7488))
+* timetable form showed to common view ([4b21b78](https://github.com/dev-pps/pps-23-ulisse/commit/4b21b78806c3d7d0fb3407bc412383869c2c68c0))
+* timetable view controller, refactor view, adding some behaviors to gui ([afc1a0d](https://github.com/dev-pps/pps-23-ulisse/commit/afc1a0daee53cd8a891e6cd47119aef3e40be093))
+
+### Bug Fixes
+
+* adopting updated gui components ([8d237a0](https://github.com/dev-pps/pps-23-ulisse/commit/8d237a0ddfbfa4470ba7f798634e60ecd3135546))
+* fixed imports in timetable gui, technology manager, train port ([86c44ae](https://github.com/dev-pps/pps-23-ulisse/commit/86c44ae1d55a641f18c40dc3ed18046a8218e66f))
+
 ## [1.19.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.18.0...v1.19.0) (2025-03-05)
 
 ### Features
