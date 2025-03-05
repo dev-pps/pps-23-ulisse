@@ -11,7 +11,7 @@ import ulisse.entities.route.RouteEnvironmentElementTest.{
   routeAB,
   routeAB_EE
 }
-import ulisse.entities.route.RouteTest.{arrival, departure, pathLength, railsCount, typeRoute}
+import ulisse.entities.route.RouteTest.{arrival, departure, pathLength, railsCount, routeType}
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
 import ulisse.entities.station.Station
@@ -39,7 +39,7 @@ object RouteEnvironmentElementTest:
     Route(
       departure,
       arrival,
-      typeRoute,
+      routeType,
       railsCount,
       2 * minPermittedDistanceBetweenTrains + trainAgent3905.lengthSize
     ).getOrFail

@@ -82,7 +82,7 @@ object Routes:
     def isTechnology(technology: Technology): Boolean = typology.technology equals technology
 
     /** Check if route is of a certain train technology. */
-    def isTrainTechnologyAcceptable(train: Train): Boolean = train.techType isCompatible typology.technology
+    def acceptTrainTechnology(train: Train): Boolean = train.techType isCompatible typology.technology
 
     /** Update departure station. */
     def withDeparture(departure: Station): Either[RouteError, Route] =
