@@ -10,7 +10,7 @@ class MotionDataTest extends AnyFlatSpec:
     MotionDatas.emptyMotionData shouldBe MotionData(distanceTravelled = 0.0, speed = 0.0, acceleration = 0.0)
 
   it should "set speed, acceleration and set an offset to distance" in:
-    val fakeValue = 20
+    val fakeValue       = 20
     val expectedMotionD = MotionData(distanceTravelled = fakeValue, speed = fakeValue, acceleration = fakeValue)
     MotionDatas.emptyMotionData
       .withDistanceOffset(fakeValue)
@@ -18,7 +18,11 @@ class MotionDataTest extends AnyFlatSpec:
       .withAcceleration(fakeValue) shouldBe expectedMotionD
 
   it should "update acceleration" in:
-    MotionDatas.emptyMotionData.withAcceleration(100) shouldBe MotionData(distanceTravelled = 0.0, speed = 0.0, acceleration = 100.0)
+    MotionDatas.emptyMotionData.withAcceleration(100) shouldBe MotionData(
+      distanceTravelled = 0.0,
+      speed = 0.0,
+      acceleration = 100.0
+    )
 
   it should "update correctly distance travelled using speed (km/h) and dt (seconds)" in:
     val speedKm_h          = 150
