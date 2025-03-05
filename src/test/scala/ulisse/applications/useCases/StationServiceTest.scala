@@ -29,9 +29,9 @@ class StationServiceTest extends AnyWordSpec with Matchers:
   private def updateState() = runAll(initialState, eventQueue.events)
 
   private def removeStation(): Unit =
-    val addStationResult = inputPort.addStation(stationA)
+    val addStationResult    = inputPort.addStation(stationA)
     val removeStationResult = inputPort.removeStation(stationA)
-    val stationMapResult = inputPort.stationMap
+    val stationMapResult    = inputPort.stationMap
     updateState()
     Await.result(addStationResult, Duration.Inf) shouldBe Right(List(stationA))
     Await.result(removeStationResult, Duration.Inf) shouldBe Right((List(), List()))
@@ -39,7 +39,7 @@ class StationServiceTest extends AnyWordSpec with Matchers:
 
   private def erroneousRemoveStation(): Unit =
     val removeStationResult = inputPort.removeStation(stationA)
-    val stationMapResult = inputPort.stationMap
+    val stationMapResult    = inputPort.stationMap
     updateState()
     Await.result(removeStationResult, Duration.Inf) shouldBe Left(Chain(StationManager.Error.StationNotFound))
     Await.result(stationMapResult, Duration.Inf) shouldBe List()
@@ -70,7 +70,7 @@ class StationServiceTest extends AnyWordSpec with Matchers:
       when(mockedRouteManager.deleteByStation(stationA)).thenReturn(Right(mockedRouteManager))
       removeStation()
 
-    "remove a present station from the station manager" in :
+    "remove a present station from the station manager" in:
       when(mockedRouteManager.deleteByStation(stationA)).thenReturn(Left(Chain()))
       removeStation()
 
@@ -78,7 +78,7 @@ class StationServiceTest extends AnyWordSpec with Matchers:
       when(mockedRouteManager.deleteByStation(stationA)).thenReturn(Left(Chain()))
       erroneousRemoveStation()
 
-    "return error when is removed an absent station from the station manager" in :
+    "return error when is removed an absent station from the station manager" in:
       when(mockedRouteManager.deleteByStation(stationA)).thenReturn(Right(mockedRouteManager))
       erroneousRemoveStation()
 
