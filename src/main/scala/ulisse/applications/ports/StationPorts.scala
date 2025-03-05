@@ -8,12 +8,16 @@ import ulisse.entities.station.Station
 
 import scala.concurrent.Future
 
+/** Defines the ports related to Stations. */
 object StationPorts:
   /** Input operations for interacting with a `StationManager`. */
   trait Input:
 
+    /** The type representing the collection of stations. */
     type SM = StationManager#StationMapType
-    type E  = NonEmptyChain[StationManager.Error]
+
+    /** The type representing the errors that can occur during station management. */
+    type E = NonEmptyChain[StationManager.Error]
 
     /** Retrieves the current `Station` collection. */
     def stationMap: Future[SM]

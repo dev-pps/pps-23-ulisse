@@ -1,7 +1,8 @@
 package ulisse.applications
 
 import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
-import ulisse.applications.event.SimulationManagers
+import ulisse.applications.event.SimulationEventQueue.SimulationManagers
+import ulisse.applications.event.StationEventQueue.StationManagers
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
@@ -35,7 +36,7 @@ trait AppState:
   val simulationManager: SimulationManager
 
   /** Read [[StationManager]]. */
-  def readStation(read: StationManager => Unit): AppState = { read(stationManager); this }
+  def readStationManager(read: StationManager => Unit): AppState = { read(stationManager); this }
 
   /** Read [[RouteManager]]. */
   def readRoute(read: RouteManager => Unit): AppState = { read(routeManager); this }
@@ -52,7 +53,7 @@ trait AppState:
   def readSimulationData(read: SimulationData => Unit): AppState = { read(simulationManager.simulationData); this }
 
   /** Update [[StationManager]]. */
-  def updateStation(update: StationManager => StationManager): AppState
+  def updateStationManager(update: StationManager => StationManager): AppState
 
   /** Update [[RouteManager]]. */
   def updateRoute(update: RouteManager => RouteManager): AppState
@@ -67,17 +68,13 @@ trait AppState:
   def updateTimetable(update: TimetableManager => TimetableManager): AppState
 
   /** Update [[SimulationManager]]. */
-  def updateSimulation(update: SimulationManager => SimulationManager): AppState
+  def updateSimulationManager(update: SimulationManager => SimulationManager): AppState
 
   /** Update [[StationManager]], [[RouteManager]]. */
   def updateRailwayNetwork(update: (StationManager, RouteManager) => (StationManager, RouteManager)): AppState
 
   /** Update [[StationManager]], [[RouteManager]] and [[TimetableManager]]. */
-  def updateStationSchedule(update: (
-      StationManager,
-      RouteManager,
-      TimetableManager
-  ) => (StationManager, RouteManager, TimetableManager)): AppState
+  def updateStationManagers(update: StationManagers => StationManagers): AppState
 
   /** Update [[RouteManager]] and [[TimetableManager]]. */
   def updateRouteSchedule(update: (RouteManager, TimetableManager) => (RouteManager, TimetableManager)): AppState
@@ -94,7 +91,7 @@ trait AppState:
   ) => (StationManager, RouteManager, TrainManager, TimetableManager)): AppState
 
   /** update [[SimulationManager]], with a function that takes a [[SimulationManager]] and a [[StationManager]]. */
-  def setupSimulation(update: SimulationManagers => SimulationManager): AppState
+  def setupSimulationManager(update: SimulationManagers => SimulationManager): AppState
 
 object AppState:
   /** Create new application state with empty managers. */
@@ -117,7 +114,7 @@ object AppState:
       SimulationManager.defaultBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
     )
 
-    override def updateStation(update: StationManager => StationManager): AppState =
+    override def updateStationManager(update: StationManager => StationManager): AppState =
       copy(stationManager = update(stationManager))
 
     override def updateRoute(update: RouteManager => RouteManager): AppState =
@@ -132,7 +129,7 @@ object AppState:
     override def updateTimetable(update: TimetableManager => TimetableManager): AppState =
       copy(timetableManager = update(timetableManager))
 
-    override def updateSimulation(update: SimulationManager => SimulationManager): AppState =
+    override def updateSimulationManager(update: SimulationManager => SimulationManager): AppState =
       copy(simulationManager = update(simulationManager))
 
     override def updateRailwayNetwork(update: (StationManager, RouteManager) => (StationManager, RouteManager))
@@ -140,12 +137,9 @@ object AppState:
       val (newStation, newRoute) = update(stationManager, routeManager)
       copy(stationManager = newStation, routeManager = newRoute)
 
-    override def updateStationSchedule(update: (
-        StationManager,
-        RouteManager,
-        TimetableManager
-    ) => (StationManager, RouteManager, TimetableManager)): AppState =
-      val (newStation, newRoute, newTimetable) = update(stationManager, routeManager, timetableManager)
+    override def updateStationManagers(update: StationManagers => StationManagers): AppState =
+      val StationManagers(newStation, newRoute, newTimetable) =
+        update(StationManagers(stationManager, routeManager, timetableManager))
       copy(stationManager = newStation, routeManager = newRoute, timetableManager = newTimetable)
 
     override def updateRouteSchedule(update: (RouteManager, TimetableManager) => (RouteManager, TimetableManager))
@@ -168,7 +162,7 @@ object AppState:
         update(stationManager, routeManager, trainManager, timetableManager)
       copy(newStation, newRoute, newTrain, timetableManager = newTimetable)
 
-    override def setupSimulation(update: SimulationManagers => SimulationManager): AppState =
+    override def setupSimulationManager(update: SimulationManagers => SimulationManager): AppState =
       copy(simulationManager =
         update(SimulationManagers(simulationManager, stationManager, routeManager, trainManager, timetableManager))
       )

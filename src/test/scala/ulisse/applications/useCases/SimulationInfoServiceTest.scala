@@ -26,7 +26,7 @@ import scala.concurrent.duration.Duration
 class SimulationInfoServiceTest extends AnyWordSpec with Matchers:
   private val dt1 = spy(dynamicTimetable1)
   private val dt2 = spy(dynamicTimetable2)
-  private val initialState = AppState().setupSimulation:
+  private val initialState = AppState().setupSimulationManager:
     _.simulationManager.setupEnvironment:
       RailwayEnvironment.auto:
         ConfigurationData(

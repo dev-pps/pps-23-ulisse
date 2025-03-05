@@ -63,7 +63,7 @@ class StationManagerTest extends AnyWordSpec with Matchers:
       "return the station if it exists" in:
         StationManager().addStation(stationA).map(
           _.findStationAt(stationA.coordinate)
-        ) shouldBe Some(stationA)
+        ) shouldBe Right(Some(stationA))
 
       "return None if the station does not exist" in:
         StationManager().findStationAt(stationA.coordinate) shouldBe None
