@@ -1,3 +1,18 @@
+## [1.23.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.22.0...v1.23.0) (2025-03-05)
+
+### Features
+
+* **SimulationInfoPorts:** complete input port ([7310fb9](https://github.com/dev-pps/pps-23-ulisse/commit/7310fb93b3ccb041f46f6e1b3b10993ec9ba9519))
+* **SimulationManager:** call step on environment on effective dostep ([5ac2220](https://github.com/dev-pps/pps-23-ulisse/commit/5ac222067dcb8095f3a36ce42fa06219057b1bab))
+* **SimulationManager:** evaluate termination ([7e565e2](https://github.com/dev-pps/pps-23-ulisse/commit/7e565e254921fc13fdec1414e4ea4bbaecff39c1))
+* **SimulationService:** check initialization and return data on reset ([e3ab392](https://github.com/dev-pps/pps-23-ulisse/commit/e3ab392f99688773368daf6246089d851dd0c5bc))
+* **Statistic:** add basic statistics ([a459cb0](https://github.com/dev-pps/pps-23-ulisse/commit/a459cb013dcf4e8271e5bdb448358f1578136560))
+* **Statistics:** add statistics for system load ([d1bebbf](https://github.com/dev-pps/pps-23-ulisse/commit/d1bebbf94425339637df83816579fa0f9573d01f))
+
+### Bug Fixes
+
+* **SimulationManager:** mock non-terminating time table and init before start ([f451fd8](https://github.com/dev-pps/pps-23-ulisse/commit/f451fd8144d4ebf75833fc9969cab9c6fd34d29a))
+
 ## [1.22.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.21.0...v1.22.0) (2025-03-05)
 
 ### Features
