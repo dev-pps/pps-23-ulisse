@@ -176,7 +176,7 @@ class TrackTest extends AnyWordSpec with Matchers:
         val updatedTrainAgent3905 =
           trainAgent3905.updateDistanceTravelled(trainAgent3905.lengthSize + minPermittedDistanceBetweenTrains)
         val updatedTrainAgent3906 = trainAgent3906.updateDistanceTravelled(
-          trainAgent3905.lengthSize + minPermittedDistanceBetweenTrains + updatedTrainAgent3905.distanceTravelled
+          trainAgent3905.lengthSize + minPermittedDistanceBetweenTrains + updatedTrainAgent3905.motionData.distanceTravelled
         )
         track.putTrain(trainAgent3905, direction).flatMap(_.updateTrain(updatedTrainAgent3905)).flatMap(
           _.putTrain(trainAgent3906, direction)

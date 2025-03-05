@@ -35,8 +35,8 @@ object PerceptionProvider:
     def trainAheadDistance: Option[Double] =
       for
         trainTAC     <- route.containers.find(_.contains(train))
-        nearestAgent <- trainTAC.trains.find(_.distanceTravelled > train.distanceTravelled)
-      yield nearestAgent.distanceTravelled - train.distanceTravelled
+        nearestAgent <- trainTAC.trains.find(_.motionData.distanceTravelled > train.motionData.distanceTravelled)
+      yield nearestAgent.motionData.distanceTravelled - train.motionData.distanceTravelled
 
     def arrivalStationIsFree: Option[Boolean] =
       for

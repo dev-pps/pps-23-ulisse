@@ -40,7 +40,7 @@ object Platforms:
       override def trains: Seq[TrainAgent] = currentTrain.toList
 
       override def putTrain(train: TrainAgent): Option[Platform] =
-        copy(currentTrain = Some(train)) when isAvailable && train.distanceTravelled == 0
+        copy(currentTrain = Some(train)) when isAvailable && train.motionData.distanceTravelled == 0
 
       override def updateTrain(train: TrainAgent): Option[Platform] =
         copy(currentTrain = Some(train)) when contains(train)
