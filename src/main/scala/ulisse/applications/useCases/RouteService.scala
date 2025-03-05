@@ -7,7 +7,7 @@ import ulisse.applications.managers.RouteManagers.Errors
 import ulisse.applications.ports.RoutePorts
 import ulisse.entities.route.Routes.Route
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ Future, Promise }
 
 /** Contains the service for routes. */
 object RouteService:
@@ -19,24 +19,24 @@ object RouteService:
 
     override def save(route: Route): Future[Either[Errors, List[Route]]] =
       val promise = Promise[Either[Errors, List[Route]]]()
-      eventQueue.addCreateRouteEvent((stationManager, routeManager) => {
-        val updatedManager = routeManager.save(route)
-        (stationManager, Services.updateManager(promise, routeManager, updatedManager, _.routes))
+      eventQueue addCreateRouteEvent ((stationManager, routeManager) => {
+        val updatedManager = routeManager save route
+        (stationManager, Services updateManager (promise, routeManager, updatedManager, _.routes))
       })
       promise.future
 
     override def modify(oldRoute: Route, newRoute: Route): Future[Either[Errors, List[Route]]] =
       val promise = Promise[Either[Errors, List[Route]]]()
-      eventQueue.addUpdateRouteEvent((stationManager, routeManager) => {
-        val updatedManager = routeManager.modify(oldRoute, newRoute)
-        (stationManager, Services.updateManager(promise, routeManager, updatedManager, _.routes))
+      eventQueue addUpdateRouteEvent ((stationManager, routeManager) => {
+        val updatedManager = routeManager modify (oldRoute, newRoute)
+        (stationManager, Services updateManager (promise, routeManager, updatedManager, _.routes))
       })
       promise.future
 
     override def delete(route: Route): Future[Either[Errors, List[Route]]] =
       val promise = Promise[Either[Errors, List[Route]]]()
-      eventQueue.addDeleteRouteEvent((routeManager, timetableManager) => {
-        val updatedManager = routeManager.delete(route)
-        (Services.updateManager(promise, routeManager, updatedManager, _.routes), timetableManager)
+      eventQueue addDeleteRouteEvent ((routeManager, timetableManager) => {
+        val updatedManager = routeManager delete route
+        (Services updateManager (promise, routeManager, updatedManager, _.routes), timetableManager)
       })
       promise.future
