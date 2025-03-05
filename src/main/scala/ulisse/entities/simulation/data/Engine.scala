@@ -21,19 +21,16 @@ object Engine:
     Engine(false, configuration, EngineState.empty())
 
   given FieldComparator[EngineStateField, Engine] with
-    def compare(engines: List[Engine], ignoredFields: Seq[EngineStateField]): Boolean =
-      val fieldsToCompare = EngineStateField.values.filterNot(ignoredFields.contains)
-      engines match
-        case firstEngine :: tail => tail.forall: otherEngine =>
-            fieldsToCompare.forall:
-              case EngineStateField.Running => firstEngine.running == otherEngine.running
-              case EngineStateField.CyclesPerSecond =>
-                firstEngine.configuration.cyclesPerSecond == otherEngine.configuration.cyclesPerSecond
-              case EngineStateField.LastUpdate => firstEngine.state.lastUpdate == otherEngine.state.lastUpdate
-              case EngineStateField.LastDelta  => firstEngine.state.lastDelta == otherEngine.state.lastDelta
-              case EngineStateField.ElapsedCycleTime =>
-                firstEngine.state.elapsedCycleTime == otherEngine.state.elapsedCycleTime
-        case _ => false
+    def fields: Seq[EngineStateField] = EngineStateField.values.toSeq
+    def _compare(firstEngine: Engine, otherEngine: Engine, field: EngineStateField): Boolean =
+      field match
+        case EngineStateField.Running => firstEngine.running == otherEngine.running
+        case EngineStateField.CyclesPerSecond =>
+          firstEngine.configuration.cyclesPerSecond == otherEngine.configuration.cyclesPerSecond
+        case EngineStateField.LastUpdate => firstEngine.state.lastUpdate == otherEngine.state.lastUpdate
+        case EngineStateField.LastDelta  => firstEngine.state.lastDelta == otherEngine.state.lastDelta
+        case EngineStateField.ElapsedCycleTime =>
+          firstEngine.state.elapsedCycleTime == otherEngine.state.elapsedCycleTime
 
   enum EngineStateField extends Field[EngineStateField, Engine]:
     case Running, CyclesPerSecond, LastUpdate, LastDelta, ElapsedCycleTime
