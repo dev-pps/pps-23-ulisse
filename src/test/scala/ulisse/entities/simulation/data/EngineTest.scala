@@ -7,7 +7,7 @@ class EngineTest extends AnyWordSpec with Matchers:
 
   private val running       = true
   private val configuration = EngineConfiguration.defaultBatch()
-  private val state         = EngineState(Some(1.0), 2.0, 3.0)
+  private val state         = EngineState(Some(1), 2, 3)
 
   "Engine" when:
     "created" should:

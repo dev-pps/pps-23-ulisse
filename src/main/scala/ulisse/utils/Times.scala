@@ -10,7 +10,7 @@ object Times:
   private type Hour   = Int
   private type Minute = Int
   private type Second = Int
-  type Milliseconds   = Double
+  type Milliseconds   = Long
   extension (millis: Milliseconds)
     def toTime: Time = Time.secondsToOverflowTime((millis / 1000).toInt)
 

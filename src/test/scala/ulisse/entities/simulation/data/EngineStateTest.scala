@@ -5,9 +5,9 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.simulation.data.EngineState.{defaultElapsedCycleTime, defaultLastDelta, defaultLastUpdate}
 
 class EngineStateTest extends AnyWordSpec with Matchers:
-  private val lastUpdate       = 1.0
-  private val lastDelta        = 2.0
-  private val elapsedCycleTime = 3.0
+  private val lastUpdate       = 1
+  private val lastDelta        = 2
+  private val elapsedCycleTime = 3
   private val engineState      = EngineState(Some(lastUpdate), lastDelta, elapsedCycleTime)
 
   "Engine state" when:
@@ -18,7 +18,7 @@ class EngineStateTest extends AnyWordSpec with Matchers:
         engineState.elapsedCycleTime shouldBe elapsedCycleTime
 
       "doesn't allow negative values" in:
-        EngineState(Some(0.0), -2.0, -3.0) shouldBe EngineState.empty()
+        EngineState(Some(0), -2, -3) shouldBe EngineState.empty()
 
     "created empty" should:
       "have default values" in:
@@ -29,12 +29,12 @@ class EngineStateTest extends AnyWordSpec with Matchers:
 
     "elapsed cycle time is updated" should:
       "update elapsed cycle time" in:
-        val delta = 5.0
+        val delta = 5
         engineState.updateElapsedCycleTime(delta).elapsedCycleTime shouldBe elapsedCycleTime + delta
 
     "updated" should:
       "set last update when is none" in:
-        val currentUpdate = 6.0
+        val currentUpdate = 6
         val engineState   = EngineState.empty()
         engineState.update(currentUpdate).lastUpdate shouldBe Some(currentUpdate)
 
@@ -43,12 +43,12 @@ class EngineStateTest extends AnyWordSpec with Matchers:
         engineState.update(currentUpdate).lastUpdate shouldBe Some(currentUpdate)
 
       "update lastDelta when current update is greater or equal than last update" in:
-        val deltaElapsed  = 1.0
+        val deltaElapsed  = 1
         val currentUpdate = lastUpdate + deltaElapsed
         engineState.update(currentUpdate).lastDelta shouldBe deltaElapsed
 
       "update elapsed cycle time when current update is greater or equal than last update" in:
-        val deltaElapsed  = 1.0
+        val deltaElapsed  = 1
         val currentUpdate = lastUpdate + deltaElapsed
         engineState.update(currentUpdate).elapsedCycleTime shouldBe elapsedCycleTime + deltaElapsed
 

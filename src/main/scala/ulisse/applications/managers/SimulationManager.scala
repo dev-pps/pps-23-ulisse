@@ -47,8 +47,8 @@ object SimulationManager:
   ): SimulationManager = SimulationManager(None, timeProvider, EngineConfiguration.defaultBatch())
 
   /** Calculate how often a cycle should occur in milliseconds. */
-  def calculateCycleTimeStep(cps: Int): Double =
-    1.0 / cps * 1000
+  def calculateCycleTimeStep(cps: Int): Long =
+    (1.0 / cps * 1000).toLong
 
   private case class SimulationManagerImpl(
       engine: Engine,
@@ -97,5 +97,5 @@ object SimulationManager:
       else simulationManager
 
     override def doStep(): SimulationManager =
-      given updatedEngineState: EngineState = engine.state.update(timeProvider.currentTimeMillis().toDouble)
+      given updatedEngineState: EngineState = engine.state.update(timeProvider.currentTimeMillis())
       evaluateTermination(updateSimulation)

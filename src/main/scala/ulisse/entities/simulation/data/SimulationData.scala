@@ -10,7 +10,7 @@ trait SimulationData:
   def simulationEnvironment: RailwayEnvironment
   def simulationEnvironment_=(simulationEnvironment: RailwayEnvironment): SimulationData
   def increaseStepByOne(): SimulationData
-  def increaseMillisecondsElapsedBy(delta: Double): SimulationData
+  def increaseMillisecondsElapsedBy(delta: Long): SimulationData
   def reset(): SimulationData
 
 object SimulationData:
@@ -41,6 +41,6 @@ private final case class SimulationDataImpl(
   override def simulationEnvironment_=(simulationEnvironment: RailwayEnvironment): SimulationData =
     copy(simulationEnvironment = simulationEnvironment)
   override def increaseStepByOne(): SimulationData = copy(step = step + 1)
-  override def increaseMillisecondsElapsedBy(delta: Double): SimulationData =
+  override def increaseMillisecondsElapsedBy(delta: Long): SimulationData =
     copy(millisecondsElapsed = millisecondsElapsed + delta)
   override def reset(): SimulationData = SimulationData.withEnvironment(initialSimulationEnvironment)
