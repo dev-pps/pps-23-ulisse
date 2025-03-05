@@ -18,10 +18,7 @@ class EngineStateTest extends AnyWordSpec with Matchers:
         engineState.elapsedCycleTime shouldBe elapsedCycleTime
 
       "doesn't allow negative values" in:
-        val engineState = EngineState(Some(-1.0), -2.0, -3.0)
-        engineState.lastUpdate shouldBe defaultLastUpdate
-        engineState.lastDelta shouldBe defaultLastDelta
-        engineState.elapsedCycleTime shouldBe defaultElapsedCycleTime
+        EngineState(Some(0.0), -2.0, -3.0) shouldBe EngineState.empty()
 
     "created empty" should:
       "have default values" in:
@@ -29,7 +26,7 @@ class EngineStateTest extends AnyWordSpec with Matchers:
         engineState.lastUpdate shouldBe defaultLastUpdate
         engineState.lastDelta shouldBe defaultLastDelta
         engineState.elapsedCycleTime shouldBe defaultElapsedCycleTime
-    
+
     "elapsed cycle time is updated" should:
       "update elapsed cycle time" in:
         val delta = 5.0
