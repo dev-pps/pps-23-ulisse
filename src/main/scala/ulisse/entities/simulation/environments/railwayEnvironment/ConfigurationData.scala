@@ -24,7 +24,11 @@ object ConfigurationData:
     val sortedTimetables: Map[Train, Seq[DynamicTimetable]] = sortedTimetablesByTrainId.filter(t =>
       stationsEEInitialState.collectTrains.contains(t._1)
     ).toMap
-    ConfigurationDataImpl(stationsEEInitialState, routes.distinctBy(_.id), sortedTimetables)
+    ConfigurationDataImpl(
+      stationsEEInitialState,
+      routes.distinctBy(_.id).sortBy(_.typology.technology).reverse,
+      sortedTimetables
+    )
 
   def empty(): ConfigurationData =
     ConfigurationDataImpl(Seq.empty, Seq.empty, Map.empty)
