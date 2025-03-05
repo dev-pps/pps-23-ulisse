@@ -1,3 +1,32 @@
+## [1.21.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.20.0...v1.21.0) (2025-03-05)
+
+### Features
+
+* adapting gui for input port manager ([14d49fb](https://github.com/dev-pps/pps-23-ulisse/commit/14d49fbfa7a2eaf04c4d3ef142021e8fb9858179))
+* add delete method to routeManager ([df95dde](https://github.com/dev-pps/pps-23-ulisse/commit/df95ddebc4fb9d6c6692c45977041145ae579232))
+* add filter method to routeManager ([bb133bd](https://github.com/dev-pps/pps-23-ulisse/commit/bb133bdf6b0c9a9ffce03291862eff6610c1a0a7))
+* added movedObserver ([6b1abdd](https://github.com/dev-pps/pps-23-ulisse/commit/6b1abdd0968136217f37e039f9d303499ac07d46))
+* added observable to drawImage ([61c6e6b](https://github.com/dev-pps/pps-23-ulisse/commit/61c6e6b47d88267d20f9a7475b675cd6a8f8371b))
+* connected form route to map ([5197fa6](https://github.com/dev-pps/pps-23-ulisse/commit/5197fa6cba0aa06c08fa30fd8609e68b70d9b2c9))
+* connected form to map ([fa5a22d](https://github.com/dev-pps/pps-23-ulisse/commit/fa5a22d571451739288547ef8a0cc3676c69c59f))
+* connected station form to map ([d5bbb65](https://github.com/dev-pps/pps-23-ulisse/commit/d5bbb65148c101f189f7c8d9a3e5717947cfb8fb))
+* connecting adapter manager to view ([cfe364f](https://github.com/dev-pps/pps-23-ulisse/commit/cfe364faa01e1d63f1dada94725d83e770a2b606))
+* connecting view to adapter station ([7a55959](https://github.com/dev-pps/pps-23-ulisse/commit/7a5595998f7dd11dcd4ad44c8e33854cbf15f59b))
+* converts observable in a observer of type I ([cf704dc](https://github.com/dev-pps/pps-23-ulisse/commit/cf704dc00b99a002af361f476329e7342580ec37))
+* create current color ([3131280](https://github.com/dev-pps/pps-23-ulisse/commit/31312801e04e3c069c5c7e371b91fbe8c35b4f08))
+* create input adapter manager ([633e408](https://github.com/dev-pps/pps-23-ulisse/commit/633e408ffb391c33bbb6838a4e134489e7873b33))
+* create input port manager ([2da3f2f](https://github.com/dev-pps/pps-23-ulisse/commit/2da3f2f3faad8ae757c225c130f30db840408d57))
+* create method to change automatic departure and arrival station ([2664964](https://github.com/dev-pps/pps-23-ulisse/commit/2664964af849695e7799b936225b234439e99878))
+* create method to change automatic departure and arrival station in routeManager ([cec18fb](https://github.com/dev-pps/pps-23-ulisse/commit/cec18fbf81627d639dc9e8f5ca60ccdb929e9aba))
+* create services manager ([8619fd0](https://github.com/dev-pps/pps-23-ulisse/commit/8619fd03bd0ec8950595c2d2f105d5119b3e16f5))
+* extract map workspace to connect to application ([50a79d0](https://github.com/dev-pps/pps-23-ulisse/commit/50a79d06458ba10718498c3ac34ad8d98e4d72e0))
+* finish draw image ([87e3c7d](https://github.com/dev-pps/pps-23-ulisse/commit/87e3c7df9581fe46804c06b8f283a1a6413f017d))
+* graphics unpackage to connect application ([311e128](https://github.com/dev-pps/pps-23-ulisse/commit/311e12811968ecf4929b1d2e907c07bc132e1677))
+* init main ([9374d3a](https://github.com/dev-pps/pps-23-ulisse/commit/9374d3a72afd3a20c98fe4c5cd5a0c8f0f472ad1))
+* methods to check route fields ([de73b4c](https://github.com/dev-pps/pps-23-ulisse/commit/de73b4ccffdf1e4d7dba22d76f115be9bc34c571))
+* split of observer behaviour ([31003c4](https://github.com/dev-pps/pps-23-ulisse/commit/31003c44d71b10c719c61e67a089859b5b1fa3ec))
+* station creation form connected with the application ([c01035d](https://github.com/dev-pps/pps-23-ulisse/commit/c01035defa942354640d56e54fbab16600b6089c))
+
 ## [1.20.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.19.0...v1.20.0) (2025-03-05)
 
 ### Features
