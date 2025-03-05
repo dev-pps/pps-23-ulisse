@@ -1,52 +1,44 @@
 package ulisse.entities.simulation.environments.railwayEnvironment
 
-import org.mockito.Mockito.{spy, when}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
-import ulisse.entities.route.RouteEnvironmentElementTest.routeAB
-import ulisse.entities.route.RouteTest.departureCoordinate
-import ulisse.entities.route.Routes.RouteType.AV
-import ulisse.entities.route.Routes.{Route, RouteType}
 import ulisse.entities.route.Tracks.TrackDirection
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.{
   routesEE,
   stationsEE,
   timetables
 }
-import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
-import ulisse.entities.station.StationTest.{stationA, stationB}
 import ulisse.entities.timetable.DynamicTimetableTest.*
+import ulisse.entities.timetable.DynamicTimetableTest.{timetable1, timetable2}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
-import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.entities.train.TrainAgentTest.{train3905, train3906, train3907}
 import ulisse.entities.train.TrainAgents.TrainAgent
+import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates
+import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates.{StateBehavior, Stopped}
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
-import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.Time
-
 import scala.Seq
 class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val dt = 1
 
-  private final case class FakeTrainAgent(train: Train, distanceTravelled: Double) extends TrainAgent:
+  private final case class FakeTrainAgent(train: Train, state: StateBehavior) extends TrainAgent:
     export train.*
+    export state.motionData
+    export state.motionData.{acceleration => currentAcceleration, distanceTravelled, speed => currentSpeed}
+    override def resetDistanceTravelled: TrainAgent =
+      FakeTrainAgent(train, state.reset())
+    override def updateDistanceTravelled(distanceDelta: Double): TrainAgent = this
+    override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): TrainAgent =
+      updateDistanceTravelled(routesEE.map(_.length).foldLeft(0.0)(math.max))
 
-    def distanceTravelled_=(newDistanceTravelled: Double): TrainAgent =
-      val minDistanceTravelled = 0.0
-      copy(distanceTravelled = math.max(minDistanceTravelled, newDistanceTravelled))
-
-    override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): Option[TrainAgent] =
-      Some(copy(distanceTravelled = distanceTravelled + routesEE.map(_.length).foldLeft(0.0)(math.max)))
-
-  private val trainAgent3905 = FakeTrainAgent(train3905, 0.0)
-  private val trainAgent3906 = FakeTrainAgent(train3906, 0.0)
-  private val trainAgent3907 = FakeTrainAgent(train3907, 0.0)
+  private val initialState   = Stopped(0.0)
+  private val trainAgent3905 = FakeTrainAgent(train3905, initialState)
+  private val trainAgent3906 = FakeTrainAgent(train3906, initialState)
+  private val trainAgent3907 = FakeTrainAgent(train3907, initialState)
 
   private val trainAgents = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
 
@@ -132,7 +124,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
             ree.containers.find(_.contains(trainAgent3905)) match
               case Some(container) =>
                 container.currentDirection shouldBe Some(dir)
-                container.trains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)
+                container.trains.find(_ == trainAgent3905).map(_.motionData.distanceTravelled) shouldBe Some(0.0)
               case _ => fail()
           case _ => fail()
 

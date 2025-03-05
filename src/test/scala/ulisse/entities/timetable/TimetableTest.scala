@@ -7,11 +7,11 @@ import ulisse.Utils.TestUtility.in
 import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.route.Routes.RouteType
 import ulisse.entities.station.Station
-import ulisse.entities.timetable.TrainStationTime.{ArrivingStationTime, AutoStationTime, DepartureStationTime}
 import ulisse.entities.timetable.Timetables.{toWaitTime, RailInfo, Timetable, TimetableBuilder}
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.ClockTime
 import ulisse.entities.timetable.TestMockedEntities.*
+import ulisse.entities.timetable.TrainStationTime.{ArrivingStationTime, AutoStationTime, DepartureStationTime}
 
 import scala.collection.immutable.ListMap
 import scala.language.postfixOps
