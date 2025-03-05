@@ -41,9 +41,10 @@ class RouteTest extends AnyFlatSpec with Matchers:
     validateRoute mustBe equalRoute
 
   "check different routes" should "have different departure or arrival station or typology " in:
-    val stationTracks: Int                     = 2
-    val newDeparture: Station                  = Station("Firenze", departureCoordinate, stationTracks)
-    val newArrival: Station                    = Station("Bologna", arrivalCoordinate, stationTracks)
+    val stationTracks: Int          = 2
+    val coordinateDelta: Coordinate = Coordinate(1, 1)
+    val newDeparture: Station       = Station("Firenze", departureCoordinate + coordinateDelta, stationTracks)
+    val newArrival: Station         = Station("Bologna", arrivalCoordinate + coordinateDelta, stationTracks)
     val routeWithNewDeparture: ValidationRoute = Route(newDeparture, arrival, routeType, railsCount, pathLength)
     val routeWithNewArrival: ValidationRoute   = Route(departure, newArrival, routeType, railsCount, pathLength)
     val createRouteByType: RouteType => Either[RouteError, Route] = Route(departure, arrival, _, railsCount, pathLength)

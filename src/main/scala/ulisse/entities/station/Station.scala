@@ -8,39 +8,48 @@ import ulisse.utils.ValidationUtils.{validateNonBlankString, validatePositive}
 
 /** Defines a `Station`, a place where trains can stop. */
 trait Station:
+  /** The id of the station. station are unique based on their location */
   def id: Int = hashCode()
+
+  /** The name of the station. */
   def name: String
+
+  /** The location of the station. */
   def coordinate: Coordinate
-  def numberOfTracks: Int
 
-  override def equals(that: Any): Boolean =
-    that match
-      case s: Station =>
-        id == s.id
-      case _ => false
+  /** The number of platforms in the station. */
+  def numberOfPlatforms: Int
 
-  override def hashCode(): Int = (name, coordinate).##
+  /** Defines equality for Station */
+  override def equals(that: Any): Boolean = that match
+    case s: Station => name === s.name || coordinate === s.coordinate
+    case _          => false
+
+  /** Defines hashCode for Station */
+  override def hashCode(): Int = coordinate.##
 
 /** Factory for [[Station]] instances. */
 object Station:
-  /** Creates a `Station` instance. The resulting station has at least 1 track. */
-  def apply(name: String, coordinate: Coordinate, numberOfTrack: Int): Station =
-    val minNumberOfTracks = 1
-    StationImpl(name, coordinate, math.max(minNumberOfTracks, numberOfTrack))
+  /** Default number of platforms for a station. */
+  val minNumberOfPlatforms: Int = 1
 
-  /** Creates a `Station` instance with validation. The resulting station must have non-blank name and positive numberOfTrack */
+  /** Creates a `Station` instance. If the provided numberOfPlatforms are lower than the minNumberOfPlatforms the min value will be set */
+  def apply(name: String, coordinate: Coordinate, numberOfPlatforms: Int): Station =
+    StationImpl(name, coordinate, math.max(minNumberOfPlatforms, numberOfPlatforms))
+
+  /** Creates a `Station` instance with validation. The resulting station must have non-blank name and numberOfPlatforms higher or equal than minNumberOfPlatforms */
   def createCheckedStation(
       name: String,
       coordinate: Coordinate,
-      numberOfTrack: Int
+      numberOfPlatforms: Int
   ): Either[NonEmptyChain[Station.Error], Station] =
     (
       validateNonBlankString(name, Station.Error.InvalidName).toValidatedNec,
-      validatePositive(numberOfTrack, Station.Error.InvalidNumberOfTrack).toValidatedNec
+      validatePositive(numberOfPlatforms, Station.Error.InvalidNumberOfPlatforms).toValidatedNec
     ).mapN(Station(_, coordinate, _)).toEither
 
-  private final case class StationImpl(name: String, coordinate: Coordinate, numberOfTracks: Int) extends Station
+  private final case class StationImpl(name: String, coordinate: Coordinate, numberOfPlatforms: Int) extends Station
 
   /** Represents errors that can occur during `Station` creation. */
   enum Error extends BaseError:
-    case InvalidName, InvalidNumberOfTrack
+    case InvalidName, InvalidNumberOfPlatforms

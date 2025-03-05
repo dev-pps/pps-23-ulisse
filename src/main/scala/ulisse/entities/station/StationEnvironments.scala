@@ -41,7 +41,7 @@ object StationEnvironments:
     def apply(station: Station): StationEnvironmentElement =
       StationEnvironmentElementImpl(
         station,
-        TrainAgentsContainer.generateSequentialContainers(Platform.apply, station.numberOfTracks)
+        TrainAgentsContainer.generateSequentialContainers(Platform.apply, station.numberOfPlatforms)
       )
 
     private final case class StationEnvironmentElementImpl(station: Station, containers: Seq[Platform])

@@ -135,5 +135,5 @@ class StationEditorAdapterTest extends AnyWordSpec with Matchers:
           )
 
         Await.result(addStationWithWrongNameAndNumberOfTrackResult, Duration.Inf) shouldBe Left(
-          Chain(Station.Error.InvalidName, Station.Error.InvalidNumberOfTrack)
+          Chain(Station.Error.InvalidName, Station.Error.InvalidNumberOfPlatforms)
         )

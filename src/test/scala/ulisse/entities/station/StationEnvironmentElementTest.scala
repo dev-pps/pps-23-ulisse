@@ -5,7 +5,15 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
 import ulisse.entities.station.StationEnvironmentElementTest.stationA_EE
 import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
-import ulisse.entities.station.StationTest.{numberOfTracks, stationA, stationB, stationC, stationD, stationE, stationF}
+import ulisse.entities.station.StationTest.{
+  defaultNumberOfPlatform,
+  stationA,
+  stationB,
+  stationC,
+  stationD,
+  stationE,
+  stationF
+}
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906, trainAgent3907}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
@@ -28,7 +36,7 @@ class StationEnvironmentElementTest extends AnyWordSpec with Matchers:
         stationA_EE shouldBe stationA
 
       "have 'numberOfTracks' empty tracks" in:
-        stationA_EE.containers.size shouldBe numberOfTracks
+        stationA_EE.containers.size shouldBe defaultNumberOfPlatform
         stationA_EE.containers.forall(_.isEmpty) shouldBe true
         stationA_EE.containers.forall(_.isAvailable) shouldBe true
 

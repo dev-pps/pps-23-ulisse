@@ -52,8 +52,9 @@ class ConfigurationDataTest extends AnyWordSpec with Matchers:
         cd.stations shouldBe stations
 
       "exclude in order duplicate stations" in:
-        val stationADuplicate = makeStationEE(Station(stationA.name, stationA.coordinate, stationA.numberOfTracks + 1))
-        val cd                = ConfigurationData((stationsEE :+ stationADuplicate), routesEE, trainAgents, timetables)
+        val stationADuplicate =
+          makeStationEE(Station(stationA.name, stationA.coordinate, stationA.numberOfPlatforms + 1))
+        val cd = ConfigurationData((stationsEE :+ stationADuplicate), routesEE, trainAgents, timetables)
         cd.stations shouldBe stations
 
       "have all routes" in:

@@ -78,7 +78,7 @@ object StationForm:
       stationForm.name.text = data.element.name
       stationForm.xField.text = data.element.coordinate.x.toString
       stationForm.yField.text = data.element.coordinate.y.toString
-      stationForm.tracks.text = data.element.numberOfTracks.toString
+      stationForm.tracks.text = data.element.numberOfPlatforms.toString
 
   private case class StationFormImpl() extends StationForm:
     override val name: ComposedSwing.InfoTextField   = ComposedSwing.createInfoTextField("Name")
