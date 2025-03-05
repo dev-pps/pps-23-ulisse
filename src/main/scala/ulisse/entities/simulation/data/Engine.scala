@@ -13,7 +13,7 @@ trait Engine:
 
 object Engine:
   def apply(running: Boolean, configuration: EngineConfiguration, state: EngineState): Engine =
-    EngineStateImpl(running, configuration, state)
+    EngineImpl(running, configuration, state)
 
   def empty(): Engine = Engine.emptyWithConfiguration(EngineConfiguration.empty())
 
@@ -36,7 +36,7 @@ object Engine:
     case Running, CyclesPerSecond, LastUpdate, LastDelta, ElapsedCycleTime
     def values: Seq[EngineStateField] = EngineStateField.values.toSeq
 
-  private final case class EngineStateImpl(
+  private final case class EngineImpl(
       running: Boolean,
       configuration: EngineConfiguration,
       state: EngineState

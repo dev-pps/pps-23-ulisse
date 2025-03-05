@@ -27,7 +27,7 @@ object SimulationData:
             case SimulationDataField.Step => obj.step == otherObj.step
             case SimulationDataField.SecondElapsed => obj.secondElapsed == otherObj.secondElapsed
             case SimulationDataField.SimulationEnvironment => obj.simulationEnvironment == otherObj.simulationEnvironment
-  
+
   enum SimulationDataField extends Field[SimulationDataField, SimulationData]:
     case Step, SecondElapsed, SimulationEnvironment
     def values: Seq[SimulationDataField] = SimulationDataField.values.toSeq
