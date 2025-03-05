@@ -46,7 +46,7 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
   private val timetableManager: TimetableManager = mock[TimetableManager]
   when(timetableManager.tables).thenReturn(simpleConfigurationData.timetables.values.flatten.toSeq)
 
-  private val initialState = AppState().updateStation(_ => stationManager)
+  private val initialState = AppState().updateStationManager(_ => stationManager)
     .updateRoute(_ => routeManager)
     .updateTrain((_, _) => trainManager)
     .updateTimetable(_ => timetableManager)

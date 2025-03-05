@@ -3,7 +3,8 @@ package ulisse.applications
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.applications.event.SimulationManagers
+import ulisse.applications.event.SimulationEventQueue.SimulationManagers
+import ulisse.applications.event.StationEventQueue.StationManagers
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
@@ -22,18 +23,17 @@ object AppStateTest:
   val timetableManager: TimetableManager                    = mock[TimetableManager]
   val simulationManager: SimulationManager                  = mock[SimulationManager]
 
-  val updateStation: StationManager => StationManager = _ => stationManager
-  val updateRoute: RouteManager => RouteManager       = _ => routeManager
+  val updateStationManager: StationManager => StationManager = _ => stationManager
+  val updateRoute: RouteManager => RouteManager              = _ => routeManager
   val updateTechnology: TechnologyManager[TrainTechnology] => TechnologyManager[TrainTechnology] =
     _ => technologyManager
   val updateTrain: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager = (_, _) => trainManager
   val updateTimetable: TimetableManager => TimetableManager                           = _ => timetableManager
-  val updateSimulation: SimulationManager => SimulationManager                        = _ => simulationManager
+  val updateSimulationManager: SimulationManager => SimulationManager                 = _ => simulationManager
   val updateRailwayNetwork: (StationManager, RouteManager) => (StationManager, RouteManager) =
     (_, _) => (stationManager, routeManager)
-  val updateStationSchedule
-      : (StationManager, RouteManager, TimetableManager) => (StationManager, RouteManager, TimetableManager) =
-    (_, _, _) => (stationManager, routeManager, timetableManager)
+  val updateStationManagers: StationManagers => StationManagers =
+    _ => StationManagers(stationManager, routeManager, timetableManager)
   val updateRouteSchedule: (RouteManager, TimetableManager) => (RouteManager, TimetableManager) =
     (_, _) => (routeManager, timetableManager)
   val updateTrainSchedule: (TrainManager, TimetableManager) => (TrainManager, TimetableManager) =
@@ -45,7 +45,7 @@ object AppStateTest:
       TimetableManager
   ) =
     (_, _, _, _) => (stationManager, routeManager, trainManager, timetableManager)
-  val setupSimulation: SimulationManagers => SimulationManager = _ => simulationManager
+  val setupSimulationManager: SimulationManagers => SimulationManager = _ => simulationManager
 
 class AppStateTest extends AnyFlatSpec with Matchers:
   import AppStateTest.*
@@ -53,7 +53,7 @@ class AppStateTest extends AnyFlatSpec with Matchers:
 
   "read station manager" should "be a function that not update manager" in:
     val initStationManager = appState.stationManager
-    appState.readStation(_ => ())
+    appState.readStationManager(_ => ())
     appState.stationManager mustBe initStationManager
 
   "read route manager" should "be a function that not update manager" in:
@@ -77,7 +77,7 @@ class AppStateTest extends AnyFlatSpec with Matchers:
     appState.simulationManager mustBe initSimulationManager
 
   "update station manager" should "update manager" in:
-    val newState = appState.updateStation(updateStation)
+    val newState = appState.updateStationManager(updateStationManager)
     newState.stationManager mustBe stationManager
 
   "update route manager" should "update manager" in:
@@ -103,9 +103,10 @@ class AppStateTest extends AnyFlatSpec with Matchers:
     newState.routeManager mustBe routeManager
 
   "update station schedule" should "update station, route and timetable managers" in:
-    val newState = appState.updateStationSchedule(updateStationSchedule)
+    val newState = appState.updateStationManagers(updateStationManagers)
 
     newState.stationManager mustBe stationManager
+    newState.routeManager mustBe routeManager
     newState.timetableManager mustBe timetableManager
 
   "update route schedule" should "update route and timetable managers" in:
@@ -128,11 +129,11 @@ class AppStateTest extends AnyFlatSpec with Matchers:
     newState.trainManager mustBe trainManager
 
   "update simulation manager" should "update manager" in:
-    val newState = appState.updateSimulation(updateSimulation)
+    val newState = appState.updateSimulationManager(updateSimulationManager)
 
     newState.simulationManager mustBe simulationManager
 
   "init simulation manager" should "update manager" in:
-    val newState = appState.setupSimulation(setupSimulation)
+    val newState = appState.setupSimulationManager(setupSimulationManager)
 
     newState.simulationManager mustBe simulationManager

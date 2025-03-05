@@ -11,25 +11,20 @@ class EventQueueTest extends AnyFlatSpec with Matchers:
   private val eventQueue    = EventQueue()
   private def updateState() = runAll(initialState, eventQueue.events)
 
-  "add read station event" should "update station manager" in:
-    eventQueue.addReadStationEvent(_ => ())
+  "add read station manager event" should "not update station manager" in:
+    eventQueue.addReadStationManagerEvent(_ => ())
     val states = updateState()
     states.lastOption mustBe Some(initialState)
 
-  "add create station event" should "update station manager" in:
-    eventQueue.addCreateStationEvent(updateStation)
+  "add update station manager" should "update station manager" in:
+    eventQueue.addUpdateStationManagerEvent(updateStationManager)
     val states = updateState()
-    states.lastOption mustBe Some(initialState.updateStation(updateStation))
+    states.lastOption mustBe Some(initialState.updateStationManager(updateStationManager))
 
-  "add update station event" should "update railway network" in:
-    eventQueue.addUpdateStationEvent(updateStationSchedule)
+  "add update station managers event" should "update station managers" in:
+    eventQueue.addUpdateStationManagersEvent(updateStationManagers)
     val states = updateState()
-    states.lastOption mustBe Some(initialState.updateStationSchedule(updateStationSchedule))
-
-  "add delete station event" should "update station schedule" in:
-    eventQueue.addDeleteStationEvent(updateStationSchedule)
-    val states = updateState()
-    states.lastOption mustBe Some(initialState.updateStationSchedule(updateStationSchedule))
+    states.lastOption mustBe Some(initialState.updateStationManagers(updateStationManagers))
 
   "add read route event" should "update route manager" in:
     eventQueue.addReadRouteEvent(_ => ())
@@ -91,17 +86,17 @@ class EventQueueTest extends AnyFlatSpec with Matchers:
     val states = updateState()
     states.lastOption mustBe Some(initialState.updateTimetable(updateTimetable))
 
-  "add read simulation event" should "update simulation manager" in:
+  "add read simulation environment event" should "not update simulation environment" in:
     eventQueue.addReadSimulationEnvironmentEvent(_ => ())
     val states = updateState()
     states.lastOption mustBe Some(initialState)
 
-  "add create simulation event" should "update simulation manager" in:
-    eventQueue.addSetupSimulationManagerEvent(setupSimulation)
+  "add setup simulation manager event" should "update simulation manager" in:
+    eventQueue.addSetupSimulationManagerEvent(setupSimulationManager)
     val states = updateState()
-    states.lastOption mustBe Some(initialState.setupSimulation(setupSimulation))
+    states.lastOption mustBe Some(initialState.setupSimulationManager(setupSimulationManager))
 
-  "add update simulation event" should "update simulation manager" in:
-    eventQueue.addUpdateSimulationManagerEvent(updateSimulation)
+  "add update simulation manager event" should "update simulation manager" in:
+    eventQueue.addUpdateSimulationManagerEvent(updateSimulationManager)
     val states = updateState()
-    states.lastOption mustBe Some(initialState.setupSimulation(setupSimulation))
+    states.lastOption mustBe Some(initialState.updateSimulationManager(updateSimulationManager))
