@@ -15,6 +15,7 @@ import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationD
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.timetable.DynamicTimetableTest.dynamicTimetable1
+import ulisse.utils.Times.Time
 
 class SimulationManagerTest extends AnyWordSpec with Matchers:
   private val sdtt = spy(dynamicTimetable1)
@@ -138,7 +139,7 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
         updatedManager.engine.state.lastDelta shouldBe timeIncrement
         updatedManager.engine.state.elapsedCycleTime shouldBe realUpdate * timeIncrement
         updatedManager.simulationData.step shouldBe step
-        updatedManager.simulationData.secondElapsed shouldBe realUpdate * timeIncrement
+        updatedManager.simulationData.millisecondsElapsed shouldBe realUpdate * timeIncrement
 
   "TimedSimulationManager" should:
     "update state on multiple steps" in:
@@ -152,7 +153,7 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
         ).setupEnvironment(mockedEnv).start()
         val updatedManager = repeatDoStep(manager, step)
         val realUpdate     = step - 1
-        val expectedStep   = (updatedManager.simulationData.secondElapsed / cycleTimeStep).toInt
+        val expectedStep   = (updatedManager.simulationData.millisecondsElapsed / cycleTimeStep).toInt
         updatedManager.engine compareTo manager.engine ignoring (EngineStateField.LastUpdate, EngineStateField.LastDelta, EngineStateField.ElapsedCycleTime) shouldBeBoolean true
         updatedManager.engine compareTo manager.engine considering EngineStateField.LastUpdate shouldBeBoolean false
         updatedManager.engine compareTo manager.engine considering EngineStateField.LastDelta shouldBeBoolean false
@@ -161,4 +162,4 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
         updatedManager.engine.state.lastDelta shouldBe timeIncrement
         updatedManager.engine.state.elapsedCycleTime shouldBe realUpdate * timeIncrement - expectedStep * cycleTimeStep
         updatedManager.simulationData.step shouldBe expectedStep
-        updatedManager.simulationData.secondElapsed shouldBe realUpdate * timeIncrement
+        updatedManager.simulationData.millisecondsElapsed shouldBe realUpdate * timeIncrement

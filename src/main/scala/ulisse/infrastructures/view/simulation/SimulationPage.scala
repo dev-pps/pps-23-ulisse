@@ -6,6 +6,7 @@ import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.ExtendedSwing.SVGPanel
 import ulisse.infrastructures.view.utils.ComponentUtils.*
+import ulisse.utils.Times.toTime
 
 import scala.concurrent.ExecutionContext
 import scala.swing.*
@@ -28,7 +29,7 @@ object SimulationPage:
     private val mapControlPane = SimulationPageControlPanel(controller)
 
     def updateData(data: SimulationData): Unit = mapControlPane.notificationLabel.text =
-      s"Step: ${data.step}, Time: ${data.secondElapsed / 1000.0}, Agent: ${data.simulationEnvironment.agents.foldLeft(
+      s"Step: ${data.step}, Time: ${data.millisecondsElapsed.toTime}, Agent: ${data.simulationEnvironment.agents.foldLeft(
           ""
         )((acc, agent) => s"$acc $agent")}"
 

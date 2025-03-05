@@ -3,6 +3,7 @@ package ulisse.applications.ports
 import cats.data.NonEmptyChain
 import ulisse.applications.managers.StationManager
 import ulisse.entities.Coordinate
+import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
 
 import scala.concurrent.Future
@@ -21,10 +22,10 @@ object StationPorts:
     def addStation(station: Station): Future[Either[E, SM]]
 
     /** Removes a `Station` from the station manager or return an error if it fails. */
-    def removeStation(station: Station): Future[Either[E, SM]]
+    def removeStation(station: Station): Future[Either[E, (SM, List[Route])]]
 
     /** Updates a `Station` from the station manager or return an error if it fails. */
-    def updateStation(oldStation: Station, newStation: Station): Future[Either[E, SM]]
+    def updateStation(oldStation: Station, newStation: Station): Future[Either[E, (SM, List[Route])]]
 
     /** Finds a `Station` at a specified location. */
     def findStationAt(coordinate: Coordinate): Future[Option[Station]]

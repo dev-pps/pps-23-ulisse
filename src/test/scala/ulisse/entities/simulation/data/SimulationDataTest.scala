@@ -8,16 +8,16 @@ import ulisse.utils.Times.Time
 
 class SimulationDataTest extends AnyWordSpec with Matchers:
   private val step                    = 10
-  private val secondElapsed           = 2
+  private val millisecondsElapsed     = 2.t
   private val railwayEnvironment      = RailwayEnvironment(Time(10, 0, 0), simpleConfigurationData)
   private val otherRailwayEnvironment = RailwayEnvironment.auto(simpleConfigurationData)
-  private val simulationData          = SimulationData(step, secondElapsed, railwayEnvironment)
+  private val simulationData          = SimulationData(step, millisecondsElapsed, railwayEnvironment)
 
   "Simulation data" when:
     "created" should:
       "have step, second elapsed and simulation environment" in:
         simulationData.step shouldBe step
-        simulationData.secondElapsed shouldBe secondElapsed
+        simulationData.millisecondsElapsed shouldBe millisecondsElapsed
         simulationData.simulationEnvironment shouldBe railwayEnvironment
 
       "doesn't allow negative values" in:
@@ -27,7 +27,7 @@ class SimulationDataTest extends AnyWordSpec with Matchers:
       "have no step and second elapsed" in:
         val simulationData = SimulationData.withEnvironment(railwayEnvironment)
         simulationData.step shouldBe 0
-        simulationData.secondElapsed shouldBe 0
+        simulationData.millisecondsElapsed shouldBe 0
         simulationData.simulationEnvironment shouldBe railwayEnvironment
 
     "created empty" should:
@@ -41,7 +41,7 @@ class SimulationDataTest extends AnyWordSpec with Matchers:
   "second elapsed is increased by delta" should:
     "increase second elapsed by delta" in:
       val delta = 5.0
-      simulationData.increaseSecondElapsedBy(delta).secondElapsed shouldBe secondElapsed + delta
+      simulationData.increaseMillisecondsElapsedBy(delta).millisecondsElapsed shouldBe millisecondsElapsed + delta
 
   "new environment is set" should:
     "set new environment" in:
@@ -50,7 +50,8 @@ class SimulationDataTest extends AnyWordSpec with Matchers:
 
   "reset" should:
     "reset simulation data" in:
-      val newSimulationData = simulationData.increaseStepByOne().increaseSecondElapsedBy(10).simulationEnvironment_=(
-        otherRailwayEnvironment
-      ).reset()
+      val newSimulationData =
+        simulationData.increaseStepByOne().increaseMillisecondsElapsedBy(10).simulationEnvironment_=(
+          otherRailwayEnvironment
+        ).reset()
       newSimulationData shouldBe SimulationData.withEnvironment(railwayEnvironment)

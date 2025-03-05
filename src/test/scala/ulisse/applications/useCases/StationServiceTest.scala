@@ -52,7 +52,7 @@ class StationServiceTest extends AnyWordSpec with Matchers:
 
       updateState()
       Await.result(addStationResult, Duration.Inf) shouldBe Right(List(stationA))
-      Await.result(removeStationResult, Duration.Inf) shouldBe Right(List())
+      Await.result(removeStationResult, Duration.Inf) shouldBe Right((List(), List()))
       Await.result(stationMapResult, Duration.Inf) shouldBe List()
 
     "return error when is removed an absent station from the station manager" in:
@@ -70,7 +70,7 @@ class StationServiceTest extends AnyWordSpec with Matchers:
 
       updateState()
       Await.result(addStationResult, Duration.Inf) shouldBe Right(List(stationA))
-      Await.result(updateStationResult, Duration.Inf) shouldBe Right(List(stationB))
+      Await.result(updateStationResult, Duration.Inf) shouldBe Right(List(stationB), List())
       Await.result(stationMapResult, Duration.Inf) shouldBe List(stationB)
 
     "return error when is updated an absent station in the station manager" in:

@@ -29,5 +29,9 @@ object Technology:
   def apply(name: String, maxSpeed: Int): Technology =
     TechnologyImpl(name, maxSpeed)
 
+  /** Defines ordering for [[Technology]] */
+  given Ordering[Technology] with
+    def compare(x: Technology, y: Technology): Int = x.maxSpeed - y.maxSpeed
+
   private case class TechnologyImpl(name: String, maxSpeed: Int)
       extends Technology

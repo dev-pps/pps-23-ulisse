@@ -10,6 +10,9 @@ object Times:
   private type Hour   = Int
   private type Minute = Int
   private type Second = Int
+  type Milliseconds   = Double
+  extension (millis: Milliseconds)
+    def toTime: Time = Time.secondsToOverflowTime((millis / 1000).toInt)
 
   /** Errors that can be returned on ClockTime creation. */
   sealed trait ClockTimeErrors(val time: Time) extends BaseError
