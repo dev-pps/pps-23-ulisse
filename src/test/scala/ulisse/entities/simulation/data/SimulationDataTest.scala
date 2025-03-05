@@ -8,7 +8,7 @@ import ulisse.utils.Times.Time
 
 class SimulationDataTest extends AnyWordSpec with Matchers:
   private val step                    = 10
-  private val millisecondsElapsed     = 2.t
+  private val millisecondsElapsed     = 2
   private val railwayEnvironment      = RailwayEnvironment(Time(10, 0, 0), simpleConfigurationData)
   private val otherRailwayEnvironment = RailwayEnvironment.auto(simpleConfigurationData)
   private val simulationData          = SimulationData(step, millisecondsElapsed, railwayEnvironment)
@@ -40,7 +40,7 @@ class SimulationDataTest extends AnyWordSpec with Matchers:
 
   "second elapsed is increased by delta" should:
     "increase second elapsed by delta" in:
-      val delta = 5.0
+      val delta = 5
       simulationData.increaseMillisecondsElapsedBy(delta).millisecondsElapsed shouldBe millisecondsElapsed + delta
 
   "new environment is set" should:
