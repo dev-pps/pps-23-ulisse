@@ -21,15 +21,19 @@ import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates
 import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates.{Running, Stopped}
 
 object TrainAgentTest:
-  val defaultTechnology  = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
-  val defaultWagon       = Wagon(UseType.Passenger, 50)
-  val defaultWagonNumber = 5
-  val train3905          = makeTrain("3905")
-  val train3906          = makeTrain("3906")
-  val train3907          = makeTrain("3907")
-  val trainAgent3905     = makeTrainAgent(train3905)
-  val trainAgent3906     = makeTrainAgent(train3906)
-  val trainAgent3907     = makeTrainAgent(train3907)
+  val defaultTechnology     = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
+  val defaultWagon          = Wagon(UseType.Passenger, 50)
+  val defaultWagonNumber    = 5
+  val normalTrainTechnology = TrainTechnology("Normal", 100, 0.5, 0.25)
+  val normalTrain           = Train("3908", normalTrainTechnology, defaultWagon, defaultWagonNumber)
+  val train3905             = makeTrain("3905")
+  val train3906             = makeTrain("3906")
+  val train3907             = makeTrain("3907")
+
+  val normalTrainAgent = makeTrainAgent(normalTrain)
+  val trainAgent3905   = makeTrainAgent(train3905)
+  val trainAgent3906   = makeTrainAgent(train3906)
+  val trainAgent3907   = makeTrainAgent(train3907)
 
   def makeTrain(name: String): Train =
     Train(name, defaultTechnology, defaultWagon, defaultWagonNumber)

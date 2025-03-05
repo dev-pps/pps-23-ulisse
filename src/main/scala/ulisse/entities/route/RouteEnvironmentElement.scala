@@ -21,6 +21,10 @@ trait RouteEnvironmentElement extends Route with TrainAgentEEWrapper[RouteEnviro
   /** Check if the route is available for a train to be put in */
   def isAvailable(direction: TrackDirection): Boolean = containers.exists(_.isAvailable(direction))
 
+  /** Check if the train can take the route */
+  def isAvailableFor(train: TrainAgent, direction: TrackDirection): Boolean =
+    acceptTrainTechnology(train) && isAvailable(direction)
+
   /** Defines equality for RouteEnvironmentElement */
   override def equals(that: Any): Boolean =
     that match
@@ -50,7 +54,7 @@ object RouteEnvironmentElement:
         firstAvailableContainer <- containers.find(_.isAvailable(direction))
         updatedContainers <-
           containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
-      yield updateEEContainers(updatedContainers)) when !contains(train)
+      yield updateEEContainers(updatedContainers)) when !contains(train) && isAvailableFor(train, direction)
 
     override def updateEEContainers(containers: Seq[Track]): RouteEnvironmentElement =
       copy(containers = containers)

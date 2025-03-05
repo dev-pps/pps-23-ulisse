@@ -9,7 +9,7 @@ trait Technology:
   def maxSpeed: Int
 
   /** Check if technology is compatible with other technology. */
-  def isCompatible(other: Technology): Boolean = maxSpeed <= other.maxSpeed
+  def isCompatible(other: Technology): Boolean = maxSpeed >= other.maxSpeed
 
 /** Factory for [[Technology]] instances. */
 object Technology:

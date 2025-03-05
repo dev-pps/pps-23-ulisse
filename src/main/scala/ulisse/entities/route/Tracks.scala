@@ -44,16 +44,17 @@ object Tracks:
   /** Factory for [[Track]] instances. */
   object Track:
     /** Minimum track id. */
-    val minPlatformId: Int = 1
-    /** Creates a `Track` instance. If track id is not positive it is set to 1 */
-    def apply(id: Int)(using minPermittedDistanceBetweenTrains: Double): Track =
-      TrackImpl(math.max(minPlatformId, id), Seq(), None)
+    val minTrackId: Int = 1
 
-    /** Creates a `Track` instance with validation. If track id is not positive an error is returned */
+    /** Creates a `Track` instance. If platform id is lower than minTrackId it's set to that value */
+    def apply(id: Int)(using minPermittedDistanceBetweenTrains: Double): Track =
+      TrackImpl(math.max(minTrackId, id), Seq(), None)
+
+    /** Creates a `Track` instance with validation. If track id is lower than minTrackId an error is returned */
     def createCheckedTrack(
         id: Int
-    )(using minPermittedDistanceBetweenTrains: Double): Either[NonEmptyChain[Tracks.Errors], Track] =
-      validatePositive(id, Errors.InvalidTrackId).toValidatedNec.toEither.map(Track(_))
+    )(using minPermittedDistanceBetweenTrains: Double): Either[NonEmptyChain[Track.Error], Track] =
+      validatePositive(id, Error.InvalidTrackId).toValidatedNec.toEither.map(Track(_))
 
     /** Represents errors that can occur during `Tracks` creation. */
     enum Error extends BaseError:

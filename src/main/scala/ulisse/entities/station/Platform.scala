@@ -24,7 +24,7 @@ object Platform:
   /** Creates a `Platform` instance. If platform id is lower than minPlatformId it's set to that value */
   def apply(id: Int): Platform = PlatformImpl(math.max(minPlatformId, id), None)
 
-  /** Creates a `Platform` instance with validation. If platform id is not positive an error is returned */
+  /** Creates a `Platform` instance with validation. If platform id is lower than minPlatformId an error is returned */
   def createCheckedPlatform(id: Int): Either[NonEmptyChain[Error], Platform] =
     validatePositive(id, Error.InvalidPlatformId).toValidatedNec.toEither.map(Platform(_))
 
