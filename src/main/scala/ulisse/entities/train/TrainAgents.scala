@@ -8,8 +8,6 @@ import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates
 
-import java.time.zone.ZoneOffsetTransitionRule
-
 object TrainAgents:
   trait TrainAgentInfo:
     def train: TrainAgent
@@ -89,14 +87,20 @@ object TrainAgents:
       private type Percepts = Option[TrainAgentPerception[?]]
 
       case class MotionData(distanceTravelled: Double, speed: Double, acceleration: Double):
-        def withAcceleration(acc: Double): MotionData = copy(acceleration = acc)
-        def withDistance(v: Double): MotionData       = copy(distanceTravelled = v)
+        def withAcceleration(acc: Double): MotionData =
+          copy(acceleration = acc)
+        def withSpeed(v: Double): MotionData =
+          copy(speed = if speed + v >= 0 then speed + v else 0)
+        def withDistance(v: Double): MotionData =
+          copy(distanceTravelled = if distanceTravelled + v >= 0 then distanceTravelled + v else 0)
 
       extension (motionData: MotionData)
         def updated(dt: Double): MotionData =
-          val newSpeed = motionData.speed + motionData.acceleration * dt
+          val secondToHours = 3600
+          val newSpeed      = motionData.speed // + motionData.acceleration * dt
+          val dtInHour      = dt / secondToHours
           val newDistanceTravelled =
-            motionData.distanceTravelled + newSpeed * dt + 0.5 * motionData.acceleration * Math.pow(dt, 2)
+            motionData.distanceTravelled + newSpeed * dtInHour // + 0.5 * motionData.acceleration * Math.pow(dt, 2)
           motionData.copy(distanceTravelled = newDistanceTravelled, speed = newSpeed)
 
       private def emptyMotionData: MotionData = MotionData(0.0, 0.0, 0.0)
@@ -111,34 +115,33 @@ object TrainAgents:
           this match
             case Stopped(currentDistance) => Stopped(positiveVal(currentDistance, offset))
             case Running(md)              => Running(md.withDistance(positiveVal(md.distanceTravelled, offset)))
-            case Accelerating(md)         => Accelerating(md.withDistance(positiveVal(md.distanceTravelled, offset)))
 
         // ** Returns next state depending on current state, train of `agent`, `dt`, percepts `p`. */
         def next(agent: TrainAgent, dt: Int, p: Percepts): StateBehavior
-//        def updatedWith(f: MotionData => StateBehavior): StateBehavior
 
       final case class Stopped(currentDistance: Double)
           extends StateBehavior(emptyMotionData.withDistance(currentDistance)):
         override def stateName: String = "Stopped"
         override def next(agent: TrainAgent, dt: Int, p: Percepts): StateBehavior =
-          // TODO: define how calculate space between
           def enoughSpace(d: Option[Double]): Boolean = true
           val trainAcc                                = agent.techType.acceleration
-          def accelerate(): StateBehavior             = Accelerating(motionData.withAcceleration(trainAcc).updated(dt))
+          def running(): StateBehavior                = Running(motionData.withSpeed(trainAcc).updated(dt))
           p.map {
             // train stopped on the route
             // train can accelerate if distance from ahead train is enough
-            case TrainPerceptionInRoute(p) if enoughSpace(p.trainAheadDistance) => accelerate()
+            case TrainPerceptionInRoute(p) if enoughSpace(p.trainAheadDistance) => running()
             // train stopped in station and depart
-            case TrainPerceptionInStation(p) if p.hasToMove && p.routeTrackIsFree => accelerate()
+            case TrainPerceptionInStation(p) if p.hasToMove && p.routeTrackIsFree => running()
           }.getOrElse(this)
-
-      final case class Accelerating(md: MotionData) extends StateBehavior(md):
-        override def stateName: String = "Accelerating"
-        override def next(agent: TrainAgent, dt: Int, p: Percepts): StateBehavior =
-          Running(motionData.withAcceleration(3.0))
 
       final case class Running(md: MotionData) extends StateBehavior(md):
         override def stateName: String = "Running"
         override def next(agent: TrainAgent, dt: Int, p: Percepts): StateBehavior =
+          def enoughSpace(d: Option[Double]): Boolean = true
+          val trainAcc = agent.techType.acceleration
+          def running(): StateBehavior = Running(motionData.withSpeed(trainAcc).updated(dt))
+          p.map {
+            case TrainPerceptionInRoute(p) if enoughSpace(p.trainAheadDistance) => Stopped(0.0)
+            case TrainPerceptionInStation(p) if p.hasToMove && p.routeTrackIsFree => Stopped(0.0)
+          }.getOrElse(this)
           Running(md.copy(distanceTravelled = md.distanceTravelled + 1))
