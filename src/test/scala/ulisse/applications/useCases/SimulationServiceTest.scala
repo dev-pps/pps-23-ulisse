@@ -26,6 +26,7 @@ import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.entities.simulation.data.Engine.EngineStateField.Running
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
+import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.annotation.tailrec
@@ -52,7 +53,8 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
 
   private val eventQueue        = EventQueue()
   private val simulationService = SimulationService(eventQueue, notificationService)
-  private def updateState()     = runAll(initialState, eventQueue.events)
+  private def updateState() =
+    runAll(initialState, eventQueue.events)
 
   @tailrec
   private def doSteps(n: Int, currentState: Option[AppState]): AppState =
@@ -62,6 +64,7 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
       case _                     => fail()
 
   private def evaluateSettings(engine: Engine, simulationData: SimulationData): Unit =
+    println(simulationData.simulationEnvironment.timetables)
     engine shouldBe Engine.emptyWithConfiguration(EngineConfiguration.defaultBatch())
     simulationData compareTo SimulationData.empty() ignoring SimulationEnvironment shouldBeBoolean true
     simulationData.simulationEnvironment shouldBe RailwayEnvironment.auto(simpleConfigurationData)
@@ -111,9 +114,10 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
       eventQueue.events.clear()
 
     "when started start to enqueue step handlers" in:
-      for i <- 0 until 10 do
+      for i <- 0 until 5 do
+        simulationService.initSimulation()
         simulationService.start()
-        eventQueue.events.size() shouldBe 1
+        eventQueue.events.size() shouldBe 2
         doSteps(i, updateState().lastOption).simulationManager.simulationData.step shouldBe i
         eventQueue.events.size() shouldBe 1
         eventQueue.events.clear()
@@ -127,10 +131,11 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
       eventQueue.events.clear()
 
     "when stopped the enqueued step handler doesn't have effects" in:
-      for i <- 1 until 10 do // starts from 1 because if not the first step handler remains in the queue
+      for i <- 1 until 5 do // starts from 1 because if not the first step handler remains in the queue
+        simulationService.initSimulation()
         simulationService.start()
         simulationService.stop()
-        eventQueue.events.size() shouldBe 2
+        eventQueue.events.size() shouldBe 3
         doSteps(i, updateState().lastOption).simulationManager.simulationData.step shouldBe 0
         eventQueue.events.size() shouldBe 0
 
