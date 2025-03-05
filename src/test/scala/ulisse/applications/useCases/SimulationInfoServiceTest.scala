@@ -13,7 +13,7 @@ import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationEnvironmentElementTest.stationA_EE
-import ulisse.entities.station.StationEnvironments.{StationEnvironmentElement, StationEnvironmentInfo}
+import ulisse.entities.station.StationEnvironmentElement.StationEnvironmentInfo
 import ulisse.entities.station.StationTest.{stationA, stationB}
 import ulisse.entities.timetable.DynamicTimetableTest.{dynamicTimetable1, dynamicTimetable2}
 import ulisse.entities.train.TrainAgentTest.{train3905, train3906, train3907, trainAgent3905, trainAgent3906}

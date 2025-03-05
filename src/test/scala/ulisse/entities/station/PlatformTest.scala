@@ -4,7 +4,7 @@ import cats.data.{Chain, NonEmptyChain}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentsContainer
-import ulisse.entities.station.Platforms.Platform
+import ulisse.entities.station.Platform.minPlatformId
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
@@ -17,8 +17,8 @@ class PlatformTest extends AnyWordSpec with Matchers:
   "A Platform" when:
     "is created" should:
       "have a positive platform id" in:
-        List(-1, 0, 1, 2).foreach(id =>
-          Platform(id).id shouldBe math.max(1, id)
+        List(-1, -2, 0, 1, 2).map(minPlatformId + _).foreach(id =>
+          Platform(id).id shouldBe math.max(minPlatformId, id)
         )
 
       "not contain any train" in:
@@ -27,18 +27,18 @@ class PlatformTest extends AnyWordSpec with Matchers:
         platform.isAvailable shouldBe true
 
     "created checked" should:
-      "have a positive platform id" in:
-        List(1, 2).foreach(id =>
+      "have a platform id greater or equal than minPlatformId" in:
+        List(0, 1, 2).map(minPlatformId + _).foreach(id =>
           Platform(id).id shouldBe math.max(1, id)
         )
 
-      "return errors if the platform id is not positive" in:
-        List(-1, 0).foreach(id =>
-          Platform.createCheckedPlatform(id) shouldBe Left(Chain(Platforms.Errors.InvalidPlatformId))
+      "return errors if the platform id is lower than minPlatformId" in:
+        List(-2, -1).map(minPlatformId + _).foreach(id =>
+          Platform.createCheckedPlatform(id) shouldBe Left(Chain(Platform.Error.InvalidPlatformId))
         )
 
       "not contain any train" in:
-        Platform.createCheckedPlatform(1) match
+        Platform.createCheckedPlatform(id) match
           case Right(platform) =>
             platform.trains shouldBe Seq()
             platform.isEmpty shouldBe true
