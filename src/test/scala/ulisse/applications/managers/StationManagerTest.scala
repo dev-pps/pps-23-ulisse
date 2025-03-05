@@ -5,11 +5,9 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
+import ulisse.entities.station.StationTest.stationA
 
 class StationManagerTest extends AnyWordSpec with Matchers:
-
-  private val station = Station("StationA", Coordinate(0, 0), 1)
-
   "A StationManager" when:
     "created" should:
       "be empty" in:
@@ -17,29 +15,29 @@ class StationManagerTest extends AnyWordSpec with Matchers:
 
     "a new station is added" should:
       "contain the new station" in:
-        StationManager().addStation(station).map(_.stations) match
+        StationManager().addStation(stationA).map(_.stations) match
           case Right(stations) =>
-            stations should contain only station
+            stations should contain only stationA
           case Left(_) => fail()
 
     "another station with same name is added" should:
       "not be added and returns error" in:
-        val otherStation = Station("StationA", Coordinate(1, 1), 1)
-        StationManager().addStation(station).flatMap(
+        val otherStation = Station(stationA.name, stationA.coordinate + Coordinate(1, 1), stationA.numberOfPlatforms)
+        StationManager().addStation(stationA).flatMap(
           _.addStation(otherStation)
         ) shouldBe Left(Chain(StationManager.Error.DuplicateStationName))
 
     "another station with same location is added" should:
       "not be added and returns error" in:
-        val otherStation = Station("StationB", Coordinate(0, 0), 1)
-        StationManager().addStation(station).flatMap(
+        val otherStation = Station(stationA.name + "2", stationA.coordinate, stationA.numberOfPlatforms)
+        StationManager().addStation(stationA).flatMap(
           _.addStation(otherStation)
         ) shouldBe Left(Chain(StationManager.Error.DuplicateStationLocation))
 
     "the same station is added" should:
-      "not be addend and return the chain of errors" in:
-        StationManager().addStation(station).flatMap(
-          _.addStation(station)
+      "not be added and return the chain of errors" in:
+        StationManager().addStation(stationA).flatMap(
+          _.addStation(stationA)
         ) shouldBe Left(
           Chain(
             StationManager.Error.DuplicateStationName,
@@ -49,14 +47,23 @@ class StationManagerTest extends AnyWordSpec with Matchers:
 
     "existing station is removed" should:
       "no longer be present" in:
-        StationManager().addStation(station).flatMap(
-          _.removeStation(station)
+        StationManager().addStation(stationA).flatMap(
+          _.removeStation(stationA)
         ).map(_.stations) match
-          case Right(stations) => stations should not contain station
+          case Right(stations) => stations should not contain stationA
           case Left(_)         => fail()
 
     "non-existing station is removed" should:
       "return error" in:
-        StationManager().removeStation(station) shouldBe Left(
+        StationManager().removeStation(stationA) shouldBe Left(
           Chain(StationManager.Error.StationNotFound)
         )
+
+    "a station is searched by location" should:
+      "return the station if it exists" in:
+        StationManager().addStation(stationA).map(
+          _.findStationAt(stationA.coordinate)
+        ) shouldBe Some(stationA)
+
+      "return None if the station does not exist" in:
+        StationManager().findStationAt(stationA.coordinate) shouldBe None

@@ -19,11 +19,6 @@ trait StationManager:
   /** The collection of stations in the manager. */
   val stations: StationMapType
 
-  /** Defines equality for StationMap. */
-  override def equals(other: Any): Boolean = other match
-    case that: StationManager => that.stations == stations
-    case _                    => false
-
   /** Adds a station to the manager. If the station is not accepted by the manager an error is returned */
   def addStation(station: Station): Either[NonEmptyChain[StationManager.Error], StationManager]
 
@@ -61,7 +56,7 @@ object StationManager:
 
     override def findStationAt(coordinate: Coordinate): Option[Station] =
       stations.find(_.coordinate == coordinate)
-  
+
   /** Represents errors that can occur during [[StationManager]] usage. */
   enum Error extends BaseError:
     case DuplicateStationName, DuplicateStationLocation, StationNotFound
