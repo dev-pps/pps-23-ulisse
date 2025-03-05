@@ -55,7 +55,7 @@ final case class TimetableService(eventQueue: TimeTableEventQueue) extends Timet
     ): Either[UnavailableTracks, List[(Route, WaitingTime)]] =
       val occupiedTracks =
         timetables.filter(t => t.startStation.name == station.name && t.departureTime == departureTime)
-      Either.cond(occupiedTracks.sizeIs < station.numberOfTracks, routesWaiting, UnavailableTracks(station.name))
+      Either.cond(occupiedTracks.sizeIs < station.numberOfPlatforms, routesWaiting, UnavailableTracks(station.name))
 
   /** Given `trainName`, `departureTime` and stations with its waitingTime a new Timetable should be saved.
     * Returns a `TimetableServiceErrors` in case of error during creation.

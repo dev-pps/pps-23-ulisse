@@ -31,7 +31,7 @@ final case class StationCard(
 ) extends GridPanel(3, 1):
   contents += new Label(s"Name: ${station.name}")
   contents += new Label(s"Location: ${station.coordinate}")
-  contents += new Label(s"numberOfTrack: ${station.numberOfTracks}")
+  contents += new Label(s"numberOfTrack: ${station.numberOfPlatforms}")
   border = LineBorder(Color.BLACK, 2)
   listenTo(mouse.clicks)
   reactions += {
@@ -157,7 +157,7 @@ final case class StationForm(
     stationName.text = s.name
     latitude.text = s.coordinate.x.toString
     longitude.text = s.coordinate.y.toString
-    numberOfTrack.text = s.numberOfTracks.toString
+    numberOfTrack.text = s.numberOfPlatforms.toString
   private val c = new Constraints
 
   /** Sets the location in the StationForm.

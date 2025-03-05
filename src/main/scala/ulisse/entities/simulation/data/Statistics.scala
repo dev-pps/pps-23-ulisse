@@ -14,7 +14,7 @@ object Statistics:
 
   extension (environment: RailwayEnvironment)
     def percStationsLoad: Double =
-      trainsInStations.toDouble / environment.stations.map(_.numberOfTracks).sum
+      trainsInStations.toDouble / environment.stations.map(_.numberOfPlatforms).sum
 
     def trainsOnRoutes: Int =
       environment.routes.collectTrains.size

@@ -126,7 +126,7 @@ object Routes:
       val minValue = 0
       railsCount.validateChain(
         (_ > minValue, Errors.FewRails),
-        (_ <= min(departure.numberOfTracks, arrival.numberOfTracks), Errors.TooManyRails)
+        (_ <= min(departure.numberOfPlatforms, arrival.numberOfPlatforms), Errors.TooManyRails)
       )
     }
 
@@ -190,14 +190,14 @@ object Routes:
       override def changeAutomaticDeparture(departure: Station): Route =
         copy(
           departure = departure,
-          railsCount = min(departure.numberOfTracks, arrival.numberOfTracks),
+          railsCount = min(departure.numberOfPlatforms, arrival.numberOfPlatforms),
           length = departure.coordinate distance arrival.coordinate
         )
 
       override def changeAutomaticArrival(arrival: Station): Route =
         copy(
           arrival = arrival,
-          railsCount = min(departure.numberOfTracks, arrival.numberOfTracks),
+          railsCount = min(departure.numberOfPlatforms, arrival.numberOfPlatforms),
           length = departure.coordinate distance arrival.coordinate
         )
 

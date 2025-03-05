@@ -19,7 +19,7 @@ trait StationManager:
   /** The collection of stations in the manager. */
   val stations: StationMapType
 
-  /** Compares two `StationMap` instances for equality. */
+  /** Defines equality for StationMap. */
   override def equals(other: Any): Boolean = other match
     case that: StationManager => that.stations == stations
     case _                    => false
@@ -35,13 +35,13 @@ trait StationManager:
 
 /** Factory for [[StationManager]] instances. */
 object StationManager:
-  /** Creates a `StationManager` instance, which is a `StationManager` with validation for unique names and locations. */
+  /** Creates a `StationManager` instance, which is a `StationManager` with validation for unique `Stations`. */
   def apply(): StationManager = StationManagerImpl(List.empty)
 
   private final case class StationManagerImpl(stations: List[Station]) extends StationManager:
     type StationMapType = List[Station]
 
-    def addStation(station: Station): Either[NonEmptyChain[StationManager.Error], StationManager] =
+    override def addStation(station: Station): Either[NonEmptyChain[StationManager.Error], StationManager] =
       val updatedStations = station :: stations
       (
         validateUniqueItems(
@@ -55,17 +55,13 @@ object StationManager:
       )
         .mapN((_, _) => StationManagerImpl(updatedStations)).toEither
 
-    def removeStation(station: Station): Either[NonEmptyChain[StationManager.Error], StationManager] =
-      if stations.contains(station) then
-        Right(StationManagerImpl(stations.filterNot(_ == station)))
-      else
-        Left(NonEmptyChain(StationManager.Error.StationNotFound))
+    override def removeStation(station: Station): Either[NonEmptyChain[StationManager.Error], StationManager] =
+      if stations.contains(station) then Right(StationManagerImpl(stations.filterNot(_ == station)))
+      else Left(NonEmptyChain(StationManager.Error.StationNotFound))
 
-    def findStationAt(coordinate: Coordinate): Option[Station] =
+    override def findStationAt(coordinate: Coordinate): Option[Station] =
       stations.find(_.coordinate == coordinate)
-
-    export stations.map
-
+  
   /** Represents errors that can occur during [[StationManager]] usage. */
   enum Error extends BaseError:
     case DuplicateStationName, DuplicateStationLocation, StationNotFound
