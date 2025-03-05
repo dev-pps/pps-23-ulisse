@@ -11,6 +11,7 @@ import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
 import ulisse.entities.station.{StationEnvironment, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetableEnvironment
+import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.*
 import ulisse.utils.Times.ClockTime
