@@ -48,7 +48,7 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
         trainAgent3905.motionData.distanceTravelled shouldBe 0
 
       "be in state Stopped and have no speed and acceleration" in:
-        val expectedMotionData = MotionData(distanceTravelled = 0.0, speed = 0.0, acceleration = 0.0, 0)
+        val expectedMotionData = MotionData(distanceTravelled = 0.0, speed = 0.0, acceleration = 0.0)
         trainAgent3905.state match
           case TrainStates.Stopped(motionData) =>
             motionData.distanceTravelled shouldBe expectedMotionData.distanceTravelled
@@ -88,7 +88,7 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
         val timeToTravelRouteLength   = 24
         val expectedDistanceTravelled = train3905.maxSpeed * timeToTravelRouteLength / 3600
         val partialMotionData =
-          MotionData(travelledDistance3Km, speed = train3905.maxSpeed, acceleration = 0.0, elapsedSeconds)
+          MotionData(travelledDistance3Km, speed = train3905.maxSpeed, acceleration = 0.0)
         val runningState      = Running(partialMotionData)
         val runningTrainAgent = TrainAgent.withInitialState(train3905, runningState)
         val trainRouteInfo    = TrainRouteInfo(AV, routeLengthKm, None, true)

@@ -1,7 +1,7 @@
 package ulisse.entities.train
 
 object MotionDatas:
-  case class MotionData(distanceTravelled: Double, speed: Double, acceleration: Double, elapsedSeconds: Int):
+  case class MotionData(distanceTravelled: Double, speed: Double, acceleration: Double):
     def withAcceleration(acc: Double): MotionData =
       copy(acceleration = acc)
     def withSpeed(v: Double): MotionData =
@@ -9,17 +9,12 @@ object MotionDatas:
     def withDistanceOffset(v: Double): MotionData =
       copy(distanceTravelled = if distanceTravelled + v >= 0 then distanceTravelled + v else 0)
 
-  extension (motionData: MotionData)
+  extension (md: MotionData)
     def updated(dt: Int): MotionData =
-      val elapsedSeconds: Int   = motionData.elapsedSeconds + dt
       val secondToHours: Double = 3600
-      val speed                 = motionData.speed + motionData.acceleration * dt
-      val dtInHour: Double      = elapsedSeconds / secondToHours
-      val newDistanceTravelled  = speed * dtInHour + 0.5 * motionData.acceleration * Math.pow(dt, 2)
-      motionData.copy(
-        distanceTravelled = newDistanceTravelled,
-        speed = speed,
-        elapsedSeconds = elapsedSeconds
-      )
+      val speed                 = md.speed + md.acceleration * dt
+      val dtInHour: Double      = dt / secondToHours
+      val newDistanceTravelled  = md.distanceTravelled + speed * dtInHour + 0.5 * md.acceleration * Math.pow(dt, 2)
+      md.copy(distanceTravelled = newDistanceTravelled, speed = speed)
 
-  def emptyMotionData: MotionData = MotionData(0.0, 0.0, 0.0, 0)
+  def emptyMotionData: MotionData = MotionData(0.0, 0.0, 0.0)
