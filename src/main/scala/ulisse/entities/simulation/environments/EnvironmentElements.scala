@@ -12,30 +12,35 @@ object EnvironmentElements:
   /** A data structure that contains trains */
   trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
     self: TAC =>
+
     /** The id of the container */
     def id: Int
+
     /** The list of trains */
     def trains: Seq[TrainAgent]
+
     /** Try to update the train in the container if it's present */
     def updateTrain(train: TrainAgent): Option[TAC]
+
     /** Try to remove the train from the container if it's present */
     def removeTrain(train: TrainAgent): Option[TAC]
+
     /** Check if the provided train is present inside the container */
     def contains(train: TrainAgent): Boolean = trains.contains(train)
-    /** Check if the container is empty */
-    def isEmpty: Boolean                     = trains.isEmpty
 
-  /** Companion object for TrainAgentsContainer */
+    /** Check if the container is empty */
+    def isEmpty: Boolean = trains.isEmpty
+
+  /** Companion object for [[TrainAgentsContainer]] */
   object TrainAgentsContainer:
     /** Creates a List of `TrainAgentContainer[?]` instances. If the specified numberOfContainers is not positive an empty List is returned */
     def generateSequentialContainers[TAC <: TrainAgentsContainer[?]](
         constructor: Int => TAC,
         numberOfContainers: Int
     ): List[TAC] =
-      val step: Int => Int = _ + 1
-      List.tabulate(numberOfContainers)(i => constructor(step(i)))
+      List.tabulate(numberOfContainers)(i => constructor(i + 1))
 
-  /** An Environment Element that contains multiple TrainAgentsContainer of the same type */
+  /** An EnvironmentElement that contains multiple TrainAgentsContainer of the same type */
   trait TrainAgentEEWrapper[EE <: TrainAgentEEWrapper[EE]] extends EnvironmentElement:
     self: EE =>
 
@@ -66,7 +71,7 @@ object EnvironmentElements:
     /** Update the containers with the provided sequence */
     protected def updateEEContainers(containers: Seq[TAC]): EE
 
-  /** Companion object for TrainAgentEEWrapper */
+  /** Companion object for [[TrainAgentEEWrapper]] */
   object TrainAgentEEWrapper:
 
     /** Extension methods for train agent */
@@ -79,11 +84,13 @@ object EnvironmentElements:
       def findIn(eeSeq: Seq[EE]): Option[EE] =
         eeSeq.find(_.contains(train))
 
+    /** Extension methods for environmentElement */
     extension [EE <: TrainAgentEEWrapper[EE]](ee: EE)
       /** Find all TrainAgent in the environment */
       def trains: Seq[TrainAgent] =
         ee.containers.flatMap(_.trains)
 
+    /** Extension methods for sequence of environmentElement */
     extension [EE <: TrainAgentEEWrapper[EE]](eeSeq: Seq[EE])
       /** Find all TrainAgent in a sequence of environments */
       def collectTrains: Seq[TrainAgent] =

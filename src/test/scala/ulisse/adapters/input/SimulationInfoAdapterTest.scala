@@ -9,7 +9,7 @@ import ulisse.applications.useCases.SimulationInfoService
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
-import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
+import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.Train
 

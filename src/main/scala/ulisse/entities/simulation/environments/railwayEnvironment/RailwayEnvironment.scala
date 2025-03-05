@@ -10,7 +10,7 @@ import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.EnvironmentElements.EnvironmentElement
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.simulation.environments.Environment
-import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
+import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.*

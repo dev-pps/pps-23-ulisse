@@ -1,7 +1,7 @@
 package ulisse.entities.simulation.environments.railwayEnvironment
 
 import ulisse.entities.route.RouteEnvironmentElement
-import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
+import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.Train

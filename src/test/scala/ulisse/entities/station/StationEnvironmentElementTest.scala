@@ -4,7 +4,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.Coordinate
 import ulisse.entities.station.StationEnvironmentElementTest.stationA_EE
-import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
+import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.station.StationTest.{
   defaultNumberOfPlatform,
   stationA,

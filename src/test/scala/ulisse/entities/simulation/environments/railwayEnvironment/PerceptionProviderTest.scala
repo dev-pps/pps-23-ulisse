@@ -19,7 +19,7 @@ import ulisse.entities.train.TrainAgents.{
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
-import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
+import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.utils.Times.{ClockTime, Time}
 class PerceptionProviderTest extends AnyWordSpec with Matchers:

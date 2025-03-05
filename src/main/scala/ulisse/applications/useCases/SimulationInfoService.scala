@@ -5,12 +5,12 @@ import ulisse.applications.ports.SimulationInfoPorts
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.route.{RouteEnvironmentElement, Routes}
 import ulisse.entities.station.Station
-import ulisse.entities.station.StationEnvironments.{StationEnvironmentElement, StationEnvironmentInfo}
 import ulisse.entities.train.TrainAgents.TrainAgentInfo
 import ulisse.entities.train.Trains
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Times.Time
 import ulisse.entities.simulation.data.Statistics.*
+import ulisse.entities.station.StationEnvironmentElement.StationEnvironmentInfo
 
 import scala.concurrent.{Future, Promise}
 

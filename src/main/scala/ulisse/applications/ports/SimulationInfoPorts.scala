@@ -3,7 +3,7 @@ package ulisse.applications.ports
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
-import ulisse.entities.station.StationEnvironments.StationEnvironmentInfo
+import ulisse.entities.station.StationEnvironmentElement.StationEnvironmentInfo
 import ulisse.entities.train.TrainAgents.TrainAgentInfo
 import ulisse.entities.train.Trains.Train
 
