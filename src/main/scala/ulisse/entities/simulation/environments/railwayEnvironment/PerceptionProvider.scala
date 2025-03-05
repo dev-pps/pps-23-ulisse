@@ -24,7 +24,7 @@ object PerceptionProvider:
         departureDelay = Id(nextDepartureTime.asTime) underflowSub Id(env.time)
         nextRoute          <- currentDTT.nextRoute
         (route, direction) <- env.findRouteWithTravelDirection(nextRoute)
-      yield TrainStationInfo(departureDelay.toSeconds <= 0, route.isAvailable(direction))
+      yield TrainStationInfo(departureDelay.toSeconds <= 0, route.isAvailableFor(train, direction))
     trainStationInfo.getOrElse(TrainStationInfo(false, false))
 
   private def trainPerceptionInRoute(

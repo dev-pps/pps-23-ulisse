@@ -200,11 +200,11 @@ class RouteTest extends AnyFlatSpec with Matchers:
     train
 
   "check train technology acceptable" should "be equals" in:
-    val train = mockTrainWithTechnologyMaxSpeed(routeType.technology.maxSpeed - 1)
+    val train = mockTrainWithTechnologyMaxSpeed(routeType.technology.maxSpeed + 1)
     for route <- validateRoute
     yield route acceptTrainTechnology train mustBe true
 
   "check train technology not acceptable" should "be different" in:
-    val train = mockTrainWithTechnologyMaxSpeed(routeType.technology.maxSpeed + 1)
+    val train = mockTrainWithTechnologyMaxSpeed(routeType.technology.maxSpeed - 1)
     for route <- validateRoute
     yield route acceptTrainTechnology train mustBe false

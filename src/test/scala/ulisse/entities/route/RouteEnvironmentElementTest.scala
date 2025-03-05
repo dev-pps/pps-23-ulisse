@@ -12,15 +12,22 @@ import ulisse.entities.route.RouteEnvironmentElementTest.{
   routeAB_EE
 }
 import ulisse.entities.route.RouteTest.{arrival, departure, pathLength, railsCount, routeType}
-import ulisse.entities.route.Routes.Route
+import ulisse.entities.route.Routes.{Route, RouteType}
 import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationTest.{stationA, stationB, stationC, stationD, stationE}
-import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906, trainAgent3907}
+import ulisse.entities.train.TrainAgentTest.{
+  normalTrain,
+  normalTrainAgent,
+  trainAgent3905,
+  trainAgent3906,
+  trainAgent3907
+}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.Utils.TestUtility.getOrFail
+import ulisse.entities.Technology
 
 object RouteEnvironmentElementTest:
   given minPermittedDistanceBetweenTrains: Double = 100.0
@@ -39,7 +46,7 @@ object RouteEnvironmentElementTest:
     Route(
       departure,
       arrival,
-      routeType,
+      RouteType.AV,
       railsCount,
       2 * minPermittedDistanceBetweenTrains + trainAgent3905.lengthSize
     ).getOrFail
@@ -118,6 +125,9 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
         )
           .flatMap(_.putTrain(trainAgent3907, direction.opposite)) shouldBe None
 
+      "not be placed if the train technology is not compatible" in:
+        routeAB_EE.putTrain(normalTrainAgent, direction) shouldBe None
+
     "a train is updated" should:
       "be updated if present" in:
         val updatedTrainAgent3905 = trainAgent3905.updateDistanceTravelled(1)
@@ -186,3 +196,19 @@ class RouteEnvironmentElementTest extends AnyWordSpec with Matchers:
 
       "not be found if there isn't a train with the same name in a track" in:
         routeAB_EE.putTrain(trainAgent3905, direction).map(_.contains(trainAgent3906)) shouldBe Some(false)
+
+    "queried for availability" should:
+      "be available if the route is available and the train technology is compatible" in:
+        routeAB_EE.isAvailable(direction) shouldBe true
+        routeAB_EE.isAvailableFor(trainAgent3905, direction) shouldBe true
+
+      "not be available if the route is available and the train technology is not compatible" in:
+        routeAB_EE.isAvailable(direction) shouldBe true
+        routeAB_EE.isAvailableFor(normalTrainAgent, direction) shouldBe false
+
+      "not be available if the train technology is compatible but the route is not available" in:
+        routeAB_EE.putTrain(trainAgent3905, direction).flatMap(_.putTrain(trainAgent3906, direction.opposite)) match
+          case Some(ur) =>
+            ur.isAvailable(direction) shouldBe false
+            ur.isAvailableFor(trainAgent3907, direction) shouldBe false
+          case None => fail()

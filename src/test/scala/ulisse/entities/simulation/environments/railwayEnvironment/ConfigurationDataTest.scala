@@ -34,7 +34,7 @@ object ConfigurationDataTest:
   val stations    = Seq(stationA, stationB, stationC, stationD)
   val stationsEE  = stations.map(makeStationEE)
   val routes      = Seq(routeAB, routeBC, routeCD)
-  val routesEE    = routes.map(makeRouteEE)
+  val routesEE    = routes.map(makeRouteEE).sortBy(_.typology)
   val trainAgents = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
   val timetables  = Seq(dynamicTimetable1, dynamicTimetable2, dynamicTimetable3)
   val simpleConfigurationData = ConfigurationData(

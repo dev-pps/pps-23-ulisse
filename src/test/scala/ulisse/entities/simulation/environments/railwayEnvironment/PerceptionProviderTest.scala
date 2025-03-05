@@ -75,7 +75,7 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
       available: Boolean
   ): Unit =
     trainInStationWithNextDepartureTimeAndRouteInfo(nextDepartureTime, Some((ree, TrackDirection.Forward)))
-    when(ree.isAvailable(TrackDirection.Forward)).thenReturn(available)
+    when(ree.isAvailableFor(trainAgent, TrackDirection.Forward)).thenReturn(available)
 
   private def trainInRoute(): Unit =
     when(see.contains(trainAgent)).thenReturn(false)

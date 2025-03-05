@@ -4,6 +4,7 @@ import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.route.Tracks.Track
+import ulisse.entities.route.Tracks.Track.minTrackId
 import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906}
 import ulisse.entities.train.TrainAgents.TrainAgent
@@ -19,8 +20,8 @@ class TrackTest extends AnyWordSpec with Matchers:
   "A track" when:
     "created" should:
       "have a positive track id" in:
-        List(-1, 0, 1, 2).foreach(id =>
-          Track(id).id shouldBe math.max(1, id)
+        List(-2, -1, 0, 1, 2).map(minTrackId + _).foreach(id =>
+          Track(id).id shouldBe math.max(minTrackId, id)
         )
 
       "not contain any train" in:
@@ -36,14 +37,14 @@ class TrackTest extends AnyWordSpec with Matchers:
         track.currentDirection shouldBe None
 
     "created checked" should:
-      "have a positive track id" in:
-        List(1, 2).foreach(id =>
+      "have a track id greater or equal than minTrackId" in:
+        List(0, 1, 2).map(minTrackId + _).foreach(id =>
           Track.createCheckedTrack(id).map(_.id) shouldBe Right(id)
         )
 
-      "return errors if the track id is not positive" in:
-        List(-1, 0).foreach(id =>
-          Track.createCheckedTrack(id) shouldBe Left(Chain(Tracks.Errors.InvalidTrackId))
+      "return errors if the track id is lower than minTrackId" in:
+        List(-2, -1).map(minTrackId + _).foreach(id =>
+          Track.createCheckedTrack(id) shouldBe Left(Chain(Track.Error.InvalidTrackId))
         )
 
       "not contain any train" in:
