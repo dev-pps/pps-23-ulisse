@@ -39,11 +39,11 @@ object TechnologyManagers:
 
     /** Creates a [[TechnologyManager]] with default train technologies */
     def createTrainTechnology(): TechnologyManager[TrainTechnology] =
-      val defaultTrainTechnology = List(TrainTechnology("AV", 300, 2.0, 1.0), TrainTechnology("Normal", 160, 1.0, 0.5))
+      val defaultTrainTechnology = List(TrainTechnology("AV", 300, 2.0, 1.0), TrainTechnology("Normal", 160, 1, 0.5))
       TechnologyManager(defaultTrainTechnology)
 
     /** Create an empty [[TechnologyManager]] with [[TrainTechnology]]. */
-    def empy(): TechnologyManager[TrainTechnology] = TechnologyManager(List.empty)
+    def empty(): TechnologyManager[TrainTechnology] = TechnologyManager(List.empty)
 
     private case class TechnologyManagerImpl[T <: Technology](technologies: Map[String, T])
         extends TechnologyManager[T]:

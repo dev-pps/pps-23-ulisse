@@ -109,7 +109,7 @@ object AppState:
       StationManager(),
       RouteManager.empty(),
       TrainManager.empty(),
-      TechnologyManager.empy(),
+      TechnologyManager.empty(),
       TimetableManagers.empty(),
       SimulationManager.defaultBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
     )
