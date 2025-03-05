@@ -28,25 +28,28 @@ import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.Utils.TestUtility.getOrFail
 import ulisse.entities.Technology
+import ulisse.entities.route.Routes.RouteType.{AV, Normal}
 
 object RouteEnvironmentElementTest:
   given minPermittedDistanceBetweenTrains: Double = 100.0
   val direction                                   = Forward
-  val routeAB                                     = makeRoute(stationA, stationB)
-  val routeBC                                     = makeRoute(stationB, stationC)
-  val routeCD                                     = makeRoute(stationC, stationD)
-  val routeDE                                     = makeRoute(stationD, stationE)
+  val normalRouteAB                               = makeRoute(stationA, stationB, Normal)
+  val routeAB                                     = makeRoute(stationA, stationB, AV)
+  val routeBC                                     = makeRoute(stationB, stationC, AV)
+  val routeCD                                     = makeRoute(stationC, stationD, AV)
+  val routeDE                                     = makeRoute(stationD, stationE, AV)
 
-  val routeAB_EE = makeRouteEE(routeAB)
-  val routeBC_EE = makeRouteEE(routeBC)
-  val routeCD_EE = makeRouteEE(routeCD)
-  val routeDE_EE = makeRouteEE(routeDE)
+  val normalRouteAB_EE = makeRouteEE(normalRouteAB)
+  val routeAB_EE       = makeRouteEE(routeAB)
+  val routeBC_EE       = makeRouteEE(routeBC)
+  val routeCD_EE       = makeRouteEE(routeCD)
+  val routeDE_EE       = makeRouteEE(routeDE)
 
-  def makeRoute(departure: Station, arrival: Station): Route =
+  def makeRoute(departure: Station, arrival: Station, routeType: RouteType): Route =
     Route(
       departure,
       arrival,
-      RouteType.AV,
+      routeType,
       railsCount,
       2 * minPermittedDistanceBetweenTrains + trainAgent3905.lengthSize
     ).getOrFail

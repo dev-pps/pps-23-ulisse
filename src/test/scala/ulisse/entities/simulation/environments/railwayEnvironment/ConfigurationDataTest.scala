@@ -33,8 +33,8 @@ import ulisse.utils.Times.Time
 object ConfigurationDataTest:
   val stations    = Seq(stationA, stationB, stationC, stationD)
   val stationsEE  = stations.map(makeStationEE)
-  val routes      = Seq(routeAB, routeBC, routeCD)
-  val routesEE    = routes.map(makeRouteEE).sortBy(_.typology)
+  val routes      = Seq(normalRouteAB, routeAB, routeBC, routeCD)
+  val routesEE    = routes.map(makeRouteEE).sortBy(_.typology.technology)
   val trainAgents = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
   val timetables  = Seq(dynamicTimetable1, dynamicTimetable2, dynamicTimetable3)
   val simpleConfigurationData = ConfigurationData(
@@ -58,7 +58,10 @@ class ConfigurationDataTest extends AnyWordSpec with Matchers:
         cd.stations shouldBe stations
 
       "have all routes" in:
-        cd.routes shouldBe routesEE
+        cd.routes should contain allElementsOf routesEE
+
+      "have all routes sorted by technology" in:
+        cd.routes shouldBe routesEE.sortBy(_.typology.technology).reverse
 
       "exclude in order duplicate routes" in:
         val routeABDuplicate = makeRouteEE(Route(
@@ -69,7 +72,7 @@ class ConfigurationDataTest extends AnyWordSpec with Matchers:
           routeAB.length + 10
         ).getOrFail)
         val cd = ConfigurationData(stationsEE, (routesEE :+ routeABDuplicate), trainAgents, timetables)
-        cd.routes shouldBe routesEE
+        cd.routes should contain allElementsOf routesEE
 
       "have all trains in stations" in:
         cd.stations.collectTrains.isEmpty shouldBe false
