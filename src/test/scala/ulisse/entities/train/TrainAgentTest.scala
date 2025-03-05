@@ -4,17 +4,15 @@ import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.train.TrainAgentTest.{train3905, trainAgent3905}
-import ulisse.entities.train.TrainAgents.{
-  TrainAgent,
-  TrainPerceptionInStation,
-  TrainStationInfo
-}
+import ulisse.entities.train.TrainAgents.{TrainAgent, TrainPerceptionInRoute, TrainPerceptionInStation, TrainRouteInfo, TrainStationInfo}
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import org.scalatestplus.mockito.MockitoSugar.mock
+import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
+import ulisse.entities.train.MotionDatas.{MotionData, emptyMotionData}
 import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates
-import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates.MotionData
+import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates.{Running, Stopped}
 
 object TrainAgentTest:
   val defaultTechnology  = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
@@ -50,14 +48,22 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
         trainAgent3905.motionData.distanceTravelled shouldBe 0
 
       "be in state Stopped and have no speed and acceleration" in:
-        val expectedMotionData = MotionData(distanceTravelled = 0.0, speed = 0.0, acceleration = 0.0)
+        val expectedMotionData = MotionData(distanceTravelled = 0.0, speed = 0.0, acceleration = 0.0, 0)
         trainAgent3905.state match
           case TrainStates.Stopped(motionData) =>
-            motionData shouldBe expectedMotionData.distanceTravelled
+            motionData.distanceTravelled shouldBe expectedMotionData.distanceTravelled
           case _ => fail()
 
+      "be initialized with some state" in:
+        val initialDistance       = 0.0
+        val stoppedTrain3905Agent = TrainAgent.withInitialState(train3905, Stopped(emptyMotionData))
+        stoppedTrain3905Agent.state shouldBe Stopped(emptyMotionData)
+        val runningState          = Running(emptyMotionData)
+        val runningTrain3905Agent = TrainAgent.withInitialState(train3905, runningState)
+        runningTrain3905Agent.state shouldBe runningState
+
     "start from station" should:
-      "change its state to running" in:
+      "travel 1 km after 12 seconds" in:
         import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
         val initialDt   = 1
         val dt          = 12
@@ -66,7 +72,7 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
         when(mockEnv.perceptionFor(trainAgent3905)).thenReturn(Some(stationPerc))
         val updatedAgent               = trainAgent3905.doStep(initialDt, mockEnv).doStep(dt, mockEnv)
         val expectedKilometerTravelled = 1.0
-        val tolerance = 0.01
+        val tolerance                  = 0.01
         updatedAgent match
           case agent: TrainAgent => agent.state match
               case TrainStates.Running(motionData) =>
@@ -74,32 +80,40 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
               case _ => fail()
           case _ => fail()
 
-//    "arrives to station (travels all route length)" should:
-//      "change its state to Stopped (and travelled distance resetted)" in:
-//        import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
-//        val routeInfo =
-//          TrainRouteInfo(TypeRoute.Normal, routeLength = 5, trainAheadDistance = None, arrivalStationIsFree = true)
-//        val dt          = 60
-//        val stationPerc = TrainPerceptionInRoute(routeInfo)
-//        val mockEnv     = mock[RailwayEnvironment]
-//        when(mockEnv.perceptionFor(trainAgent3905)).thenReturn(Some(stationPerc))
-//        val updatedAgent  = trainAgent3905.doStep(dt, mockEnv)
-//        val expectedTravelledDistance = 0.0
-//        updatedAgent match
-//          case agent: TrainAgent => agent.state match
-//              case TrainStates.Stopped(position) =>
-//                position shouldBe expectedSpeed
-//              case _ => fail()
-//          case _ => fail()
+    "is running on route" should:
+      "stop when reach route length" in:
+        val elapsedSeconds            = 36
+        val travelledDistance3Km      = 3
+        val routeLengthKm             = 5
+        val timeToTravelRouteLength   = 24
+        val expectedDistanceTravelled = train3905.maxSpeed * timeToTravelRouteLength / 3600
+        val partialMotionData =
+          MotionData(travelledDistance3Km, speed = train3905.maxSpeed, acceleration = 0.0, elapsedSeconds)
+        val runningState      = Running(partialMotionData)
+        val runningTrainAgent = TrainAgent.withInitialState(train3905, runningState)
+        val trainRouteInfo    = TrainRouteInfo(AV, routeLengthKm, None, true)
+        val routePerc         = TrainPerceptionInRoute(trainRouteInfo)
+        val mockEnv           = mock[RailwayEnvironment]
+        import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
+        when(mockEnv.perceptionFor(runningTrainAgent)).thenReturn(Some(routePerc))
+        val agentReachStation = runningTrainAgent.doStep(timeToTravelRouteLength, mockEnv)
+        agentReachStation.motionData.distanceTravelled shouldBe expectedDistanceTravelled
+
+        val stationEnvMock = mock[RailwayEnvironment]
+        val stationPerc    = TrainPerceptionInStation(TrainStationInfo(hasToMove = true, routeTrackIsFree = true))
+        when(mockEnv.perceptionFor(runningTrainAgent)).thenReturn(Some(stationPerc))
+        agentReachStation.doStep(timeToTravelRouteLength + 1, stationEnvMock).state match
+          case Stopped(md) => md.distanceTravelled shouldBe 0.0
+          case Running(_)  => fail()
 
     "distance is updated" should:
       "be updated correctly" in:
         val updatedTrainAgent3905 = trainAgent3905.updateDistanceTravelled(10)
-        updatedTrainAgent3905.distanceTravelled shouldBe 10
-        updatedTrainAgent3905.updateDistanceTravelled(5).distanceTravelled shouldBe 15
+        updatedTrainAgent3905.motionData.distanceTravelled shouldBe 10
+        updatedTrainAgent3905.updateDistanceTravelled(5).motionData.distanceTravelled shouldBe 15
 
       "be set to 0 when reset" in:
-        trainAgent3905.updateDistanceTravelled(20).resetDistanceTravelled.distanceTravelled shouldBe 0
+        trainAgent3905.updateDistanceTravelled(20).resetDistanceTravelled.motionData.distanceTravelled shouldBe 0
 
       "be at least 0" in:
-        trainAgent3905.updateDistanceTravelled(10).updateDistanceTravelled(-15).distanceTravelled shouldBe 0
+        trainAgent3905.updateDistanceTravelled(10).updateDistanceTravelled(-15).motionData.distanceTravelled shouldBe 0

@@ -114,7 +114,7 @@ object RailwayEnvironment:
         agent: TrainAgent,
         time: Time
     ): Option[RailwayEnvironmentImpl] =
-      agent.distanceTravelled match
+      agent.motionData.distanceTravelled match
         case d if d >= route.length =>
           for
             updatedRoute <- route.removeTrain(agent)

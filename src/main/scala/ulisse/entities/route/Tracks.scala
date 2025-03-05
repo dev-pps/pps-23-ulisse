@@ -42,7 +42,7 @@ object Tracks:
     /** Check if the track is available for a train to be put in */
     def isAvailable(direction: TrackDirection): Boolean =
       trains.lastOption.forall(t =>
-        t.distanceTravelled - t.lengthSize >= minPermittedDistanceBetweenTrains
+        t.motionData.distanceTravelled - t.lengthSize >= minPermittedDistanceBetweenTrains
       ) && currentDirection.getOrElse(direction) == direction
 
   /** Factory for [[Track]] instances. */
@@ -64,7 +64,7 @@ object Tracks:
 
       private def securityDistanceIsMaintained(trains: Seq[TrainAgent]): Boolean =
         trains.zip(trains.drop(1)).forall((train1, train2) =>
-          train1.distanceTravelled - train1.lengthSize - train2.distanceTravelled >= minPermittedDistanceBetweenTrains
+          train1.motionData.distanceTravelled - train1.lengthSize - train2.motionData.distanceTravelled >= minPermittedDistanceBetweenTrains
         )
 
       override def putTrain(train: TrainAgent, direction: TrackDirection): Option[Track] =
@@ -72,7 +72,7 @@ object Tracks:
           currentDirection,
           copy(trains = trains :+ train) when isAvailable(direction) && !contains(
             train
-          ) && train.distanceTravelled == 0
+          ) && train.motionData.distanceTravelled == 0
         ) match
           case (Some(`direction`), Some(updatedTrack)) => Some(updatedTrack)
           case (None, Some(updatedTrack))              => Some(updatedTrack.copy(currentDirection = Some(direction)))
