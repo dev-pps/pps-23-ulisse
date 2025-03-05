@@ -7,9 +7,9 @@ import ulisse.applications.managers.RouteManagers.Errors
 import ulisse.applications.ports.RoutePorts
 import ulisse.entities.route.Routes.Route
 
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{Future, Promise}
 
-/** Contains the service for routes. */
+/** Companion object for the [[RoutePorts.Input]] class. */
 object RouteService:
 
   /** Creates a [[RoutePorts.Input]] instance. */
