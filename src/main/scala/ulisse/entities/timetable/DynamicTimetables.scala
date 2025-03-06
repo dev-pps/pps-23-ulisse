@@ -12,6 +12,7 @@ import ulisse.utils.Times.{ClockTime, Time, given}
 
 import scala.collection.immutable.ListMap
 
+/** Wrapper for DynamicTimetable */
 object DynamicTimetables:
 
   /** Timetable for Simulation */
@@ -41,6 +42,7 @@ object DynamicTimetables:
           effectiveTable.find(_._1 == ds).flatMap(_._2.arriving) underflowSub table(ds).stationTime.arriving
         case _ => effectiveTable.lastOption.flatMap(_._2.arriving) underflowSub arrivingTime
 
+    /** The delay in a station */
     def delayIn(station: Station): Option[Time] =
       (table.get(station), effectiveTable.find(_._1 == station).map(_._2)) match
         case (Some(TrainStationTime(_, _, Some(departure))), Some(TrainStationTime(_, _, Some(effectiveDeparture)))) =>
@@ -124,9 +126,9 @@ object DynamicTimetables:
             ss: ((Station, Station)) => Station,
             tst: StationWithTimingInfo => TrainStationTime
         ): Option[DynamicTimetableImpl] =
-          route.map(nr => effectiveTable.updateWhen(_._1.name == ss(nr).name)(swti => (swti._1, tst(swti)))).map(nett =>
-            copy(nett)
-          )
+          route.map(nr => effectiveTable.updateWhen(_._1.name == ss(nr).name)(swti => (swti._1, tst(swti)))).map(copy(
+            _
+          ))
 
   /** Utility for [[DynamicTimetable]] */
   private[DynamicTimetables] object DynamicTimetableUtils:

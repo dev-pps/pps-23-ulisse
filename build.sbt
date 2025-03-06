@@ -27,7 +27,6 @@ Test / fork := true
 Test / javaOptions ++= Seq(
   "-Xmx4G"
 )
-
 enablePlugins(AssemblyPlugin)
 Compile / mainClass := Some("ulisse.Main")
 assembly / assemblyMergeStrategy := {

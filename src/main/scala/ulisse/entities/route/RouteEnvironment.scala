@@ -8,11 +8,17 @@ import ulisse.entities.station.Station
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
 
+/** Environment that contains Routes for the Simulation */
 trait RouteEnvironment extends TrainAgentEnvironment[RouteEnvironment, RouteEnvironmentElement]:
+  /** Find the routes that connect two stations with the travel direction */
   def findRoutesWithTravelDirection(route: (Station, Station)): Seq[(RouteEnvironmentElement, TrackDirection)]
+
+  /** Try to put a train in a route */
   def putTrain(train: TrainAgent, route: (Station, Station)): Option[RouteEnvironment]
 
+/** Factory for [[RouteEnvironment]] instances */
 object RouteEnvironment:
+  /** Create a new [[RouteEnvironment]] from a configurationData */
   def apply(configurationData: ConfigurationData): RouteEnvironment = RouteEnvironmentImpl(configurationData.routes)
 
   private final case class RouteEnvironmentImpl(environmentElements: Seq[RouteEnvironmentElement])

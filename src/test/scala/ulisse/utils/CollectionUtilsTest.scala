@@ -23,3 +23,12 @@ class CollectionUtilsTest extends AnyWordSpec with Matchers:
     "swap all items that satisfy the condition with effects" in:
       List(1, 2, 3, 4, 5).swapWhenWithEffects(_ % 2 == 0)(Option(0)) shouldBe Some(List(1, 0, 3, 0, 5))
       List(1, 2, 3, 4, 5).swapWhenWithEffects(_ % 2 == 0)(None) shouldBe None
+
+  "swapWhenEq" should:
+    "swap all items that are equal to the given element" in:
+      List(3, 2, 3, 4, 3).swapWhenEq(3)(0) shouldBe List(0, 2, 0, 4, 0)
+
+  "swapWhenEqWithEffects" should:
+    "swap all items that are equal to the given element with effects" in:
+      List(3, 2, 3, 4, 3).swapWhenEqWithEffects(3)(Option(0)) shouldBe Some(List(0, 2, 0, 4, 0))
+      List(3, 2, 3, 4, 3).swapWhenEqWithEffects(3)(None) shouldBe None

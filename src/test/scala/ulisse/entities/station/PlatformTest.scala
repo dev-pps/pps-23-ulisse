@@ -14,6 +14,13 @@ class PlatformTest extends AnyWordSpec with Matchers:
   private val id       = 1
   private val platform = Platform(id)
 
+  extension (platform: Platform)
+    def checkFields(trains: Seq[TrainAgent], isEmpty: Boolean, isAvailable: Boolean): Unit =
+      platform.id shouldBe id
+      platform.trains shouldBe trains
+      platform.isEmpty shouldBe isEmpty
+      platform.isAvailable shouldBe isAvailable
+
   "A Platform" when:
     "is created" should:
       "have a positive platform id" in:
@@ -22,9 +29,7 @@ class PlatformTest extends AnyWordSpec with Matchers:
         )
 
       "not contain any train" in:
-        platform.trains shouldBe Seq()
-        platform.isEmpty shouldBe true
-        platform.isAvailable shouldBe true
+        platform.checkFields(Seq(), true, true)
 
     "created checked" should:
       "have a platform id greater or equal than minPlatformId" in:
@@ -39,21 +44,14 @@ class PlatformTest extends AnyWordSpec with Matchers:
 
       "not contain any train" in:
         Platform.createCheckedPlatform(id) match
-          case Right(platform) =>
-            platform.trains shouldBe Seq()
-            platform.isEmpty shouldBe true
-            platform.isAvailable shouldBe true
-          case _ => fail()
+          case Right(platform) => platform.checkFields(Seq(), true, true)
+          case _               => fail()
 
     "a train is put in" should:
       "be updated with the specified train" in:
         platform.putTrain(trainAgent3905) match
-          case Some(up) =>
-            up.id shouldBe id
-            up.trains shouldBe Seq(trainAgent3905)
-            up.isEmpty shouldBe false
-            up.isAvailable shouldBe false
-          case _ => fail()
+          case Some(up) => up.checkFields(Seq(trainAgent3905), false, false)
+          case _        => fail()
 
       "not be updated if the platform is not available" in:
         platform.putTrain(trainAgent3905).flatMap(_.putTrain(trainAgent3905)) shouldBe None
@@ -68,12 +66,8 @@ class PlatformTest extends AnyWordSpec with Matchers:
         platform.putTrain(trainAgent3905).flatMap(
           _.updateTrain(updatedTrainAgent3905)
         ) match
-          case Some(up) =>
-            up.id shouldBe id
-            up.trains shouldBe Seq(updatedTrainAgent3905)
-            up.isEmpty shouldBe false
-            up.isAvailable shouldBe false
-          case _ => fail()
+          case Some(up) => up.checkFields(Seq(updatedTrainAgent3905), false, false)
+          case _        => fail()
 
       "not be updated if the platform doesn't contain the specified train" in:
         platform.putTrain(trainAgent3905).flatMap(_.updateTrain(trainAgent3906)) shouldBe None
@@ -83,12 +77,8 @@ class PlatformTest extends AnyWordSpec with Matchers:
         platform.putTrain(trainAgent3905).flatMap(
           _.removeTrain(trainAgent3905)
         ) match
-          case Some(up) =>
-            up.id shouldBe id
-            up.trains shouldBe Seq()
-            up.isEmpty shouldBe true
-            up.isAvailable shouldBe true
-          case _ => fail()
+          case Some(up) => up.checkFields(Seq(), true, true)
+          case _        => fail()
 
       "not be updated if the platform doesn't contain the specified train" in:
         platform.putTrain(trainAgent3905).flatMap(_.removeTrain(trainAgent3906)) shouldBe None

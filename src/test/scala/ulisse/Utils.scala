@@ -8,12 +8,16 @@ import ulisse.Utils.TestUtility.getOrFail
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.BaseError
 
+/** Utility for testing */
 object Utils:
+  /** Utilities to compare values */
   object MatchersUtils extends Matchers:
     extension (b1: Boolean)
+      /** utility to compare two boolean values. Note: it enforces the implicit conversion mechanism */
       def shouldBeBoolean(b2: Boolean): Unit =
         b1 shouldBe b2
 
+  /** Generic test utilities */
   object TestUtility:
     extension [E, R](item: Either[E, R])
       def in(test: R => Unit): Unit =
@@ -21,6 +25,7 @@ object Utils:
           case Left(e)  => fail(s"initialization error: $e")
           case Right(t) => test(t)
 
+      /** utility to get the right part of an either */
       def getOrFail: R =
         item match
           case Left(e: E) => fail(s"initialization error: $e")

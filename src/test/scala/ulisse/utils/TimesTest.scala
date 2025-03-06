@@ -107,3 +107,4 @@ class TimesTest extends AnyWordSpec with Matchers:
       1000.toTime shouldBe Time(0, 0, 1)
       60000.toTime shouldBe Time(0, 1, 0)
       3661000.toTime shouldBe Time(1, 1, 1)
+      86401000.toTime shouldBe Time(24, 0, 1)

@@ -5,10 +5,14 @@ import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationD
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
 
+/** Environment that contains Stations for the Simulation */
 trait StationEnvironment extends TrainAgentEnvironment[StationEnvironment, StationEnvironmentElement]:
+  /** Try to put a train in a station */
   def putTrain(train: TrainAgent, station: Station): Option[StationEnvironment]
 
+/** Factory for [[StationEnvironment]] instances */
 object StationEnvironment:
+  /** Create a new [[StationEnvironment]] from a configurationData */
   def apply(configurationData: ConfigurationData): StationEnvironment =
     StationEnvironmentImpl(configurationData.stations)
 
@@ -16,6 +20,7 @@ object StationEnvironment:
       extends StationEnvironment:
     override protected def constructor(environmentElements: Seq[StationEnvironmentElement]): StationEnvironment =
       copy(environmentElements)
+
     override def putTrain(train: TrainAgent, station: Station): Option[StationEnvironment] =
       for
         station        <- environmentElements.find(_ == station)

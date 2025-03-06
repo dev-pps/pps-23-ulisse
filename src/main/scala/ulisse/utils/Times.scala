@@ -26,6 +26,10 @@ object Times:
     def m: Minute
     def s: Second
     override def toString: String = s"$h:$m:$s"
+    override def equals(that: Any): Boolean =
+      that match
+        case t: Time => t.h == h && t.m == m && t.s == s
+        case _       => false
 
   object Time:
     /** Creates a `Time` instance. */
@@ -229,6 +233,6 @@ object Times:
   )(using buildStrategy: TimeBuildStrategy): M[T] =
     constructor.construct.tupled(buildStrategy.buildTimeValue(
       seconds / (Time.secondsInMinute * Time.minutesInHour),
-      (seconds / Time.secondsInMinute),
+      seconds / Time.secondsInMinute,
       seconds
     ))

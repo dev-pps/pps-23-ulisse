@@ -33,9 +33,9 @@ class StatisticsTest extends AnyWordSpec with Matchers:
 
     "delayInCurrentTimetable is requested" should:
       "find it if present" in:
-        TrainAgentInfo(trainAgent3905, Seq(dynamicTimetable2, updatedDtt1)).delayInCurrentTimetable.map(
-          _.toSeconds
-        ) shouldBe Some(delay.asTime.toSeconds)
+        TrainAgentInfo(trainAgent3905, Seq(dynamicTimetable2, updatedDtt1)).delayInCurrentTimetable shouldBe Some(
+          delay.asTime
+        )
 
       "not find it if not present" in:
         TrainAgentInfo(trainAgent3905, Seq(dynamicTimetable2)).delayInCurrentTimetable shouldBe None
