@@ -1,12 +1,32 @@
 package ulisse.applications.managers
 
-import ulisse.applications.managers.TimetableManagers.TimetableManagerErrors.{AcceptanceError, TimetableNotFound}
+import ulisse.applications.managers.TimetableManagers.TimetableManagerErrors.{
+  AcceptanceError,
+  DeletionError,
+  TimetableNotFound
+}
+import ulisse.entities.route.Routes
+import ulisse.entities.station.Station
 import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist}
 import ulisse.utils.Times.{===, >=, ClockTime, Time}
 
 object TimetableManagers:
+
+  /** Responsible to guarantee consistent deletion of [[Timetable]] when entities as [[Route]], [[Station]] or [[Train]] are deleted. */
+  trait DeletionListener:
+    import ulisse.entities.route.Routes.Route
+    import ulisse.entities.station.Station
+
+    /** Deletes all timetables related to `train` otherwise an error is returned */
+    def trainDeleted(train: Train): Either[TimetableManagerErrors, TimetableManager]
+
+    /** Deletes all timetables containing `station` otherwise an error is returned */
+    def stationDeleted(station: Station): Either[TimetableManagerErrors, TimetableManager]
+
+    /** Deletes all timetables containing `route` otherwise an error is returned */
+    def routeDeleted(route: Route): Either[TimetableManagerErrors, TimetableManager]
 
   /** Errors that can returned by manager */
   trait TimetableManagerErrors extends BaseError
@@ -15,11 +35,13 @@ object TimetableManagers:
         with TimetableManagerErrors
     final case class TimetableNotFound(trainName: String)
         extends ErrorNotExist(s"No timetables exist for train $trainName") with TimetableManagerErrors
+    final case class DeletionError(descr: String) extends ErrorMessage(s"Delete error: $descr")
+        with TimetableManagerErrors
 
   /** A rules specification for accepting new `timetable`. Checks are done by method `accept`. */
   trait AcceptanceTimetablePolicy:
     /** Returns the `timetable` otherwise if is not accepted by policy rules is returned an [[AcceptanceError]].
-      * Param `tables` is a list of TrainTimetable used by acceptance policy for checks
+      * Param `tables` is a list of Timetable used by acceptance policy for checks
       */
     def accept(timetable: Timetable, tables: List[Timetable]): Either[AcceptanceError, Timetable]
 
@@ -47,7 +69,7 @@ object TimetableManagers:
   /** Return an empty manager */
   def empty(): TimetableManager = TimetableManager(List.empty)
 
-  trait TimetableManager:
+  trait TimetableManager extends DeletionListener:
     /** Save new `timetable` for a train. Timetable is accepted if passes the `acceptancePolicy` rules.
       * Returns `Right` of updated `TimetableManager` otherwise `Left` of `TimetableManagerErrors` in case of errors.
       */
@@ -64,7 +86,7 @@ object TimetableManagers:
     def tables: Seq[Timetable]
 
     /** Gets all timetables of a given `trainName`
-      * If al least one timetable is saved returns List of TrainTimetables, otherwise a Left of `TimetableNotFound`
+      * If al least one timetable is saved returns List of Timetables, otherwise a Left of `TimetableNotFound`
       */
     def tablesOf(trainName: String): Either[TimetableNotFound, List[Timetable]]
 
@@ -118,3 +140,31 @@ object TimetableManagers:
       override def tables: Seq[Timetable] = timetables.values.toList.flatten
       override def tablesOf(trainName: String): Either[TimetableNotFound, List[Timetable]] =
         timetables.find((k, _) => k.name.contentEquals(trainName)).map(_._2).toRight(TimetableNotFound(trainName))
+
+      override def trainDeleted(train: Train): Either[TimetableManagerErrors, TimetableManager] =
+        timetables.get(train).toRight(DeletionError(s"train ${train.name} not found")).map(_ =>
+          TimetableManagerImpl(timetables.removed(train))
+        )
+
+      override def stationDeleted(station: Station): Either[TimetableManagerErrors, TimetableManager] =
+        val updatedTimetables =
+          timetables.map((train, tables) => (train, tables.filterNot(_.stations.contains(station))))
+        deletionResult(updatedTimetables, s"timetables with station $station not found")
+
+      override def routeDeleted(route: Routes.Route): Either[TimetableManagerErrors, TimetableManager] =
+        val routeToDelete    = (route.departure, route.arrival, Some(route.typology))
+        val routeToDeleteInv = (route.arrival, route.departure, Some(route.typology))
+        val updatedTimetables = timetables.map((t, tables) =>
+          (t, tables.filterNot(tt => tt.routes.contains(routeToDeleteInv) || tt.routes.contains(routeToDelete)))
+        )
+        deletionResult(updatedTimetables, s"timetables with route $route not found")
+
+      private def deletionResult(
+          updatedTables: Map[Train, List[Timetable]],
+          errMsg: String
+      ): Either[TimetableManagerErrors, TimetableManager] =
+        Either.cond(
+          updatedTables != timetables,
+          TimetableManagerImpl(updatedTables),
+          DeletionError(errMsg)
+        )

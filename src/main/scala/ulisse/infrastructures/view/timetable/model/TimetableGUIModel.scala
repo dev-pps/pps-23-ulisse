@@ -27,9 +27,9 @@ object TimetableGUIModel:
       t.table.map((station, times) =>
         TableEntryData(
           station.name,
-          times.arriving.optionString,
-          times.departure.optionString,
-          times.waitTime
+          times.stationTime.arriving.optionString,
+          times.stationTime.departure.optionString,
+          times.stationTime.waitTime
         )
       ).toList
 
