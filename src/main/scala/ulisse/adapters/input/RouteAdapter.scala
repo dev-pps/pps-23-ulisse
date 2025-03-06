@@ -32,6 +32,12 @@ object RouteAdapter:
 
   /** Errors that can be generated during calls to the [[RouteAdapter]] methods. */
   enum Errors(val text: String) extends ErrorMessage(text):
+    /** Not choose departure. */
+    case NotChooseDeparture extends Errors("Not choose departure")
+
+    /** Not choose arrival. */
+    case NotChooseArrival extends Errors("Not choose arrival")
+
     /** Invalid route type. */
     case InvalidRouteType extends Errors("Invalid route type")
 
@@ -42,15 +48,21 @@ object RouteAdapter:
     case InvalidRouteLength extends Errors("Invalid route length")
 
   /** Information required to create a new route. */
-  case class RouteCreationInfo(departure: Station, arrival: Station, typology: String, rails: String, length: String)
+  case class RouteCreationInfo(
+      departure: Option[Station],
+      arrival: Option[Station],
+      typology: String,
+      rails: String,
+      length: String
+  )
 
   /** Extension methods for the [[Route]] class. */
   extension (route: Route)
     /** Converts the route to a [[RouteCreationInfo]] instance. */
     def toCreationInfo: RouteCreationInfo =
       RouteCreationInfo(
-        route.departure,
-        route.arrival,
+        route.departure.some,
+        route.arrival.some,
         route.typology.toString,
         route.railsCount.toString,
         route.length.toString
@@ -64,10 +76,12 @@ object RouteAdapter:
     private def create(routeData: RouteCreationInfo): Either[RouteAdapterError, Route] =
       val RouteCreationInfo(departure, arrival, typology, rails, length) = routeData
       (
+        departure toValidNec Errors.NotChooseDeparture,
+        arrival toValidNec Errors.NotChooseArrival,
         typology.toRouteTypeOption toValidNec Errors.InvalidRouteType,
         rails.toIntOption toValidNec Errors.InvalidRailsCount,
         length.toDoubleOption toValidNec Errors.InvalidRouteLength
-      ).mapN((_, _, _)).toEither flatMap (Route(departure, arrival, _, _, _))
+      ).mapN((_, _, _, _, _)).toEither flatMap (Route(_, _, _, _, _))
 
     override def save(oldRoute: Option[Route], data: RouteCreationInfo)(using ec: ExecutionContext): Future[Value] =
       oldRoute.fold(create(data) onRight port.save)(route => create(data) onRight (port modify (route, _)))

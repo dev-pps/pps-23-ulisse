@@ -31,6 +31,28 @@ class RouteAdapterTest extends AnyWordSpec with Matchers:
 
   "User" when:
     "insert invalid data for saving and deletion" should:
+      "notify an error not choose departure" in:
+        for route <- validateRoute
+        yield
+          val creationInfo = route.toCreationInfo.copy(departure = None)
+          val saveError    = adapter.save(Option.empty, creationInfo)
+          val deleteError  = adapter.delete(creationInfo)
+          updateState()
+          val error = Left(Chain(RouteAdapter.Errors.NotChooseDeparture))
+          Await result (saveError, Duration.Inf) mustBe error
+          Await result (deleteError, Duration.Inf) mustBe error
+
+      "notify an error not choose arrival" in:
+        for route <- validateRoute
+        yield
+          val creationInfo = route.toCreationInfo.copy(arrival = None)
+          val saveError    = adapter.save(Option.empty, creationInfo)
+          val deleteError  = adapter.delete(creationInfo)
+          updateState()
+          val error = Left(Chain(RouteAdapter.Errors.NotChooseArrival))
+          Await result (saveError, Duration.Inf) mustBe error
+          Await result (deleteError, Duration.Inf) mustBe error
+
       "notify an error invalid route type" in:
         for route <- validateRoute
         yield
@@ -103,11 +125,12 @@ class RouteAdapterTest extends AnyWordSpec with Matchers:
           route <- validateRoute
           error <- validateDifferentRoute
         yield
-          val errorSameDepartureStation = adapter.save(Option.empty, route.toCreationInfo.copy(arrival = departure))
-          val errorSameArrivalStation   = adapter.save(Option.empty, route.toCreationInfo.copy(departure = arrival))
-          val errorFewRails             = adapter.save(Option.empty, route.toCreationInfo.copy(rails = "0"))
-          val errorTooManyRails         = adapter.save(Option.empty, route.toCreationInfo.copy(rails = "100"))
-          val errorTooShort             = adapter.save(Option.empty, route.toCreationInfo.copy(length = "0"))
+          val errorSameDepartureStation =
+            adapter.save(Option.empty, route.toCreationInfo.copy(arrival = departure.some))
+          val errorSameArrivalStation = adapter.save(Option.empty, route.toCreationInfo.copy(departure = arrival.some))
+          val errorFewRails           = adapter.save(Option.empty, route.toCreationInfo.copy(rails = "0"))
+          val errorTooManyRails       = adapter.save(Option.empty, route.toCreationInfo.copy(rails = "100"))
+          val errorTooShort           = adapter.save(Option.empty, route.toCreationInfo.copy(length = "0"))
           updateState()
           (Await result (errorSameDepartureStation, Duration.Inf)) mustBe Left(Chain(Routes.Errors.SameStation))
           (Await result (errorSameArrivalStation, Duration.Inf)) mustBe Left(Chain(Routes.Errors.SameStation))
