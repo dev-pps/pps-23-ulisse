@@ -148,9 +148,9 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
         )
 
       "provide a default perception if next route is not found in the env" in:
-        trainInStationWithNextDepartureTimeAndRouteInfo(defaultClockTime, None)
+        trainInStationWithNextDepartureTimeAndRouteInfo(defaultClockTime, Seq())
         perceptionProvider.perceptionFor(railwayEnvironment, trainAgent) shouldBe Some(
-          TrainPerceptionInStation(TrainStationInfo(false, false))
+          TrainPerceptionInStation(TrainStationInfo(true, false))
         )
 
       "provide a perception when departure time is greater than current time and the direction is unavailable" in:
