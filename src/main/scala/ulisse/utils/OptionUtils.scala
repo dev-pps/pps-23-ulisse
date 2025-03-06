@@ -1,5 +1,7 @@
 package ulisse.utils
 
+import cats.Functor
+
 /** Defines utility methods for `Option` objects. */
 object OptionUtils:
   extension [A](optionalResult: => A)
@@ -7,4 +9,5 @@ object OptionUtils:
     def when(condition: Boolean): Option[A] =
       Option.when(condition)(optionalResult)
 
+  /** Defines the conversion from flatten `Option[Option[A]]` to `Option[A]`. */
   given [A]: Conversion[Option[Option[A]], Option[A]] = _.flatten

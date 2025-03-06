@@ -6,6 +6,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.route.Tracks.Track
 import ulisse.entities.route.Tracks.Track.minTrackId
 import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
+import ulisse.entities.station.Platform
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
@@ -17,6 +18,20 @@ class TrackTest extends AnyWordSpec with Matchers:
   private val direction                           = Forward
   private val track                               = Track(id)
 
+  extension (track: Track)
+    def checkFields(
+        trains: Seq[TrainAgent],
+        isEmpty: Boolean,
+        isAvailable: Boolean,
+        isAvailableOpposite: Boolean
+    ): Unit =
+      track.id shouldBe id
+      track.trains shouldBe trains
+      track.isEmpty shouldBe isEmpty
+      track.isAvailable(direction) shouldBe isAvailable
+      track.isAvailable(direction.opposite) shouldBe isAvailableOpposite
+      track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
+
   "A track" when:
     "created" should:
       "have a positive track id" in:
@@ -25,10 +40,7 @@ class TrackTest extends AnyWordSpec with Matchers:
         )
 
       "not contain any train" in:
-        track.trains shouldBe Seq()
-        track.isEmpty shouldBe true
-        track.isAvailable(direction) shouldBe true
-        track.isAvailable(direction.opposite) shouldBe true
+        track.checkFields(Seq(), true, true, true)
 
       "have a min permitted distance between trains" in:
         track.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
@@ -50,10 +62,7 @@ class TrackTest extends AnyWordSpec with Matchers:
       "not contain any train" in:
         Track.createCheckedTrack(id) match
           case Right(track) =>
-            track.trains shouldBe Seq()
-            track.isEmpty shouldBe true
-            track.isAvailable(direction) shouldBe true
-            track.isAvailable(direction.opposite) shouldBe true
+            track.checkFields(Seq(), true, true, true)
           case _ => fail()
 
       "have a min permitted distance between trains" in:
@@ -72,12 +81,7 @@ class TrackTest extends AnyWordSpec with Matchers:
       "be updated with the specified train" in:
         track.putTrain(trainAgent3905, direction) match
           case Some(ut) =>
-            ut.id shouldBe id
-            ut.trains shouldBe Seq(trainAgent3905)
-            ut.isEmpty shouldBe false
-            ut.isAvailable(direction) shouldBe false
-            ut.isAvailable(direction.opposite) shouldBe false
-            ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
+            ut.checkFields(Seq(trainAgent3905), false, false, false)
             ut.currentDirection shouldBe Some(direction)
           case _ => fail()
 
@@ -95,12 +99,7 @@ class TrackTest extends AnyWordSpec with Matchers:
           _.updateTrain(updatedTrainAgent3905)
         ).flatMap(_.putTrain(trainAgent3906, direction)) match
           case Some(ut) =>
-            ut.id shouldBe id
-            ut.trains shouldBe Seq(updatedTrainAgent3905, trainAgent3906)
-            ut.isEmpty shouldBe false
-            ut.isAvailable(direction) shouldBe false
-            ut.isAvailable(direction.opposite) shouldBe false
-            ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
+            ut.checkFields(Seq(updatedTrainAgent3905, trainAgent3906), false, false, false)
             ut.currentDirection shouldBe Some(direction)
           case None => fail()
 
@@ -119,10 +118,7 @@ class TrackTest extends AnyWordSpec with Matchers:
         val updatedTrainAgent3905 = trainAgent3905.updateDistanceTravelled(10)
         track.putTrain(trainAgent3905, direction).flatMap(_.updateTrain(updatedTrainAgent3905)) match
           case Some(ut) =>
-            ut.id shouldBe id
-            ut.trains shouldBe Seq(updatedTrainAgent3905)
-            ut.isEmpty shouldBe false
-            ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
+            ut.checkFields(Seq(updatedTrainAgent3905), false, false, false)
             ut.currentDirection shouldBe Some(direction)
           case _ => fail()
 
@@ -158,10 +154,7 @@ class TrackTest extends AnyWordSpec with Matchers:
           _.putTrain(trainAgent3906, direction)
         ).flatMap(_.updateTrain(updatedTrainAgent3906)) match
           case Some(ut) =>
-            ut.id shouldBe id
-            ut.trains shouldBe Seq(updatedTrainAgent3905, updatedTrainAgent3906)
-            ut.isEmpty shouldBe false
-            ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
+            ut.checkFields(Seq(updatedTrainAgent3905, updatedTrainAgent3906), false, false, false)
             ut.currentDirection shouldBe Some(direction)
           case _ => fail()
 
@@ -187,12 +180,7 @@ class TrackTest extends AnyWordSpec with Matchers:
       "be updated if the specified train is the last" in:
         track.putTrain(trainAgent3905, direction).flatMap(_.removeTrain(trainAgent3905)) match
           case Some(ut) =>
-            ut.id shouldBe id
-            ut.trains shouldBe Seq()
-            ut.isEmpty shouldBe true
-            ut.isAvailable(direction) shouldBe true
-            ut.isAvailable(direction.opposite) shouldBe true
-            ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
+            ut.checkFields(Seq(), true, true, true)
             ut.currentDirection shouldBe None
           case _ => fail()
 
@@ -220,12 +208,7 @@ class TrackTest extends AnyWordSpec with Matchers:
           _.removeTrain(trainAgent3905)
         ) match
           case Some(ut) =>
-            ut.id shouldBe id
-            ut.trains shouldBe Seq(otherTrain)
-            ut.isEmpty shouldBe false
-            ut.isAvailable(direction) shouldBe false
-            ut.isAvailable(direction.opposite) shouldBe false
-            ut.minPermittedDistanceBetweenTrains shouldBe minPermittedDistanceBetweenTrains
+            ut.checkFields(Seq(otherTrain), false, false, false)
             ut.currentDirection shouldBe Some(direction)
           case _ => fail()
 

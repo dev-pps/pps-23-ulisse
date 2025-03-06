@@ -59,7 +59,9 @@ object ConfigurationData:
 
     /** Get the min departure time of the timetables or if no timetable is present returns Time(0,0,0) */
     def departureTime: Time =
-      Time.secondsToTime(configurationData.timetables.map(_.departureTime.toSeconds).foldLeft(Int.MaxValue)(math.min))
+      if configurationData.timetables.isEmpty then Time(0, 0, 0)
+      else
+        Time.secondsToTime(configurationData.timetables.map(_.departureTime.toSeconds).foldLeft(Int.MaxValue)(math.min))
 
   private def orderedTimetablesByTrainId(
       trains: Seq[TrainAgent],

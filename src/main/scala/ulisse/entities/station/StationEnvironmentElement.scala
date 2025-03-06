@@ -36,12 +36,11 @@ object StationEnvironmentElement:
   private final case class StationEnvironmentElementImpl(station: Station, containers: Seq[Platform])
       extends StationEnvironmentElement:
     export station.*
+    override protected def constructor(containers: Seq[Platform]): StationEnvironmentElement =
+      copy(containers = containers)
 
     override def putTrain(train: TrainAgent): Option[StationEnvironmentElement] =
       (for
         firstAvailableContainer <- containers.find(_.isAvailable)
         updatedContainers       <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train))
       yield constructor(updatedContainers)) when !contains(train)
-
-    override protected def constructor(containers: Seq[Platform]): StationEnvironmentElement =
-      copy(containers = containers)

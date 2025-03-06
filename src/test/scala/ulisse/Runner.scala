@@ -13,14 +13,6 @@ object Runner:
     *
     * This function starts with an initial state and applies each function from the provided `LinkedBlockingQueue` in
     * sequence, producing a list of intermediate states, including the initial state.
-    *
-    * @tparam S
-    *   The type of the state being processed.
-    * @param initialState
-    *   The initial state of type `S` to begin the computation.
-    * @param queue
-    *   A `LinkedBlockingQueue` containing functions of type `S => S`, where each function represents a transformation
-    *   to be applied to the state.
     */
   def runAll[S](initialState: S, queue: LinkedBlockingQueue[S => S]): List[S] =
     val elements = java.util.ArrayList[S => S]()

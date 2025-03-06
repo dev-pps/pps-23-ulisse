@@ -43,6 +43,8 @@ object RouteEnvironmentElement:
   private final case class RouteEnvironmentElementImpl(route: Route, containers: Seq[Track])
       extends RouteEnvironmentElement:
     export route.*
+    override def constructor(containers: Seq[Track]): RouteEnvironmentElement =
+      copy(containers = containers)
 
     override def putTrain(train: TrainAgent, direction: TrackDirection): Option[RouteEnvironmentElement] =
       (for
@@ -50,6 +52,3 @@ object RouteEnvironmentElement:
         updatedContainers <-
           containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
       yield constructor(updatedContainers)) when !contains(train) && isAvailableFor(train, direction)
-
-    override def constructor(containers: Seq[Track]): RouteEnvironmentElement =
-      copy(containers = containers)
