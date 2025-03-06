@@ -1,3 +1,11 @@
+## [1.26.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.25.0...v1.26.0) (2025-03-06)
+
+### Features
+
+* **EnvironmentCoordinator:** introduce coordinator for train agents environments ([956deb1](https://github.com/dev-pps/pps-23-ulisse/commit/956deb159eb3ffbb4ef3d2e33e9f63e6976ae3a5))
+* **RouteEnvironment:** add manager for route environment elements ([1e7f457](https://github.com/dev-pps/pps-23-ulisse/commit/1e7f45753f1a8648222863eb442d27dedb1ed612))
+* **RouteEnvironmentElement:** check train technology before putting in the route ([fb6e2dd](https://github.com/dev-pps/pps-23-ulisse/commit/fb6e2dd7a1737bc3bdb789579c98bdc9cdbb9f81))
+
 ## [1.25.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.24.0...v1.25.0) (2025-03-06)
 
 ### Features
