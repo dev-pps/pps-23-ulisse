@@ -33,9 +33,9 @@ object DynamicTimetables:
     def currentDelay: Option[Time] =
       (currentRoute, nextRoute) match
         case (Some((ds, _)), _) =>
-          effectiveTable.find(_._1 == ds).flatMap(_._2.departure) underflowSub table(ds).departure
+          effectiveTable.find(_._1 == ds).flatMap(_._2.departure) underflowSub table(ds).stationTime.departure
         case (_, Some((ds, _))) =>
-          effectiveTable.find(_._1 == ds).flatMap(_._2.arriving) underflowSub table(ds).arriving
+          effectiveTable.find(_._1 == ds).flatMap(_._2.arriving) underflowSub table(ds).stationTime.arriving
         case _ => effectiveTable.lastOption.flatMap(_._2.arriving) underflowSub arrivingTime
 
     def delayIn(station: Station): Option[Time] =
@@ -48,11 +48,11 @@ object DynamicTimetables:
 
     /** The next departure time */
     def nextDepartureTime: Option[ClockTime] =
-      calculateTimeWithDelay(nextRoute.flatMap(nr => table(nr._1).departure))
+      calculateTimeWithDelay(nextRoute.flatMap(nr => table(nr._1).stationTime.departure))
 
     /** The next arrival time */
     def nextArrivalTime: Option[ClockTime] =
-      calculateTimeWithDelay(currentRoute.flatMap(cr => table(cr._2).arriving))
+      calculateTimeWithDelay(currentRoute.flatMap(cr => table(cr._2).stationTime.arriving))
 
     private def calculateTimeWithDelay(time: Option[ClockTime]): Option[ClockTime] =
       if currentDelay.isDefined then time + currentDelay else time
@@ -114,7 +114,7 @@ object DynamicTimetables:
         )
 
       private def expectedDepartureTime: Option[ClockTime] =
-        nextRoute.flatMap(nr => table.find(_._1 == nr._1).flatMap(_._2.departure))
+        nextRoute.flatMap(nr => table.find(_._1 == nr._1).flatMap(_._2.stationTime.departure))
 
       extension (route: Option[(Station, Station)])
         private def updateTimeInfo(

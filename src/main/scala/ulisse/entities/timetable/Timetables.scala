@@ -24,23 +24,31 @@ object Timetables:
 
   extension (t: Timetable)
     /** Returns list of [[Station]] where train stops */
-    def stopStations: List[Station] = t.table.filter(_._2.waitTime.nonEmpty).keys.toList
+    def stopStations: List[Station] = t.table.filter(_._2.stationTime.waitTime.nonEmpty).keys.toList
 
     /** Returns list of [[Station]] where train just transit (doesn't stop) */
     def transitStations: List[Station] =
-      t.table.filter(_._2.waitTime.isEmpty).keys.toList.filterNot(s =>
+      t.table.filter(_._2.stationTime.waitTime.isEmpty).keys.toList.filterNot(s =>
         s.equals(t.arrivingStation) || s.equals(t.startStation)
       )
 
+    /** Returns complete list of all stations */
+    def stations: List[Station] = t.table.keys.toList
+
     /** Returns list of nearest stations pair */
-    def routes: List[(Station, Station)] = t.table.keys.zip(t.table.keys.drop(1)).toList
+    def routes: List[(Station, Station, Option[RouteType])] =
+      val pair = t.table.zip(t.table.drop(1))
+      pair.map((s, f) => (s._1, f._1, f._2.routeType)).toList
+
+  /** Station infos like `routeType` (to reach station) and `stationTime` */
+  case class StationInfo(routeType: Option[RouteType], stationTime: StationTime)
 
   /** Basic timetable */
   trait PartialTimetable:
     def train: Train
     def startStation: Station
     def departureTime: ClockTime
-    def table: ListMap[Station, StationTime]
+    def table: ListMap[Station, StationInfo]
 
   /** Complete timetable containing arriving station and ClockTime */
   trait Timetable extends PartialTimetable:
@@ -106,36 +114,41 @@ object Timetables:
         train,
         startStation,
         departureTime,
-        ListMap((startStation, DepartureStationTime(Some(departureTime))))
+        ListMap((startStation, StationInfo(None, DepartureStationTime(Some(departureTime)))))
       )
 
     private case class TimetableBuilderImpl(
         train: Train,
         startStation: Station,
         departureTime: ClockTime,
-        table: ListMap[Station, StationTime]
+        table: ListMap[Station, StationInfo]
     )(using timeEstimationStrategy: TimeEstimator) extends TimetableBuilder:
-      private def lastDepartureTime: Option[StationTime] = table.lastOption.map(_._2)
+      private def lastDepartureTime: Option[StationTime] = table.lastOption.map(_._2.stationTime)
+      private def arrivingTime(railInfo: RailInfo): Option[ClockTime] =
+        timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train)
       override def stopsIn(station: Station, waitTime: WaitTime)(railInfo: RailInfo): TimetableBuilder =
         insertStation(
           station,
-          AutoStationTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), Some(waitTime))
+          AutoStationTime(arrivingTime(railInfo), Some(waitTime)),
+          railInfo
         )
 
       override def transitIn(station: Station)(railInfo: RailInfo): TimetableBuilder =
-        insertStation(station, AutoStationTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train), None))
+        insertStation(station, AutoStationTime(arrivingTime(railInfo), None), railInfo)
 
       override def arrivesTo(station: Station)(railInfo: RailInfo): Timetable =
         TimetableImpl(
           insertStation(
             station,
-            ArrivingStationTime(timeEstimationStrategy.ETA(lastDepartureTime, railInfo, train))
+            ArrivingStationTime(arrivingTime(railInfo)),
+            railInfo
           ).partialTimetable,
           station
         )
 
-      private def insertStation(station: Station, ClockTime: StationTime) =
-        this.copy(table = table.updated(station, ClockTime))
+      private def insertStation(station: Station, stationTime: StationTime, railInfo: RailInfo) =
+        val info = StationInfo(Some(railInfo.typeRoute), stationTime)
+        this.copy(table = table.updated(station, info))
 
       override def partialTimetable: PartialTimetable = PartialTimetableImpl(this)
 
@@ -150,5 +163,5 @@ object Timetables:
       override def arrivingTime: Option[ClockTime] =
         for
           t  <- table.lastOption
-          at <- t._2.arriving
+          at <- t._2.stationTime.arriving
         yield at

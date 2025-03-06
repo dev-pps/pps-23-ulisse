@@ -53,7 +53,7 @@ object DynamicTimetableTest:
   extension (tt: Timetable)
     def stationNr(n: Int): Option[(Station, TrainStationTime)] = tt match
       case dtt: DynamicTimetable => dtt.effectiveTable.drop(n).headOption
-      case _                     => tt.table.drop(n).headOption
+      case _                     => tt.table.map((st, info) => (st, info.stationTime)).drop(n).headOption
 
   extension (r: Option[(Station, Station)])
     def listify: Option[List[Station]] = r.map(t => List(t._1, t._2))
@@ -108,9 +108,9 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
             ))
             newDtt.nextRoute.listify shouldBe Some(timetable1.table.keys.slice(1, 3))
             newDtt.currentDelay shouldBe ClockTime(0, 0).toOption
-            newDtt.nextDepartureTime shouldBe timetable1.table.drop(1).headOption.flatMap(_._2.departure)
+            newDtt.nextDepartureTime shouldBe timetable1.table.drop(1).headOption.flatMap(_._2.stationTime.departure)
             newDtt.currentRoute.listify shouldBe Some(timetable1.table.keys.take(2))
-            newDtt.nextArrivalTime shouldBe timetable1.table.drop(1).headOption.flatMap(_._2.arriving)
+            newDtt.nextArrivalTime shouldBe timetable1.table.drop(1).headOption.flatMap(_._2.stationTime.arriving)
             newDtt.completed shouldBe false
           case _ => fail()
 
@@ -128,10 +128,12 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
             newDtt.nextRoute.listify shouldBe Some(timetable1.table.keys.slice(1, 3))
             newDtt.currentDelay shouldBe delay.toOption
             newDtt.nextDepartureTime shouldBe timetable1.table.drop(1).headOption.flatMap(
-              _._2.departure + delay.toOption
+              _._2.stationTime.departure + delay.toOption
             )
             newDtt.currentRoute.listify shouldBe Some(timetable1.table.keys.take(2))
-            newDtt.nextArrivalTime shouldBe timetable1.table.drop(1).headOption.flatMap(_._2.arriving + delay.toOption)
+            newDtt.nextArrivalTime shouldBe timetable1.table.drop(1).headOption.flatMap(
+              _._2.stationTime.arriving + delay.toOption
+            )
             newDtt.completed shouldBe false
           case _ => fail()
 
@@ -146,7 +148,7 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
             ))
             newDtt.nextRoute.listify shouldBe Some(timetable1.table.keys.slice(1, 3))
             newDtt.currentDelay shouldBe ClockTime(0, 0).toOption
-            newDtt.nextDepartureTime shouldBe dynamicTimetable1.table(stationB).departure
+            newDtt.nextDepartureTime shouldBe dynamicTimetable1.table(stationB).stationTime.departure
             newDtt.currentRoute shouldBe None
             newDtt.completed shouldBe false
           case o => println(o); fail()
@@ -162,7 +164,7 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
             ))
             newDtt.nextRoute shouldBe Some(stationB, stationC)
             newDtt.currentDelay shouldBe delay + delay
-            newDtt.nextDepartureTime shouldBe dynamicTimetable1.table(stationB).departure + delay + delay
+            newDtt.nextDepartureTime shouldBe dynamicTimetable1.table(stationB).stationTime.departure + delay + delay
             newDtt.currentRoute shouldBe None
             newDtt.completed shouldBe false
           case _ => fail()

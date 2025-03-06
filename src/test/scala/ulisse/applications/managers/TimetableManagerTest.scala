@@ -138,3 +138,30 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
       val requestResult = manager.remove(timetableABC.train.name, timetableABC.departureTime)
       Then("should be returned an error")
       requestResult should be(Left(TimetableNotFound(timetableABC.train.name)))
+
+    Scenario("Delete all timetables related to a train"):
+      Given("A manager with some timetable for a train")
+      val manager = TimetableManagers.TimetableManager(List(timetableABC, timetableBC))
+      When("I notify manager that a train is deleted")
+      val result = manager.trainDeleted(timetableABC.train)
+      Then("should be removed all timetables of train")
+      result should be(Right(TimetableManagers.TimetableManager(List())))
+
+    Scenario("Delete all timetables that contains a deleted station"):
+      Given("A manager with some timetable containing deleted station")
+      val manager = TimetableManagers.TimetableManager(List(timetableABC, timetableBC))
+      When("I notify manager that a station is deleted")
+      val result = manager.stationDeleted(stationA)
+      Then("should be removed all timetables that have deleted station")
+      result should be(Right(TimetableManagers.TimetableManager(List(timetableBC))))
+
+    Scenario("Delete all timetables that contains a deleted route"):
+      import ulisse.entities.route.Routes
+      val deletedRoute = Routes.Route(stationA, stationB, railAV_10.typeRoute, 1, 50)
+      deletedRoute in: route =>
+        Given("A manager with some timetable containing deleted route")
+        val manager = TimetableManagers.TimetableManager(List(timetableABC, timetableBC))
+        When("I notify manager that a route is deleted")
+        val result = manager.routeDeleted(route)
+        Then("should be removed all timetables that have deleted station")
+        result should be(Right(TimetableManagers.TimetableManager(List(timetableBC))))
