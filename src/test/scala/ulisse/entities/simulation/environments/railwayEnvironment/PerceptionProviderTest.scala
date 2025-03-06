@@ -5,7 +5,7 @@ import org.mockito.invocation.InvocationOnMock
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.entities.route.RouteEnvironmentElement
+import ulisse.entities.route.{RouteEnvironment, RouteEnvironmentElement}
 import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.route.Tracks.{Track, TrackDirection}
 import ulisse.entities.train.TrainAgents.{
@@ -19,7 +19,7 @@ import ulisse.entities.train.TrainAgents.{
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
-import ulisse.entities.station.StationEnvironmentElement
+import ulisse.entities.station.{StationEnvironment, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.utils.Times.{ClockTime, Time}
 class PerceptionProviderTest extends AnyWordSpec with Matchers:
@@ -27,6 +27,7 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
   private val mockStationA = mock[StationEnvironmentElement]
   private val mockStationB = mock[StationEnvironmentElement]
   private val see          = mock[StationEnvironmentElement]
+  private val se           = mock[StationEnvironment]
 
   private val mockedTrack = mock[Track]
   private val trainAgent  = mock[TrainAgent]
@@ -35,6 +36,7 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
   private val otherTrainAgent = mock[TrainAgent]
 
   private val ree           = mock[RouteEnvironmentElement]
+  private val re            = mock[RouteEnvironment]
   private val routeTypology = AV
   private val routeLength   = 100.0
   when(ree.typology).thenReturn(routeTypology)
@@ -46,6 +48,8 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
   private val defaultClockTime   = baseClock.toOption
   when(railwayEnvironment.stations).thenReturn(Seq(see))
   when(railwayEnvironment.routes).thenReturn(Seq(ree))
+  when(railwayEnvironment.routeEnvironment).thenReturn(re)
+  when(railwayEnvironment.stationEnvironment).thenReturn(se)
   when(railwayEnvironment.time).thenReturn(baseClock.getOrDefault.asTime)
 
   private val perceptionProvider = summon[PerceptionProvider[RailwayEnvironment, TrainAgent]]
@@ -64,17 +68,17 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
 
   private def trainInStationWithNextDepartureTimeAndRouteInfo(
       nextDepartureTime: Option[ClockTime],
-      routeInfo: Option[(RouteEnvironmentElement, TrackDirection)]
+      routeInfo: Seq[(RouteEnvironmentElement, TrackDirection)]
   ): Unit =
     trainInStationWithNextDepartureTime(nextDepartureTime)
     when(dtt.nextRoute).thenReturn(Some((mockStationA, mockStationB)))
-    when(railwayEnvironment.findRouteWithTravelDirection((mockStationA, mockStationB))).thenReturn(routeInfo)
+    when(re.findRoutesWithTravelDirection((mockStationA, mockStationB))).thenReturn(routeInfo)
 
   private def trainInStationWithNextDepartureTimeAndRoute(
       nextDepartureTime: Option[ClockTime],
       available: Boolean
   ): Unit =
-    trainInStationWithNextDepartureTimeAndRouteInfo(nextDepartureTime, Some((ree, TrackDirection.Forward)))
+    trainInStationWithNextDepartureTimeAndRouteInfo(nextDepartureTime, Seq((ree, TrackDirection.Forward)))
     when(ree.isAvailableFor(trainAgent, TrackDirection.Forward)).thenReturn(available)
 
   private def trainInRoute(): Unit =
@@ -150,9 +154,9 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
         )
 
       "provide a default perception if next route is not found in the env" in:
-        trainInStationWithNextDepartureTimeAndRouteInfo(defaultClockTime, None)
+        trainInStationWithNextDepartureTimeAndRouteInfo(defaultClockTime, Seq())
         perceptionProvider.perceptionFor(railwayEnvironment, trainAgent) shouldBe Some(
-          TrainPerceptionInStation(TrainStationInfo(false, false))
+          TrainPerceptionInStation(TrainStationInfo(true, false))
         )
 
       "provide a perception when departure time is greater than current time and the direction is unavailable" in:

@@ -47,8 +47,11 @@ trait RailwayEnvironment extends EnvironmentsCoordinator[RailwayEnvironment]:
   /** find active timetable for an agent */
   def findCurrentTimeTableFor(train: TrainAgent): Option[DynamicTimetable]
 
+  def routeEnvironment: RouteEnvironment
+  def stationEnvironment: StationEnvironment
+
   /** find route with travel direction */
-  def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrackDirection)]
+//  def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrackDirection)]
 
 /** Factory for [[RailwayEnvironment]] instances */
 object RailwayEnvironment:
@@ -164,15 +167,15 @@ object RailwayEnvironment:
     def findCurrentTimeTableFor(train: TrainAgent): Option[DynamicTimetable] =
       timetablesByTrain(train).find(!_.completed)
 
-    def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrackDirection)] =
-      extension (r: Route)
-        private def matchStations(departure: Station, arrival: Station): Boolean =
-          r.departure.name == departure.name && r.arrival.name == arrival.name
-
-      def findRoute(departure: Station, arrival: Station): Option[RouteEnvironmentElement] =
-        routes.find(_.matchStations(departure, arrival))
-
-      (findRoute(route._1, route._2), findRoute(route._2, route._1)) match
-        case (Some(r), _) => Some((r, Forward))
-        case (_, Some(r)) => Some((r, Backward))
-        case _            => None
+//    def findRouteWithTravelDirection(route: (Station, Station)): Option[(RouteEnvironmentElement, TrackDirection)] =
+//      extension (r: Route)
+//        private def matchStations(departure: Station, arrival: Station): Boolean =
+//          r.departure.name == departure.name && r.arrival.name == arrival.name
+//
+//      def findRoute(departure: Station, arrival: Station): Option[RouteEnvironmentElement] =
+//        routes.find(_.matchStations(departure, arrival))
+//
+//      (findRoute(route._1, route._2), findRoute(route._2, route._1)) match
+//        case (Some(r), _) => Some((r, Forward))
+//        case (_, Some(r)) => Some((r, Backward))
+//        case _            => None
