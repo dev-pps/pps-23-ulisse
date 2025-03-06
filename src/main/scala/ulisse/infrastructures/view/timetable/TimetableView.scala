@@ -4,6 +4,7 @@ import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, Comp
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
 import TimetableAdapterObservers.ErrorObserver
+import ulisse.adapters.MockedEntities.TrainServiceMock
 import ulisse.applications.useCases.TrainService
 import ulisse.infrastructures.view.timetable.subviews.{EditorTab, TimetableViewerTab}
 
@@ -27,7 +28,6 @@ object TimetableView:
         formIcon  -> editorTab,
         savedIcon -> timetableViewer
       ).toTabbedPane
-    controller.addTimetableViewListener(timetableViewer)
     controller.addErrorObserver(this)
 
     override def component[T >: Component]: T = tabbedPane.component
@@ -42,8 +42,8 @@ object TimetableView:
         Message.Error
       )
 
-//@main def timetableViewDemoGUI(): Unit =
-//  import ulisse.infrastructures.view.utils.SwingUtils.showPreview
-//  import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
-//  val adapter = TimetableViewAdapter(TimetableInputPortMocked(), TrainService())
-//  TimetableView(adapter).showPreview()
+@main def timetableViewDemoGUI(): Unit =
+  import ulisse.infrastructures.view.utils.SwingUtils.showPreview
+  import ulisse.adapters.MockedEntities.TimetableServiceMock
+  val adapter = TimetableViewAdapter(TimetableServiceMock(), TrainServiceMock())
+  TimetableView(adapter).showPreview()

@@ -57,7 +57,7 @@ object Form:
 
   case class ScheduleForm() extends Form:
 
-    import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
+    import ulisse.adapters.MockedEntities.TimetableServiceMock
     import ulisse.infrastructures.view.timetable.TimetableView
 
     private val mainPanel: ExtendedSwing.SBoxPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
