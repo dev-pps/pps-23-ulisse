@@ -1,6 +1,6 @@
 package ulisse.adapters.input
 
-import ulisse.applications.ports.TimetablePorts
+import ulisse.applications.ports.{TimetablePorts, TrainPorts}
 import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.infrastructures.view.timetable.TimetableViewModel.{TableEntryData, TimetableEntry}
 import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.*
@@ -44,24 +44,24 @@ object TimetableViewAdapters:
     def setDepartureTime(h: Int, m: Int): Unit
 
     /** Insert station with `stationName` and `waitTime` to timetable draft. */
-    def insertStation(stationName: String, waitTime: Option[Int]): Unit
+    def insertStation(stationName: String, waitTime: Option[Int]): List[TimetableEntry]
 
     /** Remove last inserted station from timetable draft. */
-    def undoLastInsert(): Unit
+    def undoLastInsert(): List[TimetableEntry]
 
     /** Reset timetable draft, forget train name, departure time and all stations. */
-    def reset(): Unit
+    def reset(): List[TimetableEntry]
 
     /** Save timetable draft. */
     def save(): Unit
 
   object TimetableViewAdapter:
     /** Creates view controller for the timetables views. It requires `port` to which communicate to save and get required infos. */
-    def apply(port: TimetablePorts.Input): TimetableViewAdapter =
-      ViewAdapterImpl(port)
+    def apply(timetablePort: TimetablePorts.Input, trainPort: TrainPorts.Input): TimetableViewAdapter =
+      ViewAdapterImpl(timetablePort, trainPort)
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private class ViewAdapterImpl(port: TimetablePorts.Input)
+    private class ViewAdapterImpl(tablePort: TimetablePorts.Input, trainPort: TrainPorts.Input)
         extends TimetableViewAdapter:
       import TimetableViewAdapters.Error.*
       private var stations: List[TimetableEntry]                = List.empty
@@ -75,15 +75,16 @@ object TimetableViewAdapters:
         Executors.newFixedThreadPool(1)
       )
 
-      private def updatePreview(): Unit =
-        timetablePreview.foreach(o => Swing.onEDT(o.update(stations)))
-
       private def showError(err: Error): Unit =
         errorObserver.foreach(o => Swing.onEDT(o.showError(err.title, err.descr)))
 
-      override def trainNames: List[String] = List("Rv-3908", "AV-1000", "RV-2020")
+      override def trainNames: List[String] = List.empty
+//        trainPort.trains.onComplete {
+//          case Failure(e)     => showError(RequestException(e.getMessage))
+//          case Success(l) =>
+//        }
 
-      override def insertStation(stationName: String, waitTime: Option[Int]): Unit =
+      override def insertStation(stationName: String, waitTime: Option[Int]): List[TimetableEntry] =
         import Error.{EmptyDepartureTime, EmptyTrainSelection}
         val errorTitle = "Insert station"
         val res =
@@ -94,22 +95,23 @@ object TimetableViewAdapters:
           yield
             val departString = Option.when(stations.isEmpty)(s"${departTime.h}:${departTime.m}")
             stations.appended(TableEntryData(stationName, None, departString, waitTime))
-
         res match
-          case Left(err) => showError(err)
+          case Left(err) =>
+            showError(err)
+            stations
           case Right(updatedStations) =>
             stations = updatedStations
-            updatePreview()
+            stations
 
-      override def undoLastInsert(): Unit =
+      override def undoLastInsert(): List[TimetableEntry] =
         stations = stations.dropRight(1)
-        updatePreview()
+        stations
 
       override def deleteTimetable(trainName: Option[String], departureTime: Option[ClockTime]): Unit =
         for
           t       <- trainName
           depTime <- departureTime
-        yield port.deleteTimetable(t, depTime).handleOnComplete: updatedTimetables =>
+        yield tablePort.deleteTimetable(t, depTime).handleOnComplete: updatedTimetables =>
           timetableView.map(_.update(updatedTimetables))
 
       override def save(): Unit =
@@ -118,24 +120,24 @@ object TimetableViewAdapters:
           for
             trainName     <- selectedTrain.toRight(EmptyTrainSelection(errorTitle))
             departureTime <- startTime.toRight(EmptyDepartureTime(errorTitle))
-          yield port.createTimetable(trainName, departureTime, stations.map(e => (e.name, e.waitMinutes)))
+          yield tablePort.createTimetable(trainName, departureTime, stations.map(e => (e.name, e.waitMinutes)))
 
         res match
           case Left(err) => showError(TimetableSaveError(err.descr))
           case Right(fs) => fs.handleOnComplete(_ => reset())
 
       override def requestTimetables(trainName: String): Unit =
-        port.timetablesOf(trainName).onComplete {
+        tablePort.timetablesOf(trainName).onComplete {
           case Failure(exc)               => showError(RequestException(exc.getMessage))
           case Success(Left(err))         => showError(RequestException(s"SERVICE: $err"))
           case Success(Right(timetables)) => timetableView.map(_.update(timetables))
         }
 
-      override def reset(): Unit =
+      override def reset(): List[TimetableEntry] =
         selectedTrain = None
         startTime = None
         stations = List.empty
-        updatePreview()
+        stations
 
       override def selectTrain(trainName: String): Unit =
         selectedTrain.foreach(_ => reset())

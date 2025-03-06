@@ -12,20 +12,6 @@ import scala.concurrent.Future
 
 object MockedEntities:
 
-  trait AppStateTimetable:
-    def trainManager: TrainManager
-    def timetableManager: TimetableManager
-    def timetableManagerUpdate(timetableManager: TimetableManager): AppStateTimetable
-    def routeManager: RouteManager
-
-  case class AppStateMocked(
-      trainManager: TrainManager,
-      timetableManager: TimetableManager,
-      routeManager: RouteManager
-  ) extends AppStateTimetable:
-    override def timetableManagerUpdate(timetableManager: TimetableManager): AppStateTimetable =
-      this.copy(timetableManager = timetableManager)
-
   import ulisse.applications.ports.TimetablePorts
   case class TimetableInputPortMocked() extends TimetablePorts.Input:
     private val response = Future.successful(Right(List.empty))

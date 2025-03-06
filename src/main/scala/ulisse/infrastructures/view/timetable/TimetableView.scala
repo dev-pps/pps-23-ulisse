@@ -1,12 +1,11 @@
 package ulisse.infrastructures.view.timetable
 
-import ulisse.applications.ports.TimetablePorts
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
-import ulisse.infrastructures.view.timetable.subviews.EditingTab.EditorTab
 import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
 import TimetableAdapterObservers.ErrorObserver
-import ulisse.infrastructures.view.timetable.subviews.TimetableViewerTab
+import ulisse.applications.useCases.TrainService
+import ulisse.infrastructures.view.timetable.subviews.{EditorTab, TimetableViewerTab}
 
 import scala.swing.{Component, Orientation}
 
@@ -21,16 +20,15 @@ object TimetableView:
     given orientation: Orientation.Value = Orientation.Horizontal
     private val formIcon                 = ComposedImageLabel.createIcon("icons/calendar_add_on.svg", "Create")
     private val savedIcon                = ComposedImageLabel.createIcon("icons/calendar_clock.svg", "Saved")
-    private val formTab                  = EditorTab(controller)
+    private val editorTab                = EditorTab(controller)
     private val timetableViewer          = TimetableViewerTab(controller)
     import ulisse.infrastructures.view.utils.SwingUtils.toTabbedPane
     private val tabbedPane =
       Map(
-        formIcon  -> formTab,
+        formIcon  -> editorTab,
         savedIcon -> timetableViewer
       ).toTabbedPane
     controller.addTimetableViewListener(timetableViewer)
-    controller.addPreviewListener(formTab)
     controller.addErrorObserver(this)
 
     override def component[T >: Component]: T = tabbedPane.component
@@ -45,8 +43,8 @@ object TimetableView:
         Message.Error
       )
 
-@main def timetableViewDemoGUI(): Unit =
-  import ulisse.infrastructures.view.utils.SwingUtils.showPreview
-  import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
-  val adapter = TimetableViewAdapter(TimetableInputPortMocked())
-  TimetableView(adapter).showPreview()
+//@main def timetableViewDemoGUI(): Unit =
+//  import ulisse.infrastructures.view.utils.SwingUtils.showPreview
+//  import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
+//  val adapter = TimetableViewAdapter(TimetableInputPortMocked(), TrainService())
+//  TimetableView(adapter).showPreview()
