@@ -17,14 +17,6 @@ trait StationEnvironmentElement extends Station with TrainAgentEEWrapper[Station
   /** Check if the station is available for a train to be put in */
   def isAvailable: Boolean = containers.exists(_.isAvailable)
 
-  /** Defines equality for StationEnvironmentElement */
-  override def equals(that: Any): Boolean =
-    that match
-      case s: StationEnvironmentElement =>
-        containers == s.containers &&
-        super.equals(that)
-      case _ => super.equals(that)
-
 /** Factory for [[StationEnvironmentElement]] instances. */
 object StationEnvironmentElement:
   /** Represents the information of a station environment. */

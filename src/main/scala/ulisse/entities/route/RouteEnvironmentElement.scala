@@ -26,11 +26,8 @@ trait RouteEnvironmentElement extends Route with TrainAgentEEWrapper[RouteEnviro
   /** Defines equality for RouteEnvironmentElement */
   override def equals(that: Any): Boolean =
     that match
-      case r: RouteEnvironmentElement =>
-        containers == r.containers &&
-        this === r
-      case r: Route =>
-        this === r
+      case r: Route => this === r
+      case _        => false
 
 /** Factory for [[RouteEnvironmentElement]] instances. */
 object RouteEnvironmentElement:
