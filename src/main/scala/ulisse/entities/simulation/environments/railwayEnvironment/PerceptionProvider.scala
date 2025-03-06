@@ -14,13 +14,12 @@ import ulisse.entities.train.TrainAgents.{
 }
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.station.StationEnvironment
-
 object PerceptionProvider:
 
   private def trainPerceptionInStation(train: TrainAgent, env: RailwayEnvironment): TrainStationInfo =
     val trainStationInfo =
       for
-        currentDTT        <- env.findCurrentTimeTableFor(train)
+        currentDTT        <- env.dynamicTimetableEnvironment.findCurrentTimetableFor(train)
         nextDepartureTime <- currentDTT.nextDepartureTime
         departureDelay = Id(nextDepartureTime.asTime) underflowSub Id(env.time)
         nextRoute <- currentDTT.nextRoute
@@ -42,7 +41,7 @@ object PerceptionProvider:
 
     def arrivalStationIsFree: Option[Boolean] =
       for
-        currentDTT     <- env.findCurrentTimeTableFor(train)
+        currentDTT     <- env.dynamicTimetableEnvironment.findCurrentTimetableFor(train)
         currentRoute   <- currentDTT.currentRoute
         arrivalStation <- env.stations.find(_.id == currentRoute._2.id)
       yield arrivalStation.isAvailable
