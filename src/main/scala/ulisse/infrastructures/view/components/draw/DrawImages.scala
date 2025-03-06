@@ -15,7 +15,7 @@ object DrawImages:
   export DrawImage._
 
   /** Default dimension for images. */
-  private val defaultDimension: Dimension = new Dimension(30, 30)
+  val defaultDimension: Dimension = new Dimension(30, 30)
 
   /** Default scale for silhouette. */
   private val defaultScaleSilhouette: Float = 1.4f
