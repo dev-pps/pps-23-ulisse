@@ -3,7 +3,7 @@ package ulisse.infrastructures.view.timetable.subviews
 import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SLabel}
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
+import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
 import ulisse.infrastructures.view.utils.SwingUtils
 
@@ -12,7 +12,7 @@ import scala.swing.{ComboBox, Orientation}
 import scala.util.Try
 
 /** Timetable creation form containing fields to select train, departing time and stations sequence. */
-class TimetableFormPane(controller: TimetableViewController)
+class TimetableFormPane(controller: TimetableViewAdapter)
     extends SBoxPanel(Orientation.Vertical):
   private val waitMinutesField             = SwingUtils.SNumberField(5)
   private val trainCombo: ComboBox[String] = ComboBox[String](controller.trainNames)

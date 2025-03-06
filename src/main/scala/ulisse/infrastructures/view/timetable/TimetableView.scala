@@ -2,10 +2,10 @@ package ulisse.infrastructures.view.timetable
 
 import ulisse.applications.ports.TimetablePorts
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
-import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
+import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.infrastructures.view.timetable.subviews.EditingTab.EditorTab
 import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
-import ulisse.infrastructures.view.timetable.subviews.Observers.ErrorObserver
+import TimetableAdapterObservers.ErrorObserver
 import ulisse.infrastructures.view.timetable.subviews.TimetableViewerTab
 
 import scala.swing.{Component, Orientation}
@@ -14,11 +14,10 @@ object TimetableView:
   /** Creates timetable root view with its controller given `port`.
     * Child views are configured to be notified from internal controller of updates.
     */
-  def apply(port: TimetablePorts.Input): Component =
-    val portAdapterController = TimetableViewController(port)
-    TimetableTabbedPane(portAdapterController).component
+  def apply(adapter: TimetableViewAdapter): Component =
+    TimetableTabbedPane(adapter).component
 
-  private class TimetableTabbedPane(controller: TimetableViewController) extends JTabbedPane with ErrorObserver:
+  private class TimetableTabbedPane(controller: TimetableViewAdapter) extends JTabbedPane with ErrorObserver:
     given orientation: Orientation.Value = Orientation.Horizontal
     private val formIcon                 = ComposedImageLabel.createIcon("icons/calendar_add_on.svg", "Create")
     private val savedIcon                = ComposedImageLabel.createIcon("icons/calendar_clock.svg", "Saved")
@@ -49,4 +48,5 @@ object TimetableView:
 @main def timetableViewDemoGUI(): Unit =
   import ulisse.infrastructures.view.utils.SwingUtils.showPreview
   import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
-  TimetableView(TimetableInputPortMocked()).showPreview()
+  val adapter = TimetableViewAdapter(TimetableInputPortMocked())
+  TimetableView(adapter).showPreview()

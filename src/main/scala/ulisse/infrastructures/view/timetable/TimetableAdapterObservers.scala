@@ -1,10 +1,10 @@
-package ulisse.infrastructures.view.timetable.subviews
+package ulisse.infrastructures.view.timetable
 
 import ulisse.entities.timetable.Timetables.Timetable
-import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.TimetableEntry
+import ulisse.infrastructures.view.timetable.TimetableViewModel.TimetableEntry
 
 /** Pattern Observer traits of timetable views. */
-object Observers:
+object TimetableAdapterObservers:
 
   trait Observed:
     /** Register observer interested to show selected saved timetable. */

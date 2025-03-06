@@ -3,16 +3,16 @@ package ulisse.infrastructures.view.timetable.subviews
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton}
 import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
+import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.infrastructures.view.timetable.subviews.EditingTab.EditorTab
-import ulisse.infrastructures.view.timetable.subviews.Observers.UpdatablePreview
+import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.UpdatablePreview
 import scala.swing.Swing.{EmptyBorder, HGlue}
 import scala.swing.event.ButtonClicked
 import scala.swing.*
 
 object EditingTab:
 
-  class EditorTab(controller: TimetableViewController) extends SBoxPanel(Orientation.Vertical) with UpdatablePreview:
+  class EditorTab(controller: TimetableViewAdapter) extends SBoxPanel(Orientation.Vertical) with UpdatablePreview:
     private val listPreview = TimetableListView(List.empty)
     private val previewPane = ScrollPane(listPreview)
     private val formPane    = TimetableFormPane(controller)
@@ -49,7 +49,7 @@ object EditingTab:
     title = "timetable preview"
     val mainPanel = FlowPanel()
     import ulisse.entities.timetable.MockedEntities.TimetableInputPortMocked
-    mainPanel.contents += EditorTab(TimetableViewController(TimetableInputPortMocked()))
+    mainPanel.contents += EditorTab(TimetableViewAdapter(TimetableInputPortMocked()))
     contents = mainPanel
     visible = true
   }
