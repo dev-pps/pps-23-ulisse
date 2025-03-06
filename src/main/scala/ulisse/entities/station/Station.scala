@@ -17,12 +17,15 @@ trait Station:
   /** The location of the station. */
   def coordinate: Coordinate
 
+  /** Change the coordinate of the Station. */
+  def withCoordinate(newCoordinate: Coordinate): Station
+
   /** The number of platforms in the station. */
   def numberOfPlatforms: Int
 
   /** Defines equality for Station */
   override def equals(that: Any): Boolean = that match
-    case s: Station => name === s.name || coordinate === s.coordinate
+    case s: Station => coordinate === s.coordinate
     case _          => false
 
   /** Defines hashCode for Station */
@@ -48,7 +51,8 @@ object Station:
       validatePositive(numberOfPlatforms, Station.Error.InvalidNumberOfPlatforms).toValidatedNec
     ).mapN(Station(_, coordinate, _)).toEither
 
-  private final case class StationImpl(name: String, coordinate: Coordinate, numberOfPlatforms: Int) extends Station
+  private final case class StationImpl(name: String, coordinate: Coordinate, numberOfPlatforms: Int) extends Station:
+    override def withCoordinate(newCoordinate: Coordinate): Station = copy(coordinate = newCoordinate)
 
   /** Represents errors that can occur during `Station` creation. */
   enum Error extends BaseError:

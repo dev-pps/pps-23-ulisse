@@ -42,6 +42,12 @@ object ConfigurationDataTest:
     Seq(trainAgent3905),
     Seq(dynamicTimetable1)
   )
+  val complexConfigurationData = ConfigurationData(
+    stationsEE,
+    routesEE,
+    trainAgents,
+    timetables
+  )
 class ConfigurationDataTest extends AnyWordSpec with Matchers:
   private val cd = ConfigurationData(stationsEE, routesEE, trainAgents, timetables)
 

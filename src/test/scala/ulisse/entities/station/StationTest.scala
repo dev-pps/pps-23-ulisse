@@ -69,6 +69,14 @@ class StationTest extends AnyWordSpec with Matchers:
           defaultNumberOfPlatform
         )
 
+    "coordinate is changed" should:
+      "be equal to a station with the new coordinate" in:
+        stationA.withCoordinate(defaultCoordinate + Coordinate(1, 1)) shouldBe Station(
+          stationA.name,
+          stationA.coordinate + Coordinate(1, 1),
+          stationA.numberOfPlatforms
+        )
+
     "it is equaled" should:
       "be equal to itself" in:
         stationA shouldBe stationA
@@ -80,26 +88,12 @@ class StationTest extends AnyWordSpec with Matchers:
         Station("A", defaultCoordinate, defaultNumberOfPlatform) shouldBe Station(
           "B",
           defaultCoordinate,
-          defaultNumberOfPlatform
+          defaultNumberOfPlatform + 1
         )
 
       "not be equal to a station with different coordinate" in:
         Station("A", defaultCoordinate, defaultNumberOfPlatform) should not be Station(
-          "B",
-          defaultCoordinate + Coordinate(1, 1),
-          defaultNumberOfPlatform
-        )
-
-      "be equal to a station with the same name" in:
-        Station("A", defaultCoordinate, defaultNumberOfPlatform) shouldBe Station(
           "A",
-          defaultCoordinate + Coordinate(1, 1),
-          defaultNumberOfPlatform
-        )
-
-      "not be equal to a station with different name" in:
-        Station("A", defaultCoordinate, defaultNumberOfPlatform) should not be Station(
-          "B",
           defaultCoordinate + Coordinate(1, 1),
           defaultNumberOfPlatform
         )
