@@ -6,8 +6,7 @@ import ulisse.entities.route.Tracks.{Track, TrackDirection}
 import ulisse.entities.simulation.environments.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.*
-import ulisse.utils.OptionUtils.*
-import ulisse.utils.OptionUtils.given
+import ulisse.utils.OptionUtils.{*, given}
 
 /** Defines a route for simulation. */
 trait RouteEnvironmentElement extends Route with TrainAgentEEWrapper[RouteEnvironmentElement]:

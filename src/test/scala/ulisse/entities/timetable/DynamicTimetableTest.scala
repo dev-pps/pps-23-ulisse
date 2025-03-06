@@ -6,17 +6,16 @@ import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationTest.{stationA, stationB, stationC, stationD}
-import ulisse.entities.timetable.DynamicTimetableTest.{dynamicTimetable1, timetable1, timetable2}
+import ulisse.entities.timetable.DynamicTimetableTest.*
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.TestMockedEntities.railAV_10
 import ulisse.entities.timetable.Timetables.{RailInfo, StationTime, Timetable, TimetableBuilder}
-import ulisse.entities.train.TrainAgentTest.{train3905, train3906, train3907, trainAgent3905, trainAgent3907}
+import ulisse.entities.train.TrainAgentTest.*
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.{ClockTime, Time}
-import ulisse.entities.timetable.DynamicTimetableTest.*
 
 import scala.collection.immutable.ListMap
 

@@ -1,7 +1,6 @@
 package ulisse.entities.simulation.agents
 
 import ulisse.entities.simulation.environments.Environments.EnvironmentsCoordinator
-import ulisse.entities.train.Trains.Train
 
 /** Basic SimulationAgent trait */
 trait SimulationAgent[SA <: SimulationAgent[SA]]:

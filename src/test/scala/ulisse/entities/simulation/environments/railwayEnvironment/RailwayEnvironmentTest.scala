@@ -11,6 +11,7 @@ import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationD
 }
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationEnvironments.StationEnvironmentElement
+import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetableTest.*
 import ulisse.entities.timetable.DynamicTimetableTest.{timetable1, timetable2}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
@@ -20,6 +21,7 @@ import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates
 import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates.{StateBehavior, Stopped}
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
+import ulisse.entities.train.Wagons.Wagon
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Times.Time
 
@@ -71,17 +73,6 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
         see <- env.stations.find(_ == route._1)
         rd = env.routeEnvironment.findRoutesWithTravelDirection(route)
       yield (currentTT, see, rd)
-//    private def currentInfo(
-//        env: RailwayEnvironment,
-//        r: DynamicTimetable => Option[(Station, Station)]
-//    ): Option[(DynamicTimetable, StationEnvironmentElement, RouteEnvironmentElement, TrackDirection)] =
-//      for
-//        currentTT <- env.findCurrentTimeTableFor(agent)
-//        route     <- r(currentTT)
-//        _ = println(route)
-//        see        <- env.stations.find(_ == route._1)
-//        (ree, dir) <- env.findRouteWithTravelDirection(route)
-//      yield (currentTT, see, ree, dir)
 
     private def completeCurrentTimetable(env: RailwayEnvironment): Option[RailwayEnvironment] =
       env.dynamicTimetableEnvironment.findCurrentTimetableFor(agent).map(tt => env.doSteps(tt.table.size + 2))
@@ -89,8 +80,8 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private def checkConfiguration(env: RailwayEnvironment, cd: ConfigurationData): Unit =
     env.stations shouldBe cd.stations
     env.routes shouldBe cd.routes
-    env.timetables shouldBe cd.timetables.values.flatten
-    env.dynamicTimetableEnvironment.dynamicTimetablesByTrain shouldBe cd.timetables
+    env.timetables shouldBe cd.timetablesByTrain.values.flatten
+    env.dynamicTimetableEnvironment.dynamicTimetablesByTrain shouldBe cd.timetablesByTrain
 
   "RailwayEnvironment" when:
     "created" should:
@@ -104,7 +95,9 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
     "created auto" should:
       val env = RailwayEnvironment.auto(cd)
       "setup initial time" in:
-        env.time.toSeconds shouldBe cd.timetables.values.flatten.map(_.departureTime.toSeconds).foldLeft(0)(math.min)
+        env.time.toSeconds shouldBe cd.timetablesByTrain.values.flatten.map(_.departureTime.toSeconds).foldLeft(0)(
+          math.min
+        )
       "maintain the configuration" in:
         checkConfiguration(env, cd)
 

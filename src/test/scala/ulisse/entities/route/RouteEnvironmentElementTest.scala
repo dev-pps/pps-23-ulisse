@@ -3,7 +3,9 @@ package ulisse.entities.route
 import org.scalatest.Assertions.fail
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import ulisse.Utils.TestUtility.getOrFail
 import ulisse.applications.managers.RouteManagerTest.validateRoute
+import ulisse.entities.Technology
 import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.entities.route.RouteEnvironmentElementTest.{
   direction,
@@ -11,24 +13,16 @@ import ulisse.entities.route.RouteEnvironmentElementTest.{
   routeAB,
   routeAB_EE
 }
-import ulisse.entities.route.RouteTest.{arrival, departure, pathLength, railsCount, routeType}
+import ulisse.entities.route.RouteTest.*
+import ulisse.entities.route.Routes.RouteType.{AV, Normal}
 import ulisse.entities.route.Routes.{Route, RouteType}
 import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
 import ulisse.entities.station.Station
-import ulisse.entities.station.StationTest.{stationA, stationB, stationC, stationD, stationE}
-import ulisse.entities.train.TrainAgentTest.{
-  normalTrain,
-  normalTrainAgent,
-  trainAgent3905,
-  trainAgent3906,
-  trainAgent3907
-}
+import ulisse.entities.station.StationTest.*
+import ulisse.entities.train.TrainAgentTest.*
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
-import ulisse.Utils.TestUtility.getOrFail
-import ulisse.entities.Technology
-import ulisse.entities.route.Routes.RouteType.{AV, Normal}
 
 object RouteEnvironmentElementTest:
   given minPermittedDistanceBetweenTrains: Double = 100.0

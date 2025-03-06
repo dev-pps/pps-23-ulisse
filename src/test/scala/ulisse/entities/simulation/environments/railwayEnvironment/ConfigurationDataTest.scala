@@ -11,9 +11,8 @@ import ulisse.entities.route.RouteEnvironmentElementTest.*
 import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.route.Routes.{Route, RouteType}
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.*
-import ulisse.entities.station.Station
+import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.station.StationEnvironmentElementTest.*
-import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.station.StationTest.{stationA, stationB, stationC, stationD}
 import ulisse.entities.timetable.DynamicTimetableTest.{
   dynamicTimetable1,
@@ -91,11 +90,11 @@ class ConfigurationDataTest extends AnyWordSpec with Matchers:
         cd.stations.collectTrains shouldBe Seq(trainAgent3905)
 
       "have at least a subset of all timetables" in:
-        timetables should contain allElementsOf cd.timetables.flatMap(_._2)
+        timetables should contain allElementsOf cd.timetablesByTrain.flatMap(_._2)
 
       "exclude duplicate timetables" in:
         val cd = ConfigurationData(stationsEE, routesEE, trainAgents, Seq(dynamicTimetable1, dynamicTimetable1))
-        cd.timetables.flatMap(_._2) shouldBe Seq(dynamicTimetable1)
+        cd.timetablesByTrain.flatMap(_._2) shouldBe Seq(dynamicTimetable1)
 
       "have placed the trains in their initial stations" in:
         val cd = ConfigurationData(stationsEE, routesEE, trainAgents, Seq(dynamicTimetable2, dynamicTimetable3))
@@ -122,7 +121,7 @@ class ConfigurationDataTest extends AnyWordSpec with Matchers:
           trainAgents,
           Seq(dynamicTimetable2, dynamicTimetable4, dynamicTimetable3, dynamicTimetable1)
         )
-        cd.timetables.flatMap(_._2) shouldBe Seq(dynamicTimetable1, dynamicTimetable2, dynamicTimetable3)
+        cd.timetablesByTrain.flatMap(_._2) shouldBe Seq(dynamicTimetable1, dynamicTimetable2, dynamicTimetable3)
 
     "created empty" should:
       "have no stations" in:
@@ -132,4 +131,4 @@ class ConfigurationDataTest extends AnyWordSpec with Matchers:
         ConfigurationData.empty().routes.isEmpty shouldBe true
 
       "have no timetables" in:
-        ConfigurationData.empty().timetables.isEmpty shouldBe true
+        ConfigurationData.empty().timetablesByTrain.isEmpty shouldBe true

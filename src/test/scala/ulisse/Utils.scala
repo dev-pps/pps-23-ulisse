@@ -1,10 +1,10 @@
 package ulisse
 import org.scalatest.Assertions.fail
-import ulisse.Utils.TestUtility.getOrFail
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.Utils.MatchersUtils.shouldBeBoolean
+import ulisse.Utils.TestUtility.getOrFail
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.BaseError
 

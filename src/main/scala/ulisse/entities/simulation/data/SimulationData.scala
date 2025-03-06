@@ -2,7 +2,7 @@ package ulisse.entities.simulation.data
 
 import ulisse.dsl.comparison.FieldsComparators.{Field, FieldComparator}
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
-import ulisse.utils.Times.{Milliseconds, Time}
+import ulisse.utils.Times.Milliseconds
 
 trait SimulationData:
   def step: Int

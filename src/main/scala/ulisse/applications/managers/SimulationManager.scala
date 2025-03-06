@@ -3,9 +3,7 @@ package ulisse.applications.managers
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, EngineState, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
-import ulisse.utils.Times.{ClockTime, Time}
 
-import scala.collection.immutable.{AbstractSeq, LinearSeq}
 import scala.util.chaining.scalaUtilChainingOps
 
 trait SimulationManager:
@@ -56,18 +54,18 @@ object SimulationManager:
       notificationService: Option[SimulationPorts.Output],
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ) extends SimulationManager:
-    override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Option[SimulationManager] =
-      EngineConfiguration.createCheckedConfiguration(stepSize, cyclesPerSecond).map(ec =>
-        copy(engine.configuration = ec)
-      )
-    override def setupEnvironment(environment: RailwayEnvironment): SimulationManager =
-      copy(simulationData = SimulationData.withEnvironment(environment))
-    override def start(): SimulationManager =
-      copy(engine.running = true)
+    override def start(): SimulationManager = copy(engine.running = true)
     override def stop(): SimulationManager  = copy(engine.running = false)
     override def reset(): SimulationManager = copy(engine.reset(), simulationData.reset())
+
+    override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Option[SimulationManager] =
+      EngineConfiguration.createCheckedConfiguration(stepSize, cyclesPerSecond).map: ec =>
+        copy(engine.configuration = ec)
+    override def setupEnvironment(environment: RailwayEnvironment): SimulationManager =
+      copy(simulationData = SimulationData.withEnvironment(environment))
     override def withNotificationService(notificationService: Option[SimulationPorts.Output]): SimulationManager =
       copy(notificationService = notificationService)
+
     private def updateSimulationData(engineData: EngineState): SimulationData =
       simulationData
         .increaseStepByOne()

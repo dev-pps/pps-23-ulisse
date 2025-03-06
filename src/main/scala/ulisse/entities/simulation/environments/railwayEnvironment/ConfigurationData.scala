@@ -7,12 +7,26 @@ import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.updateWhenWithEffects
 
+/** Configuration data for the simulation */
 trait ConfigurationData:
+  /** Configured stations for the simulation */
   def stations: Seq[StationEnvironmentElement]
-  def routes: Seq[RouteEnvironmentElement]
-  def timetables: Map[Train, Seq[DynamicTimetable]]
 
+  /** Configured routes for the simulation, they are distinct and sorted by the best technology */
+  def routes: Seq[RouteEnvironmentElement]
+
+  /** Configured timetables for the simulation, they are divided by train and sorted by departure time. Note: trains that haven't a timetable are removed, trains with conflict on initial state are */
+  def timetablesByTrain: Map[Train, Seq[DynamicTimetable]]
+
+/** Factory for [[ConfigurationData]] instances */
 object ConfigurationData:
+
+  /** Create a new ConfigurationData considering:
+    * - distinct station and with train placed respective to initial state derived from timetables
+    * - distinct routes sorted by the best technology
+    * - timetables divided by train and sorted by departure time
+    * NOTE: trains that haven't a timetable are removed, trains with conflict on initial state are removed with all their timetables
+    */
   def apply(
       stations: Seq[StationEnvironmentElement],
       routes: Seq[RouteEnvironmentElement],
@@ -30,12 +44,18 @@ object ConfigurationData:
       sortedTimetables
     )
 
+  /** Create an empty ConfigurationData */
   def empty(): ConfigurationData =
     ConfigurationDataImpl(Seq.empty, Seq.empty, Map.empty)
 
+  /** extension methods for ConfigurationData */
   extension (configurationData: ConfigurationData)
-    def trains: Seq[TrainAgent] =
-      configurationData.stations.collectTrains ++ configurationData.routes.collectTrains
+    /** Get all the trains in the configuration */
+    def trains: List[TrainAgent] =
+      (configurationData.stations.collectTrains ++ configurationData.routes.collectTrains).toList
+
+    /** Get all the timetables in the configuration */
+    def timetables: Seq[DynamicTimetable] = configurationData.timetablesByTrain.values.flatten.toSeq
 
   private def orderedTimetablesByTrainId(
       trains: Seq[TrainAgent],
@@ -82,5 +102,5 @@ object ConfigurationData:
   private final case class ConfigurationDataImpl(
       stations: Seq[StationEnvironmentElement],
       routes: Seq[RouteEnvironmentElement],
-      timetables: Map[Train, Seq[DynamicTimetable]]
+      timetablesByTrain: Map[Train, Seq[DynamicTimetable]]
   ) extends ConfigurationData

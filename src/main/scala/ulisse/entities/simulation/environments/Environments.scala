@@ -6,7 +6,7 @@ import ulisse.entities.simulation.environments.EnvironmentElements.{EnvironmentE
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
 
-/** Environments for the simulation*/
+/** Environments for the simulation */
 object Environments:
   /** Base Environment */
   trait Environment[EnvironmentElements <: EnvironmentElement]:
@@ -17,12 +17,16 @@ object Environments:
   trait TrainAgentEnvironment[TAE <: TrainAgentEnvironment[TAE, EE], EE <: TrainAgentEEWrapper[EE]]
       extends Environment[EE]:
     self: TAE =>
+
     /** The list of trains in the environment */
-    def trainAgents: Seq[TrainAgent]                = environmentElements.collectTrains
+    def trainAgents: Seq[TrainAgent] = environmentElements.collectTrains
+
     /** Update the train in the environment */
     def updateTrain(train: TrainAgent): Option[TAE] = doOperationOn(train, _.updateTrain(train))
+
     /** Remove the train from the environment */
     def removeTrain(train: TrainAgent): Option[TAE] = doOperationOn(train, _.removeTrain(train))
+
     /** Constructor to update the environment */
     protected def constructor(environmentElements: Seq[EE]): TAE
     private def doOperationOn(
@@ -37,12 +41,16 @@ object Environments:
   /** Environments Coordinator */
   trait EnvironmentsCoordinator[EC <: EnvironmentsCoordinator[EC]]:
     self: EC =>
+
     /** Make a simulation step with the provided dt */
     def doStep(dt: Int): EC
+
     /** The list of environments in the coordinator */
     def environments: Seq[Environment[?]]
+
     /** The list of agents in the coordinator */
     def agents: Seq[SimulationAgent[?]]
+
     /** Return a perception to the agent based on the current state */
     def perceptionFor[SA <: SimulationAgent[SA]](simulationAgent: SA)(using
         provider: PerceptionProvider[EC, SA]

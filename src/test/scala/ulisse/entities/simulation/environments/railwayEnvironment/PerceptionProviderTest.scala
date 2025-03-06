@@ -1,28 +1,19 @@
 package ulisse.entities.simulation.environments.railwayEnvironment
 
-import org.mockito.Mockito.{spy, when}
-import org.mockito.invocation.InvocationOnMock
+import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.entities.route.{RouteEnvironment, RouteEnvironmentElement}
 import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.route.Tracks.{Track, TrackDirection}
-import ulisse.entities.train.TrainAgents.{
-  TrainAgent,
-  TrainAgentPerception,
-  TrainPerceptionInRoute,
-  TrainPerceptionInStation,
-  TrainRouteInfo,
-  TrainStationInfo
-}
-import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
+import ulisse.entities.route.{RouteEnvironment, RouteEnvironmentElement}
 import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
 import ulisse.entities.station.{StationEnvironment, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetableEnvironment
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
-import ulisse.utils.Times.{ClockTime, Time}
+import ulisse.entities.train.TrainAgents.*
+import ulisse.utils.Times.ClockTime
 class PerceptionProviderTest extends AnyWordSpec with Matchers:
 
   private val mockStationA = mock[StationEnvironmentElement]
