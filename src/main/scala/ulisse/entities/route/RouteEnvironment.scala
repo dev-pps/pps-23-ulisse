@@ -33,7 +33,7 @@ object RouteEnvironment:
     ): Seq[RouteEnvironmentElement] =
       for
         (r, d)       <- findRoutesWithTravelDirection(route)
-        updatedRoute <- r.putTrain(train.resetDistanceTravelled(), d)
+        updatedRoute <- r.putTrain(train.resetDistanceTravelled, d)
       yield updatedRoute
 
     override def putTrain(train: TrainAgent, route: (Station, Station)): Option[RouteEnvironment] =

@@ -60,7 +60,6 @@ object TrainAgents:
 
   trait TrainAgent extends Train with SimulationAgent[TrainAgent]:
     override type EC = RailwayEnvironment
-    override type E = RailwayEnvironment
     def state: TrainStates.StateBehavior
     def motionData: MotionDatas.MotionData
     def distanceTravelled: Double
