@@ -1,17 +1,11 @@
 package ulisse.infrastructures.view.timetable
 
-import ulisse.entities.timetable.Timetables.Timetable
-import ulisse.infrastructures.view.timetable.TimetableViewModel.TimetableEntry
-
 /** Pattern Observer traits of timetable views. */
 object TimetableAdapterObservers:
 
   trait Observed:
-    /** Register observer interested to show selected saved timetable. */
-    def addTimetableViewListener(timetableViewer: UpdatableTimetableView): Unit
-
     /** Register observer interested to show timetable draft not yet saved. */
-    def addPreviewListener(previewObserver: UpdatablePreview): Unit
+    def addListener[T](observer: Updatable[T]): Unit
 
     /** Register observer interested to be notified of errors. */
     def addErrorObserver(errObserver: ErrorObserver): Unit
@@ -24,9 +18,3 @@ object TimetableAdapterObservers:
   /** Generic updatable observer interested to get `data` updates. */
   trait Updatable[T]:
     def update(data: T): Unit
-
-  /** Updatable timetable preview observer. An updatable observer where updated data is `List[TimetableEntry]` */
-  trait UpdatablePreview extends Updatable[List[TimetableEntry]]
-
-  /** Updatable View that shows saved Timetables. An updatable observer where updated data is `List[Timetable]` */
-  trait UpdatableTimetableView extends Updatable[List[Timetable]]

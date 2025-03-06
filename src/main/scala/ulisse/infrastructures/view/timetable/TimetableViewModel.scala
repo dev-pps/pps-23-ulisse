@@ -23,7 +23,8 @@ object TimetableViewModel:
   extension (t: Timetable)
     def toTimetableEntries: List[TimetableEntry] =
       extension [T](t: Option[T])
-        private def optionString: Option[String] = t.map(_.toString)
+        private def optionString(using ev: T <:< AnyRef): Option[String] = t.map(_.toString)
+
       t.table.map((station, times) =>
         TableEntryData(
           station.name,

@@ -6,7 +6,6 @@ import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton,
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.infrastructures.view.timetable.TimetableViewModel
-import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.UpdatableTimetableView
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
 
 import scala.swing.event.ButtonClicked
@@ -15,8 +14,7 @@ import scala.swing.{BorderPanel, ComboBox, Orientation, ScrollPane, Swing}
 /** Timetable consulting tab view.
   * It gets `controller` and observes (adhering to [[UpdatableTimetableView]]) specific updates from controller to updates timetable preview.
   */
-class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Orientation.Vertical)
-    with UpdatableTimetableView:
+class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Orientation.Vertical):
   private val trainCombo: ComboBox[String]        = ComboBox[String](controller.trainNames)
   private val trainField                          = SFieldLabel("Train")(trainCombo)
   private val timetableCombo: ComboBox[Timetable] = ComboBox[Timetable](List.empty)
@@ -62,7 +60,7 @@ class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Ori
   import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
   contents += deleteBtn.centerHorizontally()
 
-  override def update(data: List[Timetables.Timetable]): Unit =
+  def update(data: List[Timetables.Timetable]): Unit =
     Swing.onEDT:
       timetableCombo.peer.setModel(ComboBox.newConstantModel(data))
       timetableCombo.selection.index = UNSELECTED

@@ -64,25 +64,24 @@ object TimetableViewAdapters:
     private class ViewAdapterImpl(tablePort: TimetablePorts.Input, trainPort: TrainPorts.Input)
         extends TimetableViewAdapter:
       import TimetableViewAdapters.Error.*
-      private var stations: List[TimetableEntry]                = List.empty
-      private var selectedTrain: Option[String]                 = None
-      private var startTime: Option[ClockTime]                  = None
-      private var timetablePreview: Option[UpdatablePreview]    = None
-      private var timetableView: Option[UpdatableTimetableView] = None
-      private var errorObserver: Option[ErrorObserver]          = None
+      private var stations: List[TimetableEntry]       = List.empty
+      private var selectedTrain: Option[String]        = None
+      private var startTime: Option[ClockTime]         = None
+      private var errorObserver: Option[ErrorObserver] = None
 
       given executionContext: ExecutionContext = ExecutionContext.fromExecutorService(
         Executors.newFixedThreadPool(1)
       )
 
+      def addListener[T](observer: Updatable[T]): Unit = println("add listenr")
       private def showError(err: Error): Unit =
         errorObserver.foreach(o => Swing.onEDT(o.showError(err.title, err.descr)))
 
       override def trainNames: List[String] = List.empty
-//        trainPort.trains.onComplete {
-//          case Failure(e)     => showError(RequestException(e.getMessage))
-//          case Success(l) =>
-//        }
+      trainPort.trains.onComplete {
+        case Failure(e) => showError(RequestException(e.getMessage))
+        case Success(l) => println(s"train request $l")
+      }
 
       override def insertStation(stationName: String, waitTime: Option[Int]): List[TimetableEntry] =
         import Error.{EmptyDepartureTime, EmptyTrainSelection}
@@ -112,7 +111,8 @@ object TimetableViewAdapters:
           t       <- trainName
           depTime <- departureTime
         yield tablePort.deleteTimetable(t, depTime).handleOnComplete: updatedTimetables =>
-          timetableView.map(_.update(updatedTimetables))
+          // TODO: notify the view interested
+          println(updatedTimetables)
 
       override def save(): Unit =
         val errorTitle = "Save timetable"
@@ -130,7 +130,9 @@ object TimetableViewAdapters:
         tablePort.timetablesOf(trainName).onComplete {
           case Failure(exc)               => showError(RequestException(exc.getMessage))
           case Success(Left(err))         => showError(RequestException(s"SERVICE: $err"))
-          case Success(Right(timetables)) => timetableView.map(_.update(timetables))
+          case Success(Right(timetables)) =>
+            // TODO: notify the view interested
+            println(timetables)
         }
 
       override def reset(): List[TimetableEntry] =
@@ -146,10 +148,6 @@ object TimetableViewAdapters:
         startTime.foreach(_ => reset())
         startTime = ClockTime(h, m).toOption
 
-      override def addTimetableViewListener(timetableViewer: UpdatableTimetableView): Unit =
-        timetableView = Some(timetableViewer)
-      override def addPreviewListener(previewObserver: UpdatablePreview): Unit =
-        timetablePreview = Some(previewObserver)
       override def addErrorObserver(errObserver: ErrorObserver): Unit =
         errorObserver = Some(errObserver)
 
