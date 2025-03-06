@@ -11,13 +11,9 @@ import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.page.forms.Form.BaseForm
 import ulisse.infrastructures.view.page.workspaces.MapWorkspace
+import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 
-import scala.concurrent.ExecutionContext
-import scala.swing.Swing
 import scala.swing.event.MouseEvent
-
-given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
-  Swing.onEDT(runnable.run())
 
 /** Represents the station form of the application. */
 trait StationForm extends Form:

@@ -14,15 +14,6 @@ import scala.concurrent.Future
 
 /** Adapter for the `StationEditorView` that handles interactions between the view and the Station input port. */
 trait StationEditorAdapter:
-  // TODO remove
-  def onOkClick(
-      stationName: String,
-      x: String,
-      y: String,
-      numberOfPlatforms: String,
-      oldStation: Option[Station]
-  ): Future[Either[NonEmptyChain[BaseError], StationPorts.Input#SM]]
-
   /** Adds a new station to the application. */
   def addStation(
       stationCreationInfo: StationCreationInfo
@@ -89,12 +80,3 @@ object StationEditorAdapter:
         ).mapN((_, _, _)).toEither.flatMap((x, y, nt) => Station.createCheckedStation(name, Coordinate(x, y), nt))
 
     export appPort.{findStationAt, removeStation}
-
-    def onOkClick(
-        stationName: String,
-        x: String,
-        y: String,
-        numberOfPlatforms: String,
-        oldStation: Option[Station]
-    ): Future[Either[NonEmptyChain[BaseError], StationPorts.Input#SM]] =
-      StationCreationInfo(stationName, x, y, numberOfPlatforms).createStation(appPort.addStation)

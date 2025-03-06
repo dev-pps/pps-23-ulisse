@@ -1,5 +1,8 @@
 package ulisse.infrastructures.view.page.forms
 
+import ulisse.adapters.input.RouteAdapter
+import ulisse.adapters.input.RouteAdapter.RouteCreationInfo
+import ulisse.adapters.input.StationEditorAdapter.StationCreationInfo
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.ExtendedSwing
@@ -7,10 +10,11 @@ import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.page.forms.Form.BaseForm
+import ulisse.infrastructures.view.page.workspaces.MapWorkspace
+import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 
 /** Represents the route form of the application. */
 trait RouteForm extends Form:
-
   /** The departure station field of the form. */
   val departureStation: ComposedSwing.InfoTextField
 
@@ -26,28 +30,42 @@ trait RouteForm extends Form:
   /** The length field of the form. */
   val length: ComposedSwing.InfoTextField
 
+  /** The departure station of the route. */
+  def departure: Option[Station]
+
+  /** The arrival station of the route. */
+  def arrival: Option[Station]
+
+  /** The departure station of the route. */
+  def departure_=(value: Option[Station]): Unit
+
+  /** The arrival station of the route. */
+  def arrival_=(station: Option[Station]): Unit
+
 /** Companion object of the [[RouteForm]]. */
 object RouteForm:
   /** Creates a new instance of route form. */
   def apply(): RouteForm = RouteFormImpl()
 
-  /** Represents the take station from map event. */
-  @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  final case class TakeStationFromMapEvent(routeForm: RouteForm) extends ClickObserver[MapElement[Station]]:
-    // TODO: da spostate nella form quando si attacca l'adapter
-    private var departureStation: Option[Station] = Option.empty
-    private val arrivalStation: Option[Station]   = Option.empty
+  final case class CreationRouteEvent(adapter: RouteAdapter, workspace: MapWorkspace)
+      extends ClickObserver[RouteCreationInfo]:
 
+    override def onClick(data: RouteCreationInfo): Unit =
+      adapter.save(Option.empty, data) onComplete (_ fold (println, _ fold (println, workspace.updateRoutes)))
+
+  /** Represents the take station from map event. */
+  final case class TakeStationFromMapEvent(routeForm: RouteForm) extends ClickObserver[MapElement[Station]]:
     override def onClick(data: MapElement[Station]): Unit =
-      departureStation match
+      routeForm.departure match
         case Some(value) =>
           routeForm.arrivalStation.text = data.element.name
           routeForm.length.text = (value.coordinate distance data.element.coordinate).toString
-          departureStation = Option.empty
+          routeForm.departure = Option.empty
         case None =>
-          departureStation = Option(data.element)
+          routeForm.departure = Option(data.element)
           routeForm.departureStation.text = data.element.name
 
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class RouteFormImpl() extends RouteForm:
     override val departureStation: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Departure Station"
     override val arrivalStation: ComposedSwing.InfoTextField   = ComposedSwing createInfoTextField "Arrival Station"
@@ -58,7 +76,18 @@ object RouteForm:
     private val deleteButton = ExtendedSwing.createFormButtonWith("Delete", Styles.formFalseButtonRect)
     private val form         = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
 
+    private var _departure: Option[Station] = Option.empty
+    private var _arrival: Option[Station]   = Option.empty
+
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
 
     export form._
+
+    override def departure: Option[Station] = _departure
+
+    override def arrival: Option[Station] = _arrival
+
+    override def departure_=(station: Option[Station]): Unit = _departure = station
+
+    override def arrival_=(station: Option[Station]): Unit = _arrival = station

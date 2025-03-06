@@ -4,8 +4,8 @@ import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.common.Observers.Observable
-import ulisse.infrastructures.view.components.draw.DrawImages
 import ulisse.infrastructures.view.components.draw.DrawImages.DrawImage
+import ulisse.infrastructures.view.components.draw.{DrawImageSimple, DrawImageTiled, DrawImages}
 import ulisse.infrastructures.view.utils.Swings.*
 
 import java.awt
@@ -27,14 +27,15 @@ trait MapElement[T] extends Observable[MapElement[T]]:
 object MapElement:
   /** Create a new [[MapElement]] with the given [[Station]], [[String]] and [[Point]]. */
   def createStation(station: Station, imagePath: String): MapElement[Station] =
-    new MapElementImpl(station, imagePath, station.coordinate.toPoint)
+    MapElementSimple(station, DrawImageSimple.createAt(imagePath, station.coordinate.toPoint))
 
   /** Create a new [[MapElement]] with the given [[Route]] and [[String]]. */
   def createRoute(route: Route, imagePath: String): MapElement[Route] =
-    new MapElementImpl(route, imagePath, new Point(0, 0))
+    val start = route.departure.coordinate.toPoint
+    val end   = route.arrival.coordinate.toPoint
+    MapElementSimple(route, DrawImageTiled.createAt(imagePath, start, end))
 
-  private case class MapElementImpl[T](element: T, image: DrawImage) extends MapElement[T]:
-    def this(element: T, imagePath: String, pos: Point) = this(element, DrawImages.createAt(imagePath, pos))
+  private case class MapElementSimple[T](element: T, image: DrawImage) extends MapElement[T]:
     private val observable = Observers.createObservable[MapElement[T]]
     image.attach(observable.toObserver(_ => this))
     export observable._
