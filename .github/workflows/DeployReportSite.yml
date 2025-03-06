@@ -3,7 +3,7 @@ name: Deploy Report site (using Vitepress) to Pages
 
 on:
   push:
-    branches: [main, docs/meeting-update]
+    branches: [main, docs/meeting-update, docs/scaladoc]
 
   workflow_dispatch:
 
@@ -19,12 +19,19 @@ concurrency:
 jobs:
   # Build website
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: "sbt"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -33,6 +40,12 @@ jobs:
           #cache: npm
       - name: Setup Pages
         uses: actions/configure-pages@v4
+      - name: Generate ScalaDoc
+        run: sbt doc
+      - name: Move ScalaDoc to docs/scaladoc
+        run: |
+          mkdir -p ./docs/public/scaladoc
+          cp -r target/scala-*/api/* ./docs/public/scaladoc
       - name: Install dependencies
         run: npm install
         working-directory: ./docs

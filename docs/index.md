@@ -12,8 +12,8 @@ hero:
       link: report/0-intro
     - theme: alt
       text: Scala docs
-      link: /
-
+      link: https://dev-pps.github.io/pps-23-ulisse/scaladoc/index.html
+      
 features:
   - title: Feature A
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
