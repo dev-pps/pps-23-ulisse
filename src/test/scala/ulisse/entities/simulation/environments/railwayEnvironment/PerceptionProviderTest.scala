@@ -20,6 +20,7 @@ import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEW
 import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
 import ulisse.entities.station.{StationEnvironment, StationEnvironmentElement}
+import ulisse.entities.timetable.DynamicTimetableEnvironment
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.utils.Times.{ClockTime, Time}
 class PerceptionProviderTest extends AnyWordSpec with Matchers:
@@ -42,16 +43,17 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
   when(ree.typology).thenReturn(routeTypology)
   when(ree.length).thenReturn(routeLength)
 
-  private val railwayEnvironment = mock[RailwayEnvironment]
-  private val dtt                = mock[DynamicTimetable]
-  private val baseClock          = ClockTime(0, 0)
-  private val defaultClockTime   = baseClock.toOption
+  private val dynamicTimetableEnvironment = mock[DynamicTimetableEnvironment]
+  private val railwayEnvironment          = mock[RailwayEnvironment]
+  private val dtt                         = mock[DynamicTimetable]
+  private val baseClock                   = ClockTime(0, 0)
+  private val defaultClockTime            = baseClock.toOption
   when(railwayEnvironment.stations).thenReturn(Seq(see))
   when(railwayEnvironment.routes).thenReturn(Seq(ree))
   when(railwayEnvironment.routeEnvironment).thenReturn(re)
   when(railwayEnvironment.stationEnvironment).thenReturn(se)
   when(railwayEnvironment.time).thenReturn(baseClock.getOrDefault.asTime)
-
+  when(railwayEnvironment.dynamicTimetableEnvironment).thenReturn(dynamicTimetableEnvironment)
   private val perceptionProvider = summon[PerceptionProvider[RailwayEnvironment, TrainAgent]]
 
   private def trainInStation(): Unit =
@@ -60,7 +62,7 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
 
   private def trainInStationWithTimeTable(timetable: Option[DynamicTimetable]): Unit =
     trainInStation()
-    when(railwayEnvironment.findCurrentTimeTableFor(trainAgent)).thenReturn(timetable)
+    when(railwayEnvironment.dynamicTimetableEnvironment.findCurrentTimetableFor(trainAgent)).thenReturn(timetable)
 
   private def trainInStationWithNextDepartureTime(nextDepartureTime: Option[ClockTime]): Unit =
     trainInStationWithTimeTable(Some(dtt))
@@ -91,7 +93,7 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
 
   private def trainInRouteWithTimeTable(timetable: Option[DynamicTimetable]): Unit =
     trainInRouteWithContainers(Seq())
-    when(railwayEnvironment.findCurrentTimeTableFor(trainAgent)).thenReturn(timetable)
+    when(railwayEnvironment.dynamicTimetableEnvironment.findCurrentTimetableFor(trainAgent)).thenReturn(timetable)
 
   private def trainInRouteWithStationInfo(available: Boolean): Unit =
     when(mockStationB.id).thenReturn(1)
@@ -123,7 +125,7 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
       "prioritize station perception over route perception" in:
         when(see.contains(trainAgent)).thenReturn(true)
         when(ree.contains(trainAgent)).thenReturn(true)
-        when(railwayEnvironment.findCurrentTimeTableFor(trainAgent)).thenReturn(None)
+        when(railwayEnvironment.dynamicTimetableEnvironment.findCurrentTimetableFor(trainAgent)).thenReturn(None)
         perceptionProvider.perceptionFor(railwayEnvironment, trainAgent) shouldBe a[
           Some[TrainAgentPerception[TrainStationInfo]]
         ]

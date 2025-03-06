@@ -60,37 +60,37 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
       (0 until steps).foldLeft(env)((e, _) => e.doStep(dt))
 
   extension (agent: TrainAgent)
-    private def newCurrentInfo(
-                             env: RailwayEnvironment,
-                             r: DynamicTimetable => Option[(Station, Station)]
-                           ): Option[(DynamicTimetable, StationEnvironmentElement, RouteEnvironmentElement, TrackDirection)] =
-      for
-        currentTT <- env.findCurrentTimeTableFor(agent)
-        route     <- r(currentTT)
-        _ = println(route)
-        see        <- env.stations.find(_ == route._1)
-        rs <- env.routeEnvironment.findRoutesWithTravelDirection(route)
-        yield (currentTT, see, rs)
     private def currentInfo(
         env: RailwayEnvironment,
         r: DynamicTimetable => Option[(Station, Station)]
-    ): Option[(DynamicTimetable, StationEnvironmentElement, RouteEnvironmentElement, TrackDirection)] =
+    ): Option[(DynamicTimetable, StationEnvironmentElement, Seq[(RouteEnvironmentElement, TrackDirection)])] =
       for
-        currentTT <- env.findCurrentTimeTableFor(agent)
+        currentTT <- env.dynamicTimetableEnvironment.findCurrentTimetableFor(agent)
         route     <- r(currentTT)
         _ = println(route)
-        see        <- env.stations.find(_ == route._1)
-        (ree, dir) <- env.findRouteWithTravelDirection(route)
-      yield (currentTT, see, ree, dir)
+        see <- env.stations.find(_ == route._1)
+        rd = env.routeEnvironment.findRoutesWithTravelDirection(route)
+      yield (currentTT, see, rd)
+//    private def currentInfo(
+//        env: RailwayEnvironment,
+//        r: DynamicTimetable => Option[(Station, Station)]
+//    ): Option[(DynamicTimetable, StationEnvironmentElement, RouteEnvironmentElement, TrackDirection)] =
+//      for
+//        currentTT <- env.findCurrentTimeTableFor(agent)
+//        route     <- r(currentTT)
+//        _ = println(route)
+//        see        <- env.stations.find(_ == route._1)
+//        (ree, dir) <- env.findRouteWithTravelDirection(route)
+//      yield (currentTT, see, ree, dir)
 
     private def completeCurrentTimetable(env: RailwayEnvironment): Option[RailwayEnvironment] =
-      env.findCurrentTimeTableFor(agent).map(tt => env.doSteps(tt.table.size + 2))
+      env.dynamicTimetableEnvironment.findCurrentTimetableFor(agent).map(tt => env.doSteps(tt.table.size + 2))
 
   private def checkConfiguration(env: RailwayEnvironment, cd: ConfigurationData): Unit =
     env.stations shouldBe cd.stations
     env.routes shouldBe cd.routes
     env.timetables shouldBe cd.timetables.values.flatten
-    env.timetablesByTrain shouldBe cd.timetables
+    env.dynamicTimetableEnvironment.dynamicTimetablesByTrain shouldBe cd.timetables
 
   "RailwayEnvironment" when:
     "created" should:
@@ -128,16 +128,19 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
           case Some(
                 tt: DynamicTimetable,
                 see: StationEnvironmentElement,
-                ree: RouteEnvironmentElement,
-                dir: TrackDirection
+                crd: Seq[(RouteEnvironmentElement, TrackDirection)]
               ) =>
-            tt.stationNr(0).map(_._1).contains(ree.departure) shouldBe true
-            tt.stationNr(1).map(_._1).contains(ree.arrival) shouldBe true
-            ree.departure shouldBe see
-            see.trains.contains(trainAgent3905) shouldBe false
-            ree.trains.contains(trainAgent3905) shouldBe true
-            ree.containers.find(_.contains(trainAgent3905)) match
-              case Some(container) =>
+            (tt.stationNr(0).map(_._1), tt.stationNr(1).map(_._1), crd.map(_._1).headOption) match
+              case (Some(s), Some(r), Some(rd)) =>
+                s shouldBe rd.departure
+                r shouldBe rd.arrival
+                see shouldBe rd.departure
+                see.trains.contains(trainAgent3905) shouldBe false
+                crd.map(_._1).collectTrains.contains(trainAgent3905) shouldBe true
+            val r1 = crd.find(_._1.contains(trainAgent3905))
+            val r2 = r1.map(e => (e._1.containers, e._2))
+            val r3 = r2.map(e => (e._1.find(_.contains(trainAgent3905)), e._2)) match
+              case Some(Some(container), dir) =>
                 container.currentDirection shouldBe Some(dir)
                 container.trains.find(_ == trainAgent3905).map(_.motionData.distanceTravelled) shouldBe Some(0.0)
               case _ => fail()
@@ -148,8 +151,7 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
           case Some(
                 tt: DynamicTimetable,
                 see: StationEnvironmentElement,
-                ree: RouteEnvironmentElement,
-                dir: TrackDirection
+                crd: Seq[(RouteEnvironmentElement, TrackDirection)]
               ) =>
             tt.stationNr(1).map(_._1).contains(ree.departure) shouldBe true
             tt.stationNr(2).map(_._1).contains(ree.arrival) shouldBe true
@@ -160,11 +162,13 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
           case _ => fail()
 
       "change schedule" in:
-        trainAgent3905.completeCurrentTimetable(env).flatMap(_.findCurrentTimeTableFor(trainAgent3905)) shouldBe Some(
+        trainAgent3905.completeCurrentTimetable(env).flatMap(
+          _.dynamicTimetableEnvironment.findCurrentTimetableFor(trainAgent3905)
+        ) shouldBe Some(
           DynamicTimetable(timetable2)
         )
 
       "complete schedules" in:
         trainAgent3905.completeCurrentTimetable(env).flatMap(trainAgent3905.completeCurrentTimetable).flatMap(
-          _.findCurrentTimeTableFor(trainAgent3905)
+          _.dynamicTimetableEnvironment.findCurrentTimetableFor(trainAgent3905)
         ) shouldBe None

@@ -4,6 +4,7 @@ import cats.Id
 import ulisse.entities.simulation.environments.EnvironmentElements.EnvironmentElement
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.Timetables.{StationTime, Timetable}
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.Times.{ClockTime, InvalidHours, Time, given}
 import ulisse.utils.CollectionUtils.updateWhen
 
