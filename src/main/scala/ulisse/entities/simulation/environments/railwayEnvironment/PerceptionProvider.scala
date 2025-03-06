@@ -3,17 +3,8 @@ package ulisse.entities.simulation.environments.railwayEnvironment
 import cats.Id
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
-import ulisse.entities.train.TrainAgents.{
-  TrainAgent,
-  TrainAgentPerception,
-  TrainAgentPerceptionData,
-  TrainPerceptionInRoute,
-  TrainPerceptionInStation,
-  TrainRouteInfo,
-  TrainStationInfo
-}
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
-import ulisse.entities.station.StationEnvironment
+import ulisse.entities.train.TrainAgents.*
 object PerceptionProvider:
 
   private def trainPerceptionInStation(train: TrainAgent, env: RailwayEnvironment): TrainStationInfo =

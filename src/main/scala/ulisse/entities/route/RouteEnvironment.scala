@@ -19,10 +19,12 @@ object RouteEnvironment:
       extends RouteEnvironment:
     override protected def constructor(environmentElements: Seq[RouteEnvironmentElement]): RouteEnvironment =
       copy(environmentElements)
+
     private def findRouteDirection(route: Route, routeStations: (Station, Station)): TrackDirection =
       if route.isRightDirection.tupled(routeStations) then TrackDirection.Forward else TrackDirection.Backward
 
-    def findRoutesWithTravelDirection(route: (Station, Station)): Seq[(RouteEnvironmentElement, TrackDirection)] =
+    override def findRoutesWithTravelDirection(route: (Station, Station))
+        : Seq[(RouteEnvironmentElement, TrackDirection)] =
       environmentElements.filter(_.isPath.tupled(route)).map(r => (r, findRouteDirection(r, route)))
 
     private def updatedAvailableEnvironment(
@@ -30,13 +32,10 @@ object RouteEnvironment:
         route: (Station, Station)
     ): Seq[RouteEnvironmentElement] =
       for
-        routeAndDirection <- findRoutesWithTravelDirection(route)
-        updatedRoute      <- routeAndDirection._1.putTrain(train.resetDistanceTravelled(), routeAndDirection._2)
+        (r, d)       <- findRoutesWithTravelDirection(route)
+        updatedRoute <- r.putTrain(train.resetDistanceTravelled(), d)
       yield updatedRoute
 
     override def putTrain(train: TrainAgent, route: (Station, Station)): Option[RouteEnvironment] =
-      updatedAvailableEnvironment(train, route)
-        .headOption
-        .map(updatedRoutes =>
-          copy(environmentElements = environmentElements.updateWhen(_.id == updatedRoutes.id)(_ => updatedRoutes))
-        )
+      updatedAvailableEnvironment(train, route).headOption
+        .map(updatedRoutes => constructor(environmentElements.updateWhen(_.id == updatedRoutes.id)(_ => updatedRoutes)))

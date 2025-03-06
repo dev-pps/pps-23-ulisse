@@ -8,8 +8,8 @@ import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.useCases.SimulationService
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 class SimulationPageAdapterTest extends AnyWordSpec with Matchers:
 

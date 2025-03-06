@@ -1,8 +1,5 @@
 package ulisse.entities.station
 
-import ulisse.entities.Coordinate
-import ulisse.entities.route.Routes.{Route, RouteType}
-import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper
 import ulisse.entities.simulation.environments.Environments.TrainAgentEnvironment
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationData
 import ulisse.entities.train.TrainAgents.TrainAgent
@@ -23,4 +20,4 @@ object StationEnvironment:
       for
         station        <- environmentElements.find(_ == station)
         updatedStation <- station.putTrain(train.resetDistanceTravelled())
-      yield copy(environmentElements = environmentElements.updateWhen(_ == station)(_ => updatedStation))
+      yield constructor(environmentElements.updateWhen(_ == station)(_ => updatedStation))

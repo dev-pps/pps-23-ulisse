@@ -3,6 +3,7 @@ package ulisse.entities.train
 import ulisse.entities.route.Routes.RouteType
 import ulisse.entities.simulation.agents.Perceptions.{Perception, PerceptionData}
 import ulisse.entities.simulation.agents.SimulationAgent
+import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given_PerceptionProvider_RailwayEnvironment_TrainAgent
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.Trains.Train

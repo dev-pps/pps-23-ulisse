@@ -7,8 +7,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
 import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.applications.{AppState, EventQueue}
 import ulisse.applications.managers.StationManager
+import ulisse.applications.{AppState, EventQueue}
 import ulisse.entities.Coordinate
 import ulisse.entities.Coordinate.*
 import ulisse.entities.station.Station

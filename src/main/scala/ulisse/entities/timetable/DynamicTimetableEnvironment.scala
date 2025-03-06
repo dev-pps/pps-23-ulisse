@@ -6,8 +6,8 @@ import ulisse.entities.station.Station
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.Train
-import ulisse.utils.Times.{ClockTime, Time}
 import ulisse.utils.CollectionUtils.updateWhen
+import ulisse.utils.Times.{ClockTime, Time}
 
 trait DynamicTimetableEnvironment extends Environment[DynamicTimetable]:
   def dynamicTimetablesByTrain: Map[Train, Seq[DynamicTimetable]]
@@ -23,7 +23,7 @@ trait DynamicTimetableEnvironment extends Environment[DynamicTimetable]:
   def timetables: Seq[DynamicTimetable] = dynamicTimetablesByTrain.values.flatten.toSeq
 object DynamicTimetableEnvironment:
   def apply(configurationData: ConfigurationData): DynamicTimetableEnvironment =
-    DynamicTimetableEnvironmentImpl(configurationData.timetables)
+    DynamicTimetableEnvironmentImpl(configurationData.timetablesByTrain)
   private final case class DynamicTimetableEnvironmentImpl(dynamicTimetablesByTrain: Map[Train, Seq[DynamicTimetable]])
       extends DynamicTimetableEnvironment:
     override def environmentElements: Seq[DynamicTimetable] = dynamicTimetablesByTrain.values.flatten.toSeq

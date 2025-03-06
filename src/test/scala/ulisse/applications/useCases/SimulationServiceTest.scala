@@ -5,30 +5,20 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
+import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
-import ulisse.applications.managers.{SimulationManager, StationManager}
-import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
+import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.{AppState, EventQueue}
 import ulisse.dsl.comparison.FieldsComparators.compareTo
-import ulisse.entities.route.RouteEnvironmentElementTest.routeAB_EE
+import ulisse.entities.simulation.data.Engine.EngineStateField.Running
 import ulisse.entities.simulation.data.SimulationData.SimulationDataField.SimulationEnvironment
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
-import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
-import ulisse.entities.station.Station
-import ulisse.entities.station.StationEnvironmentElementTest.{stationA_EE, stationB_EE}
-import ulisse.entities.station.StationTest.stationA
-import ulisse.entities.timetable.DynamicTimetableTest.dynamicTimetable1
-import ulisse.entities.train.TrainAgentTest.trainAgent3905
-import ulisse.entities.train.Trains.TrainTechnology
-import ulisse.Utils.MatchersUtils.shouldBeBoolean
-import ulisse.entities.simulation.data.Engine.EngineStateField.Running
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
-import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
+import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
 
-import java.util.concurrent.LinkedBlockingQueue
 import scala.annotation.tailrec
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -42,9 +32,9 @@ class SimulationServiceTest extends AnyWordSpec with Matchers:
   private val routeManager: RouteManager = mock[RouteManager]
   when(routeManager.routes).thenReturn(simpleConfigurationData.routes)
   private val trainManager: TrainManager = mock[TrainManager]
-  when(trainManager.trains).thenReturn(simpleConfigurationData.trains.toList)
+  when(trainManager.trains).thenReturn(simpleConfigurationData.trains)
   private val timetableManager: TimetableManager = mock[TimetableManager]
-  when(timetableManager.tables).thenReturn(simpleConfigurationData.timetables.values.flatten.toSeq)
+  when(timetableManager.tables).thenReturn(simpleConfigurationData.timetablesByTrain.values.flatten.toSeq)
 
   private val initialState = AppState().updateStationManager(_ => stationManager)
     .updateRoute(_ => routeManager)
