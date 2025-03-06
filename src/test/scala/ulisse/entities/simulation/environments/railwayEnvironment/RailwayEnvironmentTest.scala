@@ -60,6 +60,17 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
       (0 until steps).foldLeft(env)((e, _) => e.doStep(dt))
 
   extension (agent: TrainAgent)
+    private def newCurrentInfo(
+                             env: RailwayEnvironment,
+                             r: DynamicTimetable => Option[(Station, Station)]
+                           ): Option[(DynamicTimetable, StationEnvironmentElement, RouteEnvironmentElement, TrackDirection)] =
+      for
+        currentTT <- env.findCurrentTimeTableFor(agent)
+        route     <- r(currentTT)
+        _ = println(route)
+        see        <- env.stations.find(_ == route._1)
+        rs <- env.routeEnvironment.findRoutesWithTravelDirection(route)
+        yield (currentTT, see, rs)
     private def currentInfo(
         env: RailwayEnvironment,
         r: DynamicTimetable => Option[(Station, Station)]
