@@ -1,11 +1,11 @@
 package ulisse.infrastructures.view.map
 
 import ulisse.applications.ports.StationPorts
+import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.common.ImagePath
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
-import ulisse.infrastructures.view.components.draw.DrawImageTiled
 
 import scala.swing.*
 
@@ -17,6 +17,9 @@ trait MapPanel extends Panel with EnhancedLook:
   /** Draw the station on the screen. */
   def uploadStation(newStations: StationPorts.Input#SM): Unit
 
+  /** Draw the route on the screen. */
+  def updateGraphics(routes: List[Route]): Unit
+
 /** Companion object for [[MapPanel]]. */
 object MapPanel:
   /** Create a new [[MapPanel]]. */
@@ -24,17 +27,17 @@ object MapPanel:
 
   private case class MapPanelImpl() extends MapPanel:
     private val stations = MapElements[Station](observable)
+    private val routes   = MapElements[Route](observable)
 
-    private val route = DrawImageTiled.createAt("route.png", new Point(500, 500), new Point(400, 400))
-
-    def attachClickStation(event: ClickObserver[MapElement[Station]]): Unit =
-      stations.attachClick(event)
+    def attachClickStation(event: ClickObserver[MapElement[Station]]): Unit = stations attachClick event
 
     override def uploadStation(newStations: StationPorts.Input#SM): Unit =
-      stations.update(newStations.map(MapElement.createStation(_, ImagePath.station)))
+      stations update newStations.map(MapElement createStation (_, ImagePath.station))
       updateGraphics()
 
+    def updateGraphics(newRoutes: List[Route]): Unit =
+      routes update newRoutes.map(MapElement createRoute (_, ImagePath.route))
+
     override protected def paintLook(g: Graphics2D): Unit =
-      stations.draw(g, peer)
-      route.drawTiledImage(g, 0.1, peer)
+      stations draw (g, peer)
       super.paintLook(g)

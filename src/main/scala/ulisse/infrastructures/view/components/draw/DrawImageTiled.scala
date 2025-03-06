@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.components.draw
 
-import ulisse.infrastructures.view.components.draw.DrawImages.defaultDimension
+import ulisse.infrastructures.view.common.Observers.Observable
+import ulisse.infrastructures.view.components.draw.DrawImages.{defaultDimension, DrawImage}
 import ulisse.infrastructures.view.components.styles.Images
 import ulisse.infrastructures.view.components.styles.Images.SourceImage
 import ulisse.infrastructures.view.utils.Swings.*
@@ -8,10 +9,11 @@ import ulisse.infrastructures.view.utils.Swings.*
 import java.awt.geom.AffineTransform
 import java.awt.image.ImageObserver
 import scala.math.{abs, sqrt}
+import scala.swing.event.MouseEvent
 import scala.swing.{Dimension, Graphics2D, Point}
 
 /** Draw images tiled on the screen. */
-trait DrawImageTiled:
+trait DrawImageTiled extends DrawImage:
 
   /** Draw the tiled image on the screen. */
   def drawTiledImage(g: Graphics2D, scale: Double, observer: ImageObserver): Unit
@@ -29,9 +31,16 @@ object DrawImageTiled:
 
   private case class DrawImageTiledImpl(source: SourceImage, start: Point, end: Point, dimension: Dimension)
       extends DrawImageTiled:
-
     def this(path: String, start: Point, end: Point, dimension: Dimension) =
       this(SourceImage(path), start, end, dimension)
+
+    private val image: DrawImageSimple              = DrawImageSimple(source.path, start, dimension)
+    override val center: Point                      = start plus end times 0.5
+    override val observable: Observable[MouseEvent] = image.observable
+
+    export image.{center => _, dimension => _, draw => _, observable => _, _}
+
+    override def draw(g: Graphics2D, observer: ImageObserver): Unit = drawTiledImage(g, 0.3, observer)
 
     def drawTiledImage(g: Graphics2D, scale: Double, observer: ImageObserver): Unit =
       for img <- source.bufferImage

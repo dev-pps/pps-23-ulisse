@@ -6,11 +6,17 @@ import ulisse.infrastructures.view.components.draw.DrawImages.DrawImage
 import java.awt.image.ImageObserver
 import javax.swing.BorderFactory
 import javax.swing.border.Border
+import scala.concurrent.ExecutionContext
 import scala.swing.*
 
 /** Utility methods for Swing components */
 @SuppressWarnings(Array("org.wartremover.warts.Overloading"))
 object Swings:
+
+  /** The execution context for the Swing components. */
+  given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
+    Swing.onEDT(runnable.run())
+
   /** Create an empty border with the given [[width]] and [[height]]. */
   def createEmptyBorder(width: Int, height: Int): Border = BorderFactory.createEmptyBorder(height, width, height, width)
 
@@ -39,6 +45,9 @@ object Swings:
 
     /** Multiply the point by the other. */
     def times(other: Point): Point = new Point(point.x * other.x, point.y * other.y)
+
+    /** Multiply the point by the given [[value]]. */
+    def times(value: Double): Point = new Point((point.x * value).toInt, (point.y * value).toInt)
 
     /** Calculate the distance between the point and the other. */
     def distance(other: Point): Double = Math.sqrt(Math.pow(point.x - other.x, 2) + Math.pow(point.y - other.y, 2))

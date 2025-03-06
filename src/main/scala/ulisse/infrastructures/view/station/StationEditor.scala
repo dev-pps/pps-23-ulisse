@@ -228,13 +228,13 @@ final case class StationForm(
     text = "Ok"
     reactions += {
       case ButtonClicked(_) =>
-        controller.onOkClick(
-          stationName.text,
-          latitude.text,
-          longitude.text,
-          numberOfTrack.text,
-          station
-        )
+//        controller.onOkClick(
+//          stationName.text,
+//          latitude.text,
+//          longitude.text,
+//          numberOfTrack.text,
+//          station
+//        )
         onBackClick()
     }
   }) = c

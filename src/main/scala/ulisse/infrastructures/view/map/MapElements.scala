@@ -28,14 +28,14 @@ object MapElements:
   private case class MapElementsImpl[T](map: Observable[MouseEvent], var elements: List[MapElement[T]])
       extends MapElements[T]:
 
-    override def attachClick(event: ClickObserver[MapElement[T]]): Unit = elements.foreach(_.attachClick(event))
+    override def attachClick(event: ClickObserver[MapElement[T]]): Unit = elements foreach (_ attachClick event)
 
     override def update(newElements: Seq[MapElement[T]]): Unit =
       detachAllClicks()
-      elements.foreach(_.image detachFrom map)
+      elements foreach (_.image detachFrom map)
       elements = newElements.toList
-      elements.foreach(_.image attachOn map)
+      elements foreach (_.image attachOn map)
 
-    override def draw(g: Graphics2D, observer: ImageObserver): Unit = elements.foreach(_ drawItem (g, observer))
+    override def draw(g: Graphics2D, observer: ImageObserver): Unit = elements foreach (_ drawItem (g, observer))
 
-    private def detachAllClicks(): Unit = elements.foreach(_.detachAllClicks())
+    private def detachAllClicks(): Unit = elements foreach (_.detachAllClicks())

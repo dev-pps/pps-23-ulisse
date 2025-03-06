@@ -42,6 +42,14 @@ object Routes:
     /** High-speed route. */
     case AV extends RouteType(Technology("AV", 300))
 
+  /** Convert a string to a route type. */
+  extension (text: String)
+    /** Convert a string to a route type. */
+    def toRouteTypeOption: Option[RouteType] = text match
+      case "Normal" => Some(RouteType.Normal)
+      case "AV"     => Some(RouteType.AV)
+      case _        => None
+
   /** Represent a route between two stations. */
   trait Route:
     /** Unique identifier of route. */
