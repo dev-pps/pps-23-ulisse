@@ -29,10 +29,10 @@ trait StationForm extends Form:
   /** The tracks field of the form. */
   val tracks: ComposedSwing.InfoTextField
 
-  /** Attach the creation observer to the form. */
+  /** Attach the creation observer to the form of type [[StationCreationInfo]]. */
   def attachCreation(observer: ClickObserver[StationCreationInfo]): Unit
 
-  /** Attach the deletion observer to the form. */
+  /** Attach the deletion observer to the form of type [[StationCreationInfo]]. */
   def attachDeletion(observer: ClickObserver[StationCreationInfo]): Unit
 
   /** Compiles the form. */

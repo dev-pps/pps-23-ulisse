@@ -18,6 +18,9 @@ trait MapPanel extends Panel with EnhancedLook:
   def uploadStation(newStations: StationPorts.Input#SM): Unit
 
   /** Draw the route on the screen. */
+  def updateRoutes(newRoutes: List[Route]): Unit
+
+  /** Draw the route on the screen. */
   def updateGraphics(routes: List[Route]): Unit
 
 /** Companion object for [[MapPanel]]. */
@@ -32,11 +35,15 @@ object MapPanel:
     def attachClickStation(event: ClickObserver[MapElement[Station]]): Unit = stations attachClick event
 
     override def uploadStation(newStations: StationPorts.Input#SM): Unit =
-      stations update newStations.map(MapElement createStation (_, ImagePath.station))
+      stations update (newStations map (MapElement createStation (_, ImagePath.station)))
+      updateGraphics()
+
+    override def updateRoutes(newRoutes: List[Route]): Unit =
+      routes update (newRoutes map (MapElement createRoute (_, ImagePath.route)))
       updateGraphics()
 
     def updateGraphics(newRoutes: List[Route]): Unit =
-      routes update newRoutes.map(MapElement createRoute (_, ImagePath.route))
+      routes update (newRoutes map (MapElement createRoute (_, ImagePath.route)))
 
     override protected def paintLook(g: Graphics2D): Unit =
       stations draw (g, peer)
