@@ -65,11 +65,11 @@ object EnvironmentElements:
         condition: Boolean
     ): Option[EE] =
       containers.updateWhenWithEffects(_.contains(trainAgent))(updateFunction).map(tracks =>
-        updateEEContainers(tracks)
+        constructor(tracks)
       ) when condition
 
     /** Update the containers with the provided sequence */
-    protected def updateEEContainers(containers: Seq[TAC]): EE
+    protected def constructor(containers: Seq[TAC]): EE
 
   /** Companion object for [[TrainAgentEEWrapper]] */
   object TrainAgentEEWrapper:

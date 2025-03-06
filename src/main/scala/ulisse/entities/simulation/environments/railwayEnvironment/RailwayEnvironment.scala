@@ -9,11 +9,10 @@ import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.EnvironmentElements.EnvironmentElement
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
-import ulisse.entities.simulation.environments.{Environment, EnvironmentsCoordinator}
-import ulisse.entities.station.StationEnvironmentElement
-import ulisse.entities.station.Station
+import ulisse.entities.simulation.environments.Environments.EnvironmentsCoordinator
+import ulisse.entities.station.{Station, StationEnvironment, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
-import ulisse.entities.train.TrainAgents.*
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.{updateWhen, updateWhenWithEffects}
 import ulisse.utils.Times.{ClockTime, Time}
@@ -59,7 +58,7 @@ object RailwayEnvironment:
   ): RailwayEnvironment =
     RailwayEnvironmentImpl(
       startTime,
-      configurationData.stations,
+      StationEnvironment(configurationData),
       RouteEnvironment(configurationData),
       configurationData.timetables
     )
@@ -84,17 +83,18 @@ object RailwayEnvironment:
 
   private final case class RailwayEnvironmentImpl(
       time: Id[Time],
-      stations: Seq[StationEnvironmentElement],
+      stationEnvironment: StationEnvironment,
       routeEnvironment: RouteEnvironment,
       timetablesByTrain: Map[Train, Seq[DynamicTimetable]]
   ) extends RailwayEnvironment:
-    export routeEnvironment.environmentElements as routes
+    export routeEnvironment.environmentElements as routes, stationEnvironment.environmentElements as stations
     override def environments = Seq(routeEnvironment)
     def doStep(dt: Int): RailwayEnvironment =
       // Allow agents to be at the same time in more than an environment element
       // that because an agent when enters a station doesn't leave immediately the route and vice versa
       // also for future improvements, an agent when crossing two rails will be in two rails at the same time
       // NOTE: For now agent will be in only one station or route
+
       trains.map(_.doStep(dt, this)).foldLeft(this) { (env, updatedTrain) =>
         // Update Idea: startByMovingAgent
         // If is already on a route,
@@ -122,11 +122,9 @@ object RailwayEnvironment:
             updatedRoutes <- routeEnvironment.removeTrain(agent)
             (updatedTimetables, currentRoute) <-
               timetableUpdateFunction(_.arrivalUpdate(_), _.currentRoute, agent, time)
-            station        <- stations.find(currentRoute._2.name == _.name)
-            updatedStation <- station.putTrain(agent.resetDistanceTravelled)
-            updatedStations = stations.updateWhen(_.name == updatedStation.name)(_ => updatedStation)
+            updatedStations <- stationEnvironment.putTrain(agent, currentRoute._2)
           yield copy(
-            stations = updatedStations,
+            stationEnvironment = updatedStations,
             routeEnvironment = updatedRoutes,
             timetablesByTrain = updatedTimetables
           )
@@ -138,11 +136,14 @@ object RailwayEnvironment:
         time: Time
     ): Option[RailwayEnvironmentImpl] =
       for
-        updatedStation <- station.removeTrain(agent)
-        updatedStations = stations.updateWhen(_.name == updatedStation.name)(_ => updatedStation)
+        updatedStations                <- stationEnvironment.removeTrain(agent)
         (updatedTimetables, nextRoute) <- timetableUpdateFunction(_.departureUpdate(_), _.nextRoute, agent, time)
         updatedRoutes                  <- routeEnvironment.putTrain(agent, nextRoute)
-      yield copy(stations = updatedStations, routeEnvironment = updatedRoutes, timetablesByTrain = updatedTimetables)
+      yield copy(
+        stationEnvironment = updatedStations,
+        routeEnvironment = updatedRoutes,
+        timetablesByTrain = updatedTimetables
+      )
 
     private def timetableUpdateFunction(
         updateF: (DynamicTimetable, ClockTime) => Option[DynamicTimetable],

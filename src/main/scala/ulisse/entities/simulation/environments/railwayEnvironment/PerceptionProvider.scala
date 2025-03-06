@@ -13,6 +13,7 @@ import ulisse.entities.train.TrainAgents.{
   TrainStationInfo
 }
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
+import ulisse.entities.station.StationEnvironment
 
 object PerceptionProvider:
 

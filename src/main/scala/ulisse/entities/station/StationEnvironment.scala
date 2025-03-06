@@ -2,11 +2,25 @@ package ulisse.entities.station
 
 import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes.{Route, RouteType}
+import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper
+import ulisse.entities.simulation.environments.Environments.TrainAgentEnvironment
+import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationData
+import ulisse.entities.train.TrainAgents.TrainAgent
+import ulisse.utils.CollectionUtils.updateWhen
 
-object Test extends App:
-  val stationA = Station("A", Coordinate(0, 0), 10)
-  val stationB = Station("B", Coordinate(1, 1), 10)
-  val route1   = Route(stationA, stationB, RouteType.Normal, 1, 100)
-  val route2   = Route(stationA, stationB, RouteType.Normal, 4, 120)
-  (route1, route2) match
-    case (Right(r1), Right(r2)) => println(r1 === r2); println(r1 == r2)
+trait StationEnvironment extends TrainAgentEnvironment[StationEnvironment, StationEnvironmentElement]:
+  def putTrain(train: TrainAgent, station: Station): Option[StationEnvironment]
+
+object StationEnvironment:
+  def apply(configurationData: ConfigurationData): StationEnvironment =
+    StationEnvironmentImpl(configurationData.stations)
+
+  private final case class StationEnvironmentImpl(environmentElements: Seq[StationEnvironmentElement])
+      extends StationEnvironment:
+    override protected def constructor(environmentElements: Seq[StationEnvironmentElement]): StationEnvironment =
+      copy(environmentElements)
+    override def putTrain(train: TrainAgent, station: Station): Option[StationEnvironment] =
+      for
+        station        <- environmentElements.find(_ == station)
+        updatedStation <- station.putTrain(train.resetDistanceTravelled())
+      yield copy(environmentElements = environmentElements.updateWhen(_ == station)(_ => updatedStation))
