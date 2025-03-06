@@ -1,3 +1,9 @@
+## [1.27.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.26.0...v1.27.0) (2025-03-06)
+
+### Features
+
+* create adapter ([c430d20](https://github.com/dev-pps/pps-23-ulisse/commit/c430d201511cac46b56414ef0c539431c6f13235))
+
 ## [1.26.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.25.0...v1.26.0) (2025-03-06)
 
 ### Features
