@@ -73,9 +73,7 @@ object RailwayEnvironment:
       configurationData: ConfigurationData
   ): RailwayEnvironment =
     apply(
-      Time.secondsToTime(
-        configurationData.timetablesByTrain.values.flatten.map(_.departureTime.toSeconds).foldLeft(0)(math.min)
-      ),
+      configurationData.departureTime,
       configurationData
     )
 

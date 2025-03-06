@@ -76,14 +76,26 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
     env.timetables shouldBe cd.timetablesByTrain.values.flatten
     env.dynamicTimetableEnvironment.dynamicTimetablesByTrain shouldBe cd.timetablesByTrain
 
-  private def extractInfo(numStep: Int, r: DynamicTimetable => Option[(Station, Station)]): (DynamicTimetable, StationEnvironmentElement, Seq[(RouteEnvironmentElement, TrackDirection)]) =
+  private def extractInfo(
+      numStep: Int,
+      r: DynamicTimetable => Option[(Station, Station)]
+  ): (DynamicTimetable, StationEnvironmentElement, Seq[(RouteEnvironmentElement, TrackDirection)]) =
     trainAgent3905.currentInfo(env.doSteps(numStep), r) match
-      case Some(dtt: DynamicTimetable, see: StationEnvironmentElement, rInfo: Seq[(RouteEnvironmentElement, TrackDirection)]) =>
+      case Some(
+            dtt: DynamicTimetable,
+            see: StationEnvironmentElement,
+            rInfo: Seq[(RouteEnvironmentElement, TrackDirection)]
+          ) =>
         print(dtt)
         (dtt, see, rInfo)
       case _ => fail()
 
-  private def matchRouteInfo(d: Station, a: Station, see: StationEnvironmentElement, ree: RouteEnvironmentElement): Unit =
+  private def matchRouteInfo(
+      d: Station,
+      a: Station,
+      see: StationEnvironmentElement,
+      ree: RouteEnvironmentElement
+  ): Unit =
     d shouldBe ree.departure
     a shouldBe ree.arrival
     see shouldBe ree.departure
@@ -132,20 +144,22 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
         val (dtt, see, rInfo) = extractInfo(1, _.currentRoute)
         (dtt.stationNr(0).map(_._1), dtt.stationNr(1).map(_._1), rInfo.map(_._1).headOption) match
           case (Some(d), Some(a), Some(ree)) => matchRouteInfo(d, a, see, ree)
-          case _ => fail()
+          case _                             => fail()
         see.trains.contains(trainAgent3905) shouldBe false
         rInfo.map(_._1).collectTrains.contains(trainAgent3905) shouldBe true
-        rInfo.find(_._1.contains(trainAgent3905)).map(e => (e._1.containers.find(_.contains(trainAgent3905)), e._2)) match
-        case Some(Some(container), dir) =>
-          container.currentDirection shouldBe Some(dir)
-          container.trains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)
-        case _ => fail()
+        rInfo.find(_._1.contains(trainAgent3905)).map(e =>
+          (e._1.containers.find(_.contains(trainAgent3905)), e._2)
+        ) match
+          case Some(Some(container), dir) =>
+            container.currentDirection shouldBe Some(dir)
+            container.trains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)
+          case _ => fail()
 
       "move train into station" in:
         val (dtt, see, rInfo) = extractInfo(2, _.nextRoute)
         (dtt.stationNr(1).map(_._1), dtt.stationNr(2).map(_._1), rInfo.map(_._1).headOption) match
           case (Some(d), Some(a), Some(ree)) => matchRouteInfo(d, a, see, ree)
-          case _ => fail()
+          case _                             => fail()
         see.trains.contains(trainAgent3905) shouldBe true
         rInfo.map(_._1).collectTrains.contains(trainAgent3905) shouldBe false
         see.trains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)
