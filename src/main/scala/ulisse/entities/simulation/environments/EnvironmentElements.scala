@@ -59,6 +59,9 @@ object EnvironmentElements:
     /** Check if the provided train is present inside the element containers */
     def contains(train: TrainAgent): Boolean = containers.exists(_.contains(train))
 
+    /** Constructor to update the environment */
+    protected def constructor(containers: Seq[TAC]): EE
+
     private def updateEE(
         trainAgent: TrainAgent,
         updateFunction: TAC => Option[TAC],
@@ -67,9 +70,6 @@ object EnvironmentElements:
       containers.updateWhenWithEffects(_.contains(trainAgent))(updateFunction).map(tracks =>
         constructor(tracks)
       ) when condition
-
-    /** Update the containers with the provided sequence */
-    protected def constructor(containers: Seq[TAC]): EE
 
   /** Companion object for [[TrainAgentEEWrapper]] */
   object TrainAgentEEWrapper:
