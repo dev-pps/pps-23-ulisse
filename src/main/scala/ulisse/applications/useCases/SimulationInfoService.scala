@@ -34,7 +34,7 @@ final case class SimulationInfoService(private val eventQueue: SimulationEventQu
   override def trainInfo(t: Train): Future[Option[TrainAgentInfo]] =
     val p = Promise[Option[TrainAgentInfo]]
     eventQueue.addReadSimulationEnvironmentEvent(env => {
-      (env.trains.find(_ == t), env.dynamicTimetableEnvironment.dynamicTimetablesByTrain.find(_._1 == t)) match
+      (env.trains.find(_ == t), env.timetablesByTrain.find(_._1 == t)) match
         case (Some(t), Some(tt)) => p.success(Some(TrainAgentInfo(t, tt._2)))
         case _                   => p.success(None)
     })

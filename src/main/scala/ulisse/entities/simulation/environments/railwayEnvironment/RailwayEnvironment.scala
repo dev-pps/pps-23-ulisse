@@ -5,15 +5,13 @@ import ulisse.entities.route.{RouteEnvironment, RouteEnvironmentElement}
 import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.EnvironmentElements.EnvironmentElement
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
-import ulisse.entities.simulation.environments.Environments.EnvironmentsCoordinator
+import ulisse.entities.simulation.environments.Environments.{Environment, EnvironmentsCoordinator}
 import ulisse.entities.station.{Station, StationEnvironment, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetableEnvironment
-import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
+import ulisse.entities.timetable.DynamicTimetables.*
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.Train
-import ulisse.utils.CollectionUtils.{updateWhen, updateWhenWithEffects}
-import ulisse.utils.Times.{ClockTime, Time}
-import ulisse.entities.timetable.DynamicTimetables.*
+import ulisse.utils.Times.Time
 
 /** Simulation Environment for Railway simulations */
 trait RailwayEnvironment extends EnvironmentsCoordinator[RailwayEnvironment]:
