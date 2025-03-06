@@ -12,7 +12,9 @@ import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProv
 import ulisse.entities.station.{StationEnvironment, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetableEnvironment
 import ulisse.entities.station.StationEnvironmentElement
+import ulisse.entities.timetable.DynamicTimetableEnvironment
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
+import ulisse.entities.train.TrainAgentTest.{normalTrain, normalTrainAgent}
 import ulisse.entities.train.TrainAgents.*
 import ulisse.utils.Times.ClockTime
 class PerceptionProviderTest extends AnyWordSpec with Matchers:
@@ -230,4 +232,15 @@ class PerceptionProviderTest extends AnyWordSpec with Matchers:
         trainInRouteWithStationInfoAndTrainAhead(true, distanceTrainAhead)
         perceptionProvider.perceptionFor(railwayEnvironment, trainAgent) shouldBe Some(
           TrainPerceptionInRoute(TrainRouteInfo(routeTypology, routeLength, Some(10.0), true))
+        )
+
+      "provide a perception when there is a train ahead but the route is note compatible" in:
+        val distanceTrainAhead = 10.0
+        when(ree.contains(normalTrainAgent)).thenReturn(true)
+        when(railwayEnvironment.dynamicTimetableEnvironment.findCurrentTimetableFor(normalTrainAgent)).thenReturn(Some(
+          dtt
+        ))
+        trainInRouteWithStationInfoAndTrainAhead(true, distanceTrainAhead)
+        perceptionProvider.perceptionFor(railwayEnvironment, normalTrainAgent) shouldBe Some(
+          TrainPerceptionInRoute(TrainRouteInfo(routeTypology, routeLength, None, true))
         )

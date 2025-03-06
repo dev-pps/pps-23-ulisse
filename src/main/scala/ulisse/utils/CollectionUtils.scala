@@ -13,9 +13,6 @@ object CollectionUtils:
     /** Update all elements in the collection that satisfy the condition. */
     def updateWhen(condition: A => Boolean)(update: A => A): F[A] =
       collection.updateWhenWithEffects(condition)(wrappedUpdate(update))
-      
-    def swapWhen(condition: A => Boolean)(element: A): F[A] =
-      collection.updateWhen(condition)(_ => element)
 
     /** Swap all elements in the collection that satisfy the condition. */
     def swapWhen(condition: A => Boolean)(element: A): F[A] =

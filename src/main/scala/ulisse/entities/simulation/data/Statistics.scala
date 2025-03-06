@@ -9,7 +9,10 @@ import ulisse.utils.Times.Time
 object Statistics:
 
   extension (tai: TrainAgentInfo)
-    def currentDynamicTimetable: Option[DynamicTimetable] = tai.timetables.sortBy(_.departureTime).find(!_.completed)
+    def currentDynamicTimetable: Option[DynamicTimetable] =
+      val a = tai.timetables
+      println(a)
+      a.sortBy(_.departureTime).find(!_.completed)
     def delayInCurrentTimetable: Option[Time]             = currentDynamicTimetable.flatMap(_.currentDelay)
 
   extension (environment: RailwayEnvironment)
