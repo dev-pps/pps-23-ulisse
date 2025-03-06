@@ -1,3 +1,9 @@
+## [1.24.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.23.0...v1.24.0) (2025-03-06)
+
+### Features
+
+* **StationService:** update api to handle route update on station update/remove ([e17b759](https://github.com/dev-pps/pps-23-ulisse/commit/e17b759707f633268145b6be150f3588f6f5b9e2))
+
 ## [1.23.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.22.0...v1.23.0) (2025-03-05)
 
 ### Features
