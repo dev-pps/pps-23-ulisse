@@ -15,6 +15,7 @@ object SwingUtils:
   val labelFont = new Font("Arial", java.awt.Font.BOLD, 14)
   val valueFont = new Font("Arial", java.awt.Font.PLAIN, 14)
 
+  @SuppressWarnings (Array ("org.wartremover.warts.ImplicitConversion"))
   extension (s: Option[String])
     implicit def defaultString: String =
       s.getOrElse("N/A")

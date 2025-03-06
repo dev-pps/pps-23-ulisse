@@ -6,6 +6,7 @@ import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
+import ulisse.infrastructures.view.components.ExtendedSwing.SLabel
 
 import scala.swing.event.MouseEvent
 import scala.swing.{Component, Orientation}
@@ -61,7 +62,9 @@ object Form:
 
     private val mainPanel: ExtendedSwing.SBoxPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     mainPanel.rect = Styles.panelRect
-    mainPanel.contents += TimetableView(TimetableViewAdapter(TimetableInputPortMocked()))
+    mainPanel.contents += SLabel(
+      "set timetable view with adapters"
+    ) // TimetableView(TimetableViewAdapter(TimetableInputPortMocked()))
 
     override def showErrorMessage(message: String): Unit = ()
 
