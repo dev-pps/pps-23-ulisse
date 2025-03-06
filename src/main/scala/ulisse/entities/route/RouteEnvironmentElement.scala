@@ -4,7 +4,6 @@ import ulisse.entities
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.route.Tracks.{Track, TrackDirection}
 import ulisse.entities.simulation.environments.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
-import ulisse.entities.simulation.environments.Environment
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.*
@@ -54,7 +53,7 @@ object RouteEnvironmentElement:
         firstAvailableContainer <- containers.find(_.isAvailable(direction))
         updatedContainers <-
           containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
-      yield updateEEContainers(updatedContainers)) when !contains(train) && isAvailableFor(train, direction)
+      yield constructor(updatedContainers)) when !contains(train) && isAvailableFor(train, direction)
 
-    override def updateEEContainers(containers: Seq[Track]): RouteEnvironmentElement =
+    override def constructor(containers: Seq[Track]): RouteEnvironmentElement =
       copy(containers = containers)

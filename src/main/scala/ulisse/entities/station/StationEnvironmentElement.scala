@@ -1,7 +1,6 @@
 package ulisse.entities.station
 
 import ulisse.entities.simulation.environments.EnvironmentElements.{TrainAgentEEWrapper, TrainAgentsContainer}
-import ulisse.entities.simulation.environments.Environment
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.*
 import ulisse.utils.OptionUtils.{given_Conversion_Option_Option, when}
@@ -50,7 +49,7 @@ object StationEnvironmentElement:
       (for
         firstAvailableContainer <- containers.find(_.isAvailable)
         updatedContainers       <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train))
-      yield updateEEContainers(updatedContainers)) when !contains(train)
+      yield constructor(updatedContainers)) when !contains(train)
 
-    override protected def updateEEContainers(containers: Seq[Platform]): StationEnvironmentElement =
+    override protected def constructor(containers: Seq[Platform]): StationEnvironmentElement =
       copy(containers = containers)

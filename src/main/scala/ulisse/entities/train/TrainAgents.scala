@@ -9,6 +9,7 @@ import ulisse.entities.train.Trains.Train
 import ulisse.entities.train.MotionDatas.{emptyMotionData, MotionData}
 import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates
 import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates.StateBehavior
+import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given_PerceptionProvider_RailwayEnvironment_TrainAgent
 
 object TrainAgents:
   trait TrainAgentInfo:
@@ -57,6 +58,7 @@ object TrainAgents:
   case class TrainPerceptionInRoute(perceptionData: TrainRouteInfo)     extends TrainAgentPerception[TrainRouteInfo]
 
   trait TrainAgent extends Train with SimulationAgent[TrainAgent]:
+    override type EC = RailwayEnvironment
     override type E = RailwayEnvironment
     def state: TrainStates.StateBehavior
     def motionData: MotionDatas.MotionData
@@ -75,6 +77,7 @@ object TrainAgents:
     private final case class TrainAgentImpl(train: Train, state: TrainStates.StateBehavior)
         extends TrainAgent:
       export train.*
+
       override def motionData: MotionData             = state.motionData
       override def resetDistanceTravelled: TrainAgent = TrainAgentImpl(train, state.reset())
       override def updateDistanceTravelled(distanceDelta: Double): TrainAgent =

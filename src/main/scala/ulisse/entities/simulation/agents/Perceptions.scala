@@ -1,6 +1,6 @@
 package ulisse.entities.simulation.agents
 
-import ulisse.entities.simulation.environments.{Environment, EnvironmentsCoordinator}
+import ulisse.entities.simulation.environments.Environments.EnvironmentsCoordinator
 
 /** Contains the Perceptions objects used in the simulation */
 object Perceptions:
