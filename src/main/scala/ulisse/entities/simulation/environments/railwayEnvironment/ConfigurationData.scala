@@ -6,6 +6,7 @@ import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.updateWhenWithEffects
+import ulisse.utils.Times.Time
 
 /** Configuration data for the simulation */
 trait ConfigurationData:
@@ -55,6 +56,10 @@ object ConfigurationData:
 
     /** Get all the timetables in the configuration */
     def timetables: Seq[DynamicTimetable] = configurationData.timetablesByTrain.values.flatten.toSeq
+
+    /** Get the min departure time of the timetables or if no timetable is present returns Time(0,0,0) */
+    def departureTime: Time =
+      Time.secondsToTime(configurationData.timetables.map(_.departureTime.toSeconds).foldLeft(Int.MaxValue)(math.min))
 
   private def orderedTimetablesByTrainId(
       trains: Seq[TrainAgent],

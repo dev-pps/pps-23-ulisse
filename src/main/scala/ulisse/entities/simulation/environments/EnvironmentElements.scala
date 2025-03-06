@@ -12,6 +12,7 @@ object EnvironmentElements:
   /** A data structure that contains trains */
   trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
     self: TAC =>
+
     /** The id of the container */
     def id: Int
 

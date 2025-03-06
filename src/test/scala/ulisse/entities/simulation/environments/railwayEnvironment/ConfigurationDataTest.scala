@@ -138,3 +138,10 @@ class ConfigurationDataTest extends AnyWordSpec with Matchers:
 
       "have no timetables" in:
         ConfigurationData.empty().timetablesByTrain.isEmpty shouldBe true
+
+    "departure time" should:
+      "be the minimum departure time of all timetables" in:
+        cd.departureTime shouldBe dynamicTimetable1.departureTime
+
+      "be Time(0,0,0) if no timetable is present" in:
+        ConfigurationData.empty().departureTime shouldBe Time(0, 0, 0)
