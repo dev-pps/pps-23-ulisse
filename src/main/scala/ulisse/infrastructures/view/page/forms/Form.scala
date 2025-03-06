@@ -5,6 +5,7 @@ import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
+import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 
 import scala.swing.event.MouseEvent
 import scala.swing.{Component, Orientation}
@@ -60,7 +61,7 @@ object Form:
 
     private val mainPanel: ExtendedSwing.SBoxPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     mainPanel.rect = Styles.panelRect
-    mainPanel.contents += TimetableView(TimetableInputPortMocked())
+    mainPanel.contents += TimetableView(TimetableViewAdapter(TimetableInputPortMocked()))
 
     override def showErrorMessage(message: String): Unit = ()
 

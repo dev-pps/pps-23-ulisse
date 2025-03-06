@@ -4,9 +4,9 @@ import ulisse.entities.timetable.Timetables
 import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton}
 import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.infrastructures.view.timetable.TimetableViewControllers.TimetableViewController
-import ulisse.infrastructures.view.timetable.subviews.Observers.UpdatableTimetableView
-import ulisse.infrastructures.view.timetable.model.TimetableGUIModel
+import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
+import ulisse.infrastructures.view.timetable.TimetableViewModel
+import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.UpdatableTimetableView
 import ulisse.infrastructures.view.utils.SwingUtils.SFieldLabel
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
 import scala.swing.event.ButtonClicked
@@ -15,13 +15,13 @@ import scala.swing.{BorderPanel, ComboBox, Orientation, ScrollPane, Swing}
 /** Timetable consulting tab view.
   * It gets `controller` and observes (adhering to [[UpdatableTimetableView]]) specific updates from controller to updates timetable preview.
   */
-class TimetableViewerTab(controller: TimetableViewController) extends SBoxPanel(Orientation.Vertical)
+class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Orientation.Vertical)
     with UpdatableTimetableView:
   private val trainCombo: ComboBox[String]        = ComboBox[String](controller.trainNames)
   private val trainField                          = SFieldLabel("Train")(trainCombo)
   private val timetableCombo: ComboBox[Timetable] = ComboBox[Timetable](List.empty)
   private val timetableField                      = SFieldLabel("Timetable")(timetableCombo)
-  private val timetables                          = TimetableGUIModel.generateMockTimetable(6)
+  private val timetables                          = TimetableViewModel.generateMockTimetable(6)
   private val timetableView                       = TimetableListView(timetables)
   private val UNSELECTED                          = -1
   trainCombo.selection.index = UNSELECTED
@@ -50,7 +50,7 @@ class TimetableViewerTab(controller: TimetableViewController) extends SBoxPanel(
   listenTo(timetableCombo)
   timetableCombo.reactions += {
     case SelectionChanged(`timetableCombo`) =>
-      import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.toTimetableEntries
+      import TimetableViewModel.toTimetableEntries
       timetableCombo.selectedItemOption.foreach: i =>
         timetableView.update(i.toTimetableEntries)
         deleteBtn.enabled = true

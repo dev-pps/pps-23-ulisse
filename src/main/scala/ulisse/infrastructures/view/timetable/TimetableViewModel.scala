@@ -1,8 +1,8 @@
-package ulisse.infrastructures.view.timetable.model
+package ulisse.infrastructures.view.timetable
 
 import ulisse.entities.timetable.Timetables.Timetable
 
-object TimetableGUIModel:
+object TimetableViewModel:
 
   trait TimetableEntry:
     def name: String

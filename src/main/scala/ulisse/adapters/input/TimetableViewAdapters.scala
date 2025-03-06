@@ -1,19 +1,19 @@
-package ulisse.infrastructures.view.timetable
+package ulisse.adapters.input
 
 import ulisse.applications.ports.TimetablePorts
 import ulisse.entities.timetable.Timetables.Timetable
-import ulisse.infrastructures.view.timetable.subviews.Observers.*
-import ulisse.utils.Times.ClockTime
-import ulisse.infrastructures.view.timetable.model.TimetableGUIModel.{TableEntryData, TimetableEntry}
+import ulisse.infrastructures.view.timetable.TimetableViewModel.{TableEntryData, TimetableEntry}
+import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.*
 import ulisse.utils.Errors.BaseError
+import ulisse.utils.Times.ClockTime
 import ulisse.utils.ValidationUtils.validateNonBlankString
 
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.Swing
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Right as reset, Success}
 
-object TimetableViewControllers:
+object TimetableViewAdapters:
   /** Timetable view error. It contains a `title` and a `descr` (description). */
   sealed trait Error(val title: String, val descr: String) extends BaseError
   object Error:
@@ -25,7 +25,7 @@ object TimetableViewControllers:
     final case class RequestException(excMsg: String) extends Error("Request Exception", s"message: $excMsg")
 
   /** Timetable view controller. */
-  trait TimetableViewController extends Observed:
+  trait TimetableViewAdapter extends Observed:
     /** Returns train names. */
     def trainNames: List[String]
 
@@ -55,15 +55,15 @@ object TimetableViewControllers:
     /** Save timetable draft. */
     def save(): Unit
 
-  object TimetableViewController:
+  object TimetableViewAdapter:
     /** Creates view controller for the timetables views. It requires `port` to which communicate to save and get required infos. */
-    def apply(port: TimetablePorts.Input): TimetableViewController =
-      ViewControllerImpl(port)
+    def apply(port: TimetablePorts.Input): TimetableViewAdapter =
+      ViewAdapterImpl(port)
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private class ViewControllerImpl(port: TimetablePorts.Input)
-        extends TimetableViewController:
-      import ulisse.infrastructures.view.timetable.TimetableViewControllers.Error.*
+    private class ViewAdapterImpl(port: TimetablePorts.Input)
+        extends TimetableViewAdapter:
+      import TimetableViewAdapters.Error.*
       private var stations: List[TimetableEntry]                = List.empty
       private var selectedTrain: Option[String]                 = None
       private var startTime: Option[ClockTime]                  = None
@@ -113,7 +113,6 @@ object TimetableViewControllers:
           timetableView.map(_.update(updatedTimetables))
 
       override def save(): Unit =
-        println("request port to save timetable")
         val errorTitle = "Save timetable"
         val res =
           for
