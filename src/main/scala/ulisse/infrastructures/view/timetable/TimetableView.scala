@@ -5,7 +5,6 @@ import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
 import TimetableAdapterObservers.ErrorObserver
 import ulisse.adapters.MockedEntities.TrainServiceMock
-import ulisse.applications.useCases.TrainService
 import ulisse.infrastructures.view.timetable.subviews.{EditorTab, TimetableViewerTab}
 
 import scala.swing.{Component, Orientation}
@@ -18,6 +17,7 @@ object TimetableView:
     TimetableTabbedPane(adapter).component
 
   private class TimetableTabbedPane(controller: TimetableViewAdapter) extends JTabbedPane with ErrorObserver:
+    import ulisse.infrastructures.view.components.ExtendedSwing.toTabbedPane
     given orientation: Orientation.Value = Orientation.Horizontal
     private val formIcon                 = ComposedImageLabel.createIcon("icons/calendar_add_on.svg", "Create")
     private val savedIcon                = ComposedImageLabel.createIcon("icons/calendar_clock.svg", "Saved")
@@ -28,6 +28,7 @@ object TimetableView:
         formIcon  -> editorTab,
         savedIcon -> timetableViewer
       ).toTabbedPane
+
     controller.addErrorObserver(this)
 
     override def component[T >: Component]: T = tabbedPane.component

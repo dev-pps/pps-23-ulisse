@@ -3,9 +3,9 @@ package ulisse.infrastructures.view.timetable
 /** Pattern Observer traits of timetable views. */
 object TimetableAdapterObservers:
 
-  trait Observed:
+  trait Observed[T]:
     /** Register observer interested to show timetable draft not yet saved. */
-    def addListener[T](observer: Updatable[T]): Unit
+    def addListener(observer: Updatable[T]): Unit
 
     /** Register observer interested to be notified of errors. */
     def addErrorObserver(errObserver: ErrorObserver): Unit
