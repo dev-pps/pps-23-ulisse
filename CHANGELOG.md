@@ -1,3 +1,16 @@
+## [1.25.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.24.0...v1.25.0) (2025-03-06)
+
+### Features
+
+* implemented fsm train agent ([3409445](https://github.com/dev-pps/pps-23-ulisse/commit/340944508f5348d5c5190305297e367fdc7ab599))
+* init train agent behaviour ([2d65d13](https://github.com/dev-pps/pps-23-ulisse/commit/2d65d13b25f4ae0ac8d4355478226d32f1fe31c7))
+* separate file MotionData ([054ab4f](https://github.com/dev-pps/pps-23-ulisse/commit/054ab4f9e2572f48ef2c95e8d86e0e367acafcbe))
+* **TrainAgent:** calculate travelled distance given dt and departed from station ([e350d18](https://github.com/dev-pps/pps-23-ulisse/commit/e350d18d42d8c874eec6fe3b56f4e8db9c88e8a6))
+
+### Bug Fixes
+
+* technology manager empty method typo ([d858046](https://github.com/dev-pps/pps-23-ulisse/commit/d858046971142683b666f69739683a3f45e1b871))
+
 ## [1.24.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.23.0...v1.24.0) (2025-03-06)
 
 ### Features
