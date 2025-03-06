@@ -9,7 +9,7 @@ import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.EnvironmentElements.EnvironmentElement
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
-import ulisse.entities.simulation.environments.Environment
+import ulisse.entities.simulation.environments.{Environment, EnvironmentsCoordinator}
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
@@ -19,7 +19,7 @@ import ulisse.utils.CollectionUtils.{updateWhen, updateWhenWithEffects}
 import ulisse.utils.Times.{ClockTime, Time}
 
 /** Simulation Environment for Railway simulations */
-trait RailwayEnvironment extends Environment[RailwayEnvironment]:
+trait RailwayEnvironment extends EnvironmentsCoordinator[RailwayEnvironment]:
   /** simulation time */
   def time: Time
 
@@ -36,14 +36,14 @@ trait RailwayEnvironment extends Environment[RailwayEnvironment]:
   def timetables: Seq[DynamicTimetable] = timetablesByTrain.values.flatten.toSeq
 
   /** environment elements in the environment */
-  override def environmentElements: List[EnvironmentElement] = (stations ++ routes ++ timetables).toList
+  def environmentElements: List[EnvironmentElement] = (stations ++ routes ++ timetables).toList
 
   /** trains in the environment */
   def trains: Seq[TrainAgent] =
     (stations.flatMap(_.containers.flatMap(_.trains)) ++ routes.flatMap(_.containers.flatMap(_.trains))).distinct
 
   /** agents in the environment */
-  override def agents: List[SimulationAgent[?]] = trains.toList
+  def agents: List[SimulationAgent[?]] = trains.toList
 
   /** find active timetable for an agent */
   def findCurrentTimeTableFor(train: TrainAgent): Option[DynamicTimetable]
@@ -88,7 +88,8 @@ object RailwayEnvironment:
       routeEnvironment: RouteEnvironment,
       timetablesByTrain: Map[Train, Seq[DynamicTimetable]]
   ) extends RailwayEnvironment:
-    export routeEnvironment.routes
+    export routeEnvironment.environmentElements as routes
+    override def environments = Seq(routeEnvironment)
     def doStep(dt: Int): RailwayEnvironment =
       // Allow agents to be at the same time in more than an environment element
       // that because an agent when enters a station doesn't leave immediately the route and vice versa
