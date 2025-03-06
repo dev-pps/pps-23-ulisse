@@ -1,8 +1,7 @@
 package ulisse.infrastructures.view.train
 
 import ulisse.applications.ports.TrainPorts
-import ulisse.infrastructures.view.components.ExtendedSwing.SLabel
-import ulisse.infrastructures.view.components.ExtendedSwing.{SButton, SFlowPanel, SLabel}
+import ulisse.infrastructures.view.components.ExtendedSwing.{SButton, SFlowPanel, SLabel, SNumberField}
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.train.model.TrainViewModel.{emptyTrainData, TechType, TrainData, WagonName}
@@ -36,8 +35,8 @@ object TrainEditorView:
     private val nameField                           = ComposedSwing.createInfoTextField("Name")
     private val trainTechCombo: ComboBox[TechType]  = ComboBox(List.empty)
     private val wagonTypeCombo: ComboBox[WagonName] = ComboBox(List.empty)
-    private val wagonCountAmount: TextField         = SwingUtils.SNumberField(2)
-    private val wagonCapacity: TextField            = SwingUtils.SNumberField(4)
+    private val wagonCountAmount: TextField         = SNumberField(2)
+    private val wagonCapacity: TextField            = SNumberField(4)
     private val saveBtn                             = SButton("Save")
     private val updateBtn                           = SButton("Update")
     private val deleteBtn                           = SButton("Delete")

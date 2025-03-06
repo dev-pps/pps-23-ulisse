@@ -2,13 +2,13 @@ package ulisse.infrastructures.view.timetable.subviews
 
 import ulisse.entities.timetable.Timetables
 import ulisse.entities.timetable.Timetables.Timetable
-import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton}
+import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SFieldLabel}
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.infrastructures.view.timetable.TimetableViewModel
 import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.UpdatableTimetableView
-import ulisse.infrastructures.view.utils.SwingUtils.SFieldLabel
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
+
 import scala.swing.event.ButtonClicked
 import scala.swing.{BorderPanel, ComboBox, Orientation, ScrollPane, Swing}
 

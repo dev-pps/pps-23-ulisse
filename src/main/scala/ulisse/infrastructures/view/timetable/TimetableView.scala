@@ -22,7 +22,6 @@ object TimetableView:
     private val savedIcon                = ComposedImageLabel.createIcon("icons/calendar_clock.svg", "Saved")
     private val editorTab                = EditorTab(controller)
     private val timetableViewer          = TimetableViewerTab(controller)
-    import ulisse.infrastructures.view.utils.SwingUtils.toTabbedPane
     private val tabbedPane =
       Map(
         formIcon  -> editorTab,
