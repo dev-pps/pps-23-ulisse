@@ -1,6 +1,6 @@
 package ulisse.entities.simulation.agents
 
-import ulisse.entities.simulation.environments.Environment
+import ulisse.entities.simulation.environments.{Environment, EnvironmentsCoordinator}
 
 /** Contains the Perceptions objects used in the simulation */
 object Perceptions:
@@ -13,9 +13,9 @@ object Perceptions:
     def perceptionData: PD
 
   /** PerceptionProvider trait */
-  trait PerceptionProvider[E <: Environment[E], SA <: SimulationAgent[SA]]:
+  trait PerceptionProvider[EC <: EnvironmentsCoordinator[EC], SA <: SimulationAgent[SA]]:
     /** Provided Perception type */
     type P <: Perception[?]
 
     /** Provides a perception for the agent given the environment */
-    def perceptionFor(environment: E, agent: SA): Option[P]
+    def perceptionFor(environment: EC, agent: SA): Option[P]
