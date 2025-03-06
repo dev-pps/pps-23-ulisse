@@ -5,17 +5,22 @@ import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SFieldLabel}
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
+import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.Updatable
 import ulisse.infrastructures.view.timetable.TimetableViewModel
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
 
 import scala.swing.event.ButtonClicked
 import scala.swing.{BorderPanel, ComboBox, Orientation, ScrollPane, Swing}
 
+final case class TimetableViewerData()
+
 /** Timetable consulting tab view.
   * It gets `controller` and observes (adhering to [[UpdatableTimetableView]]) specific updates from controller to updates timetable preview.
   */
-class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Orientation.Vertical):
-  private val trainCombo: ComboBox[String]        = ComboBox[String](controller.trainNames)
+class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Orientation.Vertical)
+    with Updatable[TimetableViewerData]:
+  controller.requestTrainNames()
+  private val trainCombo: ComboBox[String]        = ComboBox[String](List.empty)
   private val trainField                          = SFieldLabel("Train")(trainCombo)
   private val timetableCombo: ComboBox[Timetable] = ComboBox[Timetable](List.empty)
   private val timetableField                      = SFieldLabel("Timetable")(timetableCombo)
@@ -69,3 +74,5 @@ class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Ori
   extension [T](comboBox: ComboBox[T])
     private def selectedItemOption: Option[T] =
       Option.when(comboBox.selection.item != null)(comboBox.selection.item)
+
+  override def update(data: TimetableViewerData): Unit = print(s"here updated data of the view: $data")

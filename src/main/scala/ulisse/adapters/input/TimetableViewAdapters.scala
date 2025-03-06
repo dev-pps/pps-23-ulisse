@@ -2,7 +2,7 @@ package ulisse.adapters.input
 
 import ulisse.applications.ports.{TimetablePorts, TrainPorts}
 import ulisse.entities.timetable.Timetables.Timetable
-import ulisse.infrastructures.view.timetable.TimetableViewModel.{TableEntryData, TimetableEntry}
+import ulisse.infrastructures.view.timetable.TimetableViewModel.{trainId, TableEntryData, TimetableEntry, TrainId}
 import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.*
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.Times.ClockTime
@@ -24,10 +24,13 @@ object TimetableViewAdapters:
         extends Error("Timetable Save request Error", msg)
     final case class RequestException(excMsg: String) extends Error("Request Exception", s"message: $excMsg")
 
-  /** Timetable view controller. */
-  trait TimetableViewAdapter extends Observed:
-    /** Returns train names. */
-    def trainNames: List[String]
+  /** Timetable view controller.
+    *
+    * It is observable for list of [[TrainId]]
+    */
+  trait TimetableViewAdapter extends Observed[List[TrainId]]:
+    /** Requests train names. */
+    def requestTrainNames(): Unit
 
     /** Requests timetables given the `trainName` to timetable service. */
     def requestTimetables(trainName: String): Unit
@@ -64,24 +67,24 @@ object TimetableViewAdapters:
     private class ViewAdapterImpl(tablePort: TimetablePorts.Input, trainPort: TrainPorts.Input)
         extends TimetableViewAdapter:
       import TimetableViewAdapters.Error.*
-      private var stations: List[TimetableEntry]       = List.empty
-      private var selectedTrain: Option[String]        = None
-      private var startTime: Option[ClockTime]         = None
-      private var errorObserver: Option[ErrorObserver] = None
+      private var stations: List[TimetableEntry]                     = List.empty
+      private var selectedTrain: Option[String]                      = None
+      private var startTime: Option[ClockTime]                       = None
+      private var errorObserver: Option[ErrorObserver]               = None
+      private var trainNamesObserver: List[Updatable[List[TrainId]]] = List.empty
 
       given executionContext: ExecutionContext = ExecutionContext.fromExecutorService(
         Executors.newFixedThreadPool(1)
       )
 
-      def addListener[T](observer: Updatable[T]): Unit = println("add listenr")
       private def showError(err: Error): Unit =
         errorObserver.foreach(o => Swing.onEDT(o.showError(err.title, err.descr)))
 
-      override def trainNames: List[String] = List.empty
-      trainPort.trains.onComplete {
-        case Failure(e) => showError(RequestException(e.getMessage))
-        case Success(l) => println(s"train request $l")
-      }
+      override def requestTrainNames(): Unit =
+        trainPort.trains.onComplete {
+          case Failure(e) => showError(RequestException(e.getMessage))
+          case Success(l) => trainNamesObserver.foreach(_.update(l.map(t => trainId(t.name))))
+        }
 
       override def insertStation(stationName: String, waitTime: Option[Int]): List[TimetableEntry] =
         import Error.{EmptyDepartureTime, EmptyTrainSelection}
@@ -144,12 +147,16 @@ object TimetableViewAdapters:
       override def selectTrain(trainName: String): Unit =
         selectedTrain.foreach(_ => reset())
         selectedTrain = Some(trainName)
+
       override def setDepartureTime(h: Int, m: Int): Unit =
         startTime.foreach(_ => reset())
         startTime = ClockTime(h, m).toOption
 
       override def addErrorObserver(errObserver: ErrorObserver): Unit =
         errorObserver = Some(errObserver)
+
+      override def addListener(observer: Updatable[List[TrainId]]): Unit =
+        trainNamesObserver = observer :: trainNamesObserver
 
       import ulisse.applications.ports.TimetablePorts.RequestResult
       extension (toComplete: Future[RequestResult])

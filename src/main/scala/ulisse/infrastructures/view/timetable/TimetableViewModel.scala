@@ -3,6 +3,11 @@ package ulisse.infrastructures.view.timetable
 import ulisse.entities.timetable.Timetables.Timetable
 
 object TimetableViewModel:
+  opaque type TrainId = String
+
+  def trainId(id: String): TrainId = id
+  extension (ti: TrainId)
+    def value: String = ti
 
   trait TimetableEntry:
     def name: String
