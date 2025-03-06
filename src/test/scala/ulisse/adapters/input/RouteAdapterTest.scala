@@ -30,6 +30,40 @@ class RouteAdapterTest extends AnyWordSpec with Matchers:
   private def updateState() = runAll(appState, eventQueue.events)
 
   "User" when:
+    "insert invalid data for saving and deletion" should:
+      "notify an error invalid route type" in:
+        for route <- validateRoute
+        yield
+          val creationInfo = route.toCreationInfo.copy(typology = "Invalid")
+          val saveError    = adapter.save(Option.empty, creationInfo)
+          val deleteError  = adapter.delete(creationInfo)
+          updateState()
+          val error = Left(Chain(RouteAdapter.Errors.InvalidRouteType))
+          Await result (saveError, Duration.Inf) mustBe error
+          Await result (deleteError, Duration.Inf) mustBe error
+
+      "notify an error because railsCount is not a number" in:
+        for route <- validateRoute
+        yield
+          val creationInfo = route.toCreationInfo.copy(rails = "Invalid")
+          val saveError    = adapter.save(Option.empty, creationInfo)
+          val deleteError  = adapter.delete(creationInfo)
+          updateState()
+          val error = Left(Chain(RouteAdapter.Errors.InvalidRailsCount))
+          Await result (saveError, Duration.Inf) mustBe error
+          Await result (deleteError, Duration.Inf) mustBe error
+
+      "notify an error because length is not a number" in:
+        for route <- validateRoute
+        yield
+          val creationInfo = route.toCreationInfo.copy(length = "Invalid")
+          val saveError    = adapter.save(Option.empty, creationInfo)
+          val deleteError  = adapter.delete(creationInfo)
+          updateState()
+          val error = Left(Chain(RouteAdapter.Errors.InvalidRouteLength))
+          Await result (saveError, Duration.Inf) mustBe error
+          Await result (deleteError, Duration.Inf) mustBe error
+
     "click save route" should:
       "add a new route when inputs are valid and oldRoute is empty" in:
         for route <- validateRoute
@@ -38,7 +72,7 @@ class RouteAdapterTest extends AnyWordSpec with Matchers:
           updateState()
           Await result (response, Duration.Inf) mustBe Right(singleElementManager.routes)
 
-      "launch an error when save same route" in:
+      "notify an error when save same route" in:
         for route <- validateRoute
         yield
           val save       = adapter.save(Option.empty, route.toCreationInfo)
@@ -57,14 +91,14 @@ class RouteAdapterTest extends AnyWordSpec with Matchers:
           updateState()
           Await result (responseUpdate, Duration.Inf) mustBe Right(updateManager.routes)
 
-      "launch an error when update route that not exist" in:
+      "notify an error when update route that not exist" in:
         for route <- validateRoute
         yield
           val update = adapter.save(route.some, route.toCreationInfo)
           updateState()
           Await result (update, Duration.Inf) mustBe Left(Chain(RouteManagers.Errors.NotFound))
 
-      "launch an errors when inputs are not valid" in:
+      "notify an errors when inputs are not valid" in:
         for
           route <- validateRoute
           error <- validateDifferentRoute
@@ -91,7 +125,7 @@ class RouteAdapterTest extends AnyWordSpec with Matchers:
           Await result (save, Duration.Inf)
           Await result (delete, Duration.Inf) mustBe Right(List.empty)
 
-      "launch an error when delete route that not exist" in:
+      "notify an error when delete route that not exist" in:
         for route <- validateRoute
         yield
           val delete = adapter.delete(route.toCreationInfo)

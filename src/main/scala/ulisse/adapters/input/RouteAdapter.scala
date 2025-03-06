@@ -2,7 +2,7 @@ package ulisse.adapters.input
 
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
-import ulisse.adapters.input.RouteAdapter.RouteCreationInfo
+import ulisse.adapters.input.RouteAdapter.{Errors, RouteCreationInfo}
 import ulisse.applications.managers.RouteManagers
 import ulisse.applications.ports.RoutePorts
 import ulisse.entities.route.Routes
@@ -21,6 +21,15 @@ trait RouteAdapter:
   /** The return type of the [[RouteAdapter]] methods. */
   type Value = Either[RouteAdapterError, List[Route]]
 
+  /** Save the route from the given [[RouteCreationInfo]] if oldRoute is None a new route is created, otherwise the old route is updated. */
+  def save(oldRoute: Option[Route], data: RouteCreationInfo)(using ec: ExecutionContext): Future[Value]
+
+  /** Delete the route from the given [[RouteCreationInfo]]. */
+  def delete(data: RouteCreationInfo)(using ec: ExecutionContext): Future[Value]
+
+/** Companion object for the [[RouteAdapter]] class. */
+object RouteAdapter:
+
   /** Errors that can be generated during calls to the [[RouteAdapter]] methods. */
   enum Errors(val text: String) extends ErrorMessage(text):
     /** Invalid route type. */
@@ -31,15 +40,6 @@ trait RouteAdapter:
 
     /** Invalid route length. */
     case InvalidRouteLength extends Errors("Invalid route length")
-
-  /** Save the route from the given [[RouteCreationInfo]] if oldRoute is None a new route is created, otherwise the old route is updated. */
-  def save(oldRoute: Option[Route], data: RouteCreationInfo)(using ec: ExecutionContext): Future[Value]
-
-  /** Delete the route from the given [[RouteCreationInfo]]. */
-  def delete(data: RouteCreationInfo)(using ec: ExecutionContext): Future[Value]
-
-/** Companion object for the [[RouteAdapter]] class. */
-object RouteAdapter:
 
   /** Information required to create a new route. */
   case class RouteCreationInfo(departure: Station, arrival: Station, typology: String, rails: String, length: String)
