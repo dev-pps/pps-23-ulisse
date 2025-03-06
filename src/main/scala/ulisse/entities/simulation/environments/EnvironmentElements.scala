@@ -74,7 +74,6 @@ object EnvironmentElements:
   /** Companion object for [[TrainAgentEEWrapper]] */
   object TrainAgentEEWrapper:
 
-    /** Extension methods for train agent */
     extension [EE <: TrainAgentEEWrapper[EE]](train: TrainAgent)
       /** Try to remove the train from the provided environmentElement */
       def leave(ee: EE): Option[EE] =
@@ -84,13 +83,11 @@ object EnvironmentElements:
       def findIn(eeSeq: Seq[EE]): Option[EE] =
         eeSeq.find(_.contains(train))
 
-    /** Extension methods for environmentElement */
     extension [EE <: TrainAgentEEWrapper[EE]](ee: EE)
       /** Find all TrainAgent in the environment */
       def trains: Seq[TrainAgent] =
         ee.containers.flatMap(_.trains)
 
-    /** Extension methods for sequence of environmentElement */
     extension [EE <: TrainAgentEEWrapper[EE]](eeSeq: Seq[EE])
       /** Find all TrainAgent in a sequence of environments */
       def collectTrains: Seq[TrainAgent] =

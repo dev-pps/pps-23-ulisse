@@ -17,7 +17,6 @@ object Tracks:
 
   /** TrackDirection utility object */
   object TrackDirection:
-    /** Extension methods for TrackDirection */
     extension (direction: TrackDirection)
       /** Return the opposite direction */
       def opposite: TrackDirection = direction match

@@ -96,12 +96,6 @@ object RailwayEnvironment:
       routeEnvironment: RouteEnvironment,
       dynamicTimetableEnvironment: DynamicTimetableEnvironment
   ) extends RailwayEnvironment:
-    export routeEnvironment.environmentElements as routes, stationEnvironment.environmentElements as stations,
-      dynamicTimetableEnvironment.dynamicTimetablesByTrain as timetablesByTrain
-    override def environments = Seq(routeEnvironment)
-    def doStep(dt: Int): RailwayEnvironment =
-      trains.map(_.doStep(dt, this)).foldLeft(this): (env, updatedTrain) =>
-        env.updateEnvironmentWith(updatedTrain, time + Time(0, 0, dt)).getOrElse(env)
     override def doStep(dt: Int): RailwayEnvironment =
       trains.map(_.doStep(dt, this)).foldLeft(this): (env, updatedTrain) =>
         env.updateEnvironmentWith(updatedTrain, time + Time(0, 0, dt)).getOrElse(env)
@@ -125,19 +119,6 @@ object RailwayEnvironment:
         agent: TrainAgent,
         time: Time
     ): Option[RailwayEnvironmentImpl] =
-      agent.motionData.distanceTravelled match
-        case d if d >= route.length =>
-          for
-            updatedRoutes <- routeEnvironment.removeTrain(agent)
-            (updatedTimetables, currentRoute) <-
-              dynamicTimetableEnvironment.updateTables(_.arrivalUpdate(_), _.currentRoute, agent, time)
-            updatedStations <- stationEnvironment.putTrain(agent, currentRoute._2)
-          yield copy(
-            stationEnvironment = updatedStations,
-            routeEnvironment = updatedRoutes,
-            dynamicTimetableEnvironment = updatedTimetables
-          )
-        case _ => routeEnvironment.updateTrain(agent).map(updatedRoutes => copy(routeEnvironment = updatedRoutes))
       agent.distanceTravelled match
         case d if d >= route.length => swapFromRouteToStation(agent)
         case _ => routeEnvironment.updateTrain(agent).map(updatedRoutes => copy(time, routeEnvironment = updatedRoutes))

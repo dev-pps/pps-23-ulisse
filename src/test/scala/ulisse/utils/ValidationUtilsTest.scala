@@ -5,8 +5,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.utils.Errors.BaseError
 
 class ValidationUtilsTest extends AnyWordSpec with Matchers:
+  private case class TestError() extends BaseError
 
-  case class TestError() extends BaseError
   "ValidationUtils" should:
     "validate a value within the range correctly" in:
       val lowerBound = 0

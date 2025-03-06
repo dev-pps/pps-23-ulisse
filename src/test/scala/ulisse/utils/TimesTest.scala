@@ -100,3 +100,10 @@ class TimesTest extends AnyWordSpec with Matchers:
       given DefaultTimeStrategy = t => Time(t.h % 24, t.m % 60, 0)
       val defaultClockTime      = invalidClockTime.getOrDefault
       defaultClockTime.asTime shouldBe Time(2, 10, 0)
+
+  "Milliseconds" should:
+    "be converted in time" in:
+      0.toTime shouldBe Time(0, 0, 0)
+      1000.toTime shouldBe Time(0, 0, 1)
+      60000.toTime shouldBe Time(0, 1, 0)
+      3661000.toTime shouldBe Time(1, 1, 1)

@@ -19,5 +19,5 @@ object StationEnvironment:
     override def putTrain(train: TrainAgent, station: Station): Option[StationEnvironment] =
       for
         station        <- environmentElements.find(_ == station)
-        updatedStation <- station.putTrain(train.resetDistanceTravelled())
+        updatedStation <- station.putTrain(train.resetDistanceTravelled)
       yield constructor(environmentElements.updateWhen(_ == station)(_ => updatedStation))

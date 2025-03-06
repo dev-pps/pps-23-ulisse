@@ -12,6 +12,7 @@ object Times:
   private type Second = Int
   type Milliseconds   = Long
   extension (millis: Milliseconds)
+    /** Converts milliseconds to OverflowTime. */
     def toTime: Time = Time.secondsToOverflowTime((millis / 1000).toInt)
 
   /** Errors that can be returned on ClockTime creation. */
@@ -27,14 +28,22 @@ object Times:
     override def toString: String = s"$h:$m:$s"
 
   object Time:
+    /** Creates a `Time` instance. */
     def apply(h: Hour, m: Minute, s: Second): Time = TimeImpl(h, m, s)
-    def secondsToOverflowTime(s: Second): Time     = Id(Time(0, 0, s)) overflowSum Time(0, 0, 0)
-    def secondsToTime(s: Second): Time             = Id(Time(0, 0, s)) + Time(0, 0, 0)
+
+    /** Creates a `Time` instance from seconds and go beyond 24h if is needed. */
+    def secondsToOverflowTime(s: Second): Time = Id(Time(0, 0, s)) overflowSum Time(0, 0, 0)
+
+    /** Creates a `Time` instance from seconds and reset times every time a day is ended. */
+    def secondsToTime(s: Second): Time = Id(Time(0, 0, s)) + Time(0, 0, 0)
 
     val secondsInMinute, minutesInHour = 60
     val hoursInDay                     = 24
     extension (time: Time)
+      /** Converts the time to seconds. */
       def toSeconds: Int = time.h * secondsInMinute * minutesInHour + time.m * secondsInMinute + time.s
+
+      /** Converts the time to minutes. */
       def toMinutes: Int = time.h * minutesInHour + time.m + time.s / secondsInMinute
 
     private case class TimeImpl(h: Hour, m: Minute, s: Second) extends Time
@@ -117,32 +126,41 @@ object Times:
     def sameAs(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
       checkCondition(time, time2)(_ == 0)
 
+  /** Typeclass to provide different time constructors */
   trait TimeConstructor[T]:
     def construct(h: Int, m: Int, s: Int): T
 
+  /** Time constructor for plain time */
   given TimeConstructor[Time] with
     def construct(h: Int, m: Int, s: Int): Time = Time(h, m, s)
 
+  /** Time constructor for ClockTime */
   given TimeConstructor[ClockTime] with
     def construct(h: Int, m: Int, s: Int): ClockTime = ClockTime(h, m).getOrDefault
 
+  /** Time constructor for Option[ClockTime] */
   given TimeConstructor[Option[ClockTime]] with
     def construct(h: Int, m: Int, s: Int): Option[ClockTime] = ClockTime(h, m).toOption
 
+  /** Time constructor for Either[ClockTimeErrors, ClockTime] */
   given TimeConstructor[Either[ClockTimeErrors, ClockTime]] with
     def construct(h: Int, m: Int, s: Int): Either[ClockTimeErrors, ClockTime] = ClockTime(h, m)
 
+  /** Implicit conversion from time to ClockTime */
   given [M[_]: Functor]: Conversion[M[Time], M[ClockTime]] = _.map(t => ClockTime(t.h, t.m).getOrDefault)
   extension [M[_]: Monad, T <: Time](time: M[T])
+    /** Adds two times */
     @targetName("add")
     def +(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
       extractAndPerform(time, time2): (t, t2) =>
         calculateSum(t, t2)
 
+    /** Adds two times with overflow */
     def overflowSum(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
       extractAndPerform(time, time2): (t, t2) =>
         calculateOverflowSum(t, t2)
 
+    /** Subtracts two times with underflow */
     def underflowSub(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
       extractAndPerform(time, time2): (t, t2) =>
         calculateUnderflowSub(t, t2)
