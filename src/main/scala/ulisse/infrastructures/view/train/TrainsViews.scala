@@ -1,7 +1,9 @@
 package ulisse.infrastructures.view.train
 
 import ulisse.infrastructures.view.train.model.TrainViewModel
+import ulisse.infrastructures.view.utils.SwingUtils
 import ulisse.infrastructures.view.utils.SwingUtils.{defaultString, headerLabel, nameFont, valueLabel}
+
 import java.awt.Color
 import scala.swing.Swing.{EmptyBorder, HGlue, HStrut}
 import scala.swing.{BoxPanel, Component, Label, ListView, Orientation, Swing}
@@ -40,7 +42,7 @@ object TrainsViews:
         new BoxPanel(Orientation.Horizontal) {
           contents += s"$labelText:".headerLabel
           contents += HGlue
-          contents += value.valueLabel
+          contents += value.defaultString.valueLabel
           background = if isSelected then selectedColor else Color.WHITE
         }
       }
