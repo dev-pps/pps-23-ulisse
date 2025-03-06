@@ -41,8 +41,7 @@ trait MapWorkspace extends Workspace:
 object MapWorkspace:
 
   /** Creates a new instance of map workspace. */
-  def apply(adapterManager: InputAdapterManager): MapWorkspace =
-    MapWorkspaceImpl(adapterManager)
+  def apply(adapterManager: InputAdapterManager): MapWorkspace = MapWorkspaceImpl(adapterManager)
 
   /** Represents the map workspace of the application. */
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
@@ -55,15 +54,16 @@ object MapWorkspace:
     private val routeForm: RouteForm     = formManager.routeForm
 
     private var _selectedStation: Option[Station] = Option.empty
+    private var _selectedRoute: Option[Route]     = Option.empty
 
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(formManager.component) = Position.East
     workspace.revalidate()
 
-    formManager.stationForm.attachCreation(CreationStationEvent(adapterManager.station, this))
-    formManager.stationForm.attachDeletion(DeletionStationEvent(adapterManager.station, this))
+    formManager.stationForm attachCreation CreationStationEvent(adapterManager.station, this)
+    formManager.stationForm attachDeletion DeletionStationEvent(adapterManager.station, this)
 
-    mapPanel.attachClick(StationForm.TakePointFomMapEvent(stationForm))
+    mapPanel attachClick StationForm.TakePointFomMapEvent(stationForm)
 
     export workspace.{component, revalidate}, stationForm.compileForm as compileStationForm
 
@@ -72,8 +72,8 @@ object MapWorkspace:
     override def selectedStation_=(station: Option[Station]): Unit = _selectedStation = station
 
     override def updateStations(stations: StationPorts.Input#SM): Unit =
-      mapPanel.uploadStation(stations)
-      mapPanel.attachClickStation(StationForm.TakeStationFromMapEvent(this))
-      mapPanel.attachClickStation(RouteForm.TakeStationFromMapEvent(routeForm))
+      mapPanel uploadStation stations
+      mapPanel attachClickStation StationForm.TakeStationFromMapEvent(this)
+      mapPanel attachClickStation RouteForm.TakeStationFromMapEvent(routeForm)
 
     override def updateRoutes(route: List[Route]): Unit = ()

@@ -40,6 +40,12 @@ object Swings:
     /** Multiply the point by the other. */
     def times(other: Point): Point = new Point(point.x * other.x, point.y * other.y)
 
+    /** Calculate the distance between the point and the other. */
+    def distance(other: Point): Double = Math.sqrt(Math.pow(point.x - other.x, 2) + Math.pow(point.y - other.y, 2))
+
+    /** Calculate the angle between the point and the other. */
+    def angle(other: Point): Double = Math.atan2(other.y - point.y, other.x - point.x)
+
     /** Transform the point to a [[Dimension]] object. */
     def toDimension: Dimension = new Dimension(point.x, point.y)
 

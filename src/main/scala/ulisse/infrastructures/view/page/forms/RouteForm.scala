@@ -42,18 +42,18 @@ object RouteForm:
       departureStation match
         case Some(value) =>
           routeForm.arrivalStation.text = data.element.name
-          routeForm.length.text = value.coordinate.distance(data.element.coordinate).toString
+          routeForm.length.text = (value.coordinate distance data.element.coordinate).toString
           departureStation = Option.empty
         case None =>
           departureStation = Option(data.element)
           routeForm.departureStation.text = data.element.name
 
   private case class RouteFormImpl() extends RouteForm:
-    override val departureStation: ComposedSwing.InfoTextField = ComposedSwing.createInfoTextField("Departure Station")
-    override val arrivalStation: ComposedSwing.InfoTextField   = ComposedSwing.createInfoTextField("Arrival Station")
-    override val routeType: ComposedSwing.InfoTextField        = ComposedSwing.createInfoTextField("Type")
-    override val rails: ComposedSwing.InfoTextField            = ComposedSwing.createInfoTextField("Rails")
-    override val length: ComposedSwing.InfoTextField           = ComposedSwing.createInfoTextField("Length")
+    override val departureStation: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Departure Station"
+    override val arrivalStation: ComposedSwing.InfoTextField   = ComposedSwing createInfoTextField "Arrival Station"
+    override val routeType: ComposedSwing.InfoTextField        = ComposedSwing createInfoTextField "Type"
+    override val rails: ComposedSwing.InfoTextField            = ComposedSwing createInfoTextField "Rails"
+    override val length: ComposedSwing.InfoTextField           = ComposedSwing createInfoTextField "Length"
     private val saveButton   = ExtendedSwing.createFormButtonWith("Save", Styles.formTrueButtonRect)
     private val deleteButton = ExtendedSwing.createFormButtonWith("Delete", Styles.formFalseButtonRect)
     private val form         = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
