@@ -1,9 +1,6 @@
 package ulisse.infrastructures.view.utils
 
-import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.components.ExtendedSwing.{SFlowPanel, STextField}
-import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
-import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
 import ulisse.infrastructures.view.components.styles.Styles
 
 import scala.swing.*

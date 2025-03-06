@@ -1,7 +1,5 @@
 package ulisse.infrastructures.view.components
 
-import ulisse.infrastructures.view.common.Themes.Theme
-import ulisse.infrastructures.view.components.composed.ComposedImageLabel
 import ulisse.infrastructures.view.components.decorators.ImageEffects.{PictureEffect, SVGEffect}
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, FontEffect, ShapeEffect}
 import ulisse.infrastructures.view.components.styles.Styles
@@ -69,6 +67,8 @@ object ExtendedSwing:
 
   case class STextField(colum: Int) extends TextField(colum) with ShapeEffect with FontEffect
 
+  import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
+  import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
   extension (panes: Map[ComposedImageLabel, Component])
     /** Returns [[JTabbedPane]] given `panes`, a mapping of tab item [[ComposedImageLabel]] to theirs views. */
     def toTabbedPane: JTabbedPane =
@@ -78,9 +78,7 @@ object ExtendedSwing:
 
   /** A specific [[STextField]] that accept only numbers. */
   class SNumberField(cols: Int) extends STextField(cols):
-
-    import ulisse.infrastructures.view.common.Themes.withAlpha
-
+    import ulisse.infrastructures.view.common.Themes.{withAlpha, Theme}
     private val textFieldPadding    = Styles.createPadding(10, 5)
     private val textFieldBackground = Theme.light.background.withAlpha(50)
 
@@ -97,6 +95,7 @@ object ExtendedSwing:
 
   /** A themed field label for given `fieldComponent` */
   class SFieldLabel(text: String)(fieldComponent: Component) extends ComposedSwing:
+    import ulisse.infrastructures.view.common.Themes.Theme
     private val fieldBackground = Theme.light.background.withAlpha(50)
     private val mainPanel       = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     private val labelPanel      = ExtendedSwing.SFlowPanel()

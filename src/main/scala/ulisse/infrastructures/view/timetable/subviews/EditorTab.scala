@@ -1,12 +1,13 @@
 package ulisse.infrastructures.view.timetable.subviews
 
-import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SLabel}
+import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SLabel, SNumberField}
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.infrastructures.view.timetable.TimetableViewModel.TimetableEntry
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
 import ulisse.infrastructures.view.utils.SwingUtils
+
 import scala.swing.Swing.{EmptyBorder, HGlue, VStrut}
 import scala.swing.event.ButtonClicked
 import scala.swing.{BoxPanel, ComboBox, Component, Font, Label, Orientation, Panel, ScrollPane}
@@ -16,7 +17,7 @@ import scala.util.Try
 class EditorTab(controller: TimetableViewAdapter)
     extends SBoxPanel(Orientation.Vertical):
   private val trainCombo: ComboBox[String] = ComboBox[String](controller.trainNames)
-  private val waitMinutesField             = SwingUtils.SNumberField(5)
+  private val waitMinutesField             = SNumberField(5)
   private val stationField                 = ComposedSwing.createInfoTextField("Station")
   private val resetBtn                     = SButton("reset")
   private val undoBtn                      = SButton("undo")
