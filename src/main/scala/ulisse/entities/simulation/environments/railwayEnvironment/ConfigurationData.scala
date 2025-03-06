@@ -48,7 +48,6 @@ object ConfigurationData:
   def empty(): ConfigurationData =
     ConfigurationDataImpl(Seq.empty, Seq.empty, Map.empty)
 
-  /** extension methods for ConfigurationData */
   extension (configurationData: ConfigurationData)
     /** Get all the trains in the configuration */
     def trains: List[TrainAgent] =
