@@ -2,8 +2,8 @@ package ulisse.infrastructures.view.page.forms
 
 import ulisse.adapters.input.RouteAdapter
 import ulisse.adapters.input.RouteAdapter.RouteCreationInfo
-import ulisse.adapters.input.StationEditorAdapter.StationCreationInfo
 import ulisse.entities.station.Station
+import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
@@ -42,16 +42,23 @@ trait RouteForm extends Form:
   /** The arrival station of the route. */
   def arrival_=(station: Option[Station]): Unit
 
+  /** Attach the creation observer to the form of type [[RouteCreationInfo]]. */
+  def attachCreation(observer: ClickObserver[RouteCreationInfo]): Unit
+
+  /** Attach the deletion observer to the form of type [[RouteCreationInfo]]. */
+  def attachDeletion(observer: ClickObserver[RouteCreationInfo]): Unit
+
 /** Companion object of the [[RouteForm]]. */
 object RouteForm:
   /** Creates a new instance of route form. */
   def apply(): RouteForm = RouteFormImpl()
 
+  /** Represents the creation route event. */
   final case class CreationRouteEvent(adapter: RouteAdapter, workspace: MapWorkspace)
       extends ClickObserver[RouteCreationInfo]:
 
     override def onClick(data: RouteCreationInfo): Unit =
-      adapter.save(Option.empty, data) onComplete (_ fold (println, _ fold (println, workspace.updateRoutes)))
+      adapter.save(Option.empty, data).onComplete(_ fold (println, _ fold (println, workspace.updateRoutes)))
 
   /** Represents the take station from map event. */
   final case class TakeStationFromMapEvent(routeForm: RouteForm) extends ClickObserver[MapElement[Station]]:
@@ -72,17 +79,27 @@ object RouteForm:
     override val routeType: ComposedSwing.InfoTextField        = ComposedSwing createInfoTextField "Type"
     override val rails: ComposedSwing.InfoTextField            = ComposedSwing createInfoTextField "Rails"
     override val length: ComposedSwing.InfoTextField           = ComposedSwing createInfoTextField "Length"
-    private val saveButton   = ExtendedSwing.createFormButtonWith("Save", Styles.formTrueButtonRect)
-    private val deleteButton = ExtendedSwing.createFormButtonWith("Delete", Styles.formFalseButtonRect)
+    private val saveButton   = ExtendedSwing createFormButtonWith ("Save", Styles.formTrueButtonRect)
+    private val deleteButton = ExtendedSwing createFormButtonWith ("Delete", Styles.formFalseButtonRect)
     private val form         = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
 
     private var _departure: Option[Station] = Option.empty
     private var _arrival: Option[Station]   = Option.empty
 
+    private val creationObservable = Observers.createObservable[RouteCreationInfo]
+    private val deletionObservable = Observers.createObservable[RouteCreationInfo]
+
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
 
-    export form._
+//    saveButton.attach(creationObservable toObserver (_ =>
+//        RouteCreationInfo(depa
+//    ))
+//    deleteButton.attach(deletionObservable toObserver (_ =>
+//      RouteCreationInfo(name.text, xField.text, yField.text, tracks.text)
+//      ))
+
+    export form._, creationObservable.attachClick as attachCreation, deletionObservable.attachClick as attachDeletion
 
     override def departure: Option[Station] = _departure
 

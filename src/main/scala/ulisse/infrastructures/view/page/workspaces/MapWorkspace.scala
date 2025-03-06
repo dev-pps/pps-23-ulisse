@@ -30,7 +30,7 @@ trait MapWorkspace extends Workspace:
   def updateStations(stations: StationPorts.Input#SM): Unit
 
   /** Updates the routes of the map. */
-  def updateRoutes(route: List[Route]): Unit
+  def updateRoutes(routes: List[Route]): Unit
 
   /** Updates the stations and routes of the map. */
   def update(stations: StationPorts.Input#SM, routes: List[Route]): Unit =
@@ -63,6 +63,8 @@ object MapWorkspace:
     formManager.stationForm attachCreation CreationStationEvent(adapterManager.station, this)
     formManager.stationForm attachDeletion DeletionStationEvent(adapterManager.station, this)
 
+    formManager.routeForm attachCreation RouteForm.CreationRouteEvent(adapterManager.route, this)
+
     mapPanel attachClick StationForm.TakePointFomMapEvent(stationForm)
 
     export workspace.{component, revalidate}, stationForm.compileForm as compileStationForm
@@ -76,4 +78,5 @@ object MapWorkspace:
       mapPanel attachClickStation StationForm.TakeStationFromMapEvent(this)
       mapPanel attachClickStation RouteForm.TakeStationFromMapEvent(routeForm)
 
-    override def updateRoutes(route: List[Route]): Unit = ()
+    override def updateRoutes(routes: List[Route]): Unit =
+      mapPanel updateRoutes routes
