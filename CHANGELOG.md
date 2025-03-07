@@ -1,3 +1,10 @@
+## [1.29.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.28.0...v1.29.0) (2025-03-07)
+
+### Features
+
+* **RouteEnvironmentElement:** check train technology before putting in the route ([3add40c](https://github.com/dev-pps/pps-23-ulisse/commit/3add40cfc905b18d1cf04c8647838d27198801f4))
+* **Statistics:** define some statistic for simulations ([756707e](https://github.com/dev-pps/pps-23-ulisse/commit/756707e1d8658988d304b2407573c5feae562641))
+
 ## [1.28.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.27.0...v1.28.0) (2025-03-07)
 
 ### Features
