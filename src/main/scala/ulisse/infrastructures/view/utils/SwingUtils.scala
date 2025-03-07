@@ -11,18 +11,22 @@ object SwingUtils:
   val labelFont = new Font("Arial", java.awt.Font.BOLD, 14)
   val valueFont = new Font("Arial", java.awt.Font.PLAIN, 14)
 
+  /** Returns default string "N/A" if string `s` is not present */
   extension (s: Option[String])
     def defaultString: String = s.getOrElse("N/A")
 
+  /** Returns default string "N/A" if given int `i` is None */
   extension (i: Option[Int])
     def defaultIntString: String = i.map(_.toString).defaultString
 
   extension (text: String)
+    /** Returns [[Label]] with bold font and size 18pt */
     def headerLabel: Label =
       new Label(text) {
         font = labelFont
       }
 
+    /** Returns [[Label]] with plain font and size 14pt */
     def valueLabel: Label =
       new Label(text) {
         font = valueFont
@@ -39,14 +43,17 @@ object SwingUtils:
         visible = true
       }
 
+  /** Set font style of each component in `components` to [[Styles.defaultFont.swingFont]] */
   extension (components: Seq[Component])
     def setDefaultFont(): Unit =
       components.foreach(_.font = Styles.defaultFont.swingFont)
 
-  extension [A](combo: ComboBox[A])
+  /** Updates `combobox` model to new one `model` */
+  extension [A](combobox: ComboBox[A])
     def updateModel(model: Seq[A]): Unit =
       Swing.onEDT:
-        combo.peer.setModel(ComboBox.newConstantModel(model))
+        combobox.peer.setModel(ComboBox.newConstantModel(model))
 
+  /** Returns optionally the `combobox` selected item */
   extension [T](comboBox: ComboBox[T])
     def selectedItemOption: Option[T] = Option.when(comboBox.selection.item != null)(comboBox.selection.item)

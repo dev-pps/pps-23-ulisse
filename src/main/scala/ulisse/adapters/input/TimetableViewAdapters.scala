@@ -8,12 +8,10 @@ import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.*
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.Times.ClockTime
 import ulisse.utils.ValidationUtils.validateNonBlankString
-
 import java.util.concurrent.Executors
-import scala.annotation.targetName
 import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.Swing
-import scala.util.{Failure, Right as reset, Success}
+import scala.util.{Failure, Success}
 
 object TimetableViewAdapters:
   /** Timetable view error. It contains a `title` and a `descr` (description). */
