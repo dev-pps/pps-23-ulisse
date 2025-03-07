@@ -81,7 +81,7 @@ object StationForm:
   /** Represents the take station from map event. */
   final case class TakeStationFromMapEvent(workspace: MapWorkspace) extends ClickObserver[MapElement[Station]]:
     override def onClick(data: MapElement[Station]): Unit =
-      workspace.selectedStation = Option(data.element)
+      workspace.selectedStation = data.element
       workspace.compileStationForm(data.element)
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))

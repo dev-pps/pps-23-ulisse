@@ -42,6 +42,8 @@ object Routes:
     /** High-speed route. */
     case AV extends RouteType(Technology("AV", 300))
 
+    override def toString: String = technology.name
+
   /** Convert a string to a route type. */
   extension (text: String)
     /** Convert a string to a route type. */

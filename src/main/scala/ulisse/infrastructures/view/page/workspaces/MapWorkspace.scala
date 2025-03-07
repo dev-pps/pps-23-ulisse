@@ -1,5 +1,6 @@
 package ulisse.infrastructures.view.page.workspaces
 
+import cats.syntax.option.*
 import ulisse.adapters.InputAdapterManager
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.route.Routes.Route
@@ -18,13 +19,25 @@ trait MapWorkspace extends Workspace:
   def selectedStation: Option[Station]
 
   /** Set the selected station of the form. */
-  def selectedStation_=(station: Option[Station]): Unit
+  def selectedStation_=(station: Station): Unit
 
   /** Reset selected station. */
-  def resetSelectedStation(): Unit = selectedStation = Option.empty
+  def resetSelectedStation(): Unit
+
+  /** The selected route of the form. */
+  def selectedRoute: Option[Route]
+
+  /** Set the selected route of the form. */
+  def selectedRoute_=(route: Route): Unit
+
+  /** Reset selected route. */
+  def resetSelectedRoute(): Unit
 
   /** Compile station form. */
   def compileStationForm(station: Station): Unit
+
+  /** Compile route form. */
+  def compileRouteForm(route: Route): Unit
 
   /** Updates the stations of the map. */
   def updateStations(stations: StationPorts.Input#SM): Unit
@@ -68,11 +81,20 @@ object MapWorkspace:
 
     mapPanel attachClick StationForm.TakePointFomMapEvent(stationForm)
 
-    export workspace.{component, revalidate}, stationForm.compileForm as compileStationForm
+    export workspace.{component, revalidate}, stationForm.compileForm as compileStationForm,
+      routeForm.compileForm as compileRouteForm
 
     override def selectedStation: Option[Station] = _selectedStation
 
-    override def selectedStation_=(station: Option[Station]): Unit = _selectedStation = station
+    override def selectedStation_=(station: Station): Unit = _selectedStation = station.some
+
+    override def resetSelectedStation(): Unit = _selectedStation = Option.empty
+
+    override def selectedRoute: Option[Route] = _selectedRoute
+
+    override def selectedRoute_=(route: Route): Unit = _selectedRoute = route.some
+
+    override def resetSelectedRoute(): Unit = _selectedRoute = Option.empty
 
     override def updateStations(stations: StationPorts.Input#SM): Unit =
       mapPanel uploadStation stations
@@ -81,3 +103,4 @@ object MapWorkspace:
 
     override def updateRoutes(routes: List[Route]): Unit =
       mapPanel updateRoutes routes
+      mapPanel attachClickRoute RouteForm.TakeRouteFromMapEvent(this)

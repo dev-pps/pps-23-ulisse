@@ -1,7 +1,9 @@
 package ulisse.infrastructures.view.page.forms
 
+import cats.syntax.option.*
 import ulisse.adapters.input.RouteAdapter
 import ulisse.adapters.input.RouteAdapter.RouteCreationInfo
+import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.common.Observers.ClickObserver
@@ -48,6 +50,9 @@ trait RouteForm extends Form:
   /** Attach the deletion observer to the form of type [[RouteCreationInfo]]. */
   def attachDeletion(observer: ClickObserver[RouteCreationInfo]): Unit
 
+  /** Compile the form. */
+  def compileForm(route: Route): Unit
+
   /** Compute the distance between the departure and arrival stations if both are present. */
   def computeDistance(): Unit = (departure, arrival) match
     case (Some(departure), Some(arrival)) => length.text = departure.coordinate.distance(arrival.coordinate).toString
@@ -74,7 +79,6 @@ object RouteForm:
 
   /** Represents the take station from map event. */
   final case class TakeStationFromMapEvent(routeForm: RouteForm) extends ClickObserver[MapElement[Station]]:
-
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var chosenStation = false
 
@@ -82,6 +86,12 @@ object RouteForm:
       if chosenStation then routeForm.departure = Option(data.element)
       else routeForm.arrival = Option(data.element)
       chosenStation = !chosenStation
+
+  /** Represents the take route from map event. */
+  final case class TakeRouteFromMapEvent(workspace: MapWorkspace) extends ClickObserver[MapElement[Route]]:
+    override def onClick(data: MapElement[Route]): Unit =
+      workspace.selectedRoute = data.element
+      workspace.compileRouteForm(data.element)
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class RouteFormImpl() extends RouteForm:
@@ -125,3 +135,10 @@ object RouteForm:
       _arrival = station
       station.foreach(data => arrivalStation.text = data.name)
       computeDistance()
+
+    override def compileForm(route: Route): Unit =
+      departure = route.departure.some
+      arrival = route.arrival.some
+      routeType.text = route.typology.toString
+      rails.text = route.railsCount.toString
+      length.text = route.length.toString
