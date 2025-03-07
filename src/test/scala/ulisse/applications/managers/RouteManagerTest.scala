@@ -3,6 +3,7 @@ package ulisse.applications.managers
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import ulisse.applications.managers.RouteManagers.{Errors, RouteManager}
+import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteTest.*
 import ulisse.entities.route.Routes.*
 import ulisse.entities.station.Station
@@ -164,3 +165,12 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
 
   "delete route form arrival station that not exist" should "be empty" in:
     singleElementManager deleteByArrival departure mustBe Left(Errors.NotFound)
+
+  "delete route from station" should "be empty" in:
+    singleElementManager deleteByStation departure mustBe Right(emptyManager)
+    singleElementManager deleteByStation arrival mustBe Right(emptyManager)
+
+  "delete route form station that not exist" should "be empty" in:
+    val station = Station("Not Exist", Coordinate(0, 0), 3)
+    station.coordinate must not be departure.coordinate
+    singleElementManager deleteByStation station mustBe Left(Errors.NotExist)

@@ -51,6 +51,9 @@ trait MapWorkspace extends Workspace:
 
   /** Updates the stations and routes of the map. */
   def update(stations: StationPorts.Input#SM, routes: List[Route]): Unit =
+    println("Updating stations and routes:")
+    println(s"Stations: $stations")
+    println(s"Routes: $routes")
     updateStations(stations)
     updateRoutes(routes)
 
