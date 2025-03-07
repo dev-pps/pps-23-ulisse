@@ -4,7 +4,6 @@ import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, Comp
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
 import TimetableAdapterObservers.ErrorObserver
-import ulisse.adapters.MockedEntities.TrainServiceMock
 import ulisse.infrastructures.view.timetable.subviews.{EditorTab, TimetableViewerTab}
 
 import scala.swing.{Component, Orientation}
@@ -45,6 +44,7 @@ object TimetableView:
 
 @main def timetableViewDemoGUI(): Unit =
   import ulisse.infrastructures.view.utils.SwingUtils.showPreview
-  import ulisse.adapters.MockedEntities.TimetableServiceMock
+  import ulisse.adapters.MockedPorts.TrainServiceMock
+  import ulisse.adapters.MockedPorts.TimetableServiceMock
   val adapter = TimetableViewAdapter(TimetableServiceMock(), TrainServiceMock())
   TimetableView(adapter).showPreview()
