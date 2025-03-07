@@ -2,8 +2,8 @@ package ulisse.infrastructures.view
 
 import ulisse.adapters.InputAdapterManager
 import ulisse.infrastructures.view.manager.{PageManager, WorkspaceManager}
-import ulisse.infrastructures.view.page.workspaces.MapWorkspace
-import ulisse.infrastructures.view.page.workspaces.Workspace.{SimulationWorkspace, TrainWorkspace}
+import ulisse.infrastructures.view.page.workspaces.Workspace.TrainWorkspace
+import ulisse.infrastructures.view.page.workspaces.{MapWorkspace, SimulationWorkspace}
 import ulisse.infrastructures.view.page.{Dashboard, Menu}
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
