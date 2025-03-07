@@ -80,7 +80,7 @@ object RouteForm:
   /** Represents the take station from map event. */
   final case class TakeStationFromMapEvent(routeForm: RouteForm) extends ClickObserver[MapElement[Station]]:
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var chosenStation = false
+    private var chosenStation = true
 
     override def onClick(data: MapElement[Station]): Unit =
       if chosenStation then routeForm.departure = Option(data.element)

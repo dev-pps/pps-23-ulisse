@@ -6,6 +6,7 @@ import ulisse.infrastructures.view.components.styles.Images
 import ulisse.infrastructures.view.components.styles.Images.SourceImage
 import ulisse.infrastructures.view.utils.Swings.*
 
+import java.awt.Color
 import java.awt.geom.AffineTransform
 import java.awt.image.ImageObserver
 import scala.math.{abs, sqrt}
@@ -38,19 +39,28 @@ object DrawImageTiled:
     override val center: Point                      = start plus end times 0.5
     override val observable: Observable[MouseEvent] = image.observable
 
-    scale = 0.5
+    scale = 0.05
 
     export image.{center => _, dimension => _, draw => _, observable => _, _}
 
-    override def draw(g: Graphics2D, observer: ImageObserver): Unit = drawTiledImage(g, scale, observer)
+    override def draw(g: Graphics2D, observer: ImageObserver): Unit =
+      drawTiledImage(g, scale, observer)
 
     def drawTiledImage(g: Graphics2D, scale: Double, observer: ImageObserver): Unit =
       for img <- source.bufferImage
       yield
-//        val scaleDim = (img.getWidth(observer) * scale, img.getHeight(observer) * scale)
-        val scaleDim = dimension times scale
+        val scaleDim = new Dimension((img.getWidth(observer) * scale).toInt, (img.getHeight(observer) * scale).toInt)
         val rotate   = start angle end
         val diagonal = sqrt(scaleDim.width * scaleDim.width + scaleDim.height * scaleDim.height)
+
+        g.setColor(Color.red)
+        g.fillOval(center.x, center.y, 5, 5)
+
+        g.setColor(Color.blue)
+        g.fillOval(start.x, start.y, 5, 5)
+
+        g.setColor(Color.green)
+        g.fillOval(end.x, end.y, 5, 5)
 
         val positions: Seq[(Double, Double)] =
           val dx       = end.x - start.x
@@ -70,6 +80,42 @@ object DrawImageTiled:
           transform translate (x, y)
           transform scale (scale, scale)
           transform rotate rotate
-          transform translate (-scaleDim.width / 2, -scaleDim.height / 2)
+          transform translate (-scaleDim.width, -scaleDim.height)
           g drawImage (img, transform, observer)
         )
+
+    import java.awt.geom.{AffineTransform, Path2D, Point2D}
+
+    def isPointInRotatedRectangle(
+        px: Double,
+        py: Double,
+        ax: Double,
+        ay: Double,
+        bx: Double,
+        by: Double,
+        width: Double
+    ): Boolean =
+      // Calcola il centro del rettangolo
+      val cx = (ax + bx) / 2
+      val cy = (ay + by) / 2
+
+      // Calcola l'angolo di rotazione
+      val angle = math.atan2(by - ay, bx - ax)
+
+      // Crea il rettangolo di base non ruotato
+      val rect = new Path2D.Double()
+      rect.moveTo(-width / 2, -Point2D.distance(ax, ay, bx, by) / 2)
+      rect.lineTo(width / 2, -Point2D.distance(ax, ay, bx, by) / 2)
+      rect.lineTo(width / 2, Point2D.distance(ax, ay, bx, by) / 2)
+      rect.lineTo(-width / 2, Point2D.distance(ax, ay, bx, by) / 2)
+      rect.closePath()
+
+      // Applica la trasformazione di rotazione e traslazione
+      val transform = new AffineTransform()
+      transform.translate(cx, cy)
+      transform.rotate(angle)
+
+      val transformedRect = transform.createTransformedShape(rect)
+
+      // Verifica se il punto è dentro il rettangolo ruotato
+      transformedRect.contains(px, py)
