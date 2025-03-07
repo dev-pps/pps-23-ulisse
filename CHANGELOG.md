@@ -1,3 +1,9 @@
+## [1.31.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.30.0...v1.31.0) (2025-03-07)
+
+### Features
+
+* **TimetableManager:** added timetable updates listener method ([c51f407](https://github.com/dev-pps/pps-23-ulisse/commit/c51f4075e5188af1e7c6c5da04363663166f695f))
+
 ## [1.30.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.29.0...v1.30.0) (2025-03-07)
 
 ### Features
