@@ -1,10 +1,11 @@
 package ulisse.adapters
 
-import ulisse.adapters.input.{RouteAdapter, SimulationInfoAdapter, SimulationPageAdapter, StationEditorAdapter}
+import ulisse.adapters.input.{RouteAdapter, SimulationInfoAdapter, TrainViewAdapter, SimulationPageAdapter, StationEditorAdapter}
 import ulisse.applications.InputPortManager
 
 /** Represents the input adapter manager of the application. */
 trait InputAdapterManager:
+  def trainAdapter: TrainViewAdapter
   /** The station editor adapter. */
   val station: StationEditorAdapter
 
@@ -27,6 +28,7 @@ object InputAdapterManager:
   private final case class InputAdapterManagerImpl(
       station: StationEditorAdapter,
       route: RouteAdapter,
+      trainAdapter: TrainViewAdapter
       simulationPage: SimulationPageAdapter,
       simulationInfo: SimulationInfoAdapter
   ) extends InputAdapterManager:
@@ -34,6 +36,7 @@ object InputAdapterManager:
       this(
         StationEditorAdapter(ports.station),
         RouteAdapter(ports.route),
+        TrainViewAdapter(ports.train),
         simulationPage,
         SimulationInfoAdapter(ports.simulationInfo)
       )

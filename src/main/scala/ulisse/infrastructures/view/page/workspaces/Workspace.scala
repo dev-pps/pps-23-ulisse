@@ -4,6 +4,9 @@ import ulisse.adapters.InputAdapterManager
 import ulisse.adapters.input.SimulationPageAdapter
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
+import ulisse.infrastructures.view.manager.FormManager
+import ulisse.infrastructures.view.map.MapPanel
+import ulisse.infrastructures.view.train.TrainEditorView
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.{BorderPanel, Component}
@@ -38,9 +41,6 @@ object Workspace:
 
   /** Represents the train workspace of the application. */
   case class TrainWorkspace(adapterManager: InputAdapterManager) extends Workspace:
-//
-//    val trainPort: TrainPorts.Input = TrainService(LinkedBlockingQueue[AppState => AppState])
-//    private val workspace           = TrainEditorView(trainPort)
-    private val workspace = BaseWorkspace()
+    private val workspace = TrainEditorView(adapterManager.trainAdapter)
     export workspace.revalidate
-    override def component[T >: Component]: T = workspace.component
+    override def component[T >: Component]: T = workspace
