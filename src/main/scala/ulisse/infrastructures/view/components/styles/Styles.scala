@@ -34,22 +34,24 @@ object Styles:
   val defaultSizeFont: Int        = 18
 
   /** Default [[Palette]]. */
-  val defaultPalette: Palette         = Palette(defaultColor, withOutColor, withOutColor)
-  val transparentPalette: Palette     = defaultPalette.withBackground(transparentColor)
-  val defaultPaletteFont: Palette     = defaultPalette.withBackground(Themes.Theme.light.text)
-  val closeLabelPalette: Palette      = createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
-  val openLabelPalette: Palette       = closeLabelPalette.withBackground(Theme.light.background.withAlpha(50))
-  val iconClosePalette: Palette       = defaultPalette.withBackground(Theme.light.background)
-  val iconOpenPalette: Palette        = createEqualPalette(Theme.light.background).withBackground(Theme.light.overlay)
-  val formButtonPalette: Palette      = defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.click)
-  val formTrueButtonPalette: Palette  = formButtonPalette.withClick(Theme.light.trueClick)
-  val formFalseButtonPalette: Palette = formButtonPalette.withClick(Theme.light.falseClick)
+  val defaultPalette: Palette     = Palette(defaultColor, withOutColor, withOutColor)
+  val transparentPalette: Palette = defaultPalette.withBackground(transparentColor)
+  val defaultPaletteFont: Palette = defaultPalette.withBackground(Themes.Theme.light.text)
+  val closeLabelPalette: Palette  = createPalette(Theme.light.overlay, Theme.light.click, Theme.light.click)
+  val openLabelPalette: Palette   = closeLabelPalette.withBackground(Theme.light.background.withAlpha(50))
+  val iconClosePalette: Palette   = defaultPalette.withBackground(Theme.light.background)
+  val iconOpenPalette: Palette    = createEqualPalette(Theme.light.background).withBackground(Theme.light.overlay)
+  val formButtonPalette: Palette =
+    defaultPalette.withBackground(Theme.light.text).withHover(Theme.light.overlay).withClick(Theme.light.click)
+  val formTrueButtonPalette: Palette  = formButtonPalette.withHover(Theme.light.click).withClick(Theme.light.trueClick)
+  val formFalseButtonPalette: Palette = formButtonPalette.withHover(Theme.light.click).withClick(Theme.light.falseClick)
   val silhouettePalette: Palette      = transparentPalette.withHover(Theme.light.overlay).withClick(Theme.light.click)
 
   /** Default [[Rect]]. */
   val defaultRect: Rect         = Rect(defaultSizeRect, defaultPaddingRect, defaultRoundRect)
   val iconButtonRect: Rect      = defaultRect.withPaddingWidthAndHeight(5, 5)
   val panelRect: Rect           = defaultRect.withPaddingWidthAndHeight(15, 15)
+  val formButtonRect: Rect      = defaultRect.withPaddingWidthAndHeight(20, 10).withPalette(formButtonPalette)
   val formTrueButtonRect: Rect  = defaultRect.withPaddingWidthAndHeight(20, 10).withPalette(formTrueButtonPalette)
   val formFalseButtonRect: Rect = defaultRect.withPaddingWidthAndHeight(20, 10).withPalette(formFalseButtonPalette)
 

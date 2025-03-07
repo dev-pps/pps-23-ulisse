@@ -98,6 +98,10 @@ object StationForm:
       workspace.selectedStation = data.element
       workspace.compileStationForm(data.element)
 
+  /** Represents the clean form event. */
+  final case class CleanFormEvent(stationForm: StationForm) extends ClickObserver[MouseEvent]:
+    override def onClick(data: MouseEvent): Unit = stationForm.cleanForm()
+
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class StationFormImpl() extends StationForm:
     override val name: ComposedSwing.InfoTextField   = ComposedSwing createInfoTextField "Name"
@@ -105,6 +109,7 @@ object StationForm:
     override val yField: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "y"
     override val tracks: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Tracks"
 
+    private val cleanButton  = ExtendedSwing createFormButtonWith ("Clean", Styles.formButtonRect)
     private val saveButton   = ExtendedSwing createFormButtonWith ("Save", Styles.formTrueButtonRect)
     private val deleteButton = ExtendedSwing createFormButtonWith ("Delete", Styles.formFalseButtonRect)
 
@@ -115,8 +120,11 @@ object StationForm:
 
     private var _selectedStation: Option[Station] = Option.empty
 
+    buttonPanel.contents += cleanButton
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
+
+    cleanButton.attachClick(CleanFormEvent(this))
 
     saveButton.attach(creationObservable toObserver (_ =>
       StationCreationInfo(name.text, xField.text, yField.text, tracks.text)
