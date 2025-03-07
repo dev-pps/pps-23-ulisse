@@ -15,20 +15,20 @@ object TimetableView:
   def apply(adapter: TimetableViewAdapter): Component =
     TimetableTabbedPane(adapter).component
 
-  private class TimetableTabbedPane(controller: TimetableViewAdapter) extends JTabbedPane with ErrorObserver:
+  private class TimetableTabbedPane(adapter: TimetableViewAdapter) extends JTabbedPane with ErrorObserver:
     import ulisse.infrastructures.view.components.ExtendedSwing.toTabbedPane
     given orientation: Orientation.Value = Orientation.Horizontal
     private val formIcon                 = ComposedImageLabel.createIcon("icons/calendar_add_on.svg", "Create")
     private val savedIcon                = ComposedImageLabel.createIcon("icons/calendar_clock.svg", "Saved")
-    private val editorTab                = EditorTab(controller)
-    private val timetableViewer          = TimetableViewerTab(controller)
+    private val editorTab                = EditorTab(adapter)
+    private val timetableViewer          = TimetableViewerTab(adapter)
     private val tabbedPane =
       Map(
         formIcon  -> editorTab,
         savedIcon -> timetableViewer
       ).toTabbedPane
 
-    controller.addErrorObserver(this)
+    adapter.addErrorObserver(this)
 
     override def component[T >: Component]: T = tabbedPane.component
 

@@ -1,16 +1,23 @@
 package ulisse.infrastructures.view.train
 
-import ulisse.applications.ports.TrainPorts
-import ulisse.infrastructures.view.components.ExtendedSwing.{SButton, SFlowPanel, SLabel, SNumberField}
+import ulisse.adapters.input.TrainViewAdapter
+import ulisse.infrastructures.view.components.ExtendedSwing.{
+  SBoxPanel,
+  SButton,
+  SFieldLabel,
+  SFlowPanel,
+  SLabel,
+  SNumberField
+}
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.infrastructures.view.train.model.TrainViewModel.{emptyTrainData, TechType, TrainData, WagonName}
-import ulisse.infrastructures.view.train.model.{TrainViewAdapter, TrainViewModel}
+import TrainViewModel.{emptyTrainData, TechType, TrainData, WagonName}
 import ulisse.infrastructures.view.utils.SwingUtils
 
 import scala.swing.event.*
 import scala.swing.*
 import scala.swing.Dialog.Message
+import scala.swing.Swing.VGlue
 
 trait TrainEditorView:
   def updateTrainList(trains: List[TrainData]): Unit
@@ -26,12 +33,8 @@ object TrainEditorView:
   private class TrainEditImpl(val modelAdapter: TrainViewAdapter)
       extends SFlowPanel, TrainEditorView:
     modelAdapter.setView(this)
-    modelAdapter.requestTechnologies()
-    modelAdapter.requestWagonTypes()
-    modelAdapter.requestTrains()
-
-    private val trainListView                       = TrainsViews.TrainListView(List.empty)
-    private val trainsFleetPanel                    = new ScrollPane(trainListView)
+    private val trainListView                       = TrainListView.TrainListView(List.empty)
+    private val trainsFleetPanel                    = ScrollPane(trainListView)
     private val nameField                           = ComposedSwing.createInfoTextField("Name")
     private val trainTechCombo: ComboBox[TechType]  = ComboBox(List.empty)
     private val wagonTypeCombo: ComboBox[WagonName] = ComboBox(List.empty)
@@ -44,7 +47,9 @@ object TrainEditorView:
     List(saveBtn, updateBtn).foreach(_.rect = Styles.formTrueButtonRect)
     List(deleteBtn, clearBtn).foreach(_.rect = Styles.formFalseButtonRect)
     List(saveBtn, updateBtn, deleteBtn, clearBtn).foreach(_.fontEffect = Styles.whiteFont)
-
+    modelAdapter.requestTechnologies()
+    modelAdapter.requestWagonTypes()
+    modelAdapter.requestTrains()
     updateBtn.enabled = false
     deleteBtn.enabled = false
 
@@ -76,14 +81,19 @@ object TrainEditorView:
 
     import scala.swing.{BoxPanel, Orientation}
     import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
-    private val editPane: BoxPanel = new BoxPanel(Orientation.Vertical) {
-      contents += nameField.component
-      contents += SLabel("Type:").createLeftRight(trainTechCombo)
-      contents += Label("Transport type:").createLeftRight(wagonTypeCombo)
-      contents += SLabel("Wagon Capacity:").createLeftRight(wagonCapacity)
-      contents += SLabel("wagons amount:").createLeftRight(wagonCountAmount)
-      contents += deleteBtn.createLeftRight(clearBtn).createLeftRight(updateBtn).createLeftRight(saveBtn)
-    }
+    import ulisse.infrastructures.view.utils.SwingUtils.vSpaced
+    private val editPane: BoxPanel = SBoxPanel(Orientation.Vertical)
+    editPane.contents ++=
+      List(
+        nameField.component,
+        SFieldLabel("Type:")(trainTechCombo).component,
+        SFieldLabel("Transport type:")(wagonTypeCombo).component,
+        SFieldLabel("Wagon Capacity:")(wagonCapacity).component,
+        SFieldLabel("wagons amount:")(wagonCountAmount).component,
+        deleteBtn.createLeftRight(clearBtn).createLeftRight(updateBtn).createLeftRight(saveBtn)
+      ).vSpaced(15)
+    import ulisse.infrastructures.view.utils.SwingUtils.setDefaultFont
+    List(trainTechCombo, wagonTypeCombo).setDefaultFont()
 
     private val mainPanel = new BorderPanel {
       preferredSize = new Dimension(800, 400)

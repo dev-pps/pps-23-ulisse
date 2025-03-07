@@ -1,25 +1,44 @@
-package ulisse.infrastructures.view.train.model
+package ulisse.adapters.input
 
-import ulisse.entities.train.Trains.Train
-import TrainViewModel.*
 import ulisse.applications.ports.TrainPorts
+import ulisse.entities.train.Trains.Train
 import ulisse.infrastructures.view.train.TrainEditorView
+import ulisse.infrastructures.view.train.TrainViewModel.TrainData
 import ulisse.utils.Errors.BaseError
+import ulisse.infrastructures.view.train.TrainViewModel.{toTechType, toTrainDatas, toWagonNames}
 
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
+/** Adapter of train view.
+  *
+  * All methods (except `setView`) prepare and send requests to train service port.
+  */
 trait TrainViewAdapter:
+  /** Requests saved trains to service port */
   def requestTrains(): Unit
+
+  /** Requests available technologies */
   def requestTechnologies(): Unit
+
+  /** Requests available wagon types */
   def requestWagonTypes(): Unit
+
+  /** Requests to add new train with the given `trainData` */
   def addTrain(trainData: TrainData): Unit
+
+  /** Requests to delete train with given `name` */
   def deleteTrain(name: String): Unit
+
+  /** Requests to updated train infos. */
   def updateTrain(trainData: TrainData): Unit
+
+  /** Bind view to that adapter. */
   def setView(editorView: TrainEditorView): Unit
 
 object TrainViewAdapter:
+  /** Returns [[TrainViewAdapter]] given `trainService` port. */
   def apply(trainService: TrainPorts.Input): TrainViewAdapter =
     BaseAdapter(trainService)
 

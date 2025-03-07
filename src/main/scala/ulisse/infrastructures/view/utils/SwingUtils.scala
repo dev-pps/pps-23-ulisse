@@ -2,7 +2,6 @@ package ulisse.infrastructures.view.utils
 
 import ulisse.infrastructures.view.components.ExtendedSwing.{SFlowPanel, STextField}
 import ulisse.infrastructures.view.components.styles.Styles
-
 import scala.swing.*
 
 object SwingUtils:
@@ -57,3 +56,9 @@ object SwingUtils:
   /** Returns optionally the `combobox` selected item */
   extension [T](comboBox: ComboBox[T])
     def selectedItemOption: Option[T] = Option.when(comboBox.selection.item != null)(comboBox.selection.item)
+
+  /** Returns `items` vertically spaced with `space` between */
+  extension (items: Seq[Component])
+    def vSpaced(space: Int): Seq[Component] =
+      import scala.swing.Swing.VStrut
+      items.flatMap(field => List(field, VStrut(space)))

@@ -1,12 +1,12 @@
 package ulisse.infrastructures.view.timetable.subviews
 
-import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SLabel, SNumberField}
+import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SFieldLabel, SLabel, SNumberField}
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.entities.train.Trains.Train
-import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.{TrainsUpdatable, Updatable}
-import ulisse.infrastructures.view.timetable.TimetableViewModel.{TimetableEntry, TrainId}
+import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.TrainsUpdatable
+import ulisse.infrastructures.view.timetable.TimetableViewModel.TimetableEntry
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
 
 import scala.swing.Swing.{onEDT, EmptyBorder, HGlue, VStrut}
@@ -17,15 +17,16 @@ import scala.util.Try
 trait EditorTab extends Component with TrainsUpdatable
 
 object EditorTab:
+  /** Returns timetable editor tab view given its `adapter` */
   def apply(adapter: TimetableViewAdapter): EditorTab =
     new EditorTabImpl(adapter)
 
   /** Timetable creation form containing fields to select train, departing time and stations sequence and preview of timetable */
-  private class EditorTabImpl(controller: TimetableViewAdapter)
+  private class EditorTabImpl(adapter: TimetableViewAdapter)
       extends SBoxPanel(Orientation.Vertical) with EditorTab:
-    controller.addTrainsObserver(this)
+    adapter.addTrainsObserver(this)
     private val trainCombo: ComboBox[String] = ComboBox[String](List.empty)
-    controller.requestTrains()
+    adapter.requestTrains()
     private val waitMinutesField = SNumberField(5)
     private val stationField     = ComposedSwing.createInfoTextField("Station")
     private val resetBtn         = SButton("reset")
@@ -46,23 +47,23 @@ object EditorTab:
 
     private val formButtonsPane = resetBtn.createLeftRight(undoBtn.createLeftRight(insertBtn))
     undoBtn.reactions += {
-      case ButtonClicked(_) => controller.undoLastInsert().andUpdatePreview()
+      case ButtonClicked(_) => adapter.undoLastInsert().andUpdatePreview()
     }
     resetBtn.reactions += {
       case ButtonClicked(_) =>
         clearFields()
-        controller.reset().andUpdatePreview()
+        adapter.reset().andUpdatePreview()
     }
     insertBtn.reactions += {
       case ButtonClicked(_) =>
         val waitMin     = Try(waitMinutesField.text.toInt).toOption
         val stationName = stationField.text
-        controller.insertStation(stationName, waitMin).andUpdatePreview()
+        adapter.insertStation(stationName, waitMin).andUpdatePreview()
         clearStationFields()
     }
     saveBtn.reactions += {
       case ButtonClicked(_) =>
-        controller.save()
+        adapter.save()
     }
 
     // Hours and Minutes ComboBox
@@ -78,24 +79,26 @@ object EditorTab:
         for
           h <- Try(hoursCombo.selection.item.toInt)
           m <- Try(minutesCombo.selection.item.toInt)
-        yield controller.setDepartureTime(h, m)
-      case SelectionChanged(`trainCombo`) => controller.selectTrain(trainCombo.selection.item)
+        yield adapter.setDepartureTime(h, m)
+      case SelectionChanged(`trainCombo`) => adapter.selectTrain(trainCombo.selection.item)
     }
 
     import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
+    import ulisse.infrastructures.view.utils.SwingUtils.vSpaced
     private val fieldsSpace = 15
-    private val spacedFields = List(
-      SLabel("Train: ").createLeftRight(trainCombo),
-      SLabel("Departure time").centerHorizontally(),
-      SLabel("h").createLeftRight(hoursCombo.createLeftRight(SLabel("m").createLeftRight(minutesCombo))),
+    private val spacedItems = List(
+      SFieldLabel("Train: ")(trainCombo).component,
+      SFieldLabel("Departure time")(
+        SLabel("h").createLeftRight(hoursCombo.createLeftRight(SLabel("m").createLeftRight(minutesCombo)))
+      ).component,
       stationField.component,
       SLabel("Waiting minutes:").createLeftRight(waitMinutesField).createLeftRight(SLabel("min.")),
-      formButtonsPane
-    ).flatMap(field => List(field, VStrut(fieldsSpace)))
+      formButtonsPane,
+      previewPane.withHeader("Timetable Preview"),
+      saveBtn.centerHorizontally()
+    ).vSpaced(fieldsSpace)
     contents += header("Timetable creation")
-    contents ++= spacedFields
-    contents += previewPane.withHeader("Timetable Preview")
-    contents += saveBtn.centerHorizontally()
+    contents ++= spacedItems
     import ulisse.infrastructures.view.utils.SwingUtils.setDefaultFont
     List(trainCombo, hoursCombo, minutesCombo).setDefaultFont()
     clearFields()
@@ -104,7 +107,7 @@ object EditorTab:
       waitMinutesField.text = ""
       stationField.text = ""
 
-    def clearFields(): Unit =
+    private def clearFields(): Unit =
       clearStationFields()
       trainCombo.selection.index = -1
       hoursCombo.selection.index = 0

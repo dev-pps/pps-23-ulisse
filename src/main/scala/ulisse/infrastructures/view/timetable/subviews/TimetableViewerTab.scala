@@ -17,18 +17,18 @@ import scala.swing.event.ButtonClicked
 import scala.swing.{BorderPanel, ComboBox, Orientation, ScrollPane, Swing}
 
 /** Timetable consulting tab view: by selecting train and departure time, timetable is shown.
-  * It gets `controller` ([[TimetableViewAdapter]]) and observes updates from controller.
+  * It gets `adapter` ([[TimetableViewAdapter]]) and observes updates from controller.
   *
   *  Observes:
   *  - [[TimetablesUpdatable]] to get timetables of selected train
   *  - [[TrainsUpdatable]] to updates train selector
   */
-class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Orientation.Vertical)
+class TimetableViewerTab(adapter: TimetableViewAdapter) extends SBoxPanel(Orientation.Vertical)
     with TimetablesUpdatable with TrainsUpdatable:
-  controller.addTimetablesObserver(this)
-  controller.addTrainsObserver(this)
+  adapter.addTimetablesObserver(this)
+  adapter.addTrainsObserver(this)
   private val trainCombo: ComboBox[String] = ComboBox[String](List.empty)
-  controller.requestTrains()
+  adapter.requestTrains()
   private val trainField                          = SFieldLabel("Train")(trainCombo)
   private val timetableCombo: ComboBox[Timetable] = ComboBox[Timetable](List.empty)
   private val timetableField                      = SFieldLabel("Timetable")(timetableCombo)
@@ -45,7 +45,7 @@ class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Ori
 
   deleteBtn.reactions += {
     case ButtonClicked(_) =>
-      controller.deleteTimetable(trainCombo.selectedItemOption, timetableCombo.selectedItemOption.map(_.departureTime))
+      adapter.deleteTimetable(trainCombo.selectedItemOption, timetableCombo.selectedItemOption.map(_.departureTime))
   }
 
   private val borderTableView = new BorderPanel {
@@ -57,7 +57,7 @@ class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Ori
   reactions += {
     case SelectionChanged(`trainCombo`) =>
       val trainName = trainCombo.selection.item
-      controller.requestTimetables(trainName)
+      adapter.requestTimetables(trainName)
 
     case SelectionChanged(`timetableCombo`) =>
       import TimetableViewModel.toTimetableEntries
@@ -65,11 +65,13 @@ class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Ori
         timetableView.update(i.toTimetableEntries)
         deleteBtn.enabled = true
   }
-
-  contents += trainField.createLeftRight(timetableField)
-  contents += borderTableView
   import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
-  contents += deleteBtn.centerHorizontally()
+  import ulisse.infrastructures.view.utils.SwingUtils.vSpaced
+  contents ++= List(
+    trainField.createLeftRight(timetableField),
+    borderTableView,
+    deleteBtn.centerHorizontally()
+  ).vSpaced(15)
 
   override def updateTimetables(tables: List[Timetable]): Unit =
     onEDT:
