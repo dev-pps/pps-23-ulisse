@@ -1,49 +1,49 @@
 package ulisse.infrastructures.view.train
 
 import ulisse.adapters.input.TrainViewAdapter
-import ulisse.infrastructures.view.components.ExtendedSwing.{
-  SBoxPanel,
-  SButton,
-  SFieldLabel,
-  SFlowPanel,
-  SLabel,
-  SNumberField
-}
+import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SFieldLabel, SFlowPanel, SNumberField}
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
-import TrainViewModel.{emptyTrainData, TechType, TrainData, WagonName}
+import TrainViewModel.{emptyTrainData, TechType, TrainData, WagonTypeName}
 import ulisse.infrastructures.view.utils.SwingUtils
 
 import scala.swing.event.*
 import scala.swing.*
 import scala.swing.Dialog.Message
-import scala.swing.Swing.VGlue
 
+/** Train editor view that can updates showed trains, technologies, wagon types and shows errors. */
 trait TrainEditorView:
+  /** Updates train list selector with given `trains` */
   def updateTrainList(trains: List[TrainData]): Unit
-  def updateTechnology(techs: List[TechType]): Unit
-  def updateWagons(wagons: List[WagonName]): Unit
+
+  /** Updates technology type selector with given `technologies` */
+  def updateTechnology(technologies: List[TechType]): Unit
+
+  /** Updates wagons type names selector with given `wagons` */
+  def updateWagons(wagons: List[WagonTypeName]): Unit
+
+  /** Shows an `errorMessage` */
   def showError(errorMessage: String): Unit
 
 object TrainEditorView:
-
+  /** Creates train editor view with its `adapter`. */
   def apply(adapter: TrainViewAdapter): Component =
     TrainEditImpl(adapter)
 
   private class TrainEditImpl(val modelAdapter: TrainViewAdapter)
       extends SFlowPanel, TrainEditorView:
     modelAdapter.setView(this)
-    private val trainListView                       = TrainListView.TrainListView(List.empty)
-    private val trainsFleetPanel                    = ScrollPane(trainListView)
-    private val nameField                           = ComposedSwing.createInfoTextField("Name")
-    private val trainTechCombo: ComboBox[TechType]  = ComboBox(List.empty)
-    private val wagonTypeCombo: ComboBox[WagonName] = ComboBox(List.empty)
-    private val wagonCountAmount: TextField         = SNumberField(2)
-    private val wagonCapacity: TextField            = SNumberField(4)
-    private val saveBtn                             = SButton("Save")
-    private val updateBtn                           = SButton("Update")
-    private val deleteBtn                           = SButton("Delete")
-    private val clearBtn                            = SButton("Clear")
+    private val trainListView                           = TrainListView.TrainListView(List.empty)
+    private val trainsFleetPanel                        = ScrollPane(trainListView)
+    private val nameField                               = ComposedSwing.createInfoTextField("Name")
+    private val trainTechCombo: ComboBox[TechType]      = ComboBox(List.empty)
+    private val wagonTypeCombo: ComboBox[WagonTypeName] = ComboBox(List.empty)
+    private val wagonCountAmount: TextField             = SNumberField(2)
+    private val wagonCapacity: TextField                = SNumberField(4)
+    private val saveBtn                                 = SButton("Save")
+    private val updateBtn                               = SButton("Update")
+    private val deleteBtn                               = SButton("Delete")
+    private val clearBtn                                = SButton("Clear")
     List(saveBtn, updateBtn).foreach(_.rect = Styles.formTrueButtonRect)
     List(deleteBtn, clearBtn).foreach(_.rect = Styles.formFalseButtonRect)
     List(saveBtn, updateBtn, deleteBtn, clearBtn).foreach(_.fontEffect = Styles.whiteFont)
@@ -130,7 +130,7 @@ object TrainEditorView:
         nameField.text = n
         nameField.editable = false
         trainTechCombo.selection.item = TechType(tk, ts, ac, de)
-        wagonTypeCombo.selection.item = WagonName(wt)
+        wagonTypeCombo.selection.item = WagonTypeName(wt)
         wagonCapacity.text = c.toString
         wagonCountAmount.text = wc.toString
         updateBtn.enabled = true
@@ -150,17 +150,17 @@ object TrainEditorView:
 
     private def getSelectedTechnology: TechType = trainTechCombo.selection.item
 
-    private def getSelectedWagonType: WagonName = wagonTypeCombo.selection.item
+    private def getSelectedWagonType: WagonTypeName = wagonTypeCombo.selection.item
 
     override def updateTrainList(trains: List[TrainData]): Unit =
       Swing.onEDT({
         trainListView.updateDataModel(trains)
       })
 
-    override def updateTechnology(techs: List[TechType]): Unit =
-      Swing.onEDT(trainTechCombo.peer.setModel(ComboBox.newConstantModel(techs)))
+    override def updateTechnology(technologies: List[TechType]): Unit =
+      Swing.onEDT(trainTechCombo.peer.setModel(ComboBox.newConstantModel(technologies)))
 
-    override def updateWagons(wagons: List[WagonName]): Unit =
+    override def updateWagons(wagons: List[WagonTypeName]): Unit =
       Swing.onEDT(wagonTypeCombo.peer.setModel(ComboBox.newConstantModel(wagons)))
 
     override def showError(errorMessage: String): Unit =

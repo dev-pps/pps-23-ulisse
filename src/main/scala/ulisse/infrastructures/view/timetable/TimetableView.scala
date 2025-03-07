@@ -9,9 +9,7 @@ import ulisse.infrastructures.view.timetable.subviews.{EditorTab, TimetableViewe
 import scala.swing.{Component, Orientation}
 
 object TimetableView:
-  /** Creates timetable root view with its controller given `port`.
-    * Child views are configured to be notified from internal controller of updates.
-    */
+  /** Creates timetable root view given its `adapter`. */
   def apply(adapter: TimetableViewAdapter): Component =
     TimetableTabbedPane(adapter).component
 

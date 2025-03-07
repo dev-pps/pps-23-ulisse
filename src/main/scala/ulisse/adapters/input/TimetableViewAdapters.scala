@@ -3,7 +3,7 @@ package ulisse.adapters.input
 import ulisse.applications.ports.{TimetablePorts, TrainPorts}
 import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.entities.train.Trains.Train
-import ulisse.infrastructures.view.timetable.TimetableViewModel.{trainId, TableEntryData, TimetableEntry, TrainId}
+import ulisse.infrastructures.view.timetable.TimetableViewModel.{TableEntryData, TimetableEntry}
 import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.*
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.Times.ClockTime
