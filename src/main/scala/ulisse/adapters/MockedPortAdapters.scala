@@ -9,7 +9,7 @@ import ulisse.utils.Times.ClockTime
 
 import scala.concurrent.Future
 
-object MockedPorts:
+object MockedPortAdapters:
   private val emptyRightListFuture = (req: String) => {
     println("Request $req")
     Future.successful(Right(List.empty))
