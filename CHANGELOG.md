@@ -1,3 +1,9 @@
+## [1.28.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.27.0...v1.28.0) (2025-03-07)
+
+### Features
+
+* **TimetableManager:** added delete method given train, route and station; timetable save route type ([b9fdf0f](https://github.com/dev-pps/pps-23-ulisse/commit/b9fdf0f678f4670c237974cf58d89f031d466145))
+
 ## [1.27.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.26.0...v1.27.0) (2025-03-06)
 
 ### Features
