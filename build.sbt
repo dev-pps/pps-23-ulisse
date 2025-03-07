@@ -29,7 +29,7 @@ Test / javaOptions ++= Seq(
 )
 
 enablePlugins(AssemblyPlugin)
-Compile / mainClass := Some("ulisse.infrastructures.view.Main")
+Compile / mainClass := Some("ulisse.Main")
 assembly / assemblyMergeStrategy := {
   case PathList("META-INF", _*) => MergeStrategy.discard
   case _                        => MergeStrategy.first

@@ -36,7 +36,17 @@
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
       "@semantic-release/changelog",
-      "@semantic-release/github",
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "path": "target/scala-*/ulisse.jar",
+              "label": "Executable JAR"
+            }
+          ]
+        }
+      ],
       [
         "@semantic-release/git",
         {

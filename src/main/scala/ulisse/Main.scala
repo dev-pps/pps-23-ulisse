@@ -6,6 +6,9 @@ import ulisse.infrastructures.view.GUI
 
 object Main:
 
+  def main(args: Array[String]): Unit =
+    launchApp()
+
   @main def launchApp(): Unit =
     val eventQueue          = EventQueue()
     val inputPortManager    = InputPortManager(eventQueue)
