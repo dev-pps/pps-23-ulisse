@@ -47,7 +47,7 @@ object DrawImageTiled:
     export image.{center => _, dimension => _, draw => _, observable => _, _}
 
     override def onMove(data: MouseEvent): Unit =
-      if test(data.point.x, data.point.y, start.x, start.y, end.x, end.y, width) then
+      if data.point.isPointInRotatedRectangle(start, end, width) then
         println("CIAO")
 
     override def draw(g: Graphics2D, observer: ImageObserver): Unit =
@@ -92,83 +92,3 @@ object DrawImageTiled:
           transform translate (-scaleDim.width, -scaleDim.height)
           g drawImage (img, transform, observer)
         )
-
-    import java.awt.geom.{AffineTransform, Path2D, Point2D}
-
-    def isPointInRotatedRectangle(
-        mousePoint: Point,
-        a: Point,
-        b: Point,
-        width: Double
-    ): Boolean =
-      // Calcola il centro del rettangolo
-      val c = (a plus b) times 0.5
-
-      // Calcola l'angolo di rotazione
-      val angle = a angle b
-
-      // Crea il rettangolo di base non ruotato
-      val rect = new Path2D.Double()
-      rect.moveTo(-width / 2, -Point2D.distance(a.x, a.y, b.x, b.y) / 2)
-      rect.lineTo(width / 2, -Point2D.distance(a.x, a.y, b.x, b.y) / 2)
-      rect.lineTo(width / 2, Point2D.distance(a.x, a.y, b.x, b.y) / 2)
-      rect.lineTo(-width / 2, Point2D.distance(a.x, a.y, b.x, b.y) / 2)
-      rect.closePath()
-
-      // Applica la trasformazione di rotazione e traslazione
-      val transform = new AffineTransform()
-      transform.translate(c.x, c.y)
-      transform.rotate(angle)
-
-      val transformedRect = transform.createTransformedShape(rect)
-
-      // Verifica se il punto è dentro il rettangolo ruotato
-      transformedRect.contains(mousePoint)
-
-    def test(px: Double, py: Double, ax: Double, ay: Double, bx: Double, by: Double, width: Double): Boolean = {
-
-      // Calcola il vettore direzione da A a B
-      val dx     = bx - ax
-      val dy     = by - ay
-      val length = Math.hypot(dx, dy)
-
-      // Normalizza il vettore direzione
-      val ux = dx / length
-      val uy = dy / length
-
-      // Calcola il vettore perpendicolare
-      val perpX = -uy * (width / 2)
-      val perpY = ux * (width / 2)
-
-      // Calcola i quattro vertici del rettangolo
-      val p1 = new Point2D.Double(ax + perpX, ay + perpY)
-      val p2 = new Point2D.Double(ax - perpX, ay - perpY)
-      val p3 = new Point2D.Double(bx - perpX, by - perpY)
-      val p4 = new Point2D.Double(bx + perpX, by + perpY)
-
-      // Funzione per testare se il punto è dentro il rettangolo usando il prodotto vettoriale
-      def isPointInPolygon(point: Point2D.Double, poly: Array[Point2D.Double]): Boolean = {
-        val (x, y) = (point.getX, point.getY)
-        @SuppressWarnings(Array("org.wartremover.warts.Var"))
-        var inside = false
-        @SuppressWarnings(Array("org.wartremover.warts.Var"))
-        var j = poly.length - 1
-        for (i <- poly.indices) {
-          val xi = poly(i).getX
-          val yi = poly(i).getY
-          val xj = poly(j).getX
-          val yj = poly(j).getY
-          if (
-            (yi > y) != (yj > y) &&
-            (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
-          ) {
-            inside = !inside
-          }
-          j = i
-        }
-        inside
-      }
-
-      // Controlla se il punto è dentro il rettangolo
-      isPointInPolygon(new Point2D.Double(px, py), Array(p1, p2, p3, p4))
-    }

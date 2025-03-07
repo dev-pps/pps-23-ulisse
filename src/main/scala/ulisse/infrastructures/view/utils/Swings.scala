@@ -3,6 +3,7 @@ package ulisse.infrastructures.view.utils
 import ulisse.entities.Coordinate
 import ulisse.infrastructures.view.components.draw.DrawImages.DrawImage
 
+import java.awt.geom.Point2D
 import java.awt.image.ImageObserver
 import javax.swing.BorderFactory
 import javax.swing.border.Border
@@ -49,6 +50,9 @@ object Swings:
     /** Multiply the point by the given [[value]]. */
     def times(value: Double): Point = new Point((point.x * value).toInt, (point.y * value).toInt)
 
+    /** Divide the point by the given [[value]]. */
+    def divide(value: Double): Point2D.Double = new Point2D.Double((point.x / value).toInt, (point.y / value).toInt)
+
     /** Calculate the distance between the point and the other. */
     def distance(other: Point): Double =
       math sqrt ((math pow (point.x - other.x, 2)) + (math pow (point.y - other.y, 2)))
@@ -59,6 +63,27 @@ object Swings:
     /** Transform the point to a [[Dimension]] object. */
     def toDimension: Dimension = new Dimension(point.x, point.y)
 
+    /** Transform the point to a [[Point2D]] object. */
+    def toPointDouble: Point2D.Double = new Point2D.Double(point.x, point.y)
+
+    /** Calculate the hypotenuse of the point. */
+    def hypot: Double = math.hypot(point.x, point.y)
+
+    /** Check if the point is inside the rectangle. */
+    def isPointInRotatedRectangle(a: Point, b: Point, width: Double): Boolean =
+      val d      = b minus a
+      val length = d.hypot
+      val u      = d.toPointDouble divide length
+      val perp   = new Point2D.Double(-u.y * (width / 2), u.x * (width / 2))
+
+      val p1 = a.toPointDouble plus perp
+      val p2 = a.toPointDouble minus perp
+      val p3 = b.toPointDouble minus perp
+      val p4 = b.toPointDouble plus perp
+
+      point.toPointDouble isPointInPolygon Array(p1, p2, p3, p4)
+
+    /** Check if the point has collided with the [[image]]. */
     def hasCollided(image: DrawImage): Boolean =
       val x          = point.x
       val y          = point.y
@@ -67,6 +92,32 @@ object Swings:
       val itemWidth  = image.dimension.width
       val itemHeight = image.dimension.height
       x >= itemX && x <= itemX + itemWidth && y >= itemY && y <= itemY + itemHeight
+
+  /** Methods to perform arithmetic operations on [[Point2D.Double]] objects */
+  extension (point: Point2D.Double)
+    /** Plus the point to the other. */
+    def plus(other: Point2D.Double): Point2D.Double = new Point2D.Double(point.x + other.x, point.y + other.y)
+
+    /** Subtract the point from the other. */
+    def minus(other: Point2D.Double): Point2D.Double = new Point2D.Double(point.x - other.x, point.y - other.y)
+
+    /** Multiply the point by the other. */
+    def divide(value: Double): Point2D.Double = new Point2D.Double(point.x / value, point.y / value)
+
+    /** Check if the point is inside the polygon. */
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
+    def isPointInPolygon(poly: Array[Point2D.Double]): Boolean =
+      val (x, y) = (point.x, point.y)
+      var inside = false
+      var j      = poly.length - 1
+      for (i <- poly.indices)
+        val xi = poly(i).x
+        val yi = poly(i).y
+        val xj = poly(j).x
+        val yj = poly(j).y
+        if ((yi > y) != (yj > y) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside
+        j = i
+      inside
 
   /** Methods to perform arithmetic operations on [[Dimension]] objects */
   extension (dimension: Dimension)
