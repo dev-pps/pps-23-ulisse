@@ -73,10 +73,9 @@ object StationForm:
       workspace.resetSelectedStation()
 
   /** Represents the take point from map event. */
-  final case class TakePointFomMapEvent(stationForm: StationForm) extends ClickObserver[MouseEvent]:
+  final case class TakePointFomMapEvent(workspace: MapWorkspace) extends ClickObserver[MouseEvent]:
     override def onClick(data: MouseEvent): Unit =
-      stationForm.xField.text = data.point.x.toString
-      stationForm.yField.text = data.point.y.toString
+      workspace.compileStationCoordinatesForm(data.point)
 
   /** Represents the take station from map event. */
   final case class TakeStationFromMapEvent(workspace: MapWorkspace) extends ClickObserver[MapElement[Station]]:

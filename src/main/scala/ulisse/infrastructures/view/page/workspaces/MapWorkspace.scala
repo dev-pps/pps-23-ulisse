@@ -12,6 +12,7 @@ import ulisse.infrastructures.view.page.forms.{RouteForm, StationForm}
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 
 import scala.swing.BorderPanel.Position
+import scala.swing.Point
 
 /** Represents the map workspace of the application. */
 trait MapWorkspace extends Workspace:
@@ -35,6 +36,9 @@ trait MapWorkspace extends Workspace:
 
   /** Compile station form. */
   def compileStationForm(station: Station): Unit
+
+  /** Compile station coordinates form. */
+  def compileStationCoordinatesForm(point: Point): Unit
 
   /** Compile route form. */
   def compileRouteForm(route: Route): Unit
@@ -79,7 +83,7 @@ object MapWorkspace:
     formManager.routeForm attachCreation RouteForm.CreationRouteEvent(adapterManager.route, this)
     formManager.routeForm attachDeletion RouteForm.DeletionRouteEvent(adapterManager.route, this)
 
-    mapPanel attachClick StationForm.TakePointFomMapEvent(stationForm)
+    mapPanel attachClick StationForm.TakePointFomMapEvent(this)
 
     export workspace.{component, revalidate}, stationForm.compileForm as compileStationForm,
       routeForm.compileForm as compileRouteForm
@@ -95,6 +99,11 @@ object MapWorkspace:
     override def selectedRoute_=(route: Route): Unit = _selectedRoute = route.some
 
     override def resetSelectedRoute(): Unit = _selectedRoute = Option.empty
+
+    override def compileStationCoordinatesForm(point: Point): Unit =
+      if (selectedStation.isEmpty)
+        stationForm.xField.text = point.x.toString
+        stationForm.yField.text = point.y.toString
 
     override def updateStations(stations: StationPorts.Input#SM): Unit =
       mapPanel uploadStation stations
