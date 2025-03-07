@@ -67,8 +67,15 @@ object RouteForm:
   final case class CreationRouteEvent(adapter: RouteAdapter, workspace: MapWorkspace)
       extends ClickObserver[RouteCreationInfo]:
 
-    override def onClick(data: RouteCreationInfo): Unit =
+    private def creationRoute(data: RouteCreationInfo): Unit =
       adapter save (Option.empty, data) onComplete (_ fold (println, _ fold (println, workspace.updateRoutes)))
+
+    private def updateRoute(data: RouteCreationInfo, oldRoute: Route): Unit =
+      adapter save (Option(oldRoute), data) onComplete (_ fold (println, _ fold (println, workspace.updateRoutes)))
+      workspace.resetSelectedRoute()
+
+    override def onClick(data: RouteCreationInfo): Unit =
+      workspace.selectedRoute.fold(creationRoute(data))(updateRoute(data, _))
 
   /** Represents the deletion route event. */
   final case class DeletionRouteEvent(adapter: RouteAdapter, workspace: MapWorkspace)
