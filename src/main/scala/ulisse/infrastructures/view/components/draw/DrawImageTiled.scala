@@ -1,9 +1,10 @@
 package ulisse.infrastructures.view.components.draw
 
+import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.common.Observers.Observable
-import ulisse.infrastructures.view.components.draw.DrawImages.{defaultDimension, DrawImage}
-import ulisse.infrastructures.view.components.styles.Images
+import ulisse.infrastructures.view.components.draw.DrawImages.{defaultDimension, defaultScaleSilhouette, DrawImage}
 import ulisse.infrastructures.view.components.styles.Images.SourceImage
+import ulisse.infrastructures.view.components.styles.{CurrentColor, Images, Styles}
 import ulisse.infrastructures.view.utils.Swings.*
 
 import java.awt.Color
@@ -30,25 +31,51 @@ object DrawImageTiled:
   def createAt(path: String, start: Point, end: Point): DrawImageTiled =
     DrawImageTiled(path, start, end, defaultDimension)
 
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class DrawImageTiledImpl(source: SourceImage, start: Point, end: Point, dimension: Dimension)
       extends DrawImageTiled:
     def this(path: String, start: Point, end: Point, dimension: Dimension) =
       this(SourceImage(path), start, end, dimension)
 
-    private val image: DrawImageSimple              = DrawImageSimple(source.path, start, dimension)
     override val center: Point                      = start plus end times 0.5
-    override val observable: Observable[MouseEvent] = image.observable
+    override val observable: Observable[MouseEvent] = Observers.createObservable[MouseEvent]
+    private var _scale: Float                       = defaultScaleSilhouette
+    private var _silhouettePalette: Styles.Palette  = Styles.silhouettePalette
+    private val silhouetteColor: CurrentColor       = CurrentColor(_silhouettePalette.background)
 
-    @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var width = 0
-
     scale = 0.05
 
-    export image.{center => _, dimension => _, draw => _, observable => _, _}
+    export observable._
+
+    override def scale: Float = _scale
+
+    override def scale_=(value: Float): Unit = _scale = value
+
+    override def silhouettePalette: Styles.Palette = _silhouettePalette
+
+    override def silhouettePalette_=(palette: Styles.Palette): Unit =
+      _silhouettePalette = palette
+      silhouetteColor.current = palette.background
 
     override def onMove(data: MouseEvent): Unit =
       if data.point.isPointInRotatedRectangle(start, end, width) then
-        println("CIAO")
+//        silhouetteColor.hoverColor(silhouettePalette)
+        observable.notifyHover(data)
+        observable.notifyMove(data)
+      else
+//        silhouetteColor.exitColor(silhouettePalette)
+        observable.notifyExit(data)
+
+    override def onClick(data: MouseEvent): Unit =
+      if data.point.isPointInRotatedRectangle(start, end, width) then
+//        silhouetteColor.clickColor(silhouettePalette)
+        observable.notifyClick(data)
+
+    override def onRelease(data: MouseEvent): Unit =
+      if data.point.isPointInRotatedRectangle(start, end, width) then
+//        silhouetteColor.releaseColor(silhouettePalette)
+        observable.notifyRelease(data)
 
     override def draw(g: Graphics2D, observer: ImageObserver): Unit =
       drawTiledImage(g, scale, observer)
@@ -67,9 +94,13 @@ object DrawImageTiled:
 
         g.setColor(Color.blue)
         g.fillOval(start.x, start.y, 5, 5)
+        g.setColor(Color.magenta)
+        g.fillOval(this.start.x, this.start.y, 5, 5)
 
         g.setColor(Color.green)
         g.fillOval(end.x, end.y, 5, 5)
+        g.setColor(Color.cyan)
+        g.fillOval(this.end.x, this.end.y, 5, 5)
 
         val positions: Seq[(Double, Double)] =
           val dx       = end.x - start.x
