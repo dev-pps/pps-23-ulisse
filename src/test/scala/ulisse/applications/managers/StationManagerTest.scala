@@ -3,9 +3,10 @@ package ulisse.applications.managers
 import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import ulisse.applications.managers.StationManager.Error.{DuplicateStationLocation, DuplicateStationName}
 import ulisse.entities.Coordinate
 import ulisse.entities.station.Station
-import ulisse.entities.station.StationTest.stationA
+import ulisse.entities.station.StationTest.{stationA, stationB}
 
 class StationManagerTest extends AnyWordSpec with Matchers:
   "A StationManager" when:
@@ -22,9 +23,8 @@ class StationManagerTest extends AnyWordSpec with Matchers:
 
     "another station with same name is added" should:
       "not be added and returns error" in:
-        val otherStation = Station(stationA.name, stationA.coordinate + Coordinate(1, 1), stationA.numberOfPlatforms)
-        StationManager().addStation(stationA).flatMap(
-          _.addStation(otherStation)
+        StationManager().addStation(stationA.withCoordinate(stationA.coordinate + Coordinate(1,1))).flatMap(
+          _.addStation(stationA)
         ) shouldBe Left(Chain(StationManager.Error.DuplicateStationName))
 
     "another station with same location is added" should:
@@ -49,15 +49,37 @@ class StationManagerTest extends AnyWordSpec with Matchers:
       "no longer be present" in:
         StationManager().addStation(stationA).flatMap(
           _.removeStation(stationA)
-        ).map(_.stations) match
-          case Right(stations) => stations should not contain stationA
-          case Left(_)         => fail()
+        ).map(_.stations) shouldBe Right(List())
 
     "non-existing station is removed" should:
       "return error" in:
         StationManager().removeStation(stationA) shouldBe Left(
           Chain(StationManager.Error.StationNotFound)
         )
+
+    "a station is updated with a new station" should:
+      "replace the old station with the new one" in:
+        StationManager().addStation(stationA).flatMap(
+          _.updateStation(stationA, stationB)
+        ).map(_.stations) shouldBe Right(List(stationB))
+
+    "a station is updated with a the same station" should:
+      "keep the station unchanged" in:
+        StationManager().addStation(stationA).flatMap(
+          _.updateStation(stationA, stationA)
+        ).map(_.stations) shouldBe Right(List(stationA))
+
+    "a station is updated with a station that is not in the manager" should:
+      "return an error" in:
+        StationManager().updateStation(stationA, stationB) shouldBe Left(
+          Chain(StationManager.Error.StationNotFound)
+        )
+
+    "a station is updated with a station that is not accepted by the manager" should:
+      "return an error" in:
+        StationManager().addStation(stationA).flatMap(_.addStation(stationB)).flatMap(
+          _.updateStation(stationA, stationB)
+        ) shouldBe Left(Chain(DuplicateStationName, DuplicateStationLocation))
 
     "a station is searched by location" should:
       "return the station if it exists" in:
