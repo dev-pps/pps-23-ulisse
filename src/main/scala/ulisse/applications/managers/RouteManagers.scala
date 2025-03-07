@@ -1,5 +1,6 @@
 package ulisse.applications.managers
 
+import cats.syntax.all.*
 import cats.syntax.either.*
 import cats.syntax.option.*
 import ulisse.entities.route.Routes.{IdRoute, Route}
@@ -85,8 +86,14 @@ object RouteManagers:
     def deleteByArrival(station: Station): Either[Errors, RouteManager]
 
     /** Delete all the routes that contain this station, either as departure or arrival. */
-    def deleteByStation(station: Station): Either[Errors, RouteManager] =
-      deleteByDeparture(station) flatMap (_ deleteByArrival station)
+    def deleteByStation(station: Station): Either[Errors, RouteManager]
+//      val d1  = deleteByDeparture(station).fold(_ => this, m => m)
+//      val d2 = deleteByArrival(station).fold(_ => this, a => a)
+//      println(s"delete
+//
+//      val d = deleteByDeparture(station).fold(_ => this, m => m).deleteByArrival(station).fold(_ => this, m => m)
+//      d.asRight
+  //      deleteByDeparture(station).fold(_ => this, _.deleteByArrival(station).fold(_ => this, a => a)).asRight
 
   /** Companion object of [[RouteManager]] */
   object RouteManager:
@@ -133,6 +140,12 @@ object RouteManagers:
 
       override def deleteByArrival(station: Station): Either[Errors, RouteManager] =
         deleteByStation(findByArrival)(station)
+
+      override def deleteByStation(station: Station): Either[Errors, RouteManager] =
+        val route = routes.filter(route => (route isDeparture station) || (route isArrival station))
+        route match
+          case Nil => Left(Errors.NotExist)
+          case _   => Right(copy(manager -- route.map(_.id)))
 
       private def deleteByStation(find: Station => Either[Errors, List[Route]])
           : Station => Either[Errors, RouteManager] = station =>
