@@ -11,7 +11,7 @@ import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.map.MapElement
-import ulisse.infrastructures.view.page.forms.Form.BaseForm
+import ulisse.infrastructures.view.page.forms.Form.{BaseForm, CleanFormEvent}
 import ulisse.infrastructures.view.page.workspaces.MapWorkspace
 import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 
@@ -115,6 +115,8 @@ object RouteForm:
     override val routeType: ComposedSwing.InfoTextField        = ComposedSwing createInfoTextField "Type"
     override val rails: ComposedSwing.InfoTextField            = ComposedSwing createInfoTextField "Rails"
     override val length: ComposedSwing.InfoTextField           = ComposedSwing createInfoTextField "Length"
+
+    private val cleanButton  = ExtendedSwing createFormButtonWith ("Clean", Styles.formButtonRect)
     private val saveButton   = ExtendedSwing createFormButtonWith ("Save", Styles.formTrueButtonRect)
     private val deleteButton = ExtendedSwing createFormButtonWith ("Delete", Styles.formFalseButtonRect)
     private val form         = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
@@ -126,8 +128,11 @@ object RouteForm:
     private val creationObservable = Observers.createObservable[RouteCreationInfo]
     private val deletionObservable = Observers.createObservable[RouteCreationInfo]
 
+    buttonPanel.contents += cleanButton
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
+
+    cleanButton.attachClick(CleanFormEvent(this))
 
     saveButton attach (creationObservable toObserver (_ =>
       RouteCreationInfo(departure, arrival, routeType.text, rails.text, length.text)
