@@ -1,9 +1,5 @@
 package ulisse.adapters
 
-import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.applications.managers.StationManager
-import ulisse.applications.managers.TimetableManagers.TimetableManager
-import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.TimetablePorts.{RequestResult, StationId, WaitingTime}
 import ulisse.entities.train.{Trains, Wagons}
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
@@ -13,7 +9,7 @@ import ulisse.utils.Times.ClockTime
 
 import scala.concurrent.Future
 
-object MockedEntities:
+object MockedPorts:
   private val emptyRightListFuture = (req: String) => {
     println("Request $req")
     Future.successful(Right(List.empty))

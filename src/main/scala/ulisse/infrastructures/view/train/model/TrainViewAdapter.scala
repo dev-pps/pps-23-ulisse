@@ -5,6 +5,7 @@ import TrainViewModel.*
 import ulisse.applications.ports.TrainPorts
 import ulisse.infrastructures.view.train.TrainEditorView
 import ulisse.utils.Errors.BaseError
+
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -16,20 +17,26 @@ trait TrainViewAdapter:
   def addTrain(trainData: TrainData): Unit
   def deleteTrain(name: String): Unit
   def updateTrain(trainData: TrainData): Unit
+  def setView(editorView: TrainEditorView): Unit
 
 object TrainViewAdapter:
-  def apply(trainService: TrainPorts.Input, view: TrainEditorView): TrainViewAdapter =
-    BaseAdapter(trainService, view)
+  def apply(trainService: TrainPorts.Input): TrainViewAdapter =
+    BaseAdapter(trainService)
 
-  private final case class BaseAdapter(trainService: TrainPorts.Input, view: TrainEditorView)
+  private final case class BaseAdapter(trainService: TrainPorts.Input)
       extends TrainViewAdapter:
     given executionContext: ExecutionContext = ExecutionContext.fromExecutorService(
       Executors.newFixedThreadPool(1)
     )
 
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
+    private var view: Option[TrainEditorView] = None
+
+    override def setView(editorView: TrainEditorView): Unit = view = Some(editorView)
+
     override def requestTrains(): Unit =
       trainService.trains.handleOnComplete(l =>
-        view.updateTrainList(l.toTrainDatas)
+        view.onEDT(_.updateTrainList(l.toTrainDatas))
       )
 
     override def addTrain(trainData: TrainData): Unit =
@@ -45,10 +52,10 @@ object TrainViewAdapter:
       }
 
     override def requestWagonTypes(): Unit =
-      trainService.wagonTypes.handleOnComplete(w => view.updateWagons(w.toWagonNames))
+      trainService.wagonTypes.handleOnComplete(w => view.onEDT(_.updateWagons(w.toWagonNames)))
 
     override def requestTechnologies(): Unit =
-      trainService.technologies.handleOnComplete(t => view.updateTechnology(t.toTechType))
+      trainService.technologies.handleOnComplete(t => view.onEDT(_.updateTechnology(t.toTechType)))
 
     extension (trainData: TrainData)
       private def extractThenPerform(action: (
@@ -69,16 +76,23 @@ object TrainViewAdapter:
           yield (n, tn, wn, wc, wq)
         data match
           case Some(d) => action(d._1, d._2, d._3, d._4, d._5).handleOnComplete(t => showNewTrainList(t))
-          case None    => view.showError("Some field are empty!")
+          case None    => view.onEDT(_.showError("Some field are empty!"))
 
     extension [T](toComplete: Future[T])
       private def handleOnComplete(onSuccess: T => Unit): Unit =
         toComplete.onComplete {
-          case Failure(e) => view.showError(e.getMessage)
+          case Failure(e) => view.onEDT(_.showError(e.getMessage))
           case Success(r) => onSuccess(r)
         }
 
     private def showNewTrainList(r: Either[BaseError, List[Train]]): Unit =
       r match
-        case Left(err) => view.showError(s"Error: $err")
-        case Right(t)  => view.updateTrainList(t.toTrainDatas)
+        case Left(err) => view.onEDT(_.showError(s"Error: $err"))
+        case Right(t)  => view.onEDT(_.updateTrainList(t.toTrainDatas))
+
+    extension (v: Option[TrainEditorView])
+      private def onEDT(f: TrainEditorView => Unit): Unit =
+        import scala.swing.Swing
+        v.foreach: vw =>
+          Swing.onEDT:
+            f(vw)

@@ -20,12 +20,12 @@ trait TrainEditorView:
 
 object TrainEditorView:
 
-  def apply(inServicePort: TrainPorts.Input): Panel =
-    TrainEditImpl(inServicePort)
+  def apply(adapter: TrainViewAdapter): Component =
+    TrainEditImpl(adapter)
 
-  private class TrainEditImpl(val port: TrainPorts.Input)
+  private class TrainEditImpl(val modelAdapter: TrainViewAdapter)
       extends SFlowPanel, TrainEditorView:
-    private val modelAdapter = TrainViewAdapter(port, this)
+    modelAdapter.setView(this)
     modelAdapter.requestTechnologies()
     modelAdapter.requestWagonTypes()
     modelAdapter.requestTrains()
@@ -162,3 +162,9 @@ object TrainEditorView:
           Message.Warning
         )
       )
+
+@main def trainViewDemoGUI(): Unit =
+  import ulisse.infrastructures.view.utils.SwingUtils.showPreview
+  import ulisse.adapters.MockedPorts.TrainServiceMock
+  val adapter = TrainViewAdapter(TrainServiceMock())
+  TrainEditorView(adapter).showPreview()
