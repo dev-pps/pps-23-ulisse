@@ -9,6 +9,9 @@ import scala.swing.event.MouseEvent
 /** Represent a generic element of the map. */
 trait MapElements[T]:
 
+  /** The elements of the map. */
+  def find(el: T): Option[T]
+
   /** Attach the click observer to each element of the map. */
   def attachClick(event: ClickObserver[MapElement[T]]): Unit
 
@@ -27,6 +30,8 @@ object MapElements:
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class MapElementsImpl[T](map: Observable[MouseEvent], var elements: List[MapElement[T]])
       extends MapElements[T]:
+
+    override def find(el: T): Option[T] = elements find (_.element == el) map (_.element)
 
     override def attachClick(event: ClickObserver[MapElement[T]]): Unit = elements foreach (_ attachClick event)
 
