@@ -23,7 +23,7 @@ import ulisse.utils.Times.ClockTime
 
 import scala.concurrent.{Future, Promise}
 
-/** Timetable service that jobs is like gatekeeper and enqueue edits to app state using `stateEventQueue` queue. */
+/** Timetable service that jobs is like gatekeeper and enqueue edits to app state on `eventQueue` queue. */
 final case class TimetableService(eventQueue: TimeTableEventQueue) extends TimetablePorts.Input:
 
   extension (toCheck: List[(StationId, WaitingTime)])

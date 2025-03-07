@@ -24,7 +24,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
   private val stationA      = Station("Station A", Coordinate(0, 0), 1)
   private val stationB      = Station("Station B", Coordinate(16, 0), 1)
   private val stationC      = Station("Station C", Coordinate(20, 0), 1)
-  private val railAV_10     = RailInfo(length = 10, typeRoute = AV)
+  private val railAV_10     = RailInfo(length = 16, typeRoute = AV)
   private val departTime9_0 = h(9).m(0).getOrDefault
 
   val timetableABC: Timetable =
@@ -139,6 +139,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
       Then("should be returned an error")
       requestResult should be(Left(TimetableNotFound(timetableABC.train.name)))
 
+  Feature("Timetable containing some deleted train/station/route should be deleted"):
     Scenario("Delete all timetables related to a train"):
       Given("A manager with some timetable for a train")
       val manager = TimetableManagers.TimetableManager(List(timetableABC, timetableBC))
@@ -157,7 +158,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
 
     Scenario("Delete all timetables that contains a deleted route"):
       import ulisse.entities.route.Routes
-      val deletedRoute = Routes.Route(stationA, stationB, railAV_10.typeRoute, 1, 50)
+      val deletedRoute = Routes.Route(stationA, stationB, railAV_10.typeRoute, 1, railAV_10.length)
       deletedRoute in: route =>
         Given("A manager with some timetable containing deleted route")
         val manager = TimetableManagers.TimetableManager(List(timetableABC, timetableBC))
@@ -165,3 +166,18 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
         val result = manager.routeDeleted(route)
         Then("should be removed all timetables that have deleted station")
         result should be(Right(TimetableManagers.TimetableManager(List(timetableBC))))
+
+//  Feature("Autoupdate of timetable when route, train or station are updated"):
+//    Scenario("Train with some timetable has been updated"):
+//      val newTrainTech        = TrainTechnology("Tech1", 500, 1.0, 2.0)
+//      val trainName           = trainRV_3905.name
+//      val updatedTrainRV_3905 = Train(trainName, newTrainTech, trainRV_3905.wagon, trainRV_3905.length)
+//      Given("A manager with some timetable related to the edited train")
+//      val manager = TimetableManagers.TimetableManager(List(timetableAB))
+//      When("I notify manager that a train has been updated")
+//
+//      val updatedManager = manager.trainUpdated(updatedTrainRV_3905)
+//      Then("all timetables related to train should be updated")
+//      // TODO: call method on updatedMAnager
+//      manager.tablesOf(trainName) should be(Right(List(
+//      )))

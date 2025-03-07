@@ -36,12 +36,12 @@ object Timetables:
     def stations: List[Station] = t.table.keys.toList
 
     /** Returns list of nearest stations pair */
-    def routes: List[(Station, Station, Option[RouteType])] =
+    def routes: List[(Station, Station, Option[RailInfo])] =
       val pair = t.table.zip(t.table.drop(1))
-      pair.map((s, f) => (s._1, f._1, f._2.routeType)).toList
+      pair.map((s, f) => (s._1, f._1, f._2.railInfo)).toList
 
   /** Station infos like `routeType` (to reach station) and `stationTime` */
-  case class StationInfo(routeType: Option[RouteType], stationTime: StationTime)
+  case class StationInfo(railInfo: Option[RailInfo], stationTime: StationTime)
 
   /** Basic timetable */
   trait PartialTimetable:
@@ -147,7 +147,7 @@ object Timetables:
         )
 
       private def insertStation(station: Station, stationTime: StationTime, railInfo: RailInfo) =
-        val info = StationInfo(Some(railInfo.typeRoute), stationTime)
+        val info = StationInfo(Some(railInfo), stationTime)
         this.copy(table = table.updated(station, info))
 
       override def partialTimetable: PartialTimetable = PartialTimetableImpl(this)

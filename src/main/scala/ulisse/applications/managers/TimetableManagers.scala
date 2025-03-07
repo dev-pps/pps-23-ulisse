@@ -7,17 +7,18 @@ import ulisse.applications.managers.TimetableManagers.TimetableManagerErrors.{
 }
 import ulisse.entities.route.Routes
 import ulisse.entities.station.Station
-import ulisse.entities.timetable.Timetables.Timetable
+import ulisse.entities.route.Routes.Route
+import ulisse.entities.timetable.Timetables.{RailInfo, Timetable}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist}
 import ulisse.utils.Times.{===, >=, ClockTime, Time}
 
 object TimetableManagers:
 
-  /** Responsible to guarantee consistent deletion of [[Timetable]] when entities as [[Route]], [[Station]] or [[Train]] are deleted. */
+  /** Responsible to guarantee consistent deletion of [[Timetable]] when entities
+    * as [[Route]], [[Station]] or [[Train]] are deleted.
+    */
   trait DeletionListener:
-    import ulisse.entities.route.Routes.Route
-    import ulisse.entities.station.Station
 
     /** Deletes all timetables related to `train` otherwise an error is returned */
     def trainDeleted(train: Train): Either[TimetableManagerErrors, TimetableManager]
@@ -27,6 +28,19 @@ object TimetableManagers:
 
     /** Deletes all timetables containing `route` otherwise an error is returned */
     def routeDeleted(route: Route): Either[TimetableManagerErrors, TimetableManager]
+
+  /** Listener for entities updates, it is  Responsible to guarantee consistent updates
+    * of [[Timetable]] when entities as [[Route]], [[Station]] or [[Train]] are updated.
+    */
+  trait UpdateListener:
+    /** Updates timetables and recalculates times of all tables related to given `train`. */
+    def trainUpdated(train: Train): Either[TimetableManagerErrors, TimetableManager]
+
+    /** Updates timetables and recalculates times of all tables that contains `oldStation` with the new one `newStation` */
+    def stationUpdated(oldStation: Station, newStation: Station): Either[TimetableManagerErrors, TimetableManager]
+
+    /** Updates timetables and recalculates times of all tables that contains `oldRoute` with the `newRoute`. */
+    def routeUpdated(oldRoute: Route, newRoute: Route): Either[TimetableManagerErrors, TimetableManager]
 
   /** Errors that can returned by manager */
   trait TimetableManagerErrors extends BaseError
@@ -69,7 +83,7 @@ object TimetableManagers:
   /** Return an empty manager */
   def empty(): TimetableManager = TimetableManager(List.empty)
 
-  trait TimetableManager extends DeletionListener:
+  trait TimetableManager extends DeletionListener with UpdateListener:
     /** Save new `timetable` for a train. Timetable is accepted if passes the `acceptancePolicy` rules.
       * Returns `Right` of updated `TimetableManager` otherwise `Left` of `TimetableManagerErrors` in case of errors.
       */
@@ -152,8 +166,9 @@ object TimetableManagers:
         deletionResult(updatedTimetables, s"timetables with station $station not found")
 
       override def routeDeleted(route: Routes.Route): Either[TimetableManagerErrors, TimetableManager] =
-        val routeToDelete    = (route.departure, route.arrival, Some(route.typology))
-        val routeToDeleteInv = (route.arrival, route.departure, Some(route.typology))
+        val railInfo         = Some(RailInfo(route.length, route.typology))
+        val routeToDelete    = (route.departure, route.arrival, railInfo)
+        val routeToDeleteInv = (route.arrival, route.departure, railInfo)
         val updatedTimetables = timetables.map((t, tables) =>
           (t, tables.filterNot(tt => tt.routes.contains(routeToDeleteInv) || tt.routes.contains(routeToDelete)))
         )
@@ -168,3 +183,15 @@ object TimetableManagers:
           TimetableManagerImpl(updatedTables),
           DeletionError(errMsg)
         )
+
+      override def trainUpdated(train: Train): Either[TimetableManagerErrors, TimetableManager] = Right(this)
+      // find timetables with same train name
+      // recalculate all timetables starting from
+
+      override def stationUpdated(
+          oldStation: Station,
+          newStation: Station
+      ): Either[TimetableManagerErrors, TimetableManager] = Right(this)
+
+      override def routeUpdated(oldRoute: Route, newRoute: Route): Either[TimetableManagerErrors, TimetableManager] =
+        Right(this)
