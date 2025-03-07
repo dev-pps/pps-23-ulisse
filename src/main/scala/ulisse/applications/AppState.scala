@@ -8,11 +8,11 @@ import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager, TimetableManagers}
-import ulisse.entities.simulation.data.{EngineConfiguration, SimulationData}
+import ulisse.entities.simulation.data.SimulationData
+import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 
-import java.lang.module.Configuration
 import scala.compiletime.{erasedValue, summonInline}
 
 /** Application state that contains all managers. */
@@ -166,3 +166,15 @@ object AppState:
       copy(simulationManager =
         update(SimulationManagers(simulationManager, stationManager, routeManager, trainManager, timetableManager))
       )
+
+    def updateTimetable(oldStation: Station, newStation: Station): AppState =
+      val remove = stationManager.addStation(oldStation)
+      val add    = stationManager.removeStation(newStation)
+      val update = remove.flatMap(_ => add)
+
+      val oldRoute    = routeManager.routes
+      val updateRoute = routeManager.modifyAutomaticByStation(oldStation, newStation)
+
+      timetableManager
+
+      this
