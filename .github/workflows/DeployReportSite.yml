@@ -42,10 +42,18 @@ jobs:
         uses: actions/configure-pages@v4
       - name: Generate ScalaDoc
         run: sbt doc
-      - name: Move ScalaDoc to docs/scaladoc
+      - name: Move ScalaDoc to docs/public/scaladoc
         run: |
           mkdir -p ./docs/public/scaladoc
           cp -r target/scala-*/api/* ./docs/public/scaladoc
+      - name: Generate Scoverage Report
+        run: |
+          sbt clean coverage test
+          sbt coverageReport
+      - name: Move Scoverage Report to docs/public/coverage
+        run: |
+          mkdir -p ./docs/public/coverage
+          cp -r target/scala-*/scoverage-report/* ./docs/public/coverage
       - name: Install dependencies
         run: npm install
         working-directory: ./docs

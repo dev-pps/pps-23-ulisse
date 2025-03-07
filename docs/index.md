@@ -13,6 +13,9 @@ hero:
     - theme: alt
       text: Scala docs
       link: https://dev-pps.github.io/pps-23-ulisse/scaladoc/index.html
+    - theme: alt
+      text: Coverage
+      link: https://dev-pps.github.io/pps-23-ulisse/coverage/index.html  
       
 features:
   - title: Feature A

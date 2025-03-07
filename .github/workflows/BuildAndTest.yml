@@ -1,7 +1,8 @@
 name: Build and Test
 on:
   push:
-    branches-ignore: [main, docs/scaladoc]
+    branches-ignore:
+      - main
   workflow_dispatch:
 
 jobs:

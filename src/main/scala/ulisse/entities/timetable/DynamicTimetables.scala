@@ -44,7 +44,7 @@ object DynamicTimetables:
 
     /** The delay in a station */
     def delayIn(station: Station): Option[Time] =
-      (table.get(station), effectiveTable.find(_._1 == station).map(_._2)) match
+      (table.get(station).map(_.stationTime), effectiveTable.find(_._1 == station).map(_._2)) match
         case (Some(TrainStationTime(_, _, Some(departure))), Some(TrainStationTime(_, _, Some(effectiveDeparture)))) =>
           Some(Id(effectiveDeparture) underflowSub departure)
         case (Some(TrainStationTime(Some(arrival), _, _)), Some(TrainStationTime(Some(effectiveArrival), _, _))) =>
