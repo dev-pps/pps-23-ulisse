@@ -67,19 +67,21 @@ object Swings:
     def toPointDouble: Point2D.Double = new Point2D.Double(point.x, point.y)
 
     /** Calculate the hypotenuse of the point. */
-    def hypot: Double = math.hypot(point.x, point.y)
+    def hypot: Double = math hypot (point.x, point.y)
 
     /** Check if the point is inside the rectangle. */
     def isPointInRotatedRectangle(a: Point, b: Point, width: Double): Boolean =
-      val d      = b minus a
-      val length = d.hypot
-      val u      = d.toPointDouble divide length
-      val perp   = new Point2D.Double(-u.y * (width / 2), u.x * (width / 2))
+      val endMinusStart = b minus a
+      val normal        = endMinusStart.toPointDouble divide endMinusStart.hypot
+      val perp          = new Point2D.Double(-normal.y, normal.x)
 
-      val p1 = a.toPointDouble plus perp
-      val p2 = a.toPointDouble minus perp
-      val p3 = b.toPointDouble minus perp
-      val p4 = b.toPointDouble plus perp
+      val halfWidth = width / 2
+      val height    = endMinusStart.hypot
+
+      val p1 = a.toPointDouble plus (perp times halfWidth)
+      val p2 = a.toPointDouble minus (perp times halfWidth)
+      val p3 = p2 plus (normal times height)
+      val p4 = p1 plus (normal times height)
 
       point.toPointDouble isPointInPolygon Array(p1, p2, p3, p4)
 
@@ -102,7 +104,22 @@ object Swings:
     def minus(other: Point2D.Double): Point2D.Double = new Point2D.Double(point.x - other.x, point.y - other.y)
 
     /** Multiply the point by the other. */
+    def times(other: Point2D.Double): Point2D.Double = new Point2D.Double(point.x * other.x, point.y * other.y)
+
+    /** Multiply the point by the given [[value]]. */
+    def times(values: Double) = new Point2D.Double(point.x * values, point.y * values)
+
+    /** Multiply the point by the other. */
     def divide(value: Double): Point2D.Double = new Point2D.Double(point.x / value, point.y / value)
+
+    /** Normalize the point. */
+    def normalize: Point2D.Double = point divide math.hypot(point.x, point.y)
+
+    /** Calculate the perpendicular of the point. */
+    def perp: Point2D.Double = new Point2D.Double(-point.y, point.x)
+
+    /** Transform the point to a [[Point]] object. */
+    def toPoint: Point = new Point(point.x.toInt, point.y.toInt)
 
     /** Check if the point is inside the polygon. */
     @SuppressWarnings(Array("org.wartremover.warts.Var"))

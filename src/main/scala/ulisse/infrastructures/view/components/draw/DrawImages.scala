@@ -14,7 +14,7 @@ object DrawImages:
   /** Default dimension for images. */
   val defaultDimension: Dimension = new Dimension(30, 30)
 
-  /** Default scale for silhouette. */
+  /** Default value for silhouette. */
   val defaultScaleSilhouette: Float = 1.4f
 
   /** Represent a generic image. */
@@ -32,7 +32,7 @@ object DrawImages:
     /** Scale of the image. */
     def scale: Float
 
-    /** Set the scale of the image. */
+    /** Set the value of the image. */
     def scale_=(value: Float): Unit
 
     /** Silhouette of the image. */

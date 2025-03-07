@@ -7,37 +7,38 @@ import ulisse.infrastructures.view.components.styles.Images.SourceImage
 import ulisse.infrastructures.view.components.styles.{CurrentColor, Images, Styles}
 import ulisse.infrastructures.view.utils.Swings.*
 
-import java.awt.geom.AffineTransform
-import java.awt.image.{BufferedImage, ImageObserver}
-import scala.math.{abs, sqrt}
+import java.awt.Color
+import java.awt.image.ImageObserver
 import scala.swing.event.MouseEvent
 import scala.swing.{Dimension, Graphics2D, Point}
 
 /** Draw images tiled on the screen. */
-trait DrawImageTiled extends DrawImage:
-
-  /** Draw the tiled image on the screen. */
-  def drawTiledImage(g: Graphics2D, scale: Double, observer: ImageObserver): Unit
+trait DrawImageTiled extends DrawImage
 
 /** Companion object for [[DrawImageTiled]]. */
 object DrawImageTiled:
 
+  /** Default dimension for the image. */
+  private val defaultRouteDimension: Dimension = new Dimension(12, 12)
+
   /** Create a new [[DrawImageTiled]]. */
-  def apply(path: String, start: Point, end: Point, dimension: Dimension): DrawImageTiled =
-    new DrawImageTiledImpl(path, start, end, dimension)
+  def apply(start: Point, end: Point, dimension: Dimension, color: Color): DrawImageTiled =
+    new DrawImageTiledImpl(start, end, dimension, color)
 
   /** Create a new [[DrawImageTiled]] with the default dimension. */
-  def createAt(path: String, start: Point, end: Point): DrawImageTiled =
-    DrawImageTiled(path, start, end, defaultDimension)
+  def createAt(start: Point, end: Point, color: Color): DrawImageTiled =
+    DrawImageTiled(start, end, defaultRouteDimension, color)
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  private case class DrawImageTiledImpl(source: SourceImage, start: Point, end: Point, dimension: Dimension)
-      extends DrawImageTiled:
-    def this(path: String, start: Point, end: Point, dimension: Dimension) =
-      this(SourceImage(path), start, end, dimension)
-
-    private val silhouette: Option[BufferedImage] =
-      source.bufferImage.map(image => BufferedImage(image.getWidth, image.getHeight, BufferedImage.TYPE_INT_ARGB))
+  private case class DrawImageTiledImpl(
+      source: SourceImage,
+      start: Point,
+      end: Point,
+      dimension: Dimension,
+      color: Color
+  ) extends DrawImageTiled:
+    def this(start: Point, end: Point, dimension: Dimension, color: Color) =
+      this(SourceImage(""), start, end, dimension, color)
 
     override val center: Point                      = start plus end times 0.5
     override val observable: Observable[MouseEvent] = Observers.createObservable[MouseEvent]
@@ -45,9 +46,6 @@ object DrawImageTiled:
     private var _scale: Float                      = defaultScaleSilhouette
     private var _silhouettePalette: Styles.Palette = Styles.silhouettePalette
     private val silhouetteColor: CurrentColor      = CurrentColor(_silhouettePalette.background)
-
-    private var width = 0
-    scale = 0.05
 
     export observable._
 
@@ -62,9 +60,7 @@ object DrawImageTiled:
       silhouetteColor.current = palette.background
 
     private def isCollide(point: Point): Boolean =
-      val a = new Point(this.start.x - width, this.start.y)
-      val b = new Point(this.end.x - width, this.end.y)
-      point.isPointInRotatedRectangle(a, b, width)
+      point.isPointInRotatedRectangle(start, end, dimension.width)
 
     override def onMove(data: MouseEvent): Unit =
       if isCollide(data.point) then
@@ -86,68 +82,28 @@ object DrawImageTiled:
         observable.notifyRelease(data)
 
     override def draw(g: Graphics2D, observer: ImageObserver): Unit =
-      drawTiledImage(g, scale, observer)
+      val dir   = (end minus start).toPointDouble.normalize
+      val width = dimension.width
 
-    def drawTiledImage(g: Graphics2D, scale: Double, observer: ImageObserver): Unit =
-      for img <- source.bufferImage
-      yield
-        val silhouetteScale = scale + 0.01
-        val silhouetteDim   = new Dimension(img.getWidth(observer), img.getHeight(observer)) plus silhouetteScale
-        val dimImage        = new Dimension(img.getWidth(observer), img.getHeight(observer))
-        val scaleDim        = dimImage times scale
-
-        val start = new Point(this.start.x - (scaleDim.width / 2), this.start.y)
-        val end   = new Point(this.end.x - (scaleDim.width / 2), this.end.y)
-
-        val rotate   = start angle end
-        val diagonal = sqrt(scaleDim.width * scaleDim.width + scaleDim.height * scaleDim.height)
-
-        width = scaleDim.width
-
-        val positions: Seq[(Double, Double)] =
-          val dx       = end.x - start.x
-          val dy       = end.y - start.y
-          val distance = start distance end
-
-          val correctedStep = diagonal - abs(diagonal - scaleDim.width)
-          val stepX         = (dx / distance) * correctedStep
-          val stepY         = (dy / distance) * correctedStep
-
-          val x = start.x until end.x by stepX.toInt
-          val y = start.y until end.y by stepY.toInt
-          (x zip y).map((x, y) => (x.toDouble, y.toDouble))
-
-        positions.foreach((x, y) =>
-          val transformSilhouette = new AffineTransform()
-          transformSilhouette translate (x, y)
-          transformSilhouette scale (silhouetteScale, silhouetteScale)
-          transformSilhouette rotate rotate
-          val dimS = silhouetteDim divide 2
-          transformSilhouette translate (-scaleDim.width, -scaleDim.height)
-
-          if silhouetteColor.current != Styles.transparentColor then
-            silhouette.foreach(silhouette =>
-              setupSilhouette(observer)
-              g.drawImage(silhouette, transformSilhouette, observer)
-            )
-
-          val transform = new AffineTransform()
-          transform translate (x, y)
-          transform scale (scale, scale)
-          transform rotate rotate
-          val dim = scaleDim divide 2
-          transform translate (-dim.width, 0)
-          g drawImage (img, transform, observer)
+      val positions =
+        val distance = start distance end
+        val nStep    = distance / width
+        val i        = 0 until (nStep.toInt + 1)
+        i.map(i =>
+          val step = (dir times (width * i)).toPoint
+          start plus step
         )
 
-    private def setupSilhouette(observer: ImageObserver): Unit =
-      source.bufferImage.foreach(image =>
-        silhouette.foreach(silhouette =>
-          val graphics = silhouette.createGraphics()
-          graphics.drawImage(image, 0, 0, observer)
-          graphics.setComposite(java.awt.AlphaComposite.SrcAtop)
-          graphics.setColor(silhouetteColor.current)
-          graphics.fillRect(0, 0, image.getWidth, image.getHeight)
-          graphics.dispose()
-        )
+      positions.foreach(point =>
+        val (x, y)              = (point.x, point.y)
+        val silhouetteWidth     = width + 4
+        val halfWidth           = width / 2
+        val silhouetteHalfWidth = silhouetteWidth / 2
+
+        if silhouetteColor.current != Styles.transparentColor then
+          g.setColor(silhouetteColor.current)
+          g.fillOval(x - silhouetteHalfWidth, y - silhouetteHalfWidth, silhouetteWidth, silhouetteWidth)
+
+        g.setColor(color)
+        g.fillOval(x - halfWidth, y - halfWidth, width, width)
       )

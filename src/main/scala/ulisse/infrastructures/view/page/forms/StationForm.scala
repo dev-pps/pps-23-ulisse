@@ -51,6 +51,7 @@ trait StationForm extends Form:
     xField.text = ""
     yField.text = ""
     tracks.text = ""
+    resetSelectedStation()
 
   /** Compiles the form. */
   def compileForm(station: Station): Unit =
@@ -120,12 +121,12 @@ object StationForm:
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
 
-    cleanButton.attachClick(CleanFormEvent(this))
+    cleanButton attachClick CleanFormEvent(this)
 
-    saveButton.attach(creationObservable toObserver (_ =>
+    saveButton attach (creationObservable toObserver (_ =>
       StationCreationInfo(name.text, xField.text, yField.text, tracks.text)
     ))
-    deleteButton.attach(deletionObservable toObserver (_ =>
+    deleteButton attach (deletionObservable toObserver (_ =>
       StationCreationInfo(name.text, xField.text, yField.text, tracks.text)
     ))
 

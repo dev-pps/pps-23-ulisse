@@ -9,6 +9,7 @@ import ulisse.infrastructures.view.components.draw.{DrawImageSimple, DrawImageTi
 import ulisse.infrastructures.view.utils.Swings.*
 
 import java.awt
+import java.awt.Color
 import java.awt.image.ImageObserver
 import scala.swing.{Graphics2D, Point}
 
@@ -30,15 +31,17 @@ object MapElement:
     MapElementSimple(station, DrawImageSimple.createAt(imagePath, station.coordinate.toPoint))
 
   /** Create a new [[MapElement]] with the given [[Route]] and [[String]]. */
-  def createRoute(route: Route, otherRoute: Option[Route]): MapElement[Route] =
-    val offset        = new Point(5, 5)
-    val offsetWithOld = otherRoute.map(_ => offset).getOrElse(new Point(-5, -5))
+  def createRoute(route: Route, checkPath: Boolean): MapElement[Route] =
+    val offset        = new Point(-15, -15)
+    val offsetWithOld = if checkPath then offset else new Point(0, 0)
     val start         = route.departure.coordinate.toPoint plus offsetWithOld
     val end           = route.arrival.coordinate.toPoint plus offsetWithOld
-    val path = route.typology match
-      case RouteType.Normal => ImagePath.routeNormal
-      case RouteType.AV     => ImagePath.routeAV
-    MapElementSimple(route, DrawImageTiled.createAt(path, start, end))
+//    val start = route.departure.coordinate.toPoint
+//    val end = route.arrival.coordinate.toPoint
+    val color = route.typology match
+      case RouteType.Normal => Color.black
+      case RouteType.AV     => Color.red
+    MapElementSimple(route, DrawImageTiled.createAt(start, end, color))
 
   private case class MapElementSimple[T](element: T, image: DrawImage) extends MapElement[T]:
     private val observable = Observers.createObservable[MapElement[T]]
