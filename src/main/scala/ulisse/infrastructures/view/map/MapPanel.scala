@@ -6,7 +6,6 @@ import ulisse.entities.station.Station
 import ulisse.infrastructures.view.common.ImagePath
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
-import ulisse.infrastructures.view.components.draw.DrawImageTiled
 
 import scala.swing.*
 
@@ -23,9 +22,6 @@ trait MapPanel extends Panel with EnhancedLook:
 
   /** Draw the route on the screen. */
   def updateRoutes(newRoutes: List[Route]): Unit
-
-  /** Draw the route on the screen. */
-  def updateGraphics(routes: List[Route]): Unit
 
 /** Companion object for [[MapPanel]]. */
 object MapPanel:
@@ -45,11 +41,8 @@ object MapPanel:
       updateGraphics()
 
     override def updateRoutes(newRoutes: List[Route]): Unit =
-      routes update (newRoutes map (MapElement createRoute (_, ImagePath.route)))
+      routes update (newRoutes map (route => MapElement createRoute (route, ImagePath.route, routes.find(route))))
       updateGraphics()
-
-    def updateGraphics(newRoutes: List[Route]): Unit =
-      routes update (newRoutes map (MapElement createRoute (_, ImagePath.route)))
 
     override protected def paintLook(g: Graphics2D): Unit =
       routes draw (g, peer)

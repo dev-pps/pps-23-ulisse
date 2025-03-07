@@ -7,7 +7,6 @@ import ulisse.infrastructures.view.components.styles.Images.SourceImage
 import ulisse.infrastructures.view.components.styles.{CurrentColor, Images, Styles}
 import ulisse.infrastructures.view.utils.Swings.*
 
-import java.awt.Color
 import java.awt.geom.AffineTransform
 import java.awt.image.{BufferedImage, ImageObserver}
 import scala.math.{abs, sqrt}
@@ -63,8 +62,8 @@ object DrawImageTiled:
       silhouetteColor.current = palette.background
 
     private def isCollide(point: Point): Boolean =
-      val a = new Point(this.start.x - (width / 2), this.start.y)
-      val b = new Point(this.end.x - (width / 2), this.end.y)
+      val a = new Point(this.start.x - width, this.start.y)
+      val b = new Point(this.end.x - width, this.end.y)
       point.isPointInRotatedRectangle(a, b, width)
 
     override def onMove(data: MouseEvent): Unit =
@@ -104,19 +103,6 @@ object DrawImageTiled:
         val diagonal = sqrt(scaleDim.width * scaleDim.width + scaleDim.height * scaleDim.height)
 
         width = scaleDim.width
-
-        g.setColor(Color.red)
-        g.fillOval(center.x, center.y, 5, 5)
-
-        g.setColor(Color.blue)
-//        g.fillOval(a.x, a.y, 5, 5)
-        g.setColor(Color.magenta)
-        g.fillOval(this.start.x, this.start.y, 5, 5)
-
-        g.setColor(Color.green)
-//        g.fillOval(b.x, b.y, 5, 5)
-        g.setColor(Color.cyan)
-        g.fillOval(this.end.x, this.end.y, 5, 5)
 
         val positions: Seq[(Double, Double)] =
           val dx       = end.x - start.x
