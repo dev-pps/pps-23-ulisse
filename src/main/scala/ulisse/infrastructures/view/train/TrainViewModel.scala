@@ -1,4 +1,4 @@
-package ulisse.infrastructures.view.train.model
+package ulisse.infrastructures.view.train
 
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.UseType

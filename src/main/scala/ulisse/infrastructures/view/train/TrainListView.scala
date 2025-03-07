@@ -1,6 +1,5 @@
 package ulisse.infrastructures.view.train
 
-import ulisse.infrastructures.view.train.model.TrainViewModel
 import ulisse.infrastructures.view.utils.SwingUtils
 import ulisse.infrastructures.view.utils.SwingUtils.{defaultString, headerLabel, nameFont, valueLabel}
 
@@ -8,7 +7,7 @@ import java.awt.Color
 import scala.swing.Swing.{EmptyBorder, HGlue, HStrut}
 import scala.swing.{BoxPanel, Component, Label, ListView, Orientation, Swing}
 
-object TrainsViews:
+object TrainListView:
 
   private val selectedColor = Color.decode("#fff3d0")
 

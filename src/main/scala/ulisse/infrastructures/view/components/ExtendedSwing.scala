@@ -91,10 +91,9 @@ object ExtendedSwing:
 
   import ulisse.infrastructures.view.components.composed.ComposedSwing
   import ulisse.infrastructures.view.common.Themes.withAlpha
-  import ulisse.infrastructures.view.components.ExtendedSwing
 
   /** A themed field label for given `fieldComponent` */
-  class SFieldLabel(text: String)(fieldComponent: Component) extends ComposedSwing:
+  class SFieldLabel[A <: Component](text: String)(fieldComponent: A) extends ComposedSwing:
     import ulisse.infrastructures.view.common.Themes.Theme
     private val fieldBackground = Theme.light.background.withAlpha(50)
     private val mainPanel       = ExtendedSwing.SBoxPanel(Orientation.Vertical)

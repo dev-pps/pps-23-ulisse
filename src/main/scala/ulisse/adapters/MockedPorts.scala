@@ -28,16 +28,16 @@ object MockedPorts:
 
   import ulisse.applications.ports.TrainPorts
   case class TrainServiceMock() extends TrainPorts.Input:
+    private val avTech: TrainTechnology =
+      TrainTechnology("AV", maxSpeed = 300, acceleration = 1.5, deceleration = 1.0)
     def trains: Future[List[Train]] =
-      val avTech: TrainTechnology =
-        TrainTechnology("AV", maxSpeed = 300, acceleration = 1.5, deceleration = 1.0)
       val wagonInfo: Wagons.Wagon = Wagons.PassengerWagon(300)
       val AV1000Train: Train      = Train(name = "AV1000", avTech, wagonInfo, length = 4)
       val AV800Train: Train       = Train(name = "AV800", avTech, wagonInfo, length = 12)
       val trains                  = List(AV1000Train, AV800Train)
       Future.successful(trains)
     def technologies: Future[List[TrainTechnology]] =
-      Future.successful(List.empty)
+      Future.successful(List(avTech))
     def wagonTypes: Future[List[UseType]] = Future.successful(Wagons.UseType.values.toList)
     def createTrain(
         name: String,
