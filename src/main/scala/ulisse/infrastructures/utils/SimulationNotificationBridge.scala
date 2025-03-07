@@ -1,15 +1,15 @@
-package ulisse.infrastructures.utils
+package ulisse.infrastructures.utilty
 
 import ulisse.entities.simulation.data.SimulationData
-import ulisse.infrastructures.view.simulation.SimulationPage
+import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 
 /** Adapter requirements for the simulation notification bridge. */
 trait SimulationNotificationAdapterRequirements:
   /** The actual component that has to receive notification. */
-  def simulationPageComponent(): SimulationPage
+  def simulationPageComponent(): SimulationNotificationListener
 
 /** Bridge for the simulation notification. Is needed to make lazy DI. */
 final case class SimulationNotificationBridge(requirements: SimulationNotificationAdapterRequirements)
-    extends SimulationPage:
+    extends SimulationNotificationListener:
   override def updateData(data: SimulationData): Unit    = requirements.simulationPageComponent().updateData(data)
   override def endSimulation(data: SimulationData): Unit = requirements.simulationPageComponent().endSimulation(data)

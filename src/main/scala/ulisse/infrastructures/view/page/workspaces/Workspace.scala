@@ -1,11 +1,11 @@
 package ulisse.infrastructures.view.page.workspaces
 
 import ulisse.adapters.InputAdapterManager
+import ulisse.adapters.input.SimulationPageAdapter
+import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
-import ulisse.infrastructures.view.manager.FormManager
-import ulisse.infrastructures.view.map.MapPanel
-import ulisse.infrastructures.view.train.TrainEditorView
+import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.{BorderPanel, Component}
@@ -16,7 +16,8 @@ trait Workspace extends ComposedSwing:
 
 object Workspace:
   /** Creates a new instance of simulation workspace. */
-  def createSimulation(adapterManager: InputAdapterManager): SimulationWorkspace = SimulationWorkspace(adapterManager)
+  def createSimulation(simulationAdapter: SimulationPageAdapter): SimulationWorkspace =
+    SimulationWorkspace(simulationAdapter)
 
   /** Creates a new instance of map workspace. */
   def createMap(adapterManager: InputAdapterManager): MapWorkspace = MapWorkspace(adapterManager)
@@ -37,16 +38,18 @@ object Workspace:
     override def component[T >: Component]: T = mainPanel
 
   /** Represents the simulation workspace of the application. */
-  case class SimulationWorkspace(adapterManager: InputAdapterManager) extends Workspace:
+  case class SimulationWorkspace(simulationAdapter: SimulationPageAdapter) extends Workspace
+      with SimulationNotificationListener:
     private val workspace = BaseWorkspace()
 
     export workspace.{component, revalidate}
 
+    override def updateData(data: SimulationData): Unit = ()
+
+    override def endSimulation(data: SimulationData): Unit = ()
+
   /** Represents the train workspace of the application. */
   case class TrainWorkspace(adapterManager: InputAdapterManager) extends Workspace:
-    import ulisse.applications.ports.TrainPorts
-    import ulisse.applications.useCases.TrainService
-    import java.util.concurrent.LinkedBlockingQueue
 //
 //    val trainPort: TrainPorts.Input = TrainService(LinkedBlockingQueue[AppState => AppState])
 //    private val workspace           = TrainEditorView(trainPort)

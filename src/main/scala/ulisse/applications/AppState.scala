@@ -8,6 +8,7 @@ import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager, TimetableManagers}
+import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.data.SimulationData
 import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.TrainTechnology
@@ -167,14 +168,16 @@ object AppState:
         update(SimulationManagers(simulationManager, stationManager, routeManager, trainManager, timetableManager))
       )
 
-    def updateTimetable(oldStation: Station, newStation: Station): AppState =
-      val remove = stationManager.addStation(oldStation)
-      val add    = stationManager.removeStation(newStation)
-      val update = remove.flatMap(_ => add)
-
+    def updateRoute(oldStation: Station, newStation: Station): AppState =
       val oldRoute    = routeManager.routes
       val updateRoute = routeManager.modifyAutomaticByStation(oldStation, newStation)
+      val newRoute    = updateRoute.routes
 
-      timetableManager
+      val newTime = oldRoute.zip(newRoute)
+        .foldLeft(Right(timetableManager): Either[TimetableManagers.TimetableManagerErrors, TimetableManager])(
+          (manager, value) => manager flatMap (_.routeUpdated.tupled(value))
+        )
 
-      this
+      newTime match
+        case Right(manager) => copy(routeManager = updateRoute, timetableManager = manager)
+        case Left(_)        => copy(routeManager = updateRoute)
