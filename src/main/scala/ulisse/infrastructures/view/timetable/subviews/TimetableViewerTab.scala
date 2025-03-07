@@ -8,7 +8,6 @@ import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.entities.train.Trains.Train
 import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.{TimetablesUpdatable, TrainsUpdatable, Updatable}
 import ulisse.infrastructures.view.timetable.TimetableViewModel
-import ulisse.infrastructures.view.timetable.TimetableViewModel.{trainId, TrainId}
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
 import ulisse.infrastructures.view.utils.SwingUtils.selectedItemOption
 import ulisse.infrastructures.view.utils.SwingUtils.updateModel
@@ -17,11 +16,12 @@ import scala.swing.Swing.onEDT
 import scala.swing.event.ButtonClicked
 import scala.swing.{BorderPanel, ComboBox, Orientation, ScrollPane, Swing}
 
-/** Timetable consulting tab view.
-  * It gets `controller` and observes updates from controller.
+/** Timetable consulting tab view: by selecting train and departure time, timetable is shown.
+  * It gets `controller` ([[TimetableViewAdapter]]) and observes updates from controller.
   *
   *  Observes:
-  *  - [[TimetablesUpdatable]]
+  *  - [[TimetablesUpdatable]] to get timetables of selected train
+  *  - [[TrainsUpdatable]] to updates train selector
   */
 class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Orientation.Vertical)
     with TimetablesUpdatable with TrainsUpdatable:
