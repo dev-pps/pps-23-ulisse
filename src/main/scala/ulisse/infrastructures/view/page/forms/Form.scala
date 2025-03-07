@@ -1,10 +1,12 @@
 package ulisse.infrastructures.view.page.forms
 
+import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 
+import scala.swing.event.MouseEvent
 import scala.swing.{Component, Orientation}
 
 trait Form extends ComposedSwing:
@@ -15,6 +17,10 @@ object Form:
   def createRoute(): RouteForm       = RouteForm()
   def createStation(): StationForm   = StationForm()
   def createSchedule(): ScheduleForm = ScheduleForm()
+
+  /** Represents the clean form event. */
+  final case class CleanFormEvent(form: Form) extends ClickObserver[MouseEvent]:
+    override def onClick(data: MouseEvent): Unit = form.cleanForm()
 
   final case class BaseForm(title: String, fields: ComposedSwing.InfoTextField*):
     private val mainPanel: ExtendedSwing.SBoxPanel    = ExtendedSwing.SBoxPanel(Orientation.Vertical)

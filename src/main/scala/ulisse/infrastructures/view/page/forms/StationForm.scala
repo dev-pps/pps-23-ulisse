@@ -10,7 +10,7 @@ import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.map.MapElement
-import ulisse.infrastructures.view.page.forms.Form.BaseForm
+import ulisse.infrastructures.view.page.forms.Form.{BaseForm, CleanFormEvent}
 import ulisse.infrastructures.view.page.workspaces.MapWorkspace
 import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 
@@ -97,10 +97,6 @@ object StationForm:
     override def onClick(data: MapElement[Station]): Unit =
       workspace.selectedStation = data.element
       workspace.compileStationForm(data.element)
-
-  /** Represents the clean form event. */
-  final case class CleanFormEvent(stationForm: StationForm) extends ClickObserver[MouseEvent]:
-    override def onClick(data: MouseEvent): Unit = stationForm.cleanForm()
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class StationFormImpl() extends StationForm:
