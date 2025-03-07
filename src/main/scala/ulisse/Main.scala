@@ -3,9 +3,11 @@ package ulisse
 import ulisse.adapters.InputAdapterManager
 import ulisse.adapters.input.SimulationPageAdapter
 import ulisse.adapters.output.SimulationNotificationAdapter
+import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.useCases.SimulationService
 import ulisse.applications.{AppState, EventQueue, InputPortManager}
+import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 import ulisse.infrastructures.utilty.{SimulationNotificationAdapterRequirements, SimulationNotificationBridge}
 import ulisse.infrastructures.view.GUI
 import ulisse.infrastructures.view.simulation.SimulationPage
@@ -23,8 +25,11 @@ object Main:
     val simulationPageGUI: SimulationPage                      = SimulationPage(simulationAdapter)
 
   @main def launchApp(): Unit =
-    val eventQueue          = EventQueue()
+    val eventQueue = EventQueue()
+
     val simulationSetting   = SimulationSetting(eventQueue)
+    val timeProviderAdapter = TimeProviderAdapter(TimeProvider.systemTimeProvider())
+
     val inputPortManager    = InputPortManager(eventQueue, simulationSetting.simulationInput)
     val inputAdapterManager = InputAdapterManager(inputPortManager, simulationSetting.simulationAdapter)
 
