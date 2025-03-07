@@ -4,6 +4,16 @@
 
 * **TimetableManager:** added timetable updates listener method ([c51f407](https://github.com/dev-pps/pps-23-ulisse/commit/c51f4075e5188af1e7c6c5da04363663166f695f))
 
+### Bug Fixes
+
+* **FatJar:** exclude coverage by default ([3e0951d](https://github.com/dev-pps/pps-23-ulisse/commit/3e0951df4e400118d8d8d1186aa25b615cbfc9c3))
+
+## [1.31.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.30.0...v1.31.0) (2025-03-07)
+
+### Features
+
+* **TimetableManager:** added timetable updates listener method ([c51f407](https://github.com/dev-pps/pps-23-ulisse/commit/c51f4075e5188af1e7c6c5da04363663166f695f))
+
 ## [1.30.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.29.0...v1.30.0) (2025-03-07)
 
 ### Features
