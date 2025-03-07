@@ -38,3 +38,15 @@ object SwingUtils:
         contents = mainPanel
         visible = true
       }
+
+  extension (components: Seq[Component])
+    def setDefaultFont(): Unit =
+      components.foreach(_.font = Styles.defaultFont.swingFont)
+
+  extension [A](combo: ComboBox[A])
+    def updateModel(model: Seq[A]): Unit =
+      Swing.onEDT:
+        combo.peer.setModel(ComboBox.newConstantModel(model))
+
+  extension [T](comboBox: ComboBox[T])
+    def selectedItemOption: Option[T] = Option.when(comboBox.selection.item != null)(comboBox.selection.item)

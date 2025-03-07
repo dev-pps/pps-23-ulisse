@@ -2,6 +2,7 @@ package ulisse.adapters.input
 
 import ulisse.applications.ports.{TimetablePorts, TrainPorts}
 import ulisse.entities.timetable.Timetables.Timetable
+import ulisse.entities.train.Trains.Train
 import ulisse.infrastructures.view.timetable.TimetableViewModel.{trainId, TableEntryData, TimetableEntry, TrainId}
 import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.*
 import ulisse.utils.Errors.BaseError
@@ -9,6 +10,7 @@ import ulisse.utils.Times.ClockTime
 import ulisse.utils.ValidationUtils.validateNonBlankString
 
 import java.util.concurrent.Executors
+import scala.annotation.targetName
 import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.Swing
 import scala.util.{Failure, Right as reset, Success}
@@ -26,11 +28,11 @@ object TimetableViewAdapters:
 
   /** Timetable view controller.
     *
-    * It is observable for list of [[TrainId]]
+    * It is observable for list of [[Train]]
     */
-  trait TimetableViewAdapter extends Observed[List[TrainId]]:
+  trait TimetableViewAdapter extends TrainsObservable with TimetablesObservable with ErrorObservable:
     /** Requests train names. */
-    def requestTrainNames(): Unit
+    def requestTrains(): Unit
 
     /** Requests timetables given the `trainName` to timetable service. */
     def requestTimetables(trainName: String): Unit
@@ -55,7 +57,7 @@ object TimetableViewAdapters:
     /** Reset timetable draft, forget train name, departure time and all stations. */
     def reset(): List[TimetableEntry]
 
-    /** Save timetable draft. */
+    /** Save timetable draft. A request on service port is requested. */
     def save(): Unit
 
   object TimetableViewAdapter:
@@ -67,11 +69,12 @@ object TimetableViewAdapters:
     private class ViewAdapterImpl(tablePort: TimetablePorts.Input, trainPort: TrainPorts.Input)
         extends TimetableViewAdapter:
       import TimetableViewAdapters.Error.*
-      private var stations: List[TimetableEntry]                     = List.empty
-      private var selectedTrain: Option[String]                      = None
-      private var startTime: Option[ClockTime]                       = None
-      private var errorObserver: Option[ErrorObserver]               = None
-      private var trainNamesObserver: List[Updatable[List[TrainId]]] = List.empty
+      private var stations: List[TimetableEntry]                = List.empty
+      private var selectedTrain: Option[String]                 = None
+      private var startTime: Option[ClockTime]                  = None
+      private var errorObserver: Option[ErrorObserver]          = None
+      private var trainsObserver: List[TrainsUpdatable]         = List.empty
+      private var timetablesObserver: List[TimetablesUpdatable] = List.empty
 
       given executionContext: ExecutionContext = ExecutionContext.fromExecutorService(
         Executors.newFixedThreadPool(1)
@@ -80,10 +83,10 @@ object TimetableViewAdapters:
       private def showError(err: Error): Unit =
         errorObserver.foreach(o => Swing.onEDT(o.showError(err.title, err.descr)))
 
-      override def requestTrainNames(): Unit =
+      override def requestTrains(): Unit =
         trainPort.trains.onComplete {
           case Failure(e) => showError(RequestException(e.getMessage))
-          case Success(l) => trainNamesObserver.foreach(_.update(l.map(t => trainId(t.name))))
+          case Success(l) => trainsObserver.foreach(_.updateNewTrains(l))
         }
 
       override def insertStation(stationName: String, waitTime: Option[Int]): List[TimetableEntry] =
@@ -131,11 +134,10 @@ object TimetableViewAdapters:
 
       override def requestTimetables(trainName: String): Unit =
         tablePort.timetablesOf(trainName).onComplete {
-          case Failure(exc)               => showError(RequestException(exc.getMessage))
-          case Success(Left(err))         => showError(RequestException(s"SERVICE: $err"))
+          case Failure(exc)       => showError(RequestException(exc.getMessage))
+          case Success(Left(err)) => showError(RequestException(s"SERVICE: $err"))
           case Success(Right(timetables)) =>
-            // TODO: notify the view interested
-            println(timetables)
+            timetablesObserver.foreach(_.updateTimetables(timetables))
         }
 
       override def reset(): List[TimetableEntry] =
@@ -155,8 +157,12 @@ object TimetableViewAdapters:
       override def addErrorObserver(errObserver: ErrorObserver): Unit =
         errorObserver = Some(errObserver)
 
-      override def addListener(observer: Updatable[List[TrainId]]): Unit =
-        trainNamesObserver = observer :: trainNamesObserver
+      override def addTimetablesObserver(observer: TimetablesUpdatable): Unit =
+        timetablesObserver = observer :: timetablesObserver
+
+      override def addTrainsObserver(
+          observer: TrainsUpdatable
+      ): Unit = trainsObserver = observer :: trainsObserver
 
       import ulisse.applications.ports.TimetablePorts.RequestResult
       extension (toComplete: Future[RequestResult])
