@@ -48,6 +48,7 @@ jobs:
           cp -r target/scala-*/api/* ./docs/public/scaladoc
       - name: Generate Scoverage Report
         run: |
+          sbt 'set coverageEnabled := true'
           sbt clean coverage test
           sbt coverageReport
       - name: Move Scoverage Report to docs/public/coverage
