@@ -37,6 +37,7 @@ object MapPanel:
     private val routes   = MapElements[Route](observable)
 
     private val test = DrawImageTiled.createAt("route.png", new Point(400, 200), new Point(600, 500))
+    observable.attachMove(test)
 
     def attachClickStation(event: ClickObserver[MapElement[Station]]): Unit = stations attachClick event
 
