@@ -1,34 +1,52 @@
 package ulisse.applications
 
-import ulisse.applications.ports.{RoutePorts, SimulationPorts, StationPorts, TimetablePorts, TrainPorts}
-import ulisse.applications.useCases.{RouteService, SimulationService, StationService, TimetableService, TrainService}
+import ulisse.applications.ports.*
+import ulisse.applications.useCases.*
 
 /** Represents the input port manager of the application. */
 trait InputPortManager:
-  def station: StationPorts.Input
-  def route: RoutePorts.Input
-  def train: TrainPorts.Input
-  def timetable: TimetablePorts.Input
+  /** The station input port. */
+  val station: StationPorts.Input
+
+  /** The route input port. */
+  val route: RoutePorts.Input
+
+  /** The simulation input port. */
+  val train: TrainPorts.Input
+
+  /** The timetable input port. */
+  val timetable: TimetablePorts.Input
+
+  /** The simulation input port. */
+  val simulation: SimulationPorts.Input
+
+  /** The simulation info input port. */
+  val simulationInfo: SimulationInfoPorts.Input
 
 /** Companion object of the input port manager. */
 object InputPortManager:
 
   /** Creates a new instance of the input port manager. */
-  def apply(eventQueue: EventQueue): InputPortManager = new InputPortManagerImpl(eventQueue)
+  def apply(eventQueue: EventQueue, simulationInput: SimulationPorts.Input): InputPortManager =
+    new InputPortManagerImpl(eventQueue, simulationInput)
 
   private case class InputPortManagerImpl(
       eventQueue: EventQueue,
       station: StationPorts.Input,
       route: RoutePorts.Input,
       train: TrainPorts.Input,
-      timetable: TimetablePorts.Input
+      timetable: TimetablePorts.Input,
+      simulation: SimulationPorts.Input,
+      simulationInfo: SimulationInfoPorts.Input
   ) extends InputPortManager:
 
-    def this(eventQueue: EventQueue) =
+    def this(eventQueue: EventQueue, simulationInput: SimulationPorts.Input) =
       this(
         eventQueue,
         StationService(eventQueue),
         RouteService(eventQueue),
         TrainService(eventQueue),
-        TimetableService(eventQueue)
+        TimetableService(eventQueue),
+        simulationInput,
+        SimulationInfoService(eventQueue)
       )
