@@ -2,10 +2,8 @@ package ulisse.infrastructures.view.page.workspaces
 
 import ulisse.adapters.InputAdapterManager
 import ulisse.adapters.input.SimulationPageAdapter
-import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
-import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.{BorderPanel, Component}
@@ -14,6 +12,7 @@ import scala.swing.{BorderPanel, Component}
 trait Workspace extends ComposedSwing:
   def revalidate(): Unit
 
+/** Companion object of the [[Workspace]]. */
 object Workspace:
   /** Creates a new instance of simulation workspace. */
   def createSimulation(simulationAdapter: SimulationPageAdapter): SimulationWorkspace =
