@@ -128,8 +128,8 @@ object RouteForm:
     private val creationObservable = Observers.createObservable[RouteCreationInfo]
     private val deletionObservable = Observers.createObservable[RouteCreationInfo]
 
-    buttonPanel.contents += cleanButton
     buttonPanel.contents += saveButton
+    buttonPanel.contents += cleanButton
     buttonPanel.contents += deleteButton
 
     cleanButton attachClick CleanFormEvent(this)

@@ -117,8 +117,8 @@ object StationForm:
 
     private var _selectedStation: Option[Station] = Option.empty
 
-    buttonPanel.contents += cleanButton
     buttonPanel.contents += saveButton
+    buttonPanel.contents += cleanButton
     buttonPanel.contents += deleteButton
 
     cleanButton attachClick CleanFormEvent(this)
