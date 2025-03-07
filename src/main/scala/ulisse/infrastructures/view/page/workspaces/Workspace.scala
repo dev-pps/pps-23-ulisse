@@ -37,17 +37,6 @@ object Workspace:
 
     override def component[T >: Component]: T = mainPanel
 
-  /** Represents the simulation workspace of the application. */
-  case class SimulationWorkspace(simulationAdapter: SimulationPageAdapter) extends Workspace
-      with SimulationNotificationListener:
-    private val workspace = BaseWorkspace()
-
-    export workspace.{component, revalidate}
-
-    override def updateData(data: SimulationData): Unit = ()
-
-    override def endSimulation(data: SimulationData): Unit = ()
-
   /** Represents the train workspace of the application. */
   case class TrainWorkspace(adapterManager: InputAdapterManager) extends Workspace:
 //

@@ -5,7 +5,6 @@ import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.common.Themes.*
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.ExtendedSwing.SVGPanel
-import ulisse.infrastructures.view.page.workspaces.Workspace.SimulationWorkspace
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 import ulisse.utils.Times.toTime
 

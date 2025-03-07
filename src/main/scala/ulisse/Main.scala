@@ -8,7 +8,7 @@ import ulisse.applications.useCases.SimulationService
 import ulisse.applications.{AppState, EventQueue, InputPortManager}
 import ulisse.infrastructures.utilty.{SimulationNotificationAdapterRequirements, SimulationNotificationBridge}
 import ulisse.infrastructures.view.GUI
-import ulisse.infrastructures.view.page.workspaces.Workspace.SimulationWorkspace
+import ulisse.infrastructures.view.page.workspaces.SimulationWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 
 object Main:
