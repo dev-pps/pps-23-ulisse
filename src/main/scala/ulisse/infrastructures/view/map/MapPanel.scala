@@ -41,7 +41,7 @@ object MapPanel:
       updateGraphics()
 
     override def updateRoutes(newRoutes: List[Route]): Unit =
-      routes update (newRoutes map (route => MapElement createRoute (route, ImagePath.route, routes.find(route))))
+      routes update (newRoutes map (route => MapElement createRoute (route, routes.find(route))))
       updateGraphics()
 
     override protected def paintLook(g: Graphics2D): Unit =
