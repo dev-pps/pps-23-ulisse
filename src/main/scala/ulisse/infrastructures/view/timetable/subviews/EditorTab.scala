@@ -9,19 +9,22 @@ import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.TrainsUpd
 import ulisse.infrastructures.view.timetable.TimetableViewModel.TimetableEntry
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
 
-import scala.swing.Swing.{onEDT, EmptyBorder, HGlue, VStrut}
+import scala.swing.Swing.{onEDT, EmptyBorder, HGlue}
 import scala.swing.event.ButtonClicked
 import scala.swing.{BoxPanel, ComboBox, Component, Font, Label, Orientation, Panel, ScrollPane}
 import scala.util.Try
 
+/** Timetable editor tab view where compose and create timetables for a train. */
 trait EditorTab extends Component with TrainsUpdatable
 
 object EditorTab:
-  /** Returns timetable editor tab view given its `adapter` */
+  /** Returns timetable editor tab view given its `adapter`. */
   def apply(adapter: TimetableViewAdapter): EditorTab =
     new EditorTabImpl(adapter)
 
-  /** Timetable creation form containing fields to select train, departing time and stations sequence and preview of timetable */
+  /** Timetable creation form containing fields to select train,
+    * departing time and stations sequence and preview of timetable
+    */
   private class EditorTabImpl(adapter: TimetableViewAdapter)
       extends SBoxPanel(Orientation.Vertical) with EditorTab:
     adapter.addTrainsObserver(this)

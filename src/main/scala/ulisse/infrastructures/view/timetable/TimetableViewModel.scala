@@ -2,12 +2,10 @@ package ulisse.infrastructures.view.timetable
 
 import ulisse.entities.timetable.Timetables.Timetable
 
+/** Objects containing all data models used by timetable views and
+  * utility method to convert service application data type into view one.
+  */
 object TimetableViewModel:
-  opaque type TrainId = String
-
-  def trainId(id: String): TrainId = id
-  extension (ti: TrainId)
-    def value: String = ti
 
   trait TimetableEntry:
     def name: String
@@ -18,6 +16,7 @@ object TimetableViewModel:
     override def toString: String =
       s"(Station: $name, arrivingAt: $arrivingTime, departingAt: $departureTime, waits: $waitMinutes min)"
 
+  /** Timetable station entry information. */
   case class TableEntryData(
       name: String,
       arrivingTime: Option[String],
@@ -25,10 +24,11 @@ object TimetableViewModel:
       waitMinutes: Option[Int]
   ) extends TimetableEntry
 
+  /** Returns converted station info from entries of timetable `t`. */
   extension (t: Timetable)
     def toTimetableEntries: List[TimetableEntry] =
       extension [T](t: Option[T])
-        private def optionString(using ev: T <:< AnyRef): Option[String] = t.map(_.toString)
+        private def optionString: Option[String] = t.map(_.toString)
 
       t.table.map((station, times) =>
         TableEntryData(
@@ -38,19 +38,3 @@ object TimetableViewModel:
           times.stationTime.waitTime
         )
       ).toList
-
-  import scala.util.Random
-  private def randomTime(): String =
-    val hour   = Random.nextInt(24)
-    val minute = Random.nextInt(60)
-    s"$hour:$minute"
-
-  def generateMockTimetable(size: Int): List[TimetableEntry] =
-    (1 to size).map(i =>
-      new TimetableEntry {
-        val name                          = s"Station $i"
-        val arrivingTime: Option[String]  = Some(randomTime())
-        val departureTime: Option[String] = Some(randomTime())
-        val waitMinutes: Option[Int]      = Option.when(Random.nextBoolean())(Random.nextInt(30))
-      }
-    ).toList
