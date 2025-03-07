@@ -60,7 +60,6 @@ object StationForm:
       workspace.resetSelectedStation()
 
     override def onClick(data: StationCreationInfo): Unit =
-      println("SAVE")
       workspace.selectedStation.fold(createStation(data))(updateStation(data, _))
 
   /** Represents the deletion station event. */

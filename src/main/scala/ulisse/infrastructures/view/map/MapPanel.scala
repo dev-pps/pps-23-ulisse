@@ -6,6 +6,7 @@ import ulisse.entities.station.Station
 import ulisse.infrastructures.view.common.ImagePath
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.components.draw.DrawImageTiled
 
 import scala.swing.*
 
@@ -35,6 +36,8 @@ object MapPanel:
     private val stations = MapElements[Station](observable)
     private val routes   = MapElements[Route](observable)
 
+    private val test = DrawImageTiled.createAt("route.png", new Point(400, 200), new Point(600, 500))
+
     def attachClickStation(event: ClickObserver[MapElement[Station]]): Unit = stations attachClick event
 
     def attachClickRoute(event: ClickObserver[MapElement[Route]]): Unit = routes attachClick event
@@ -51,6 +54,7 @@ object MapPanel:
       routes update (newRoutes map (MapElement createRoute (_, ImagePath.route)))
 
     override protected def paintLook(g: Graphics2D): Unit =
-      stations draw (g, peer)
+      test draw (g, peer)
       routes draw (g, peer)
+      stations draw (g, peer)
       super.paintLook(g)
