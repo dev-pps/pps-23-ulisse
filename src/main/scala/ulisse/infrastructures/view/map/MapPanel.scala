@@ -14,6 +14,9 @@ trait MapPanel extends Panel with EnhancedLook:
   /** Attach the station form to the map panel. */
   def attachClickStation(event: ClickObserver[MapElement[Station]]): Unit
 
+  /** Attach the route form to the map panel. */
+//  def attachClickRoute(event: ClickObserver[MapElement[Route]]): Unit
+
   /** Draw the station on the screen. */
   def uploadStation(newStations: StationPorts.Input#SM): Unit
 
@@ -47,4 +50,5 @@ object MapPanel:
 
     override protected def paintLook(g: Graphics2D): Unit =
       stations draw (g, peer)
+      routes draw (g, peer)
       super.paintLook(g)

@@ -40,7 +40,7 @@ object DrawImageTiled:
 
     export image.{center => _, dimension => _, draw => _, observable => _, _}
 
-    override def draw(g: Graphics2D, observer: ImageObserver): Unit = drawTiledImage(g, 0.3, observer)
+    override def draw(g: Graphics2D, observer: ImageObserver): Unit = drawTiledImage(g, 0.05, observer)
 
     def drawTiledImage(g: Graphics2D, scale: Double, observer: ImageObserver): Unit =
       for img <- source.bufferImage

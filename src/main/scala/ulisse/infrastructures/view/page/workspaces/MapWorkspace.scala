@@ -64,6 +64,7 @@ object MapWorkspace:
     formManager.stationForm attachDeletion DeletionStationEvent(adapterManager.station, this)
 
     formManager.routeForm attachCreation RouteForm.CreationRouteEvent(adapterManager.route, this)
+    formManager.routeForm attachDeletion RouteForm.DeletionRouteEvent(adapterManager.route, this)
 
     mapPanel attachClick StationForm.TakePointFomMapEvent(stationForm)
 

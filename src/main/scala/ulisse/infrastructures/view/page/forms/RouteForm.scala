@@ -48,6 +48,11 @@ trait RouteForm extends Form:
   /** Attach the deletion observer to the form of type [[RouteCreationInfo]]. */
   def attachDeletion(observer: ClickObserver[RouteCreationInfo]): Unit
 
+  /** Compute the distance between the departure and arrival stations if both are present. */
+  def computeDistance(): Unit = (departure, arrival) match
+    case (Some(departure), Some(arrival)) => length.text = departure.coordinate.distance(arrival.coordinate).toString
+    case _                                => ()
+
 /** Companion object of the [[RouteForm]]. */
 object RouteForm:
   /** Creates a new instance of route form. */
@@ -58,19 +63,25 @@ object RouteForm:
       extends ClickObserver[RouteCreationInfo]:
 
     override def onClick(data: RouteCreationInfo): Unit =
-      adapter.save(Option.empty, data).onComplete(_ fold (println, _ fold (println, workspace.updateRoutes)))
+      adapter save (Option.empty, data) onComplete (_ fold (println, _ fold (println, workspace.updateRoutes)))
+
+  /** Represents the deletion route event. */
+  final case class DeletionRouteEvent(adapter: RouteAdapter, workspace: MapWorkspace)
+      extends ClickObserver[RouteCreationInfo]:
+
+    override def onClick(data: RouteCreationInfo): Unit =
+      adapter delete data onComplete (_ fold (println, _ fold (println, workspace.updateRoutes)))
 
   /** Represents the take station from map event. */
   final case class TakeStationFromMapEvent(routeForm: RouteForm) extends ClickObserver[MapElement[Station]]:
+
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
+    private var chosenStation = false
+
     override def onClick(data: MapElement[Station]): Unit =
-      routeForm.departure match
-        case Some(value) =>
-          routeForm.arrivalStation.text = data.element.name
-          routeForm.length.text = (value.coordinate distance data.element.coordinate).toString
-          routeForm.departure = Option.empty
-        case None =>
-          routeForm.departure = Option(data.element)
-          routeForm.departureStation.text = data.element.name
+      if chosenStation then routeForm.departure = Option(data.element)
+      else routeForm.arrival = Option(data.element)
+      chosenStation = !chosenStation
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class RouteFormImpl() extends RouteForm:
@@ -92,12 +103,12 @@ object RouteForm:
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
 
-//    saveButton.attach(creationObservable toObserver (_ =>
-//        RouteCreationInfo(depa
-//    ))
-//    deleteButton.attach(deletionObservable toObserver (_ =>
-//      RouteCreationInfo(name.text, xField.text, yField.text, tracks.text)
-//      ))
+    saveButton attach (creationObservable toObserver (_ =>
+      RouteCreationInfo(departure, arrival, routeType.text, rails.text, length.text)
+    ))
+    deleteButton attach (deletionObservable toObserver (_ =>
+      RouteCreationInfo(departure, arrival, routeType.text, rails.text, length.text)
+    ))
 
     export form._, creationObservable.attachClick as attachCreation, deletionObservable.attachClick as attachDeletion
 
@@ -105,6 +116,12 @@ object RouteForm:
 
     override def arrival: Option[Station] = _arrival
 
-    override def departure_=(station: Option[Station]): Unit = _departure = station
+    override def departure_=(station: Option[Station]): Unit =
+      _departure = station
+      station.foreach(data => departureStation.text = data.name)
+      computeDistance()
 
-    override def arrival_=(station: Option[Station]): Unit = _arrival = station
+    override def arrival_=(station: Option[Station]): Unit =
+      _arrival = station
+      station.foreach(data => arrivalStation.text = data.name)
+      computeDistance()
