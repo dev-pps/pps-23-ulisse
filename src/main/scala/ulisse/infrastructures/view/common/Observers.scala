@@ -150,11 +150,11 @@ object Observers:
       private var _move: List[MovedObserver[T]]
   ) extends Observable[T]:
     override def observers: List[Observer[T]]       = _observers
-    override def clicks: List[ClickObserver[T]]     = _click
-    override def releases: List[ReleaseObserver[T]] = _release
-    override def hovers: List[HoverObserver[T]]     = _hover
-    override def exits: List[ExitObserver[T]]       = _exit
-    override def moves: List[MovedObserver[T]]      = _move
+    override def clicks: List[ClickObserver[T]]     = _click ++ observers
+    override def releases: List[ReleaseObserver[T]] = _release ++ observers
+    override def hovers: List[HoverObserver[T]]     = _hover ++ observers
+    override def exits: List[ExitObserver[T]]       = _exit ++ observers
+    override def moves: List[MovedObserver[T]]      = _move ++ observers
 
     override def attach(observer: Observer[T]): Unit = _observers = observer :: observers
     override def detach(observer: Observer[T]): Unit = _observers = observers.filterNot(_ == observer)
