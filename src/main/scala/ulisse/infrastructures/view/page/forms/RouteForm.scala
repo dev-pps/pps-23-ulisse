@@ -132,7 +132,7 @@ object RouteForm:
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
 
-    cleanButton.attachClick(CleanFormEvent(this))
+    cleanButton attachClick CleanFormEvent(this)
 
     saveButton attach (creationObservable toObserver (_ =>
       RouteCreationInfo(departure, arrival, routeType.text, rails.text, length.text)
@@ -173,6 +173,7 @@ object RouteForm:
     override def cleanForm(): Unit =
       departure = Option.empty
       arrival = Option.empty
+      resetSelectedRoute()
       departureStation.text = ""
       arrivalStation.text = ""
       routeType.text = ""

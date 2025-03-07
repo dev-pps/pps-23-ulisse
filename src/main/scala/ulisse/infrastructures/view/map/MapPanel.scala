@@ -6,6 +6,7 @@ import ulisse.entities.station.Station
 import ulisse.infrastructures.view.common.ImagePath
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.components.draw.DrawImageTiled
 
 import scala.swing.*
 
@@ -41,7 +42,10 @@ object MapPanel:
       updateGraphics()
 
     override def updateRoutes(newRoutes: List[Route]): Unit =
-      routes update (newRoutes map (route => MapElement createRoute (route, routes.find(route))))
+      val paths         = newRoutes map (route => route.isPath)
+      val checkNewRoute = newRoutes map (route => (route, paths.exists(_.tupled(route.departure, route.arrival))))
+
+      routes update (checkNewRoute map MapElement.createRoute)
       updateGraphics()
 
     override protected def paintLook(g: Graphics2D): Unit =
