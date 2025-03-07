@@ -31,13 +31,11 @@ object MapElement:
     MapElementSimple(station, DrawImageSimple.createAt(imagePath, station.coordinate.toPoint))
 
   /** Create a new [[MapElement]] with the given [[Route]] and [[String]]. */
-  def createRoute(route: Route, checkPath: Boolean): MapElement[Route] =
-    val offset        = new Point(-15, -15)
-    val offsetWithOld = if checkPath then offset else new Point(0, 0)
+  def createRoute(route: Route, findPath: Boolean): MapElement[Route] =
+    val offset        = new Point(-10, -10)
+    val offsetWithOld = if findPath then offset else new Point(0, 0)
     val start         = route.departure.coordinate.toPoint plus offsetWithOld
     val end           = route.arrival.coordinate.toPoint plus offsetWithOld
-//    val start = route.departure.coordinate.toPoint
-//    val end = route.arrival.coordinate.toPoint
     val color = route.typology match
       case RouteType.Normal => Color.black
       case RouteType.AV     => Color.red
