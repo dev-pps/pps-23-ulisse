@@ -4,15 +4,17 @@ import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton,
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
-import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.Updatable
+import ulisse.entities.train.Trains.Train
+import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.{TrainsUpdatable, Updatable}
 import ulisse.infrastructures.view.timetable.TimetableViewModel.{TimetableEntry, TrainId}
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
-import scala.swing.Swing.{EmptyBorder, HGlue, VStrut}
+
+import scala.swing.Swing.{onEDT, EmptyBorder, HGlue, VStrut}
 import scala.swing.event.ButtonClicked
 import scala.swing.{BoxPanel, ComboBox, Component, Font, Label, Orientation, Panel, ScrollPane}
 import scala.util.Try
 
-trait EditorTab extends Component with Updatable[List[TrainId]]
+trait EditorTab extends Component with TrainsUpdatable
 
 object EditorTab:
   def apply(adapter: TimetableViewAdapter): EditorTab =
@@ -21,17 +23,17 @@ object EditorTab:
   /** Timetable creation form containing fields to select train, departing time and stations sequence and preview of timetable */
   private class EditorTabImpl(controller: TimetableViewAdapter)
       extends SBoxPanel(Orientation.Vertical) with EditorTab:
-    controller.addListener(this)
-    controller.requestTrainNames()
+    controller.addTrainsObserver(this)
     private val trainCombo: ComboBox[String] = ComboBox[String](List.empty)
-    private val waitMinutesField             = SNumberField(5)
-    private val stationField                 = ComposedSwing.createInfoTextField("Station")
-    private val resetBtn                     = SButton("reset")
-    private val undoBtn                      = SButton("undo")
-    private val insertBtn                    = SButton("insert")
-    private val listPreview                  = TimetableListView(List.empty)
-    private val previewPane                  = ScrollPane(listPreview)
-    private val saveBtn                      = SButton("Save")
+    controller.requestTrains()
+    private val waitMinutesField = SNumberField(5)
+    private val stationField     = ComposedSwing.createInfoTextField("Station")
+    private val resetBtn         = SButton("reset")
+    private val undoBtn          = SButton("undo")
+    private val insertBtn        = SButton("insert")
+    private val listPreview      = TimetableListView(List.empty)
+    private val previewPane      = ScrollPane(listPreview)
+    private val saveBtn          = SButton("Save")
 
     private val falseBtnStyle = List(resetBtn, undoBtn)
     private val trueBtnStyle  = List(saveBtn, insertBtn)
@@ -94,6 +96,7 @@ object EditorTab:
     contents ++= spacedFields
     contents += previewPane.withHeader("Timetable Preview")
     contents += saveBtn.centerHorizontally()
+    import ulisse.infrastructures.view.utils.SwingUtils.setDefaultFont
     List(trainCombo, hoursCombo, minutesCombo).setDefaultFont()
     clearFields()
 
@@ -106,10 +109,6 @@ object EditorTab:
       trainCombo.selection.index = -1
       hoursCombo.selection.index = 0
       minutesCombo.selection.index = 0
-
-    extension (components: Seq[Component])
-      private def setDefaultFont(): Unit =
-        components.foreach(_.font = Styles.defaultFont.swingFont)
 
     extension (c: Component)
       private def withHeader(headerText: String): Panel =
@@ -125,5 +124,7 @@ object EditorTab:
       contents += HGlue
     }
 
-    override def update(data: List[TrainId]): Unit =
-      trainCombo.peer.setModel(ComboBox.newConstantModel(data.map(_.value)))
+    override def updateNewTrains(data: List[Train]): Unit =
+      import ulisse.infrastructures.view.utils.SwingUtils.updateModel
+      onEDT:
+        trainCombo.updateModel(data.map(_.name))

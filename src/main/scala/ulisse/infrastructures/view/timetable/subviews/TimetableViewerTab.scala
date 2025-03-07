@@ -5,30 +5,39 @@ import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton, SFieldLabel}
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
-import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.Updatable
+import ulisse.entities.train.Trains.Train
+import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.{TimetablesUpdatable, TrainsUpdatable, Updatable}
 import ulisse.infrastructures.view.timetable.TimetableViewModel
+import ulisse.infrastructures.view.timetable.TimetableViewModel.{trainId, TrainId}
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
+import ulisse.infrastructures.view.utils.SwingUtils.selectedItemOption
+import ulisse.infrastructures.view.utils.SwingUtils.updateModel
 
+import scala.swing.Swing.onEDT
 import scala.swing.event.ButtonClicked
 import scala.swing.{BorderPanel, ComboBox, Orientation, ScrollPane, Swing}
 
-final case class TimetableViewerData()
-
 /** Timetable consulting tab view.
-  * It gets `controller` and observes (adhering to [[UpdatableTimetableView]]) specific updates from controller to updates timetable preview.
+  * It gets `controller` and observes updates from controller.
+  *
+  *  Observes:
+  *  - [[TimetablesUpdatable]]
   */
 class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Orientation.Vertical)
-    with Updatable[TimetableViewerData]:
-  controller.requestTrainNames()
-  private val trainCombo: ComboBox[String]        = ComboBox[String](List.empty)
+    with TimetablesUpdatable with TrainsUpdatable:
+  controller.addTimetablesObserver(this)
+  controller.addTrainsObserver(this)
+  private val trainCombo: ComboBox[String] = ComboBox[String](List.empty)
+  controller.requestTrains()
   private val trainField                          = SFieldLabel("Train")(trainCombo)
   private val timetableCombo: ComboBox[Timetable] = ComboBox[Timetable](List.empty)
   private val timetableField                      = SFieldLabel("Timetable")(timetableCombo)
-  private val timetables                          = TimetableViewModel.generateMockTimetable(6)
-  private val timetableView                       = TimetableListView(timetables)
+  private val timetableView                       = TimetableListView(List.empty)
   private val UNSELECTED                          = -1
   trainCombo.selection.index = UNSELECTED
 
+  import ulisse.infrastructures.view.utils.SwingUtils.setDefaultFont
+  List(trainCombo, timetableCombo).setDefaultFont()
   private val deleteBtn = SButton("Delete timetable")
   deleteBtn.rect = Styles.formFalseButtonRect
   deleteBtn.fontEffect = Styles.whiteFont
@@ -43,21 +52,18 @@ class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Ori
     layout(ScrollPane(timetableView)) = BorderPanel.Position.Center
   }
 
-  listenTo(trainCombo)
+  listenTo(trainCombo.selection, timetableCombo.selection)
   import scala.swing.event.SelectionChanged
-  trainCombo.reactions += {
+  reactions += {
     case SelectionChanged(`trainCombo`) =>
       val trainName = trainCombo.selection.item
       controller.requestTimetables(trainName)
-  }
-  listenTo(timetableCombo)
-  timetableCombo.reactions += {
+
     case SelectionChanged(`timetableCombo`) =>
       import TimetableViewModel.toTimetableEntries
       timetableCombo.selectedItemOption.foreach: i =>
         timetableView.update(i.toTimetableEntries)
         deleteBtn.enabled = true
-
   }
 
   contents += trainField.createLeftRight(timetableField)
@@ -65,14 +71,10 @@ class TimetableViewerTab(controller: TimetableViewAdapter) extends SBoxPanel(Ori
   import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
   contents += deleteBtn.centerHorizontally()
 
-  def update(data: List[Timetables.Timetable]): Unit =
-    Swing.onEDT:
-      timetableCombo.peer.setModel(ComboBox.newConstantModel(data))
-      timetableCombo.selection.index = UNSELECTED
-      deleteBtn.enabled = false
+  override def updateTimetables(tables: List[Timetable]): Unit =
+    onEDT:
+      timetableCombo.updateModel(tables)
 
-  extension [T](comboBox: ComboBox[T])
-    private def selectedItemOption: Option[T] =
-      Option.when(comboBox.selection.item != null)(comboBox.selection.item)
-
-  override def update(data: TimetableViewerData): Unit = print(s"here updated data of the view: $data")
+  override def updateNewTrains(trains: List[Train]): Unit =
+    onEDT:
+      trainCombo.updateModel(trains.map(_.name))
