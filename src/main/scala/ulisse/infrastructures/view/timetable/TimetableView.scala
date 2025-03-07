@@ -42,7 +42,7 @@ object TimetableView:
 
 @main def timetableViewDemoGUI(): Unit =
   import ulisse.infrastructures.view.utils.SwingUtils.showPreview
-  import ulisse.adapters.MockedPorts.TrainServiceMock
-  import ulisse.adapters.MockedPorts.TimetableServiceMock
+  import ulisse.adapters.MockedPortAdapters.TrainServiceMock
+  import ulisse.adapters.MockedPortAdapters.TimetableServiceMock
   val adapter = TimetableViewAdapter(TimetableServiceMock(), TrainServiceMock())
   TimetableView(adapter).showPreview()

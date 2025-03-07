@@ -175,6 +175,6 @@ object TrainEditorView:
 
 @main def trainViewDemoGUI(): Unit =
   import ulisse.infrastructures.view.utils.SwingUtils.showPreview
-  import ulisse.adapters.MockedPorts.TrainServiceMock
+  import ulisse.adapters.MockedPortAdapters.TrainServiceMock
   val adapter = TrainViewAdapter(TrainServiceMock())
   TrainEditorView(adapter).showPreview()
