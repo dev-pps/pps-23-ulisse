@@ -150,32 +150,32 @@ object Observers:
       private var _move: List[MovedObserver[T]]
   ) extends Observable[T]:
     override def observers: List[Observer[T]]       = _observers
-    override def clicks: List[ClickObserver[T]]     = _click ++ observers
-    override def releases: List[ReleaseObserver[T]] = _release ++ observers
-    override def hovers: List[HoverObserver[T]]     = _hover ++ observers
-    override def exits: List[ExitObserver[T]]       = _exit ++ observers
-    override def moves: List[MovedObserver[T]]      = _move ++ observers
+    override def clicks: List[ClickObserver[T]]     = _click
+    override def releases: List[ReleaseObserver[T]] = _release
+    override def hovers: List[HoverObserver[T]]     = _hover
+    override def exits: List[ExitObserver[T]]       = _exit
+    override def moves: List[MovedObserver[T]]      = _move
 
     override def attach(observer: Observer[T]): Unit = _observers = observer :: observers
-    override def detach(observer: Observer[T]): Unit = _observers = observers.filterNot(_ == observer)
+    override def detach(observer: Observer[T]): Unit = _observers = observers filterNot (_ == observer)
 
     override def attachClick(observer: ClickObserver[T]): Unit = _click = observer :: clicks
-    override def detachClick(observer: ClickObserver[T]): Unit = _click = clicks.filterNot(_ == observer)
+    override def detachClick(observer: ClickObserver[T]): Unit = _click = clicks filterNot (_ == observer)
 
     override def attachRelease(observer: ReleaseObserver[T]): Unit = _release = observer :: releases
-    override def detachRelease(observer: ReleaseObserver[T]): Unit = _release = releases.filterNot(_ == observer)
+    override def detachRelease(observer: ReleaseObserver[T]): Unit = _release = releases filterNot (_ == observer)
 
     override def attachHover(observer: HoverObserver[T]): Unit = _hover = observer :: hovers
-    override def detachHover(observer: HoverObserver[T]): Unit = _hover = hovers.filterNot(_ == observer)
+    override def detachHover(observer: HoverObserver[T]): Unit = _hover = hovers filterNot (_ == observer)
 
     override def attachExit(observer: ExitObserver[T]): Unit = _exit = observer :: exits
-    override def detachExit(observer: ExitObserver[T]): Unit = _exit = exits.filterNot(_ == observer)
+    override def detachExit(observer: ExitObserver[T]): Unit = _exit = exits filterNot (_ == observer)
 
     override def attachMove(observer: MovedObserver[T]): Unit = _move = observer :: moves
-    override def detachMove(observer: MovedObserver[T]): Unit = _move = moves.filterNot(_ == observer)
+    override def detachMove(observer: MovedObserver[T]): Unit = _move = moves filterNot (_ == observer)
 
-    override def notifyClick(data: T): Unit   = (observers ++ clicks).foreach(_ onClick data)
-    override def notifyHover(data: T): Unit   = (observers ++ hovers).foreach(_ onHover data)
-    override def notifyRelease(data: T): Unit = (observers ++ releases).foreach(_ onRelease data)
-    override def notifyExit(data: T): Unit    = (observers ++ exits).foreach(_ onExit data)
-    override def notifyMove(data: T): Unit    = (observers ++ moves).foreach(_ onMove data)
+    override def notifyClick(data: T): Unit   = (observers ++ clicks) foreach (_ onClick data)
+    override def notifyHover(data: T): Unit   = (observers ++ hovers) foreach (_ onHover data)
+    override def notifyRelease(data: T): Unit = (observers ++ releases) foreach (_ onRelease data)
+    override def notifyExit(data: T): Unit    = (observers ++ exits) foreach (_ onExit data)
+    override def notifyMove(data: T): Unit    = (observers ++ moves) foreach (_ onMove data)

@@ -31,7 +31,7 @@ object DrawImageSimple:
     private val silhouette: Option[BufferedImage] =
       source.bufferImage.map(image => BufferedImage(image.getWidth, image.getHeight, BufferedImage.TYPE_INT_ARGB))
 
-    override val center: Point = new Point(position.x - (dimension.width / 2), position.y - (dimension.height / 2))
+    override val center: Point                      = position minus (dimension.toPoint times 0.5)
     override val observable: Observable[MouseEvent] = Observers.createObservable[MouseEvent]
     private var _scale: Float                       = defaultScaleSilhouette
     private var _silhouettePalette: Styles.Palette  = Styles.silhouettePalette
