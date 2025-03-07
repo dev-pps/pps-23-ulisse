@@ -34,7 +34,6 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: "temurin"
-          cache: sbt
       - name: Build JAR
         run: sbt assembly
       - name: Set up Node.js
