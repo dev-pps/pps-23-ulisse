@@ -32,15 +32,20 @@ class TimetableTest extends AnyFlatSpec:
     AV1000TimeTable.stations should be(List(stationA, stationB, stationC, stationD, stationF))
 
   "timetable" should "calculate arriving and departure time of each station where train arrives" in:
+    val railInfoAB = RailInfo(length = 10, typeRoute = AV)
+    val railInfoBC = RailInfo(length = 15, typeRoute = AV)
     val timeTableWithStops =
       timetableBuilder
-        .stopsIn(stationB, 5)(RailInfo(length = 10, typeRoute = AV))
-        .arrivesTo(stationC)(RailInfo(length = 15, typeRoute = AV))
+        .stopsIn(stationB, 5)(railInfoAB)
+        .arrivesTo(stationC)(railInfoBC)
 
     timeTableWithStops.table should be(ListMap(
       stationA -> StationInfo(None, DepartureStationTime(h(9).m(0).toOption)),
-      stationB -> StationInfo(Some(AV), AutoStationTime(arriving = h(9).m(2).toOption, waitTime = Some(5.toWaitTime))),
-      stationC -> StationInfo(Some(AV), ArrivingStationTime(arriving = h(9).m(10).toOption))
+      stationB -> StationInfo(
+        Some(railInfoAB),
+        AutoStationTime(arriving = h(9).m(2).toOption, waitTime = Some(5.toWaitTime))
+      ),
+      stationC -> StationInfo(Some(railInfoBC), ArrivingStationTime(arriving = h(9).m(10).toOption))
     ))
 
   "timetable" should "consider also station of transit in estimation of arriving time" in:
@@ -57,9 +62,9 @@ class TimetableTest extends AnyFlatSpec:
         .stopsIn(stationB, waitTime = 5)(railAV_10)
         .stopsIn(stationC, waitTime = 5)(railAV_10)
         .arrivesTo(stationD)(railAV_10)
-    val typeRoute = Some(AV)
+
     AV1000TimeTable.routes should be(List(
-      (stationA, stationB, typeRoute),
-      (stationB, stationC, typeRoute),
-      (stationC, stationD, typeRoute)
+      (stationA, stationB, Some(railAV_10)),
+      (stationB, stationC, Some(railAV_10)),
+      (stationC, stationD, Some(railAV_10))
     ))
