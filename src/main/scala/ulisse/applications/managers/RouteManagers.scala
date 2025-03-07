@@ -87,13 +87,6 @@ object RouteManagers:
 
     /** Delete all the routes that contain this station, either as departure or arrival. */
     def deleteByStation(station: Station): Either[Errors, RouteManager]
-//      val d1  = deleteByDeparture(station).fold(_ => this, m => m)
-//      val d2 = deleteByArrival(station).fold(_ => this, a => a)
-//      println(s"delete
-//
-//      val d = deleteByDeparture(station).fold(_ => this, m => m).deleteByArrival(station).fold(_ => this, m => m)
-//      d.asRight
-  //      deleteByDeparture(station).fold(_ => this, _.deleteByArrival(station).fold(_ => this, a => a)).asRight
 
   /** Companion object of [[RouteManager]] */
   object RouteManager:

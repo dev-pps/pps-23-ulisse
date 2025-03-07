@@ -10,7 +10,7 @@ import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationD
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class SimulationPageAdapterTest extends AnyWordSpec with Matchers:
+class SimulationNotificationListenerAdapterTest extends AnyWordSpec with Matchers:
   private val mockedPort            = mock[SimulationPorts.Input]
   private val simulationPageAdapter = SimulationPageAdapter(mockedPort)
   private val defaultEngineState    = Engine.empty()
