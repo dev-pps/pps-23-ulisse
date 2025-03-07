@@ -35,6 +35,13 @@ trait StationForm extends Form:
   /** Attach the deletion observer to the form of type [[StationCreationInfo]]. */
   def attachDeletion(observer: ClickObserver[StationCreationInfo]): Unit
 
+  /** Cleans the form. */
+  override def cleanForm(): Unit =
+    name.text = ""
+    xField.text = ""
+    yField.text = ""
+    tracks.text = ""
+
   /** Compiles the form. */
   def compileForm(station: Station): Unit =
     name.text = station.name
@@ -57,7 +64,6 @@ object StationForm:
 
     private def updateStation(data: StationCreationInfo, oldStation: Station): Unit =
       adapter updateStation (data, oldStation) onComplete (_ fold (println, _ fold (println, workspace.update)))
-      workspace.resetSelectedStation()
 
     override def onClick(data: StationCreationInfo): Unit =
       workspace.selectedStation.fold(createStation(data))(updateStation(data, _))
@@ -70,7 +76,6 @@ object StationForm:
       workspace.selectedStation.fold(println("Error not found"))(
         adapter removeStation _ onComplete (_ fold (println, _ fold (println, workspace.update)))
       )
-      workspace.resetSelectedStation()
 
   /** Represents the take point from map event. */
   final case class TakePointFomMapEvent(workspace: MapWorkspace) extends ClickObserver[MouseEvent]:

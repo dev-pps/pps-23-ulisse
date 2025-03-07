@@ -22,17 +22,11 @@ trait MapWorkspace extends Workspace:
   /** Set the selected station of the form. */
   def selectedStation_=(station: Station): Unit
 
-  /** Reset selected station. */
-  def resetSelectedStation(): Unit
-
   /** The selected route of the form. */
   def selectedRoute: Option[Route]
 
   /** Set the selected route of the form. */
   def selectedRoute_=(route: Route): Unit
-
-  /** Reset selected route. */
-  def resetSelectedRoute(): Unit
 
   /** Compile station form. */
   def compileStationForm(station: Station): Unit
@@ -95,13 +89,13 @@ object MapWorkspace:
 
     override def selectedStation_=(station: Station): Unit = _selectedStation = station.some
 
-    override def resetSelectedStation(): Unit = _selectedStation = Option.empty
-
     override def selectedRoute: Option[Route] = _selectedRoute
 
     override def selectedRoute_=(route: Route): Unit = _selectedRoute = route.some
 
-    override def resetSelectedRoute(): Unit = _selectedRoute = Option.empty
+    private def resetSelectedStation(): Unit = _selectedStation = Option.empty
+
+    private def resetSelectedRoute(): Unit = _selectedRoute = Option.empty
 
     override def compileStationCoordinatesForm(point: Point): Unit =
       if (selectedStation.isEmpty)
@@ -112,7 +106,11 @@ object MapWorkspace:
       mapPanel uploadStation stations
       mapPanel attachClickStation StationForm.TakeStationFromMapEvent(this)
       mapPanel attachClickStation RouteForm.TakeStationFromMapEvent(routeForm)
+      stationForm.cleanForm()
+      resetSelectedStation()
 
     override def updateRoutes(routes: List[Route]): Unit =
       mapPanel updateRoutes routes
       mapPanel attachClickRoute RouteForm.TakeRouteFromMapEvent(this)
+      routeForm.cleanForm()
+      resetSelectedRoute()
