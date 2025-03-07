@@ -1,3 +1,32 @@
+## [1.30.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.29.0...v1.30.0) (2025-03-07)
+
+### Features
+
+* add double route ([6faf3f6](https://github.com/dev-pps/pps-23-ulisse/commit/6faf3f64deafb3dc9542b66631885b592642975c))
+* add error of route adapter when choose departure and arrival station ([ab98e7f](https://github.com/dev-pps/pps-23-ulisse/commit/ab98e7fdabc833f8a282310f83b1882c87834c59))
+* add route av image ([e4fca10](https://github.com/dev-pps/pps-23-ulisse/commit/e4fca108e890bfc9a3868b503657a0fb780f9bda))
+* attach creation route from gui ([83cde3f](https://github.com/dev-pps/pps-23-ulisse/commit/83cde3fa6771d311156f1436458217ae5119e3d4))
+* change how to draw route ([da4fb23](https://github.com/dev-pps/pps-23-ulisse/commit/da4fb23c51aeb30c5c7559db8d4adb924138ec30))
+* clean button for route form ([c791d92](https://github.com/dev-pps/pps-23-ulisse/commit/c791d92310e777d2a07c27b0d3f5fdc344218f12))
+* clean button for station form ([ae68241](https://github.com/dev-pps/pps-23-ulisse/commit/ae68241e48f0cd52a167da4594a39629af3e87e7))
+* clean form ([22d8c10](https://github.com/dev-pps/pps-23-ulisse/commit/22d8c108d505f2385e494dfc3ad8cbf94824ff69))
+* connect click route at form ([b3ce114](https://github.com/dev-pps/pps-23-ulisse/commit/b3ce114a3ddb789223000c98c1ec12db69b8ad92))
+* connected station form at gui ([57b0746](https://github.com/dev-pps/pps-23-ulisse/commit/57b0746ae5a900864efe7570777a3852639c7408))
+* create connection to delete and update route ([95292cb](https://github.com/dev-pps/pps-23-ulisse/commit/95292cb89284a656e416276c52a4f1f12f6017e5))
+* create method to colllide route ([2c2d10f](https://github.com/dev-pps/pps-23-ulisse/commit/2c2d10f3c24672b6a3a77838d0d06ec42d3110b9))
+* create observable to attach at route form ([622370e](https://github.com/dev-pps/pps-23-ulisse/commit/622370e4bb38e27878fe57715f27733d3099a175))
+* draw double route ([676283b](https://github.com/dev-pps/pps-23-ulisse/commit/676283ba609fe5bb210a1f5597a6446363cc9aae))
+* improve clear button position ([491b336](https://github.com/dev-pps/pps-23-ulisse/commit/491b3369f3d27c0dff1371a028f0a730fb1ec74c))
+* init compute click route ([0b9e91e](https://github.com/dev-pps/pps-23-ulisse/commit/0b9e91ee26f6f7145bdc133fff61dc80fb7e6a3d))
+* modify and delete route ([34fd6d0](https://github.com/dev-pps/pps-23-ulisse/commit/34fd6d09020f98fc521dac05096ccc4e6da54cc4))
+* restore draw image tiled ([c760f16](https://github.com/dev-pps/pps-23-ulisse/commit/c760f1623d8ad78677b02c3bf438d654ce536b8b))
+* silhouette route ([2c1589f](https://github.com/dev-pps/pps-23-ulisse/commit/2c1589f7ae8afd9ad6cd20c4faad9f4692e840e6))
+
+### Bug Fixes
+
+* delete route from station ([aace31e](https://github.com/dev-pps/pps-23-ulisse/commit/aace31e7f04d924a9e7b7bd533ffc6a8e68f487c))
+* double click observer ([d72a2c6](https://github.com/dev-pps/pps-23-ulisse/commit/d72a2c6be995bd93da6f5a087ab2894794bf3452))
+
 ## [1.29.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.28.0...v1.29.0) (2025-03-07)
 
 ### Features
