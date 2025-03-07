@@ -129,6 +129,10 @@ object Swings:
     def plus(other: Dimension): Dimension =
       new Dimension(dimension.width + other.width, dimension.height + other.height)
 
+    /** Add the dimension to the given [[scale]]. */
+    def plus(scale: Double): Dimension =
+      new Dimension((dimension.width + scale).toInt, (dimension.height + scale).toInt)
+
     /** Multiply the dimension by the other. */
     def times(other: Dimension): Dimension =
       new Dimension(dimension.width * other.width, dimension.height * other.height)
@@ -136,6 +140,10 @@ object Swings:
     /** Multiply the dimension by the given [[value]]. */
     def times(value: Double): Dimension =
       new Dimension((dimension.width * value).toInt, (dimension.height * value).toInt)
+
+    /** Divide the dimension by the given [[value]]. */
+    def divide(value: Double): Dimension =
+      new Dimension((dimension.width / value).toInt, (dimension.height / value).toInt)
 
     /** Transform the dimension to a [[Point]] object. */
     def toPoint: Point = new Point(dimension.width, dimension.height)
