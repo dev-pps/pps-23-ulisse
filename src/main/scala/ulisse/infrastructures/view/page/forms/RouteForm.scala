@@ -72,7 +72,6 @@ object RouteForm:
 
     private def updateRoute(data: RouteCreationInfo, oldRoute: Route): Unit =
       adapter save (Option(oldRoute), data) onComplete (_ fold (println, _ fold (println, workspace.updateRoutes)))
-      workspace.resetSelectedRoute()
 
     override def onClick(data: RouteCreationInfo): Unit =
       workspace.selectedRoute.fold(creationRoute(data))(updateRoute(data, _))
@@ -149,3 +148,12 @@ object RouteForm:
       routeType.text = route.typology.toString
       rails.text = route.railsCount.toString
       length.text = route.length.toString
+
+    override def cleanForm(): Unit =
+      departure = Option.empty
+      arrival = Option.empty
+      departureStation.text = ""
+      arrivalStation.text = ""
+      routeType.text = ""
+      rails.text = ""
+      length.text = ""
