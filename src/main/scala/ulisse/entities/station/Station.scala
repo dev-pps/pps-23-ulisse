@@ -25,7 +25,11 @@ trait Station:
 
   /** Defines equality for Station */
   override def equals(that: Any): Boolean = that match
-    case s: Station => coordinate === s.coordinate
+    case s: Station =>
+      id === s.id &&
+      name === s.name &&
+      coordinate === s.coordinate &&
+      numberOfPlatforms === s.numberOfPlatforms
     case _          => false
 
   /** Defines hashCode for Station */
