@@ -38,23 +38,26 @@ object DrawImageTiled:
     override val center: Point                      = start plus end times 0.5
     override val observable: Observable[MouseEvent] = image.observable
 
+    scale = 0.5
+
     export image.{center => _, dimension => _, draw => _, observable => _, _}
 
-    override def draw(g: Graphics2D, observer: ImageObserver): Unit = drawTiledImage(g, 0.05, observer)
+    override def draw(g: Graphics2D, observer: ImageObserver): Unit = drawTiledImage(g, scale, observer)
 
     def drawTiledImage(g: Graphics2D, scale: Double, observer: ImageObserver): Unit =
       for img <- source.bufferImage
       yield
-        val scaleDim = (img.getWidth(observer) * scale, img.getHeight(observer) * scale)
+//        val scaleDim = (img.getWidth(observer) * scale, img.getHeight(observer) * scale)
+        val scaleDim = dimension times scale
         val rotate   = start angle end
-        val diagonal = sqrt(scaleDim._1 * scaleDim._1 + scaleDim._2 * scaleDim._2)
+        val diagonal = sqrt(scaleDim.width * scaleDim.width + scaleDim.height * scaleDim.height)
 
         val positions: Seq[(Double, Double)] =
           val dx       = end.x - start.x
           val dy       = end.y - start.y
           val distance = start distance end
 
-          val correctedStep = diagonal - abs(diagonal - scaleDim._1)
+          val correctedStep = diagonal - abs(diagonal - scaleDim.width)
           val stepX         = (dx / distance) * correctedStep
           val stepY         = (dy / distance) * correctedStep
 
@@ -67,6 +70,6 @@ object DrawImageTiled:
           transform translate (x, y)
           transform scale (scale, scale)
           transform rotate rotate
-          transform translate (-scaleDim._1 / 2, -scaleDim._2 / 2)
+          transform translate (-scaleDim.width / 2, -scaleDim.height / 2)
           g drawImage (img, transform, observer)
         )
