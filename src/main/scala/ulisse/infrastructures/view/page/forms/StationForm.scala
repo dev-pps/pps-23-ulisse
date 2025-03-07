@@ -1,5 +1,6 @@
 package ulisse.infrastructures.view.page.forms
 
+import cats.syntax.option.*
 import ulisse.adapters.input.StationEditorAdapter
 import ulisse.adapters.input.StationEditorAdapter.StationCreationInfo
 import ulisse.entities.station.Station
@@ -34,6 +35,15 @@ trait StationForm extends Form:
 
   /** Attach the deletion observer to the form of type [[StationCreationInfo]]. */
   def attachDeletion(observer: ClickObserver[StationCreationInfo]): Unit
+
+  /** The selected station of the form. */
+  def selectedStation: Option[Station]
+
+  /** Set the selected station of the form. */
+  def selectedStation_=(station: Station): Unit
+
+  /** Reset the selected station of the form. */
+  def resetSelectedStation(): Unit
 
   /** Cleans the form. */
   override def cleanForm(): Unit =
@@ -103,6 +113,8 @@ object StationForm:
     private val creationObservable = Observers.createObservable[StationCreationInfo]
     private val deletionObservable = Observers.createObservable[StationCreationInfo]
 
+    private var _selectedStation: Option[Station] = Option.empty
+
     buttonPanel.contents += saveButton
     buttonPanel.contents += deleteButton
 
@@ -114,3 +126,9 @@ object StationForm:
     ))
 
     export form._, creationObservable.attachClick as attachCreation, deletionObservable.attachClick as attachDeletion
+
+    override def selectedStation: Option[Station] = _selectedStation
+
+    override def selectedStation_=(station: Station): Unit = _selectedStation = station.some
+
+    override def resetSelectedStation(): Unit = _selectedStation = Option.empty

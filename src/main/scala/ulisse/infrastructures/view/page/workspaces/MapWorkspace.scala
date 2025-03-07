@@ -67,9 +67,6 @@ object MapWorkspace:
     private val stationForm: StationForm = formManager.stationForm
     private val routeForm: RouteForm     = formManager.routeForm
 
-    private var _selectedStation: Option[Station] = Option.empty
-    private var _selectedRoute: Option[Route]     = Option.empty
-
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(formManager.component) = Position.East
     workspace.revalidate()
@@ -83,19 +80,8 @@ object MapWorkspace:
     mapPanel attachClick StationForm.TakePointFomMapEvent(this)
 
     export workspace.{component, revalidate}, stationForm.compileForm as compileStationForm,
-      routeForm.compileForm as compileRouteForm
-
-    override def selectedStation: Option[Station] = _selectedStation
-
-    override def selectedStation_=(station: Station): Unit = _selectedStation = station.some
-
-    override def selectedRoute: Option[Route] = _selectedRoute
-
-    override def selectedRoute_=(route: Route): Unit = _selectedRoute = route.some
-
-    private def resetSelectedStation(): Unit = _selectedStation = Option.empty
-
-    private def resetSelectedRoute(): Unit = _selectedRoute = Option.empty
+      routeForm.compileForm as compileRouteForm, stationForm.selectedStation, stationForm.selectedStation_=,
+      stationForm.resetSelectedStation, routeForm.selectedRoute, routeForm.selectedRoute_=, routeForm.resetSelectedRoute
 
     override def compileStationCoordinatesForm(point: Point): Unit =
       if (selectedStation.isEmpty)

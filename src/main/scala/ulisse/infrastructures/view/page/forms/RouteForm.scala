@@ -44,6 +44,15 @@ trait RouteForm extends Form:
   /** The arrival station of the route. */
   def arrival_=(station: Option[Station]): Unit
 
+  /** The selected route of the form. */
+  def selectedRoute: Option[Route]
+
+  /** Set the selected route of the form. */
+  def selectedRoute_=(route: Route): Unit
+
+  /** Reset the selected route of the form. */
+  def resetSelectedRoute(): Unit
+
   /** Attach the creation observer to the form of type [[RouteCreationInfo]]. */
   def attachCreation(observer: ClickObserver[RouteCreationInfo]): Unit
 
@@ -110,8 +119,9 @@ object RouteForm:
     private val deleteButton = ExtendedSwing createFormButtonWith ("Delete", Styles.formFalseButtonRect)
     private val form         = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
 
-    private var _departure: Option[Station] = Option.empty
-    private var _arrival: Option[Station]   = Option.empty
+    private var _departure: Option[Station]   = Option.empty
+    private var _arrival: Option[Station]     = Option.empty
+    private var _selectedRoute: Option[Route] = Option.empty
 
     private val creationObservable = Observers.createObservable[RouteCreationInfo]
     private val deletionObservable = Observers.createObservable[RouteCreationInfo]
@@ -141,6 +151,12 @@ object RouteForm:
       _arrival = station
       station.foreach(data => arrivalStation.text = data.name)
       computeDistance()
+
+    override def selectedRoute: Option[Route] = _selectedRoute
+
+    override def selectedRoute_=(route: Route): Unit = _selectedRoute = route.some
+
+    override def resetSelectedRoute(): Unit = _selectedRoute = Option.empty
 
     override def compileForm(route: Route): Unit =
       departure = route.departure.some
