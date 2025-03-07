@@ -1,9 +1,9 @@
 package ulisse.infrastructures.view.map
 
-import ulisse.entities.route.Routes.Route
+import ulisse.entities.route.Routes.{Route, RouteType}
 import ulisse.entities.station.Station
-import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.common.Observers.Observable
+import ulisse.infrastructures.view.common.{ImagePath, Observers}
 import ulisse.infrastructures.view.components.draw.DrawImages.DrawImage
 import ulisse.infrastructures.view.components.draw.{DrawImageSimple, DrawImageTiled, DrawImages}
 import ulisse.infrastructures.view.utils.Swings.*
@@ -30,12 +30,15 @@ object MapElement:
     MapElementSimple(station, DrawImageSimple.createAt(imagePath, station.coordinate.toPoint))
 
   /** Create a new [[MapElement]] with the given [[Route]] and [[String]]. */
-  def createRoute(route: Route, imagePath: String, otherRoute: Option[Route]): MapElement[Route] =
+  def createRoute(route: Route, otherRoute: Option[Route]): MapElement[Route] =
     val offset        = new Point(5, 5)
     val offsetWithOld = otherRoute.map(_ => offset).getOrElse(new Point(-5, -5))
     val start         = route.departure.coordinate.toPoint plus offsetWithOld
     val end           = route.arrival.coordinate.toPoint plus offsetWithOld
-    MapElementSimple(route, DrawImageTiled.createAt(imagePath, start, end))
+    val path = route.typology match
+      case RouteType.Normal => ImagePath.routeNormal
+      case RouteType.AV     => ImagePath.routeAV
+    MapElementSimple(route, DrawImageTiled.createAt(path, start, end))
 
   private case class MapElementSimple[T](element: T, image: DrawImage) extends MapElement[T]:
     private val observable = Observers.createObservable[MapElement[T]]

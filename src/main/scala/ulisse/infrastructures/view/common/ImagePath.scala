@@ -24,5 +24,6 @@ object ImagePath:
   val map: String        = menuPath + "map.svg"
 
   /** Image of map */
-  val station: String = "station.png"
-  val route: String   = "route.png"
+  val station: String     = "station.png"
+  val routeNormal: String = "route-Normal.png"
+  val routeAV: String     = "route-AV.png"
