@@ -14,6 +14,9 @@ trait Form extends ComposedSwing:
   /** Cleans the form. */
   def cleanForm(): Unit = ()
 
+  /** Shows the error message. */
+  def showErrorMessage(message: String): Unit
+
 /** Companion object of the [[Form]]. */
 object Form:
 
@@ -31,7 +34,12 @@ object Form:
     private val insertForm: ComposedSwing.JInsertForm = ComposedSwing.createInsertForm(title, fields: _*)
     private val space                                 = 10
 
+    private val boxPanel                      = ExtendedSwing.SBoxPanel(Orientation.Vertical)
+    private val label                         = ExtendedSwing.SLabel("")
     val buttonPanel: ExtendedSwing.SFlowPanel = ExtendedSwing.SFlowPanel()
+
+    boxPanel.contents += label
+    boxPanel.contents += buttonPanel
 
     mainPanel.rect = Styles.panelRect
     insertForm.titleLabel.fontEffect = Styles.titleFormFont
@@ -39,7 +47,9 @@ object Form:
     buttonPanel.hGap = space
 
     mainPanel.contents += insertForm.component
-    mainPanel.contents += buttonPanel
+    mainPanel.contents += boxPanel
+
+    def showErrorMessage(message: String): Unit = label.text = message
 
     def component[T >: Component]: T = mainPanel
 
@@ -51,5 +61,7 @@ object Form:
     private val mainPanel: ExtendedSwing.SBoxPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     mainPanel.rect = Styles.panelRect
     mainPanel.contents += TimetableView(TimetableInputPortMocked())
+
+    override def showErrorMessage(message: String): Unit = ()
 
     override def component[T >: Component]: T = mainPanel
