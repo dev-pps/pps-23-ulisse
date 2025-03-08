@@ -12,10 +12,11 @@ import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.page.forms.Form.BaseForm
 import ulisse.infrastructures.view.page.forms.SimulationForm.SimulationInfo
 import ulisse.entities.simulation.data.Statistics.*
-import ulisse.infrastructures.view.utils.ComponentUtils._
+import ulisse.infrastructures.view.utils.ComponentUtils.*
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, ShapeEffect}
 import ulisse.infrastructures.view.map.MapElement
+import ulisse.infrastructures.view.map.MapSimulation.TrainMapElement
 import ulisse.utils.Times.*
 
 import scala.swing.BorderPanel.Position
@@ -41,6 +42,9 @@ trait SimulationForm extends Form:
 
   /** Shows the route simulation. */
   def showRouteSimulation(route: RouteEnvironmentElement): Unit
+
+  /** Shows the train simulation. */
+  def showTrainSimulation(train: TrainMapElement): Unit
 
 /** Companion object of the [[SimulationForm]]. */
 object SimulationForm:
@@ -73,6 +77,10 @@ object SimulationForm:
   final case class TakeRouteEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[RouteEnvironmentElement]]:
     override def onClick(data: MapElement[RouteEnvironmentElement]): Unit = form.showRouteSimulation(data.element)
+
+  final case class TakeTrainEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
+      extends ClickObserver[MapElement[TrainMapElement]]:
+    override def onClick(data: MapElement[TrainMapElement]): Unit = form.showTrainSimulation(data.element)
 
   private case class SimulationFormImpl() extends SimulationForm:
     private val mainPanel: SBorderPanel                     = SBorderPanel()
@@ -143,6 +151,14 @@ object SimulationForm:
                  \nROUTE ARRIVAL: 
                  \nROUTE DISTANCE: 
                  \nROUTE DURATION: """
+      elementInfoArea.setText(infoStr)
+
+    override def showTrainSimulation(train: TrainMapElement): Unit =
+      val infoStr = s"""TRAIN SIMULATION:
+                     \nTRAIN NAME: 
+                     \nTRAIN POSITION: 
+                     \nTRAIN SPEED: 
+                     \nTRAIN DIRECTION: """
       elementInfoArea.setText(infoStr)
 
     override def component[T >: Component]: T = mainPanel
