@@ -151,7 +151,7 @@ class DynamicTimetableTest extends AnyWordSpec with Matchers:
             newDtt.nextDepartureTime shouldBe dynamicTimetable1.table(stationB).stationTime.departure
             newDtt.currentRoute shouldBe None
             newDtt.completed shouldBe false
-          case o => println(o); fail()
+          case o => fail()
 
       "update the effective table with an effective arrival time" in:
         val delay = ClockTime(0, 5).toOption
