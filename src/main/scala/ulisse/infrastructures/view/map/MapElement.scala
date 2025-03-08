@@ -51,7 +51,7 @@ object MapElement:
 
   def createTrain(position: Point2D.Double): MapElement[Point2D.Double] =
     val imagePath = ImagePath.train
-    val dimension = new Dimension(10, 10)
+    val dimension = new Dimension(20, 20)
     MapElementSimple(position, DrawImageSimple(imagePath, position.toPoint, dimension))
 
   private case class MapElementSimple[T](element: T, image: DrawImage) extends MapElement[T]:

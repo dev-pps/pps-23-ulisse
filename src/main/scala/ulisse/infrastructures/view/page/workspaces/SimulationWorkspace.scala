@@ -7,9 +7,10 @@ import ulisse.infrastructures.view.map.{MapPanel, MapSimulation}
 import ulisse.infrastructures.view.page.forms.{Form, SimulationForm}
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
-import ulisse.infrastructures.view.utils.Swings.{computePosition, given_ExecutionContext, *}
+import ulisse.infrastructures.view.utils.Swings.{given_ExecutionContext, *}
 
 import scala.swing.BorderPanel.Position
+import scala.swing.Swing
 
 /** Represents the simulation workspace of the application. */
 trait SimulationWorkspace extends Workspace with SimulationNotificationListener:
@@ -48,7 +49,9 @@ object SimulationWorkspace:
       println("Initializing simulation:")
 
     override def updateData(data: SimulationData): Unit =
-      println("Updating simulation data:")
+      Swing.onEDT(() =>
+        println("Updating simulation data:")
+      )
 
     override def endSimulation(data: SimulationData): Unit =
       println("Ending simulation:")
