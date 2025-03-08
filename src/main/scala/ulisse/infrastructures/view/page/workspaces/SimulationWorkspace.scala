@@ -9,6 +9,8 @@ import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 import ulisse.infrastructures.view.utils.Swings.{given_ExecutionContext, *}
 import ulisse.entities.simulation.data.Statistics.*
+import ulisse.entities.station.StationEnvironmentElement
+import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.utils.Times.*
 
 import scala.swing.BorderPanel.Position
@@ -49,6 +51,7 @@ object SimulationWorkspace:
         (engine, data) =>
           mapPanel.uploadStation(data.simulationEnvironment.stations)
           mapPanel.uploadRoutes(data.simulationEnvironment.routes)
+          mapPanel attachClickStation SimulationForm.TakeStationEvent(simulation, infoSimulation)
           simulation.setEngineConfiguration(engine.configuration)
       ))
       println("Initializing simulation:")

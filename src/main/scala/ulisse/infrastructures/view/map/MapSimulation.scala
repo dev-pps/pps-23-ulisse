@@ -1,7 +1,9 @@
 package ulisse.infrastructures.view.map
 
+import ulisse.entities.route.Routes.Route
 import ulisse.entities.route.{RouteEnvironmentElement, Tracks}
 import ulisse.entities.station.StationEnvironmentElement
+import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
 import ulisse.infrastructures.view.utils.Swings.{computePosition, given_ExecutionContext, *}
 
@@ -10,6 +12,12 @@ import scala.swing.{Graphics2D, Panel}
 
 /** Represent the map simulation. */
 trait MapSimulation extends Panel with EnhancedLook:
+  /** Attach the station form to the map panel. */
+  def attachClickStation(event: ClickObserver[MapElement[StationEnvironmentElement]]): Unit
+
+  /** Attach the route form to the map panel. */
+  def attachClickRoute(event: ClickObserver[MapElement[RouteEnvironmentElement]]): Unit
+
   /** Draw the station on the screen. */
   def uploadStation(newStations: Seq[StationEnvironmentElement]): Unit
 
@@ -29,6 +37,12 @@ object MapSimulation:
     private val stations = MapElements[StationEnvironmentElement](observable)
     private val routes   = MapElements[RouteEnvironmentElement](observable)
     private val trains   = MapElements[Point2D.Double](observable)
+
+    override def attachClickStation(event: ClickObserver[MapElement[StationEnvironmentElement]]): Unit =
+      stations attachClick event
+
+    override def attachClickRoute(event: ClickObserver[MapElement[RouteEnvironmentElement]]): Unit =
+      routes attachClick event
 
     override def uploadStation(newStations: Seq[StationEnvironmentElement]): Unit =
       stations update (newStations map MapElement.createStationEnvironmentElement)
@@ -61,11 +75,11 @@ object MapSimulation:
                 arrivalCoordinate.toPoint2D computePosition (departureCoordinate.toPoint2D, train.distanceTravelled)
             }
           )
-
           val checkPosition = positions.foldLeft(List[Point2D.Double]())((acc, pos) => acc ++ pos)
           trains update (checkPosition map MapElement.createTrain)
         )
       )
+      updateGraphics()
 
     override protected def paintLook(g: Graphics2D): Unit =
       routes draw (g, peer)
