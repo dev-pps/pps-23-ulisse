@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.page.forms
 
-import ulisse.adapters.input.SimulationPageAdapter
+import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
+import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.data.{EngineConfiguration, SimulationData}
 import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.common.Observers.ClickObserver
@@ -11,7 +12,9 @@ import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.page.forms.Form.BaseForm
 import ulisse.infrastructures.view.page.forms.SimulationForm.SimulationInfo
 import ulisse.entities.simulation.data.Statistics.*
+import ulisse.entities.station.StationEnvironmentElement
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, ShapeEffect}
+import ulisse.infrastructures.view.map.MapElement
 import ulisse.utils.Times.*
 
 import javax.swing.JTextArea
@@ -54,6 +57,12 @@ object SimulationForm:
   /** Represents the reset simulation event. */
   final case class ResetSimulationEvent(adapter: SimulationPageAdapter) extends ClickObserver[Unit]:
     override def onClick(info: Unit): Unit = adapter.reset()
+
+  /** Represents the take station event. */
+  final class TakeStationEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
+      extends ClickObserver[MapElement[StationEnvironmentElement]]:
+    override def onClick(data: MapElement[StationEnvironmentElement]): Unit =
+      println("Take station event")
 
   private case class SimulationFormImpl() extends SimulationForm:
     private val mainPanel: SBorderPanel                     = SBorderPanel()
