@@ -8,6 +8,7 @@ import ulisse.utils.CollectionUtils.updateWhen
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.OptionUtils.when
 import ulisse.utils.ValidationUtils.{validatePositive, validateRange, validateUniqueItems, validateUniqueItemsBy}
+import ulisse.utils.CollectionUtils.swapWhenEq
 
 object Tracks:
 
@@ -80,7 +81,7 @@ object Tracks:
           case _                                       => None
 
       override def updateTrain(train: TrainAgent): Option[Track] =
-        val updatedTrains = trains.updateWhen(_ == train)(_ => train)
+        val updatedTrains = trains.swapWhenEq(train)(train)
         copy(trains = updatedTrains) when contains(train) && securityDistanceIsMaintained(updatedTrains)
 
       override def removeTrain(train: TrainAgent): Option[Track] =

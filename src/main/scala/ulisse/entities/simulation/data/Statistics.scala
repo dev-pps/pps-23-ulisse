@@ -17,6 +17,14 @@ object Statistics:
     def delayInCurrentTimetable: Option[Time] = currentDynamicTimetable.flatMap(_.currentDelay)
 
   extension (environment: RailwayEnvironment)
+    private def collectDelay(timeF: DynamicTimetable => Option[Time]): Time =
+      Time.secondsToOverflowTime(
+        environment
+          .timetables
+          .flatMap(timeF)
+          .map(_.toSeconds).sum
+      )
+
     /** Get the percentage of stations load */
     def percStationsLoad: Double =
       trainsInStations.toDouble / environment.stations.map(_.numberOfPlatforms).sum
@@ -39,12 +47,7 @@ object Statistics:
 
     /** Get the cumulative delay of all the timetables */
     def cumulativeDelay: Time =
-      Time.secondsToOverflowTime(
-        environment
-          .timetables
-          .flatMap(_.currentDelay)
-          .map(_.toSeconds).sum
-      )
+      environment.collectDelay(_.currentDelay)
 
     /** Get the average delay of all the timetables */
     def averageDelay: Time =
@@ -54,12 +57,7 @@ object Statistics:
 
     /** Get the cumulative delay of a station */
     def cumulativeDelayIn(see: Station): Time =
-      Time.secondsToOverflowTime(
-        environment
-          .timetables
-          .flatMap(_.delayIn(see))
-          .map(_.toSeconds).sum
-      )
+      environment.collectDelay(_.delayIn(see))
 
     /** Get the average delay of a station */
     def averageDelayIn(see: Station): Time =

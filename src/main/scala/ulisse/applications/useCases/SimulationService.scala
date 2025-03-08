@@ -14,6 +14,7 @@ import ulisse.infrastructures.commons.TimeProviders.*
 import scala.concurrent.{Future, Promise}
 import scala.util.chaining.scalaUtilChainingOps
 
+/** Service for simulation */
 final case class SimulationService(
     private val eventQueue: SimulationEventQueue,
     private val notificationService: SimulationPorts.Output

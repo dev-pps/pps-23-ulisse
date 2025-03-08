@@ -40,6 +40,7 @@ object SimulationData:
   /** Create a new empty Simulation data with initial state and an empty environment */
   def empty(): SimulationData = withEnvironment(RailwayEnvironment.empty())
 
+  /** Create a FieldComparator for SimulationData */
   given FieldComparator[SimulationDataField, SimulationData] with
     def fields: Seq[SimulationDataField] = SimulationDataField.values.toSeq
     def _compare(obj: SimulationData, otherObj: SimulationData, field: SimulationDataField): Boolean =
@@ -48,6 +49,7 @@ object SimulationData:
         case SimulationDataField.MillisecondElapsed    => obj.millisecondsElapsed == otherObj.millisecondsElapsed
         case SimulationDataField.SimulationEnvironment => obj.simulationEnvironment == otherObj.simulationEnvironment
 
+  /** Field of a simulation data */
   enum SimulationDataField extends Field[SimulationDataField, SimulationData]:
     case Step, MillisecondElapsed, SimulationEnvironment
     def values: Seq[SimulationDataField] = SimulationDataField.values.toSeq
