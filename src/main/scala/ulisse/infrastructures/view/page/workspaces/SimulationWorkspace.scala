@@ -27,8 +27,8 @@ object SimulationWorkspace:
 
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(simulation.component) = Position.East
-    workspace.revalidate()
-    workspace.component.repaint()
+
+
 
     export workspace.{component, revalidate}
 
