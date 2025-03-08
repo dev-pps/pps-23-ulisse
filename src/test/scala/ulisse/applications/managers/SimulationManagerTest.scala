@@ -9,7 +9,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
-import ulisse.dsl.comparison.FieldsComparators.compareTo
+import ulisse.dsl.FieldsComparators.compareTo
 import ulisse.entities.simulation.data.Engine.*
 import ulisse.entities.simulation.data.Engine.EngineField.State
 import ulisse.entities.simulation.data.EngineConfiguration.{defaultBatch, defaultStepSize}

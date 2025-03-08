@@ -14,7 +14,7 @@ import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.{AppState, EventQueue}
-import ulisse.dsl.comparison.FieldsComparators.compareTo
+import ulisse.dsl.FieldsComparators.compareTo
 import ulisse.entities.simulation.data.Engine.EngineField.Running
 import ulisse.entities.simulation.data.SimulationData.SimulationDataField.SimulationEnvironment
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
