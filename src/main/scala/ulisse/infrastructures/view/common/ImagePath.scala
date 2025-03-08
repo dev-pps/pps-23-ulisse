@@ -18,12 +18,13 @@ object ImagePath:
   val logo: String = "logo.jpg"
 
   /** Icon for the menu */
-  val simulation: String = menuPath + "simulation.svg"
-  val settings: String   = menuPath + "settings.svg"
-  val trainIcon: String  = menuPath + "train.svg"
-  val mapIcon: String    = menuPath + "map.svg"
+  val simulationIcon: String = menuPath + "simulation.svg"
+  val settingsIcon: String   = menuPath + "settings.svg"
+  val trainIcon: String      = menuPath + "train.svg"
+  val mapIcon: String        = menuPath + "map.svg"
 
   /** Image of map */
   val station: String     = "station.png"
   val routeNormal: String = "route-Normal.png"
   val routeAV: String     = "route-AV.png"
+  val train: String       = "train.png"

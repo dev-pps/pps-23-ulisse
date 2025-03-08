@@ -13,7 +13,7 @@ import java.awt
 import java.awt.Color
 import java.awt.geom.Point2D
 import java.awt.image.ImageObserver
-import scala.swing.{Graphics2D, Point}
+import scala.swing.{Dimension, Graphics2D, Point}
 
 /** Represent a generic element of the map. */
 trait MapElement[T] extends Observable[MapElement[T]]:
@@ -50,8 +50,9 @@ object MapElement:
     MapElementSimple(route, DrawImageTiled.createAt(start, end, color))
 
   def createTrain(position: Point2D.Double): MapElement[Point2D.Double] =
-    val imagePath = ImagePath.trainIcon
-    MapElementSimple(position, DrawImageSimple.createAt(imagePath, position.toPoint))
+    val imagePath = ImagePath.train
+    val dimension = new Dimension(10, 10)
+    MapElementSimple(position, DrawImageSimple(imagePath, position.toPoint, dimension))
 
   private case class MapElementSimple[T](element: T, image: DrawImage) extends MapElement[T]:
     private val observable = Observers.createObservable[MapElement[T]]

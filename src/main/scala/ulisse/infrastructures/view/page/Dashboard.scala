@@ -58,10 +58,10 @@ object Dashboard:
     private val heightLabels      = 50
     private val widthExpandButton = heightLabels / 2
 
-    private val simulationLabel = simulation -> ComposedImageLabel.createIcon(ImgPath.simulation, simulation)
+    private val simulationLabel = simulation -> ComposedImageLabel.createIcon(ImgPath.simulationIcon, simulation)
     private val mapLabel        = map        -> ComposedImageLabel.createIcon(ImgPath.mapIcon, map)
     private val trainLabel      = train      -> ComposedImageLabel.createIcon(ImgPath.trainIcon, train)
-    private val settingsLabel   = settings   -> ComposedImageLabel.createIcon(ImgPath.settings, settings)
+    private val settingsLabel   = settings   -> ComposedImageLabel.createIcon(ImgPath.settingsIcon, settings)
 
     private val mainPanel       = BorderPanel().transparent()
     private val mainLabelPanel  = ExtendedSwing.SBorderPanel()
