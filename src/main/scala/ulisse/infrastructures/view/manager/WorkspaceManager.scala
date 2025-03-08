@@ -45,7 +45,7 @@ object WorkspaceManager:
       workspace.revalidate()
       mainPanel.validate()
 
-    override def showSimulation(): Unit = showWorkspace(simulation)
+    override def showSimulation(): Unit = { showWorkspace(simulation); simulation.initSimulation() }
     override def showMap(): Unit        = showWorkspace(map)
     override def showTrain(): Unit      = showWorkspace(train)
 

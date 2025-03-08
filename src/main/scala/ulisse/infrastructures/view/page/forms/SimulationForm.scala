@@ -35,7 +35,6 @@ object SimulationForm:
   /** Represents the start simulation event. */
   final case class PlaySimulationEvent(adapter: SimulationPageAdapter) extends ClickObserver[SimulationInfo]:
     override def onClick(info: SimulationInfo): Unit =
-      adapter.initSimulation()
       info.stepInt.fold(println("error"))(step =>
         adapter.setupEngine(step, info.cyclePerSecondInt)
         adapter.start()
