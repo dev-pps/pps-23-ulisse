@@ -22,10 +22,9 @@ trait Form extends ComposedSwing:
 /** Companion object of the [[Form]]. */
 object Form:
 
-  def createRoute(): RouteForm           = RouteForm()
-  def createStation(): StationForm       = StationForm()
-  def createSchedule(): ScheduleForm     = ScheduleForm()
-  def createSimulation(): SimulationForm = SimulationForm()
+  def createRoute(): RouteForm                                      = RouteForm()
+  def createStation(): StationForm                                  = StationForm()
+  def createTimetable(adapter: TimetableViewAdapter): TimetableForm = TimetableForm(adapter)
 
   /** Represents the clean form event. */
   final case class CleanFormEvent(form: Form) extends ClickObserver[MouseEvent]:
@@ -55,16 +54,11 @@ object Form:
 
     def component[T >: Component]: T = mainPanel
 
-  case class ScheduleForm() extends Form:
-
-    import ulisse.adapters.MockedPortAdapters.TimetableServiceMock
+  case class TimetableForm(adapter: TimetableViewAdapter) extends Form:
     import ulisse.infrastructures.view.timetable.TimetableView
-
     private val mainPanel: ExtendedSwing.SBoxPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     mainPanel.rect = Styles.panelRect
-    mainPanel.contents += SLabel(
-      "set timetable view with adapters"
-    ) // TimetableView(TimetableViewAdapter(TimetableInputPortMocked()))
+    mainPanel.contents += TimetableView(adapter)
 
     override def showErrorMessage(message: String): Unit = ()
 

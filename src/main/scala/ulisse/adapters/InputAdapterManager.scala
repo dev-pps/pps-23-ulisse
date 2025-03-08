@@ -1,11 +1,23 @@
 package ulisse.adapters
 
-import ulisse.adapters.input.{RouteAdapter, SimulationInfoAdapter, TrainViewAdapter, SimulationPageAdapter, StationEditorAdapter}
+import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
+import ulisse.adapters.input.{
+  RouteAdapter,
+  SimulationInfoAdapter,
+  SimulationPageAdapter,
+  StationEditorAdapter,
+  TrainViewAdapter
+}
 import ulisse.applications.InputPortManager
 
 /** Represents the input adapter manager of the application. */
 trait InputAdapterManager:
-  def trainAdapter: TrainViewAdapter
+  /** The train editor adapter */
+  def train: TrainViewAdapter
+
+  /** The timetable editor adapter */
+  def timetable: TimetableViewAdapter
+
   /** The station editor adapter. */
   val station: StationEditorAdapter
 
@@ -22,9 +34,21 @@ trait InputAdapterManager:
 object InputAdapterManager:
 
   /** Creates a new instance of the input adapter manager. */
+  def apply(ports: InputPortManager): InputAdapterManager =
+    InputAdapterManagerImpl(StationEditorAdapter(ports.station), TrainViewAdapter(ports.train))
+
+  private final case class InputAdapterManagerImpl(stationAdapter: StationEditorAdapter, trainAdapter: TrainViewAdapter)
+      extends InputAdapterManager
+
+  private final case class InputAdapterManagerImpl(
+      station: StationEditorAdapter,
+      route: RouteAdapter,
+      train: TrainViewAdapter
+  ) extends InputAdapterManager:
+
+
   def apply(ports: InputPortManager, simulationPage: SimulationPageAdapter): InputAdapterManager =
     new InputAdapterManagerImpl(ports, simulationPage)
-
   private final case class InputAdapterManagerImpl(
       station: StationEditorAdapter,
       route: RouteAdapter,
