@@ -3,12 +3,14 @@ package ulisse.applications.managers
 import ulisse.applications.managers.TimetableManagers.TimetableManagerErrors.{
   AcceptanceError,
   DeletionError,
+  DuplicatedStations,
+  StationNotFound,
   TimetableNotFound
 }
 import ulisse.entities.route.Routes
-import ulisse.entities.station.Station
 import ulisse.entities.route.Routes.Route
-import ulisse.entities.timetable.Timetables.{RailInfo, Timetable}
+import ulisse.entities.station.Station
+import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist}
 import ulisse.utils.Times.{===, >=, ClockTime, Time}
@@ -36,9 +38,6 @@ object TimetableManagers:
     /** Updates timetables and recalculates times of all tables related to given `train`. */
     def trainUpdated(train: Train): Either[TimetableManagerErrors, TimetableManager]
 
-    /** Updates timetables and recalculates times of all tables that contains `oldStation` with the new one `newStation` */
-    def stationUpdated(oldStation: Station, newStation: Station): Either[TimetableManagerErrors, TimetableManager]
-
     /** Updates timetables and recalculates times of all tables that contains `oldRoute` with the `newRoute`. */
     def routeUpdated(oldRoute: Route, newRoute: Route): Either[TimetableManagerErrors, TimetableManager]
 
@@ -50,6 +49,10 @@ object TimetableManagers:
     final case class TimetableNotFound(trainName: String)
         extends ErrorNotExist(s"No timetables exist for train $trainName") with TimetableManagerErrors
     final case class DeletionError(descr: String) extends ErrorMessage(s"Delete error: $descr")
+        with TimetableManagerErrors
+    final case class StationNotFound() extends ErrorNotExist(s"some station not found") with TimetableManagerErrors
+    final case class DuplicatedStations(stations: Seq[Station])
+        extends ErrorMessage(s"Timetable has duplicated stations: $stations")
         with TimetableManagerErrors
 
   /** A rules specification for accepting new `timetable`. Checks are done by method `accept`. */
@@ -84,7 +87,7 @@ object TimetableManagers:
   def empty(): TimetableManager = TimetableManager(List.empty)
 
   trait TimetableManager extends DeletionListener with UpdateListener:
-    /** Save new `timetable` for a train. Timetable is accepted if passes the `acceptancePolicy` rules.
+    /** Save new `timetable` for a train. Timetable is accepted if passes the `acceptancePolicy` rules and has distinct stations.
       * Returns `Right` of updated `TimetableManager` otherwise `Left` of `TimetableManagerErrors` in case of errors.
       */
     def save(timetable: Timetable)(using
@@ -130,12 +133,23 @@ object TimetableManagers:
       override def save(timetable: Timetable)(using
           acceptancePolicy: AcceptanceTimetablePolicy
       ): Either[TimetableManagerErrors, TimetableManager] =
+        extension (timetable: Timetable)
+          private def checkDuplicatedStation: Either[DuplicatedStations, Timetable] =
+            val duplicated: List[Station] =
+              timetable.stations.groupBy(identity).collect[Station] { case (k, l) if l.sizeIs > 0 => k }.toList
+            Either.cond(
+              timetable.stations.toSet.sizeIs == timetable.stations.size,
+              timetable,
+              DuplicatedStations(duplicated)
+            )
+
         for
-          ts <- tablesOf(timetable.train.name).orElse(Right(List.empty))
-          t  <- acceptancePolicy.accept(timetable, ts)
-        yield TimetableManagerImpl(timetables.updatedWith(t.train) {
-          case Some(l) => Some(l.appended(t))
-          case None    => Some(List(t))
+          noStationDuplicates <- timetable.checkDuplicatedStation
+          existingTimetables  <- tablesOf(timetable.train.name).orElse(Right(List.empty))
+          noOverlappingTable  <- acceptancePolicy.accept(noStationDuplicates, existingTimetables)
+        yield TimetableManagerImpl(timetables.updatedWith(noOverlappingTable.train) {
+          case Some(l) => Some(l.appended(noOverlappingTable))
+          case None    => Some(List(noOverlappingTable))
         })
 
       override def remove(trainName: String, departureTime: ClockTime): Either[TimetableNotFound, TimetableManager] =
@@ -184,14 +198,32 @@ object TimetableManagers:
           DeletionError(errMsg)
         )
 
-      override def trainUpdated(train: Train): Either[TimetableManagerErrors, TimetableManager] = Right(this)
-      // find timetables with same train name
-      // recalculate all timetables starting from
-
-      override def stationUpdated(
-          oldStation: Station,
-          newStation: Station
-      ): Either[TimetableManagerErrors, TimetableManager] = Right(this)
+      override def trainUpdated(train: Train): Either[TimetableManagerErrors, TimetableManager] =
+        // find timetables with same train name
+        @SuppressWarnings(Array("org.wartremover.warts.OptionPartial", "org.wartremover.warts.IterableOps"))
+        def update(oldTable: Timetable) =
+          for
+            endStation <- oldTable.table.lastOption.toRight(StationNotFound())
+          yield oldTable.table.drop(1).dropRight(1).foldLeft(TimetableBuilder(
+            train,
+            oldTable.startStation,
+            oldTable.departureTime
+          )) {
+            case (timetable, (station, info)) if info.stationTime.waitTime.isDefined =>
+              timetable.stopsIn(station, info.stationTime.waitTime.get)(info.railInfo.get)
+            case (timetable, (station, info)) =>
+              timetable.transitIn(station)(info.railInfo.get)
+          }.arrivesTo(endStation._1)(endStation._2.railInfo.get)
+        import cats.implicits.toTraverseOps
+        for
+          oldTrain <- timetables.keys.find(t => t.name == train.name).toRight(TimetableNotFound(train.name))
+          tables   <- tablesOf(oldTrain.name)
+          mgr      <- trainDeleted(oldTrain)
+          newTT    <- tables.traverse(update)
+          updated <- newTT.foldLeft[Either[TimetableManagerErrors, TimetableManager]](Right(mgr))((m, t) =>
+            m.flatMap(mm => mm.save(t))
+          )
+        yield updated
 
       override def routeUpdated(oldRoute: Route, newRoute: Route): Either[TimetableManagerErrors, TimetableManager] =
         Right(this)

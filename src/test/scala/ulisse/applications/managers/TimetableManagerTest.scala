@@ -27,12 +27,12 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
   private val railAV_10     = RailInfo(length = 16, typeRoute = AV)
   private val departTime9_0 = h(9).m(0).getOrDefault
 
+  val timetableAB: Timetable = TimetableBuilder(trainRV_3905, startStation = stationA, h(12).m(0).getOrDefault)
+    .arrivesTo(stationB)(railAV_10)
   val timetableABC: Timetable =
     TimetableBuilder(trainRV_3905, startStation = stationA, departTime9_0)
       .transitIn(stationB)(railAV_10)
       .arrivesTo(stationC)(railAV_10)
-  val timetableAB: Timetable = TimetableBuilder(trainRV_3905, startStation = stationA, h(12).m(0).getOrDefault)
-    .arrivesTo(stationB)(railAV_10)
   val timetableBC: Timetable = TimetableBuilder(trainRV_3905, startStation = stationB, h(20).m(30).getOrDefault)
     .arrivesTo(stationC)(railAV_10)
 
@@ -166,18 +166,43 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
         val result = manager.routeDeleted(route)
         Then("should be removed all timetables that have deleted station")
         result should be(Right(TimetableManagers.TimetableManager(List(timetableBC))))
-
-//  Feature("Autoupdate of timetable when route, train or station are updated"):
-//    Scenario("Train with some timetable has been updated"):
-//      val newTrainTech        = TrainTechnology("Tech1", 500, 1.0, 2.0)
-//      val trainName           = trainRV_3905.name
-//      val updatedTrainRV_3905 = Train(trainName, newTrainTech, trainRV_3905.wagon, trainRV_3905.length)
-//      Given("A manager with some timetable related to the edited train")
-//      val manager = TimetableManagers.TimetableManager(List(timetableAB))
-//      When("I notify manager that a train has been updated")
 //
-//      val updatedManager = manager.trainUpdated(updatedTrainRV_3905)
-//      Then("all timetables related to train should be updated")
-//      // TODO: call method on updatedMAnager
-//      manager.tablesOf(trainName) should be(Right(List(
-//      )))
+//      "timetable" should "return error in case of duplicated station" in:
+//    import ulisse.entities.timetable.Timetables.TimetableBuilderErrors.DuplicatedStations
+//    timetableBuilder.arrivesTo(stationA)(railAV_10) should be(Left(DuplicatedStations(List(stationA))))
+
+  Feature("Autoupdate of timetable when route, train or station are updated"):
+    Scenario("Train is updated and then all related timetables are too"):
+      import ulisse.entities.train.Wagons
+      val trainAV8080 = Train("AV8080", TrainTechnology("Normal", 160, 1.0, 1.5), Wagons.PassengerWagon(200), 12)
+
+      val newTrainTech        = TrainTechnology("Tech1", 500, 1.0, 2.0)
+      val trainName           = trainRV_3905.name
+      val updatedTrainRV_3905 = Train(trainName, newTrainTech, trainRV_3905.wagon, trainRV_3905.length)
+
+      val timetableAB_newTrain = TimetableBuilder(
+        updatedTrainRV_3905,
+        stationA,
+        timetableAB.departureTime
+      ).arrivesTo(stationB)(railAV_10)
+
+      val timetableABC_newTrain = TimetableBuilder(updatedTrainRV_3905, startStation = stationA, departTime9_0)
+        .transitIn(stationB)(railAV_10)
+        .arrivesTo(stationC)(railAV_10)
+
+      val updatedIgnoredTimetable =
+        TimetableBuilder(trainAV8080, startStation = stationA, departTime9_0).arrivesTo(stationB)(railAV_10)
+
+      Given("A manager with some timetable related to the edited train")
+      val manager = TimetableManagers.TimetableManager(List(timetableAB, timetableABC, updatedIgnoredTimetable))
+      When("I notify manager that a train has been updated")
+      val updatedManager = manager.trainUpdated(updatedTrainRV_3905)
+      Then("all timetables related to train should be updated with the new train")
+      updatedManager match
+        case Left(err) => fail(s"Manager wrong result: $err")
+        case Right(updatedManager) =>
+          updatedManager.tables.toSet should be(Set(
+            timetableAB_newTrain,
+            timetableABC_newTrain,
+            updatedIgnoredTimetable
+          ))
