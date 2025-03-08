@@ -1,9 +1,11 @@
 package ulisse.infrastructures.view.map
 
-import ulisse.entities.route.RouteEnvironmentElement
+import ulisse.entities.route.{RouteEnvironmentElement, Tracks}
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.utils.Swings.{computePosition, given_ExecutionContext, *}
 
+import java.awt.geom.Point2D
 import scala.swing.{Graphics2D, Panel}
 
 /** Represent the map simulation. */
@@ -23,24 +25,44 @@ object MapSimulation:
   private case class MapSimulationImpl() extends MapSimulation:
     private val stations = MapElements[StationEnvironmentElement](observable)
     private val routes   = MapElements[RouteEnvironmentElement](observable)
+    private val trains   = MapElements[Point2D.Double](observable)
 
     override def uploadStation(newStations: Seq[StationEnvironmentElement]): Unit =
       stations update (newStations map MapElement.createStationEnvironmentElement)
       updateGraphics()
 
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
     override def uploadRoutes(newRoutes: Seq[RouteEnvironmentElement]): Unit =
-      @SuppressWarnings(Array("org.wartremover.warts.Var"))
       var routeCheck: List[(RouteEnvironmentElement, Boolean)] = List.empty
-
       newRoutes.foreach(route =>
         if routeCheck.exists((a, b) => a.isPath(route.departure, route.arrival) && !b) then
           routeCheck = routeCheck.::(route, true)
-        else
-          routeCheck = routeCheck.::(route, false)
+        else routeCheck = routeCheck.::(route, false)
       )
 
       routes update (routeCheck map MapElement.createRoute)
       updateGraphics()
+
+    def uploadTrain(newRoutes: Seq[RouteEnvironmentElement]): Unit =
+      newRoutes.foreach(route =>
+        val env                 = route.containers
+        val departureCoordinate = route.departure.coordinate
+        val arrivalCoordinate   = route.arrival.coordinate
+        env.foreach(rails =>
+          val trainsEnv = rails.trains
+          val positions = trainsEnv.map(train =>
+            rails.currentDirection map {
+              case Tracks.TrackDirection.Forward =>
+                departureCoordinate.toPoint2D computePosition (arrivalCoordinate.toPoint2D, train.distanceTravelled)
+              case Tracks.TrackDirection.Backward =>
+                arrivalCoordinate.toPoint2D computePosition (departureCoordinate.toPoint2D, train.distanceTravelled)
+            }
+          )
+
+          val checkPosition = positions.foldLeft(List[Point2D.Double]())((acc, pos) => acc ++ pos)
+          trains update (checkPosition map MapElement.createTrain)
+        )
+      )
 
     override protected def paintLook(g: Graphics2D): Unit =
       routes draw (g, peer)

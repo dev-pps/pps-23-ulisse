@@ -59,8 +59,8 @@ object Dashboard:
     private val widthExpandButton = heightLabels / 2
 
     private val simulationLabel = simulation -> ComposedImageLabel.createIcon(ImgPath.simulation, simulation)
-    private val mapLabel        = map        -> ComposedImageLabel.createIcon(ImgPath.map, map)
-    private val trainLabel      = train      -> ComposedImageLabel.createIcon(ImgPath.train, train)
+    private val mapLabel        = map        -> ComposedImageLabel.createIcon(ImgPath.mapIcon, map)
+    private val trainLabel      = train      -> ComposedImageLabel.createIcon(ImgPath.trainIcon, train)
     private val settingsLabel   = settings   -> ComposedImageLabel.createIcon(ImgPath.settings, settings)
 
     private val mainPanel       = BorderPanel().transparent()

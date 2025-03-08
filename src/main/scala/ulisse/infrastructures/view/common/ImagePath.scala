@@ -20,8 +20,8 @@ object ImagePath:
   /** Icon for the menu */
   val simulation: String = menuPath + "simulation.svg"
   val settings: String   = menuPath + "settings.svg"
-  val train: String      = menuPath + "train.svg"
-  val map: String        = menuPath + "map.svg"
+  val trainIcon: String  = menuPath + "train.svg"
+  val mapIcon: String    = menuPath + "map.svg"
 
   /** Image of map */
   val station: String     = "station.png"

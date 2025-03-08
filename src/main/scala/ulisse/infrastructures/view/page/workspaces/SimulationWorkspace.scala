@@ -1,12 +1,13 @@
 package ulisse.infrastructures.view.page.workspaces
 
 import ulisse.adapters.input.SimulationPageAdapter
+import ulisse.entities.route.Tracks
 import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.map.{MapPanel, MapSimulation}
 import ulisse.infrastructures.view.page.forms.{Form, SimulationForm}
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
-import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
+import ulisse.infrastructures.view.utils.Swings.{computePosition, given_ExecutionContext, *}
 
 import scala.swing.BorderPanel.Position
 
