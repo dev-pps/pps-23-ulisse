@@ -2,24 +2,43 @@ package ulisse.entities.simulation.data
 
 import ulisse.dsl.comparison.FieldsComparators.{Field, FieldComparator}
 
+/** Engine for simulation */
 trait Engine:
+  /** running indication */
   def running: Boolean
+
+  /** modify running state */
   def running_=(running: Boolean): Engine
+
+  /** configuration of the engine */
   def configuration: EngineConfiguration
+
+  /** modify configuration */
   def configuration_=(configuration: EngineConfiguration): Engine
+
+  /** state of the engine */
   def state: EngineState
+
+  /** modify state */
   def state_=(state: EngineState): Engine
+
+  /** reset the engine state */
   def reset(): Engine
 
+/** Factory for [[Engine]] instances. */
 object Engine:
+  /** Create a new engine */
   def apply(running: Boolean, configuration: EngineConfiguration, state: EngineState): Engine =
     EngineImpl(running, configuration, state)
 
-  def empty(): Engine = Engine.emptyWithConfiguration(EngineConfiguration.empty())
-
+  /** Create an engine with the given configuration */
   def emptyWithConfiguration(configuration: EngineConfiguration): Engine =
     Engine(false, configuration, EngineState.empty())
 
+  /** Create an engine with empty configuration */
+  def empty(): Engine = Engine.emptyWithConfiguration(EngineConfiguration.empty())
+
+  // TODO
   given FieldComparator[EngineStateField, Engine] with
     def fields: Seq[EngineStateField] = EngineStateField.values.toSeq
     def _compare(firstEngine: Engine, otherEngine: Engine, field: EngineStateField): Boolean =
