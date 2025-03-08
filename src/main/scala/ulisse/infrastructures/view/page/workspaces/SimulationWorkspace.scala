@@ -45,17 +45,17 @@ object SimulationWorkspace:
       values.onComplete(_.fold(
         error => println(s"Error: $error"),
         (engine, data) =>
-          mapPanel.uploadStation(data.simulationEnvironment.stations)
-          mapPanel.uploadRoutes(data.simulationEnvironment.routes)
-          mapPanel attachClickStation SimulationForm.TakeStationEvent(simulation, infoSimulation)
-          mapPanel attachClickRoute SimulationForm.TakeRouteEvent(simulation, infoSimulation)
+          updateData(data)
           simulation.setEngineConfiguration(engine.configuration)
       ))
-      println("Initializing simulation:")
 
     override def updateData(data: SimulationData): Unit =
       Swing.onEDT {
+        mapPanel.uploadStation(data.simulationEnvironment.stations)
+        mapPanel.uploadRoutes(data.simulationEnvironment.routes)
         mapPanel uploadTrain data.simulationEnvironment.routes
+        mapPanel attachClickStation SimulationForm.TakeStationEvent(simulation, infoSimulation)
+        mapPanel attachClickRoute SimulationForm.TakeRouteEvent(simulation, infoSimulation)
         mapPanel attachClickTrain SimulationForm.TakeTrainEvent(simulation, infoSimulation)
         simulation.showSimulationData(data)
       }

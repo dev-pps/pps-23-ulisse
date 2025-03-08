@@ -98,6 +98,10 @@ object AppState:
   /** Create new application state with empty managers. */
   def apply(): AppState = new AppStateImpl().updateTechnology(_ => TechnologyManager.createTrainTechnology())
 
+  /** Create new application state with empty managers and technology. */
+  def withTechnology(technologyManager: TechnologyManager[TrainTechnology]): AppState =
+    new AppStateImpl().updateTechnology(_ => technologyManager)
+
   private case class AppStateImpl(
       stationManager: StationManager,
       routeManager: RouteManager,

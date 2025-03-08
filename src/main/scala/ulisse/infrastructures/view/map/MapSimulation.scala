@@ -72,13 +72,13 @@ object MapSimulation:
       updateGraphics()
 
     override def uploadTrain(newRoutes: Seq[RouteEnvironmentElement]): Unit =
-      newRoutes.foreach(route =>
+      val trainsWithPosition = newRoutes.flatten(route =>
         val env                 = route.containers
         val departureCoordinate = route.departure.coordinate
         val arrivalCoordinate   = route.arrival.coordinate
-        env.foreach(rails =>
+        env.flatten(rails =>
           val trainsEnv = rails.trains
-          val trainsWithPosition = trainsEnv.map(train =>
+          trainsEnv.map(train =>
             val pos = rails.currentDirection map {
               case Tracks.TrackDirection.Forward =>
                 departureCoordinate.toPoint2D computePosition (arrivalCoordinate.toPoint2D, train.distanceTravelled)
@@ -87,16 +87,20 @@ object MapSimulation:
             }
             pos.map((_, train))
           )
-          val checkPosition =
-            trainsWithPosition.foldLeft(List[TrainMapElement]())((acc, value) =>
-              value.fold(acc)((pos, train) => TrainMapElement(train, pos) :: acc)
-            )
-          trains update (checkPosition map MapElement.createTrain)
         )
       )
+
+      val checkPosition =
+        trainsWithPosition.foldLeft(List[TrainMapElement]())((acc, value) =>
+          value.fold(acc)((pos, train) =>
+            TrainMapElement(train, pos) :: acc
+          )
+        )
+      trains update (checkPosition map MapElement.createTrain)
       updateGraphics()
 
     override protected def paintLook(g: Graphics2D): Unit =
       routes draw (g, peer)
       stations draw (g, peer)
+      trains draw (g, peer)
       super.paintLook(g)

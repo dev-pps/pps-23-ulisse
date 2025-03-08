@@ -82,10 +82,12 @@ object TrainAgents:
       override def resetDistanceTravelled: TrainAgent = TrainAgentImpl(train, state.reset())
       override def updateDistanceTravelled(distanceDelta: Double): TrainAgent =
         TrainAgentImpl(train, state.withOffsetDistance(distanceDelta))
+
       override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): TrainAgent =
         import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProviders.given
         val perception: Option[TrainAgentPerception[?]] = simulationEnvironment.perceptionFor[TrainAgent](this)
         copy(state = state.next(this, dt, perception))
+//        updateDistanceTravelled(20)
 
       override def distanceTravelled: Double = state.motionData.distanceTravelled
 
