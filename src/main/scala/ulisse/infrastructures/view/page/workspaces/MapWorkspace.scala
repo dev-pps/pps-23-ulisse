@@ -11,12 +11,16 @@ import ulisse.infrastructures.view.page.forms.Form.TimetableForm
 import ulisse.infrastructures.view.page.forms.StationForm.{CreationStationEvent, DeletionStationEvent}
 import ulisse.infrastructures.view.page.forms.{RouteForm, StationForm}
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
+import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 
 import scala.swing.BorderPanel.Position
 import scala.swing.Point
 
 /** Represents the map workspace of the application. */
 trait MapWorkspace extends Workspace:
+  /** Initialize the map. */
+  def initMap(): Unit
+
   /** The selected station of the form. */
   def selectedStation: Option[Station]
 
@@ -81,6 +85,10 @@ object MapWorkspace:
     export workspace.{component, revalidate}, stationForm.compileForm as compileStationForm,
       routeForm.compileForm as compileRouteForm, stationForm.selectedStation, stationForm.selectedStation_=,
       stationForm.resetSelectedStation, routeForm.selectedRoute, routeForm.selectedRoute_=, routeForm.resetSelectedRoute
+
+    override def initMap(): Unit =
+      adapterManager.station.stationMap onComplete (_ fold (a => a, updateStations))
+      adapterManager.route.routes onComplete (_ fold (a => a, updateRoutes))
 
     override def compileStationCoordinatesForm(point: Point): Unit =
       stationForm.xField.text = point.x.toString

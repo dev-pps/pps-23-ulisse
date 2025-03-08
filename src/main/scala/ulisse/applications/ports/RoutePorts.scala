@@ -10,6 +10,9 @@ object RoutePorts:
 
   /** Input port for the route management. */
   trait Input:
+    /** Get the routes. */
+    def routes: Future[List[Route]]
+
     /** Save a route. */
     def save(route: Route): Future[Either[Errors, List[Route]]]
 

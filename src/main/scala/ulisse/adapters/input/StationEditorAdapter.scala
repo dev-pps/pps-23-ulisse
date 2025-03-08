@@ -31,6 +31,9 @@ trait StationEditorAdapter:
   /** Finds a station at the given coordinate. */
   def findStationAt(coordinate: Coordinate): Future[Option[Station]]
 
+  /** Retrieves the current station collection. */
+  def stationMap: Future[StationPorts.Input#SM]
+
 /** Factory for [[StationEditorAdapter]] instances. */
 object StationEditorAdapter:
   /** Information required to create a new station. */
@@ -79,4 +82,4 @@ object StationEditorAdapter:
           numberOfPlatforms.toIntOption.toValidNec(StationEditorAdapter.Error.InvalidNumberOfPlatformsFormat)
         ).mapN((_, _, _)).toEither.flatMap((x, y, nt) => Station.createCheckedStation(name, Coordinate(x, y), nt))
 
-    export appPort.{findStationAt, removeStation}
+    export appPort.{findStationAt, removeStation, stationMap}

@@ -27,6 +27,9 @@ trait RouteAdapter:
   /** Delete the route from the given [[RouteCreationInfo]]. */
   def delete(data: RouteCreationInfo)(using ec: ExecutionContext): Future[Value]
 
+  /** Get the routes. */
+  def routes(using ec: ExecutionContext): Future[List[Route]]
+
 /** Companion object for the [[RouteAdapter]] class. */
 object RouteAdapter:
 
@@ -88,6 +91,8 @@ object RouteAdapter:
 
     override def delete(data: RouteCreationInfo)(using ec: ExecutionContext): Future[Value] =
       create(data) onRight port.delete
+
+    override def routes(using ec: ExecutionContext): Future[List[Route]] = port.routes
 
     extension (creation: Either[RouteAdapterError, Route])
       private def onRight(fun: Route => Future[Either[RouteManagers.Errors, List[Route]]])(using

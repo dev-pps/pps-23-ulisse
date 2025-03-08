@@ -17,6 +17,11 @@ object RouteService:
 
   private case class RouteServiceImpl(eventQueue: RouteEventQueue) extends RoutePorts.Input:
 
+    override def routes: Future[List[Route]] =
+      val promise = Promise[List[Route]]()
+      eventQueue.addReadRouteEvent(routeManager => promise success routeManager.routes)
+      promise.future
+
     override def save(route: Route): Future[Either[Errors, List[Route]]] =
       val promise = Promise[Either[Errors, List[Route]]]()
       eventQueue addCreateRouteEvent ((stationManager, routeManager) => {

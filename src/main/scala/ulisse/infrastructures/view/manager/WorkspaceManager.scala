@@ -46,7 +46,7 @@ object WorkspaceManager:
       mainPanel.validate()
 
     override def showSimulation(): Unit = { showWorkspace(simulation); simulation.initSimulation() }
-    override def showMap(): Unit        = showWorkspace(map)
+    override def showMap(): Unit        = { showWorkspace(map); map.initMap() }
     override def showTrain(): Unit      = showWorkspace(train)
 
     override def component[T >: Component]: T = mainPanel
