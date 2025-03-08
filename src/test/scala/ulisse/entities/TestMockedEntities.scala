@@ -25,4 +25,4 @@ object TestMockedEntities:
 
   val appState: AppState = AppState()
     .updateTechnology(_ => TechnologyManager(List(trainTechnology)))
-    .updateTrain((_, _) => TrainManager(List(AV1000Train, AV800Train)))
+    .createTrain((_, _) => TrainManager(List(AV1000Train, AV800Train)))

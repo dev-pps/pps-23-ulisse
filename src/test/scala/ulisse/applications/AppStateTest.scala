@@ -27,9 +27,12 @@ object AppStateTest:
   val updateRoute: RouteManager => RouteManager              = _ => routeManager
   val updateTechnology: TechnologyManager[TrainTechnology] => TechnologyManager[TrainTechnology] =
     _ => technologyManager
-  val updateTrain: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager = (_, _) => trainManager
-  val updateTimetable: TimetableManager => TimetableManager                           = _ => timetableManager
-  val updateSimulationManager: SimulationManager => SimulationManager                 = _ => simulationManager
+  val createTrain: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager = (_, _) => trainManager
+  val updateTrain
+      : (TrainManager, TechnologyManager[TrainTechnology], TimetableManager) => (TrainManager, TimetableManager) =
+    (_, _, _) => (trainManager, timetableManager)
+  val updateTimetable: TimetableManager => TimetableManager           = _ => timetableManager
+  val updateSimulationManager: SimulationManager => SimulationManager = _ => simulationManager
   val updateRailwayNetwork: (StationManager, RouteManager) => (StationManager, RouteManager) =
     (_, _) => (stationManager, routeManager)
   val updateRailwayNetworkSchedule

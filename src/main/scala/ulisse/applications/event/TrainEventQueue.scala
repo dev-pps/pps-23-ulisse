@@ -17,8 +17,11 @@ trait TrainEventQueue:
   def addCreateTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): Unit
 
   /** Add an event to update a train. */
-  def addUpdateTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): Unit =
-    addCreateTrainEvent(update)
+  def addUpdateTrainEvent(update: (
+      TrainManager,
+      TechnologyManager[TrainTechnology],
+      TimetableManager
+  ) => (TrainManager, TimetableManager)): Unit
 
   /** Add an event to delete a train. */
   def addDeleteTrainEvent(update: (TrainManager, TimetableManager) => (TrainManager, TimetableManager)): Unit
@@ -34,7 +37,13 @@ object TrainEventQueue:
     override def addReadTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology]) => Unit): Unit =
       events.offer(_ readTrain update)
 
-    def addCreateTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): Unit =
+    override def addCreateTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): Unit =
+      events.offer(_ createTrain update)
+
+    override def addUpdateTrainEvent(update: (TrainManager, TechnologyManager[TrainTechnology], TimetableManager) => (
+        TrainManager,
+        TimetableManager
+    )): Unit =
       events.offer(_ updateTrain update)
 
     override def addDeleteTrainEvent(update: (TrainManager, TimetableManager) => (TrainManager, TimetableManager))

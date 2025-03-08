@@ -1,5 +1,6 @@
 package ulisse.applications.managers
 
+import ulisse.applications.managers.TrainManagers.TrainErrors.{TrainAlreadyExists, TrainNotExists}
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist, ErrorValidation}
@@ -24,6 +25,10 @@ object TrainManagers:
       * Returns [[Right]] of updated `TrainManager` if train is added else [[Left]] of [[TrainErrors.TrainAlreadyExists]]
       */
     def addTrain(train: Train): Either[TrainErrors, TrainManager]
+
+    /** Returns Train given its `name`. */
+    def findTrain(name: String): Either[TrainErrors, Train] =
+      trains.find(_.name == name).toRight(TrainNotExists(name))
 
     /** Creates new [[Train]] given its `name`, `technology`, `wagonTypeName`, `wagonCapacity` and `length` (amount of wagons)
       *
@@ -93,7 +98,7 @@ object TrainManagers:
           length: Int
       ): Either[TrainErrors, TrainManager] =
         for
-          _ <- findTrain(name).map(t => TrainErrors.TrainAlreadyExists(t.name)).toLeft(trains)
+          _ <- findTrain(name).map(_ => TrainAlreadyExists(name)).toOption.toLeft(name)
           w <- wagonTypes.find(_.name.contentEquals(wagonTypeName)).toRight(TrainErrors.WagonTypeUnknown(wagonTypeName))
           wc <- wagonCapacity.validatePositiveValue("wagon capacity")
           c  <- length.validatePositiveValue("train length")
@@ -107,7 +112,7 @@ object TrainManagers:
         findTrain(name)
           .map(_ =>
             TrainManager(trains.filterNot(_.name.contentEquals(name)))
-          ).toRight(TrainErrors.TrainNotExists(name))
+          )
 
       override def updateTrain(name: String)(
           technology: TrainTechnology,
@@ -127,5 +132,3 @@ object TrainManagers:
         yield ts
 
       override def wagonTypes: List[UseType] = UseType.values.toList
-
-      private def findTrain(name: String): Option[Train] = trains.find(_.name.contentEquals(name))
