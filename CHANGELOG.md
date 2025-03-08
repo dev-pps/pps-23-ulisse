@@ -112,8 +112,8 @@
 
 ### Features
 
-* implemented fsm train agent ([3409445](https://github.com/dev-pps/pps-23-ulisse/commit/340944508f5348d5c5190305297e367fdc7ab599))
-* init train agent behaviour ([2d65d13](https://github.com/dev-pps/pps-23-ulisse/commit/2d65d13b25f4ae0ac8d4355478226d32f1fe31c7))
+* implemented fsm train train ([3409445](https://github.com/dev-pps/pps-23-ulisse/commit/340944508f5348d5c5190305297e367fdc7ab599))
+* init train train behaviour ([2d65d13](https://github.com/dev-pps/pps-23-ulisse/commit/2d65d13b25f4ae0ac8d4355478226d32f1fe31c7))
 * separate file MotionData ([054ab4f](https://github.com/dev-pps/pps-23-ulisse/commit/054ab4f9e2572f48ef2c95e8d86e0e367acafcbe))
 * **TrainAgent:** calculate travelled distance given dt and departed from station ([e350d18](https://github.com/dev-pps/pps-23-ulisse/commit/e350d18d42d8c874eec6fe3b56f4e8db9c88e8a6))
 
@@ -239,7 +239,7 @@
 * create methods to update event queue ([ca4882a](https://github.com/dev-pps/pps-23-ulisse/commit/ca4882abb07863f4767bffddcec97d0328da0b6a))
 * init app state ([ac0e5a4](https://github.com/dev-pps/pps-23-ulisse/commit/ac0e5a4432e9dea1b20811bb1ca637dadedfb34a))
 * updated route service with new event queue ([c725a93](https://github.com/dev-pps/pps-23-ulisse/commit/c725a932950e3c0ee3c7eb5e2cb84d56c56e3410))
-* updated simulation info service with new event queue ([35f62bd](https://github.com/dev-pps/pps-23-ulisse/commit/35f62bdcf60902a416112f00a9b40f151b890e7e))
+* updated simulation trainInfo service with new event queue ([35f62bd](https://github.com/dev-pps/pps-23-ulisse/commit/35f62bdcf60902a416112f00a9b40f151b890e7e))
 * updated station service with new event queue ([0cbb2d0](https://github.com/dev-pps/pps-23-ulisse/commit/0cbb2d021bcf487f63eaec2b9d7cc23db690d676))
 * updated timetable and train service with new event queue ([9f39364](https://github.com/dev-pps/pps-23-ulisse/commit/9f3936453950da54dd0e72a086fd9dd9ee5d9257))
 

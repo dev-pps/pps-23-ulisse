@@ -13,12 +13,17 @@ import ulisse.infrastructures.view.page.forms.Form.BaseForm
 import ulisse.infrastructures.view.page.forms.SimulationForm.SimulationInfo
 import ulisse.entities.simulation.data.Statistics.*
 import ulisse.infrastructures.view.utils.ComponentUtils.*
+import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 import ulisse.entities.station.StationEnvironmentElement
+import ulisse.entities.station.StationEnvironmentElement.StationEnvironmentInfo
+import ulisse.entities.train.TrainAgents
+import ulisse.entities.train.TrainAgents.TrainAgentInfo
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, ShapeEffect}
 import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.map.MapSimulation.TrainMapElement
 import ulisse.utils.Times.*
 
+import java.awt.geom.Point2D
 import scala.swing.BorderPanel.Position
 import scala.swing.{Component, Orientation, Swing}
 
@@ -38,13 +43,13 @@ trait SimulationForm extends Form:
   def showSimulationData(info: SimulationData): Unit
 
   /** Shows the station simulation. */
-  def showStationSimulation(station: StationEnvironmentElement): Unit
+  def showStationSimulation(station: StationEnvironmentInfo): Unit
 
   /** Shows the route simulation. */
   def showRouteSimulation(route: RouteEnvironmentElement): Unit
 
   /** Shows the train simulation. */
-  def showTrainSimulation(train: TrainMapElement): Unit
+  def showTrainSimulation(train: TrainAgentInfo, position: Point2D.Double): Unit
 
 /** Companion object of the [[SimulationForm]]. */
 object SimulationForm:
@@ -71,16 +76,25 @@ object SimulationForm:
   /** Represents the take station event. */
   final case class TakeStationEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[StationEnvironmentElement]]:
-    override def onClick(data: MapElement[StationEnvironmentElement]): Unit = form.showStationSimulation(data.element)
+    override def onClick(data: MapElement[StationEnvironmentElement]): Unit =
+      infoSimulation.stationInfo(data.element).onComplete(_.fold(
+        println,
+        station => station.foreach(form.showStationSimulation)
+      ))
 
   /** Represents the take route event. */
   final case class TakeRouteEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[RouteEnvironmentElement]]:
-    override def onClick(data: MapElement[RouteEnvironmentElement]): Unit = form.showRouteSimulation(data.element)
+    override def onClick(data: MapElement[RouteEnvironmentElement]): Unit =
+      form.showRouteSimulation(data.element)
 
   final case class TakeTrainEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[TrainMapElement]]:
-    override def onClick(data: MapElement[TrainMapElement]): Unit = form.showTrainSimulation(data.element)
+    override def onClick(data: MapElement[TrainMapElement]): Unit =
+      infoSimulation.trainInfo(data.element.train).onComplete(_.fold(
+        println,
+        train => train.foreach(form.showTrainSimulation(_, data.element.position))
+      ))
 
   private case class SimulationFormImpl() extends SimulationForm:
     private val mainPanel: SBorderPanel                     = SBorderPanel()
@@ -137,28 +151,28 @@ object SimulationForm:
          \nSTATION LOAD: ${info.simulationEnvironment.percStationsLoad} %"""
       infoArea.setText(infoStr)
 
-    override def showStationSimulation(statio: StationEnvironmentElement): Unit =
-      val infoStr = s"""STATION SIMULATION:
-             \nSTATION NAME: 
-             \nSTATION COORDINATES: 
-             \nSTATION TRACKS: """
+    override def showStationSimulation(station: StationEnvironmentInfo): Unit =
+      val StationEnvironmentInfo(env, cumulativeDelay, averageDelay) = station
+
+      val infoStr = s"""STATION [${env.name}]:
+             \nTrains: ${env.trains.size} / ${env.numberOfPlatforms}
+             \nCumulative Delay: $cumulativeDelay
+             \nAverage Delay: $averageDelay """
       elementInfoArea.setText(infoStr)
 
     override def showRouteSimulation(route: RouteEnvironmentElement): Unit =
-      val infoStr = s"""ROUTE SIMULATION:
-                 \nROUTE NAME: 
-                 \nROUTE DEPARTURE: 
-                 \nROUTE ARRIVAL: 
-                 \nROUTE DISTANCE: 
-                 \nROUTE DURATION: """
+      val infoStr = s"""ROUTE:
+                 \nStations: ${route.departure.name} - ${route.arrival.name}
+                 \nTrains: ${route.trains.size}
+                 \nType: ${route.typology}"""
       elementInfoArea.setText(infoStr)
 
-    override def showTrainSimulation(train: TrainMapElement): Unit =
-      val infoStr = s"""TRAIN SIMULATION:
-                     \nTRAIN NAME: 
-                     \nTRAIN POSITION: 
-                     \nTRAIN SPEED: 
-                     \nTRAIN DIRECTION: """
+    override def showTrainSimulation(trainInfo: TrainAgentInfo, position: Point2D.Double): Unit =
+      val infoStr = s"""TRAIN [${trainInfo.train.name}]:
+                     \nName: ${trainInfo.delayInCurrentTimetable.getOrElse("No Timetable")}
+                     \nPosition: ${position.x} - ${position.y}
+                     \nDistance Travelled: ${trainInfo.train.distanceTravelled}
+                     \nSpeed: ${trainInfo.train.state.motionData.speed}"""
       elementInfoArea.setText(infoStr)
 
     override def component[T >: Component]: T = mainPanel
