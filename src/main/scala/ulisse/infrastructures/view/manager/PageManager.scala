@@ -60,6 +60,7 @@ object PageManager:
     dashboard.attachSimulation(SimulationButtonEvents(this))
     dashboard.attachMap(MapButtonEvents(this))
     dashboard.attachTrain(TrainButtonEvents(this))
+    mainPanel.revalidate()
 
     export mainPanel.revalidate
 
