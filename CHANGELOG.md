@@ -1,3 +1,13 @@
+## [1.32.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.31.0...v1.32.0) (2025-03-08)
+
+### Features
+
+* **StationService:** notify timetables on update/remove ([8f4cfe1](https://github.com/dev-pps/pps-23-ulisse/commit/8f4cfe12330a748725e947567540d46d37ca057c))
+
+### Bug Fixes
+
+* **SimulationManager:** send end update with old data ([51b1cd6](https://github.com/dev-pps/pps-23-ulisse/commit/51b1cd6fee882e7b78a7cfa2752e7b6c0726db28))
+
 ## [1.31.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.30.0...v1.31.0) (2025-03-07)
 
 ### Features
