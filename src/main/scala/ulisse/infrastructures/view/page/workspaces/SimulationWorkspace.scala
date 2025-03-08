@@ -28,10 +28,13 @@ object SimulationWorkspace:
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(simulation.component) = Position.East
 
-
+    simulation.attachStartSimulation(SimulationForm.PlaySimulationEvent(simulationAdapter))
+    simulation.attachResetSimulation(SimulationForm.ResetSimulationEvent(simulationAdapter))
 
     export workspace.{component, revalidate}
 
-    override def updateData(data: SimulationData): Unit = ()
+    override def updateData(data: SimulationData): Unit =
+      println("Updating simulation data:")
 
-    override def endSimulation(data: SimulationData): Unit = ()
+    override def endSimulation(data: SimulationData): Unit =
+      println("Ending simulation:")
