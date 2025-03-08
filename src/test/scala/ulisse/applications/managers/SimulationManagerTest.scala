@@ -11,15 +11,14 @@ import ulisse.Utils.MatchersUtils.shouldBeBoolean
 import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
 import ulisse.dsl.comparison.FieldsComparators.compareTo
 import ulisse.entities.simulation.data.Engine.*
-import ulisse.entities.simulation.data.Engine.EngineField.{Configuration, State}
+import ulisse.entities.simulation.data.Engine.EngineField.State
 import ulisse.entities.simulation.data.EngineConfiguration.{defaultBatch, defaultStepSize}
-import ulisse.entities.simulation.data.EngineState.EngineStateField.{ElapsedCycleTime, LastDelta, LastUpdate}
+import ulisse.entities.simulation.data.EngineState.EngineStateField.{ElapsedCycleTime, LastUpdate}
 import ulisse.entities.simulation.data.SimulationData.SimulationDataField.SimulationEnvironment
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.timetable.DynamicTimetableTest.dynamicTimetable1
-import ulisse.utils.Times.Time
 
 class SimulationManagerTest extends AnyWordSpec with Matchers with BeforeAndAfterEach:
   private val timeProvider  = mock[UtilityPorts.Output.TimeProviderPort]

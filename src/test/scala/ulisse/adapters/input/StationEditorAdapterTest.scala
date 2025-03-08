@@ -1,28 +1,22 @@
 package ulisse.adapters.input
 
 import cats.data.{Chain, NonEmptyChain}
-import org.mockito.Mockito.{spy, when}
+import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.Runner.runAll
-import ulisse.adapters.input.StationEditorAdapter
 import ulisse.adapters.input.StationEditorAdapter.StationCreationInfo
-import ulisse.applications.AppState
 import ulisse.applications.managers.StationManager
 import ulisse.applications.ports.StationPorts
-import ulisse.applications.useCases.StationService
 import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
 import ulisse.utils.Errors.BaseError
 
-import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 class StationEditorAdapterTest extends AnyWordSpec with Matchers:
-
   private val stationName   = "New Station"
   private val x             = 1
   private val y             = 1

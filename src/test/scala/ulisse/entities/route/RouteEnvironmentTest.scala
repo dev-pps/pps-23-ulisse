@@ -1,18 +1,15 @@
 package ulisse.entities.route
 
-import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar.mock
+import ulisse.Utils.TestUtility.getOrFail
 import ulisse.entities.route.RouteEnvironmentElementTest.{makeRouteEE, normalRouteAB_EE, routeAB_EE, routeBC_EE}
+import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationData
 import ulisse.entities.station.StationEnvironmentElementTest.{stationA_EE, stationB_EE, stationC_EE}
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906}
-import ulisse.Utils.TestUtility.getOrFail
-import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
 
 class RouteEnvironmentTest extends AnyWordSpec with Matchers:
-
   private val routeABTuple           = (stationA_EE, stationB_EE)
   private val routeAB_EE_Single_Slow = makeRouteEE(normalRouteAB_EE.withRailsCount(1).getOrFail)
   private val routeAB_EE_Single      = makeRouteEE(routeAB_EE.withRailsCount(1).getOrFail)

@@ -8,13 +8,13 @@ import ulisse.utils.Times.Time
 
 /** Defines a station for simulation. */
 trait StationEnvironmentElement extends Station with TrainAgentEEWrapper[StationEnvironmentElement]:
-  /** Type of the TrainAgentsContainer */
+  /** Type of the TrainAgentsContainer. */
   type TAC = Platform
 
-  /** Try to put train inside a platform given the desired direction */
+  /** Try to put train inside a platform given the desired direction. */
   def putTrain(train: TrainAgent): Option[StationEnvironmentElement]
 
-  /** Check if the station is available for a train to be put in */
+  /** Check if the station is available for a train to be put in. */
   def isAvailable: Boolean = containers.exists(_.isAvailable)
 
 /** Factory for [[StationEnvironmentElement]] instances. */

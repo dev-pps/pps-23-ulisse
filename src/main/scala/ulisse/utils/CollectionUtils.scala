@@ -1,12 +1,10 @@
 package ulisse.utils
 
-import cats.data.{State, StateT}
 import cats.syntax.all.*
-import cats.{Functor, Id, Monad, Traverse}
+import cats.{Id, Monad, Traverse}
 
 /** Defines utility methods for collections. */
 object CollectionUtils:
-
   private def wrappedUpdate[A](update: A => A)(in: A): Id[A] = Id(update(in))
 
   extension [F[_]: Traverse, A](collection: F[A])
@@ -18,7 +16,7 @@ object CollectionUtils:
     def swapWhen(condition: A => Boolean)(element: A): F[A] =
       collection.updateWhen(condition)(_ => element)
 
-    /** Update all elements in the collection that are equal to the given element */
+    /** Update all elements in the collection that are equal to the given element. */
     def swapWhenEq(find: A)(replace: A): F[A] =
       collection.updateWhen(_ == find)(_ => replace)
 

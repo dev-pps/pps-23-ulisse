@@ -8,25 +8,25 @@ import ulisse.entities.train.Trains.Train
 import ulisse.utils.CollectionUtils.updateWhenWithEffects
 import ulisse.utils.Times.Time
 
-/** Configuration data for the simulation */
+/** Configuration data for the simulation. */
 trait ConfigurationData:
-  /** Configured stations for the simulation */
+  /** Configured stations for the simulation. */
   def stations: Seq[StationEnvironmentElement]
 
-  /** Configured routes for the simulation, they are distinct and sorted by the best technology */
+  /** Configured routes for the simulation, they are distinct and sorted by the best technology. */
   def routes: Seq[RouteEnvironmentElement]
 
-  /** Configured timetables for the simulation, they are divided by train and sorted by departure time. Note: trains that haven't a timetable are removed, trains with conflict on initial state are */
+  /** Configured timetables for the simulation, they are divided by train and sorted by departure time. Note: trains that haven't a timetable are removed, trains with conflict on initial state are. */
   def timetablesByTrain: Map[Train, Seq[DynamicTimetable]]
 
-/** Factory for [[ConfigurationData]] instances */
+/** Factory for [[ConfigurationData]] instances. */
 object ConfigurationData:
 
   /** Create a new ConfigurationData considering:
     * - distinct station and with train placed respective to initial state derived from timetables
     * - distinct routes sorted by the best technology
-    * - timetables divided by train and sorted by departure time
-    * NOTE: trains that haven't a timetable are removed, trains with conflict on initial state are removed with all their timetables
+    * - timetables divided by train and sorted by departure time.
+    * NOTE: trains that haven't a timetable are removed, trains with conflict on initial state are removed with all their timetables.
     */
   def apply(
       stations: Seq[StationEnvironmentElement],
@@ -45,19 +45,19 @@ object ConfigurationData:
       sortedTimetables
     )
 
-  /** Create an empty ConfigurationData */
+  /** Create an empty ConfigurationData. */
   def empty(): ConfigurationData =
     ConfigurationDataImpl(Seq.empty, Seq.empty, Map.empty)
 
   extension (configurationData: ConfigurationData)
-    /** Get all the trains in the configuration */
+    /** Get all the trains in the configuration. */
     def trains: List[TrainAgent] =
       (configurationData.stations.collectTrains ++ configurationData.routes.collectTrains).toList
 
-    /** Get all the timetables in the configuration */
+    /** Get all the timetables in the configuration. */
     def timetables: Seq[DynamicTimetable] = configurationData.timetablesByTrain.values.flatten.toSeq
 
-    /** Get the min departure time of the timetables or if no timetable is present returns Time(0,0,0) */
+    /** Get the min departure time of the timetables or if no timetable is present returns Time(0,0,0). */
     def departureTime: Time =
       if configurationData.timetables.isEmpty then Time(0, 0, 0)
       else

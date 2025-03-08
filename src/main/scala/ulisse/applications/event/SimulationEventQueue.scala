@@ -6,7 +6,6 @@ import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
-import ulisse.entities.simulation.data.SimulationData
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -19,7 +18,7 @@ trait SimulationEventQueue:
   /** Add an event to set up a simulationManager. */
   def addSetupSimulationManagerEvent(update: SimulationManagers => SimulationManager): Unit
 
-  /** Add an event to update the simulationManager */
+  /** Add an event to update the simulationManager. */
   def addUpdateSimulationManagerEvent(update: SimulationManager => SimulationManager): Unit
 
 /** Companion object for the [[SimulationEventQueue]] trait. */

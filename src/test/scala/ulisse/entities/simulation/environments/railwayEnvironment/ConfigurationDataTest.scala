@@ -1,19 +1,15 @@
 package ulisse.entities.simulation.environments.railwayEnvironment
 
-import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Utils.TestUtility.getOrFail
-import ulisse.entities.Coordinate
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.RouteEnvironmentElementTest.*
-import ulisse.entities.route.Routes.RouteType.AV
-import ulisse.entities.route.Routes.{Route, RouteType}
+import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.*
-import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.station.StationEnvironmentElementTest.*
 import ulisse.entities.station.StationTest.{stationA, stationB, stationC, stationD}
+import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetableTest.{
   dynamicTimetable1,
   dynamicTimetable2,
@@ -21,12 +17,9 @@ import ulisse.entities.timetable.DynamicTimetableTest.{
   dynamicTimetable4
 }
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
-import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.entities.train.TrainAgentTest.*
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons.{UseType, Wagon}
-import ulisse.utils.Times.FluentDeclaration.h
+import ulisse.entities.train.Trains.Train
 import ulisse.utils.Times.Time
 
 object ConfigurationDataTest:

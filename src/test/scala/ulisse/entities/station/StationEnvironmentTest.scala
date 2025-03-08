@@ -1,15 +1,13 @@
 package ulisse.entities.station
 
-import org.mockito.Mockito.{spy, when}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationData
-import ulisse.entities.station.StationEnvironmentElementTest.{stationA_EE, stationB_EE, stationC_EE}
+import ulisse.entities.station.StationEnvironmentElementTest.{stationA_EE, stationC_EE}
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906, trainAgent3907}
 
 class StationEnvironmentTest extends AnyWordSpec with Matchers:
-
   private val stations                        = Seq(stationA_EE)
   private val configurationData               = ConfigurationData(stations, Seq(), Seq(), Seq())
   private val stationEnvironment              = StationEnvironment(configurationData)

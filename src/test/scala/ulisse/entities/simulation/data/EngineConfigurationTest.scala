@@ -5,7 +5,6 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.simulation.data.EngineConfiguration.{defaultCyclesPerSecond, defaultStepSize}
 
 class EngineConfigurationTest extends AnyWordSpec with Matchers:
-
   private val stepSize            = 10
   private val cyclesPerSecond     = 2
   private val engineConfiguration = EngineConfiguration(stepSize, Some(cyclesPerSecond))

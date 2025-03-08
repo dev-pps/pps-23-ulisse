@@ -5,8 +5,9 @@ import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
 import ulisse.entities.train.TrainAgents.*
-object PerceptionProvider:
 
+/** Perception Providers for RailwayEnvironment. */
+object PerceptionProviders:
   private def trainPerceptionInStation(train: TrainAgent, env: RailwayEnvironment): TrainStationInfo =
     val trainStationInfo =
       for
@@ -38,7 +39,7 @@ object PerceptionProvider:
       yield arrivalStation.isAvailable
     TrainRouteInfo(route.typology, route.length, trainAheadDistance, arrivalStationIsFree.getOrElse(false))
 
-  /** Provide perception for TrainAgent in RailwayEnvironment */
+  /** Provide perception for TrainAgent in RailwayEnvironment. */
   given PerceptionProvider[RailwayEnvironment, TrainAgent] with
     type P = TrainAgentPerception[?]
     def perceptionFor(env: RailwayEnvironment, agent: TrainAgent): Option[P] =

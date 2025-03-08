@@ -1,7 +1,6 @@
 package ulisse.applications.useCases
 
 import cats.data.Chain
-import org.junit.jupiter.api.BeforeEach
 import org.mockito.Mockito.{reset, verify, verifyNoInteractions, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
@@ -12,20 +11,16 @@ import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.{AppState, EventQueue}
-import ulisse.entities.Coordinate
-import ulisse.entities.Coordinate.*
 import ulisse.entities.route.RouteEnvironmentElementTest.{routeAB, routeBC, routeCD, routeDE}
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationTest.{stationA, stationB}
 
-import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.Right
 
 class StationServiceTest extends AnyWordSpec with Matchers with BeforeAndAfterEach:
-
   private val mockedTimetableManager = mock[TimetableManager]
   private val mockedRouteManager     = mock[RouteManager]
   private val newMockedRouteManager  = mock[RouteManager]

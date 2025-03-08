@@ -5,14 +5,12 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.applications.ports.SimulationPorts
-import ulisse.applications.useCases.SimulationService
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 class SimulationPageAdapterTest extends AnyWordSpec with Matchers:
-
   private val mockedPort            = mock[SimulationPorts.Input]
   private val simulationPageAdapter = SimulationPageAdapter(mockedPort)
   private val defaultEngineState    = Engine.empty()

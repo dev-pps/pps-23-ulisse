@@ -2,22 +2,16 @@ package ulisse.entities.timetable
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import ulisse.entities.Coordinate
-import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationTest.{stationA, stationB, stationC, stationD}
 import ulisse.entities.timetable.DynamicTimetableTest.*
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.timetable.TestMockedEntities.railAV_10
-import ulisse.entities.timetable.Timetables.{RailInfo, StationTime, Timetable, TimetableBuilder}
+import ulisse.entities.timetable.Timetables.{Timetable, TimetableBuilder}
 import ulisse.entities.train.TrainAgentTest.*
-import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons.{UseType, Wagon}
+import ulisse.entities.train.Trains.Train
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.{ClockTime, Time}
-
-import scala.collection.immutable.ListMap
 
 object DynamicTimetableTest:
   val timetable1: Timetable = defaultTimeTable(train3905)
@@ -59,7 +53,6 @@ object DynamicTimetableTest:
     def listify: Option[List[Station]] = r.map(t => List(t._1, t._2))
 
 class DynamicTimetableTest extends AnyWordSpec with Matchers:
-
   extension (dtt: DynamicTimetable)
     def travel(nStations: Int, delay: Option[ClockTime]): Option[DynamicTimetable] =
       (0 until nStations).foldLeft(Option(dtt)) { (dtt, _) =>

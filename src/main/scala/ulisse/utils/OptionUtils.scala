@@ -1,7 +1,5 @@
 package ulisse.utils
 
-import cats.Functor
-
 /** Defines utility methods for `Option` objects. */
 object OptionUtils:
   extension [A](optionalResult: => A)

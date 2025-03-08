@@ -8,37 +8,36 @@ import scala.util.chaining.scalaUtilChainingOps
 
 /** Manager for the simulation. */
 trait SimulationManager:
-  /** Engine of the simulation */
+  /** Engine of the simulation. */
   def engine: Engine
 
-  /** Data of the simulation */
+  /** Data of the simulation. */
   def simulationData: SimulationData
 
-  /** Set up the engine of the simulation */
+  /** Set up the engine of the simulation. */
   def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Option[SimulationManager]
 
-  /** Set up the environment of the simulation */
+  /** Set up the environment of the simulation. */
   def setupEnvironment(environment: RailwayEnvironment): SimulationManager
 
-  /** Start the simulation */
+  /** Start the simulation. */
   def start(): SimulationManager
 
-  /** Stop the simulation */
+  /** Stop the simulation. */
   def stop(): SimulationManager
 
-  /** Reset the simulation */
+  /** Reset the simulation. */
   def reset(): SimulationManager
 
-  /** Perform a step of the simulation */
+  /** Perform a step of the simulation. */
   def doStep(): SimulationManager
 
-  /** Set the notification service */
+  /** Set the notification service. */
   def withNotificationService(notificationService: Option[SimulationPorts.Output]): SimulationManager
 
 /** Factory for [[SimulationManager]] instances. */
 object SimulationManager:
-
-  /** Create a new simulation manager */
+  /** Create a new simulation manager. */
   def apply(
       notificationService: Option[SimulationPorts.Output],
       timeProvider: UtilityPorts.Output.TimeProviderPort,
@@ -51,19 +50,19 @@ object SimulationManager:
       timeProvider
     )
 
-  /** Create a new simulation manager with the given configuration */
+  /** Create a new simulation manager with the given configuration. */
   def configuredManager(
       timeProvider: UtilityPorts.Output.TimeProviderPort,
       engineConfiguration: EngineConfiguration
   ): SimulationManager =
     SimulationManager(None, timeProvider, engineConfiguration)
 
-  /** Create a new simulation manager with the default timed configuration */
+  /** Create a new simulation manager with the default timed configuration. */
   def defaultTimedManager(
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ): SimulationManager = SimulationManager(None, timeProvider, EngineConfiguration.defaultTimed())
 
-  /** Create a new simulation manager with the default batch configuration */
+  /** Create a new simulation manager with the default batch configuration. */
   def defaultBatchManager(
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ): SimulationManager = SimulationManager(None, timeProvider, EngineConfiguration.defaultBatch())

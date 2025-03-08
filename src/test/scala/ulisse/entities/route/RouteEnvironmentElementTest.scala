@@ -4,9 +4,6 @@ import org.scalatest.Assertions.fail
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.Utils.TestUtility.getOrFail
-import ulisse.applications.managers.RouteManagerTest.validateRoute
-import ulisse.entities.Technology
-import ulisse.entities.route.RouteEnvironmentElement.*
 import ulisse.entities.route.RouteEnvironmentElementTest.{
   defaultDirection,
   minPermittedDistanceBetweenTrains,
@@ -16,13 +13,11 @@ import ulisse.entities.route.RouteEnvironmentElementTest.{
 import ulisse.entities.route.RouteTest.*
 import ulisse.entities.route.Routes.RouteType.{AV, Normal}
 import ulisse.entities.route.Routes.{Route, RouteType}
-import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
+import ulisse.entities.route.Tracks.TrackDirection.Forward
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationTest.*
 import ulisse.entities.train.TrainAgentTest.*
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 object RouteEnvironmentElementTest:
   given minPermittedDistanceBetweenTrains: Double = 100.0

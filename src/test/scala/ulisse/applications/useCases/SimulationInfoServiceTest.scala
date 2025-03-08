@@ -4,12 +4,10 @@ import cats.Id
 import org.mockito.Mockito.{spy, when}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
 import ulisse.applications.{AppState, EventQueue}
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.RouteEnvironmentElementTest.{routeAB, routeAB_EE, routeBC}
-import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
 import ulisse.entities.station.Station
 import ulisse.entities.station.StationEnvironmentElement.StationEnvironmentInfo

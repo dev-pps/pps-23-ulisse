@@ -9,7 +9,6 @@ import ulisse.entities.simulation.environments.EnvironmentElements.{TrainAgentEE
 import ulisse.entities.train.TrainAgents.TrainAgent
 
 class EnvironmentElementsTest extends AnyWordSpec with Matchers:
-
   trait TestTrainAgentsContainer extends TrainAgentsContainer[TestTrainAgentsContainer]
 
   "TrainAgentsContainer" when:

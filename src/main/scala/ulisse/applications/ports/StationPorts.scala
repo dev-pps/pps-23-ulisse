@@ -12,7 +12,6 @@ import scala.concurrent.Future
 object StationPorts:
   /** Input operations for interacting with a `StationManager`. */
   trait Input:
-
     /** The type representing the collection of stations. */
     type SM = StationManager#StationMapType
 

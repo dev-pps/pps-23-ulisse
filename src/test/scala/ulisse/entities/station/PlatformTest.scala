@@ -1,14 +1,11 @@
 package ulisse.entities.station
 
-import cats.data.{Chain, NonEmptyChain}
+import cats.data.Chain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentsContainer
 import ulisse.entities.station.Platform.minPlatformId
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906}
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 class PlatformTest extends AnyWordSpec with Matchers:
   private val id       = 1

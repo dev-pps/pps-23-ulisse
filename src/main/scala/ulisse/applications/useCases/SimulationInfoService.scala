@@ -13,9 +13,8 @@ import ulisse.entities.train.Trains.Train
 
 import scala.concurrent.{Future, Promise}
 
-/** Service for simulation info */
+/** Service for simulation info. */
 final case class SimulationInfoService(private val eventQueue: SimulationEventQueue) extends SimulationInfoPorts.Input:
-
   override def stationInfo(s: Station): Future[Option[StationEnvironmentInfo]] =
     val p = Promise[Option[StationEnvironmentInfo]]
     eventQueue.addReadSimulationEnvironmentEvent(env =>

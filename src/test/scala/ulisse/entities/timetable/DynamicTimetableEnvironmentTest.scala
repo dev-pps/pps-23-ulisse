@@ -2,10 +2,7 @@ package ulisse.entities.timetable
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.{
-  complexConfigurationData,
-  trainAgents
-}
+import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.complexConfigurationData
 import ulisse.entities.timetable.DynamicTimetableTest.dynamicTimetable1
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3907}
 import ulisse.utils.Times.{ClockTime, Time}

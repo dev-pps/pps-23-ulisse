@@ -8,7 +8,6 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.jdk.CollectionConverters.*
 
 object Runner:
-
   /** Processes a queue of state transformation functions and computes the sequence of states.
     *
     * This function starts with an initial state and applies each function from the provided `LinkedBlockingQueue` in
@@ -20,7 +19,6 @@ object Runner:
     elements.asScala.toList.scanLeft(initialState)((state, event) => event(state))
 
 class RunnerTest extends AnyWordSpec with Matchers:
-
   "runAll" should:
     "return just the initial state when the queue is empty" in:
       val queue = LinkedBlockingQueue[String => String]()
