@@ -54,11 +54,15 @@ final case class TimetableService(eventQueue: TimeTableEventQueue) extends Timet
         timetables: Seq[Timetable]
     ): Either[UnavailableTracks, List[(Route, WaitingTime)]] =
       val occupiedTracks =
-        timetables.filter(t => t.startStation.name == station.name && t.departureTime == departureTime)
+        timetables.filter(t => t.startStation == station && t.departureTime == departureTime)
       Either.cond(occupiedTracks.sizeIs < station.numberOfPlatforms, routesWaiting, UnavailableTracks(station.name))
 
   /** Given `trainName`, `departureTime` and stations with its waitingTime a new Timetable should be saved.
-    * Returns a `TimetableServiceErrors` in case of error during creation.
+    * Returns a `TimetableServiceErrors` in case of error during creation:
+    *
+    * - [[InvalidStation]] in case some station not found or duplicated
+    * - [[UnavailableTracks]] if a station have no free tracks to accept train
+    * - [[GenericError]] in any other cases
     */
   def createTimetable(
       trainName: String,
@@ -66,34 +70,30 @@ final case class TimetableService(eventQueue: TimeTableEventQueue) extends Timet
       stations: List[(StationId, WaitingTime)]
   ): Future[RequestResult] =
     eventQueue.updateWith: (managers, promise) =>
-      val (stationManager, routeManager, trainManager, timetableManager) = managers
-      val savedRoutes: List[Route]                                       = routeManager.routes
-      val savedTrains                                                    = trainManager.trains
-      val savedTimetables                                                = timetableManager.tables
+      val (_, routeManager, trainManager, timetableManager) = managers
+      val savedRoutes: List[Route]                          = routeManager.routes
+      val savedTrains                                       = trainManager.trains
+      val savedTimetables                                   = timetableManager.tables
       for
-        timetable     <- buildTimetable(trainName, departureTime, stations)(savedTrains, savedRoutes, savedTimetables)
-        newManager    <- timetableManager.save(timetable)
+        train         <- savedTrains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
+        routesWaiting <- stations.toRoutes(savedRoutes)
+        startFrom     <- routesWaiting.headOption.toRight(InvalidStation("start station not found"))
+        _             <- routesWaiting.checkAvailableTracks(startFrom._1.departure, departureTime, savedTimetables)
+        arriveTo      <- routesWaiting.lastOption.toRight(InvalidStation("arriving station not found"))
+        newManager    <- timetableManager.save(buildTimetable(train, startFrom, arriveTo, departureTime, routesWaiting))
         updatedTables <- newManager.tablesOf(trainName)
       yield
         promise.success(Right(updatedTables))
         newManager
 
   private def buildTimetable(
-      trainName: String,
+      train: Train,
+      startFrom: (Route, WaitingTime),
+      arriveTo: (Route, WaitingTime),
       departureTime: ClockTime,
-      usrStations: List[(StationId, WaitingTime)]
-  )(
-      trains: List[Train],
-      routes: List[Route],
-      timetables: Seq[Timetable]
-  ): Either[BaseError, Timetable] =
-    for
-      train         <- trains.find(_.name == trainName).toRight(GenericError(s"Train $trainName not found"))
-      routesWaiting <- usrStations.toRoutes(routes)
-      startFrom     <- routesWaiting.headOption.toRight(InvalidStation("start station not found"))
-      _             <- routesWaiting.checkAvailableTracks(startFrom._1.departure, departureTime, timetables)
-      arriveTo      <- routesWaiting.lastOption.toRight(InvalidStation("arriving station not found"))
-    yield routesWaiting.foldLeft(TimetableBuilder(train, startFrom._1.departure, departureTime)) {
+      routesWaiting: List[(Route, WaitingTime)]
+  ): Timetable =
+    routesWaiting.foldLeft(TimetableBuilder(train, startFrom._1.departure, departureTime)) {
       case (timetable, (route, Some(waitTime))) =>
         timetable.stopsIn(route.arrival, waitTime)(RailInfo(route.length, route.typology))
       case (timetable, (route, None)) => timetable.transitIn(route.arrival)(RailInfo(route.length, route.typology))
@@ -120,13 +120,18 @@ final case class TimetableService(eventQueue: TimeTableEventQueue) extends Timet
     promise.future
 
   extension (error: BaseError)
-    /** Returns `TimetableServiceErrors` starting from any error that is a `BaseError` errors. */
+    /** Returns `TimetableServiceErrors` starting from any error that is a `BaseError` errors.
+      *
+      * Convert manager errors to the service one.
+      */
     private def toServiceError: TimetableServiceErrors =
       error match
         case TimetableManagerErrors.AcceptanceError(reason)      => OverlapError(reason)
         case TimetableManagerErrors.TimetableNotFound(trainName) => TrainTablesNotExist(trainName)
-        case e: TimetableServiceErrors                           => e
-        case _                                                   => GenericError("Unknown error")
+        case TimetableManagerErrors.DuplicatedStations(stationList) =>
+          InvalidStation(s"duplicated stations: $stationList")
+        case e: TimetableServiceErrors => e
+        case _                         => GenericError("Unknown error")
 
   extension (eventQueue: TimeTableEventQueue)
     private def updateWith(f: (
