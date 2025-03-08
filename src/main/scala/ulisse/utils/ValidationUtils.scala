@@ -48,4 +48,7 @@ object ValidationUtils:
       f.map(value.cond).traverse(_.toValidatedNec).map(_ => value).toEither
 
   extension [A <: ErrorMessage](chainErrors: NonEmptyChain[A])
-    def mkStringErrors: String = chainErrors.toList.map(_.msg).mkString(", ")
+    def mkMsgErrors: String = chainErrors.toList.map(_.msg).mkString(", ")
+
+  extension [A <: BaseError](chainErrors: NonEmptyChain[A])
+    def mkErrors: String = chainErrors.toList.map(e => s"$e").mkString(", ")

@@ -103,7 +103,6 @@ object SimulationForm:
     private val playButton  = ExtendedSwing createFormButtonWith ("Play", Styles.formButtonRect)
     private val resetButton = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
     private val form        = BaseForm("Simulation", stepSize, cyclePerSecond)
-    private val space       = 10
 
     private val infoArea        = ExtendedSwing.STextArea()
     private val elementInfoArea = ExtendedSwing.STextArea()
