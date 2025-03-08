@@ -35,11 +35,11 @@ object Form:
     private val insertForm: ComposedSwing.JInsertForm = ComposedSwing.createInsertForm(title, fields: _*)
     private val space                                 = 10
 
-    private val boxPanel                      = ExtendedSwing.SBoxPanel(Orientation.Vertical)
-    private val label                         = ExtendedSwing.SLabel("")
+    private val boxPanel                      = ExtendedSwing SBoxPanel Orientation.Vertical
+    private val errorLabel                    = ExtendedSwing SLabel ""
     val buttonPanel: ExtendedSwing.SFlowPanel = ExtendedSwing.SFlowPanel()
 
-    boxPanel.contents += label
+    boxPanel.contents += errorLabel
     boxPanel.contents += buttonPanel
 
     mainPanel.rect = Styles.panelRect
@@ -50,7 +50,7 @@ object Form:
     mainPanel.contents += insertForm.component
     mainPanel.contents += boxPanel
 
-    def showErrorMessage(message: String): Unit = label.text = message
+    def showErrorMessage(message: String): Unit = errorLabel.text = message
 
     def component[T >: Component]: T = mainPanel
 

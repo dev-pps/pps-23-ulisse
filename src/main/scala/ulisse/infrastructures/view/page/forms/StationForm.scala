@@ -12,8 +12,10 @@ import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.page.forms.Form.{BaseForm, CleanFormEvent}
 import ulisse.infrastructures.view.page.workspaces.MapWorkspace
+import ulisse.infrastructures.view.utils.ComponentUtils.*
 import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 
+import scala.swing.{Orientation, Swing}
 import scala.swing.event.MouseEvent
 
 /** Represents the station form of the application. */
@@ -106,22 +108,26 @@ object StationForm:
     override val yField: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "y"
     override val tracks: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Tracks"
 
-    private val cleanButton  = ExtendedSwing createFormButtonWith ("Clean", Styles.formButtonRect)
+    private val layoutButton = ExtendedSwing.SBoxPanel(Orientation.Vertical).transparent()
+    private val controlPanel = ExtendedSwing.SFlowPanel().transparent()
     private val saveButton   = ExtendedSwing createFormButtonWith ("Save", Styles.formTrueButtonRect)
     private val deleteButton = ExtendedSwing createFormButtonWith ("Delete", Styles.formFalseButtonRect)
+    private val resetButton  = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
+    private val form         = BaseForm("Station", name, xField, yField, tracks)
 
-    private val form = BaseForm("Station", name, xField, yField, tracks)
-
-    private val creationObservable = Observers.createObservable[StationCreationInfo]
-    private val deletionObservable = Observers.createObservable[StationCreationInfo]
-
+    private val creationObservable                = Observers.createObservable[StationCreationInfo]
+    private val deletionObservable                = Observers.createObservable[StationCreationInfo]
     private var _selectedStation: Option[Station] = Option.empty
 
-    buttonPanel.contents += saveButton
-    buttonPanel.contents += cleanButton
-    buttonPanel.contents += deleteButton
+    controlPanel.hGap = 10
+    controlPanel.contents += saveButton
+    controlPanel.contents += deleteButton
+    layoutButton.contents += controlPanel
+    layoutButton.contents += Swing.VStrut(10)
+    layoutButton.contents += resetButton.centerHorizontally()
+    buttonPanel.contents += layoutButton
 
-    cleanButton attachClick CleanFormEvent(this)
+    resetButton attachClick CleanFormEvent(this)
 
     saveButton attach (creationObservable toObserver (_ =>
       StationCreationInfo(name.text, xField.text, yField.text, tracks.text)
