@@ -32,16 +32,18 @@ object RouteService:
 
     override def modify(oldRoute: Route, newRoute: Route): Future[Either[Errors, List[Route]]] =
       val promise = Promise[Either[Errors, List[Route]]]()
-      eventQueue addUpdateRouteEvent ((stationManager, routeManager) => {
-        val updatedManager = routeManager modify (oldRoute, newRoute)
-        (stationManager, Services updateManager (promise, routeManager, updatedManager, _.routes))
+      eventQueue addUpdateRouteEvent ((stationManager, routeManager, timetable) => {
+        val updatedManager  = routeManager modify (oldRoute, newRoute)
+        val updateTimeTable = (timetable routeUpdated (oldRoute, newRoute)).toOption.getOrElse(timetable)
+        (stationManager, Services updateManager (promise, routeManager, updatedManager, _.routes), updateTimeTable)
       })
       promise.future
 
     override def delete(route: Route): Future[Either[Errors, List[Route]]] =
       val promise = Promise[Either[Errors, List[Route]]]()
       eventQueue addDeleteRouteEvent ((routeManager, timetableManager) => {
-        val updatedManager = routeManager delete route
+        val updatedManager  = routeManager delete route
+        val updateTimetable = timetableManager routeDeleted route
         (Services updateManager (promise, routeManager, updatedManager, _.routes), timetableManager)
       })
       promise.future

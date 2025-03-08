@@ -32,6 +32,9 @@ object AppStateTest:
   val updateSimulationManager: SimulationManager => SimulationManager                 = _ => simulationManager
   val updateRailwayNetwork: (StationManager, RouteManager) => (StationManager, RouteManager) =
     (_, _) => (stationManager, routeManager)
+  val updateRailwayNetworkSchedule
+      : (StationManager, RouteManager, TimetableManager) => (StationManager, RouteManager, TimetableManager) =
+    (_, _, _) => (stationManager, routeManager, timetableManager)
   val updateStationManagers: StationManagers => StationManagers =
     _ => StationManagers(stationManager, routeManager, timetableManager)
   val updateRouteSchedule: (RouteManager, TimetableManager) => (RouteManager, TimetableManager) =
@@ -101,6 +104,13 @@ class AppStateTest extends AnyFlatSpec with Matchers:
 
     newState.stationManager mustBe stationManager
     newState.routeManager mustBe routeManager
+
+  "update railway network schedule" should "update station, route and timetable managers" in:
+    val newState = appState.updateRailwayNetworkSchedule(updateRailwayNetworkSchedule)
+
+    newState.stationManager mustBe stationManager
+    newState.routeManager mustBe routeManager
+    newState.timetableManager mustBe timetableManager
 
   "update station schedule" should "update station, route and timetable managers" in:
     val newState = appState.updateStationManagers(updateStationManagers)
