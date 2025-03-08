@@ -11,6 +11,7 @@ import ulisse.infrastructures.view.utils.Swings.*
 
 import java.awt
 import java.awt.Color
+import java.awt.geom.Point2D
 import java.awt.image.ImageObserver
 import scala.swing.{Graphics2D, Point}
 
@@ -47,6 +48,10 @@ object MapElement:
       case RouteType.Normal => Color.black
       case RouteType.AV     => Color.red
     MapElementSimple(route, DrawImageTiled.createAt(start, end, color))
+
+  def createTrain(position: Point2D.Double): MapElement[Point2D.Double] =
+    val imagePath = ImagePath.trainIcon
+    MapElementSimple(position, DrawImageSimple.createAt(imagePath, position.toPoint))
 
   private case class MapElementSimple[T](element: T, image: DrawImage) extends MapElement[T]:
     private val observable = Observers.createObservable[MapElement[T]]

@@ -26,6 +26,9 @@ object Swings:
     /** Transform the [[Coordinate]] to a [[Point]] object. */
     def toPoint: Point = new Point(coordinate.x, coordinate.y)
 
+    /** Transform the [[Coordinate]] to a [[Point2D.Double]] object. */
+    def toPoint2D: Point2D.Double = new Point2D.Double(coordinate.x, coordinate.y)
+
   /** Methods to improve the [[Container]] object. */
   extension (a: Container)
     /** Center the [[Container]] in the [[Container]] [[b]]. */
@@ -111,6 +114,17 @@ object Swings:
 
     /** Multiply the point by the other. */
     def divide(value: Double): Point2D.Double = new Point2D.Double(point.x / value, point.y / value)
+
+    /** Compute position between the point and the other, with the given [[distance]]. */
+    def computePosition(b: Point2D.Double, distance: Double): Point2D.Double = {
+      val maxDistance = math.sqrt(math.pow(b.x - point.x, 2) + math.pow(b.y - point.y, 2))
+      if distance >= maxDistance then b
+      else
+        val t = distance / maxDistance
+        val x = point.x + t * (b.x - point.x)
+        val y = point.y + t * (b.y - point.y)
+        Point2D.Double(x, y)
+    }
 
     /** Normalize the point. */
     def normalize: Point2D.Double = point divide math.hypot(point.x, point.y)
