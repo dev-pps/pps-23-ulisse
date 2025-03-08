@@ -13,6 +13,7 @@ import StationEventQueue.StationManagers
 import ulisse.utils.OptionUtils.when
 import scala.concurrent.{Future, Promise}
 
+/** Service for station */
 final case class StationService(private val eventQueue: StationEventQueue) extends StationPorts.Input:
 
   override def stationMap: Future[SM] =

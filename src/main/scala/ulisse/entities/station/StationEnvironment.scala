@@ -4,6 +4,7 @@ import ulisse.entities.simulation.environments.Environments.TrainAgentEnvironmen
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationData
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
+import ulisse.utils.CollectionUtils.swapWhenEq
 
 /** Environment that contains Stations for the Simulation */
 trait StationEnvironment extends TrainAgentEnvironment[StationEnvironment, StationEnvironmentElement]:
@@ -25,4 +26,4 @@ object StationEnvironment:
       for
         station        <- environmentElements.find(_ == station)
         updatedStation <- station.putTrain(train.resetDistanceTravelled)
-      yield constructor(environmentElements.updateWhen(_ == station)(_ => updatedStation))
+      yield constructor(environmentElements.swapWhenEq(station)(updatedStation))

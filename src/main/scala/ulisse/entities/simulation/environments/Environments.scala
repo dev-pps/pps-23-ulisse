@@ -5,6 +5,7 @@ import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.EnvironmentElements.{EnvironmentElement, TrainAgentEEWrapper}
 import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.utils.CollectionUtils.updateWhen
+import ulisse.utils.CollectionUtils.swapWhenEq
 
 /** Environments for the simulation */
 object Environments:
@@ -36,7 +37,7 @@ object Environments:
       for
         ee        <- environmentElements.find(_.contains(train))
         updatedEE <- operation(ee)
-      yield constructor(environmentElements.updateWhen(_ == ee)(_ => updatedEE))
+      yield constructor(environmentElements.swapWhenEq(ee)(updatedEE))
 
   /** Environments Coordinator */
   trait EnvironmentsCoordinator[EC <: EnvironmentsCoordinator[EC]]:

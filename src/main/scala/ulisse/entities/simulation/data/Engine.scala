@@ -38,6 +38,7 @@ object Engine:
   /** Create an engine with empty configuration */
   def empty(): Engine = Engine.emptyWithConfiguration(EngineConfiguration.empty())
 
+  /** Create a FiledComparator for Engine */
   given FieldComparator[EngineField, Engine] with
     def fields: Seq[EngineField] = EngineField.values.toSeq
     def _compare(firstEngine: Engine, otherEngine: Engine, field: EngineField): Boolean =
@@ -46,6 +47,7 @@ object Engine:
         case EngineField.Configuration => firstEngine.configuration == otherEngine.configuration
         case EngineField.State         => firstEngine.state == otherEngine.state
 
+  /** Field of an engine */
   enum EngineField extends Field[EngineField, Engine]:
     case Running, Configuration, State
     def values: Seq[EngineField] = EngineField.values.toSeq

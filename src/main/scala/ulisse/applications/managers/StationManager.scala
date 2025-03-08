@@ -64,6 +64,6 @@ object StationManager:
     override def findStationAt(coordinate: Coordinate): Option[Station] =
       stations.find(_.coordinate == coordinate)
 
-  /** Represents errors that can occur during [[StationManager]] usage. */
+  /** Represents errors that can occur during StationManager usage. */
   enum Error extends BaseError:
     case DuplicateStationName, DuplicateStationLocation, StationNotFound

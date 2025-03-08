@@ -36,7 +36,7 @@ trait DynamicTimetableEnvironment extends Environment[DynamicTimetable]:
 /** Factory for [[DynamicTimetable]] instances */
 object DynamicTimetableEnvironment:
 
-  /** Create a new [[DynamicTimetableEnvironment]] from a configurationData */
+  /** Create a new DynamicTimetableEnvironment from a configurationData */
   def apply(configurationData: ConfigurationData): DynamicTimetableEnvironment =
     DynamicTimetableEnvironmentImpl(configurationData.timetablesByTrain)
 

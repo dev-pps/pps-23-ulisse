@@ -6,4 +6,5 @@ object UtilityPorts:
   object Output:
     /** Port for TimeProvider service */
     trait TimeProviderPort:
+      /** Get the current time in milliseconds */
       def currentTimeMillis(): Long

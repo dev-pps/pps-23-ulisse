@@ -32,8 +32,8 @@ object PerceptionProvider:
 
     def arrivalStationIsFree: Option[Boolean] =
       for
-        currentDTT   <- env.dynamicTimetableEnvironment.findCurrentTimetableFor(train)
-        currentRoute <- currentDTT.currentRoute
+        currentDTT     <- env.dynamicTimetableEnvironment.findCurrentTimetableFor(train)
+        currentRoute   <- currentDTT.currentRoute
         arrivalStation <- env.stations.find(_.id == currentRoute._2.id)
       yield arrivalStation.isAvailable
     TrainRouteInfo(route.typology, route.length, trainAheadDistance, arrivalStationIsFree.getOrElse(false))

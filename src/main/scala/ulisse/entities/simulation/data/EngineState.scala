@@ -42,18 +42,18 @@ object EngineState:
   /** Create a new Engine state with default values */
   def empty(): EngineState = EngineState(defaultLastUpdate, defaultLastDelta, defaultElapsedCycleTime)
 
+  /** Create a FieldComparator for EngineState */
   given FieldComparator[EngineStateField, EngineState] with
     def fields: Seq[EngineStateField] = EngineStateField.values.toSeq
-
     def _compare(firstEngineState: EngineState, otherEngineState: EngineState, field: EngineStateField): Boolean =
       field match
         case EngineStateField.LastUpdate       => firstEngineState.lastUpdate == otherEngineState.lastUpdate
         case EngineStateField.LastDelta        => firstEngineState.lastDelta == otherEngineState.lastDelta
         case EngineStateField.ElapsedCycleTime => firstEngineState.elapsedCycleTime == otherEngineState.elapsedCycleTime
 
+  /** Field of an engine state */
   enum EngineStateField extends Field[EngineStateField, EngineState]:
     case LastUpdate, LastDelta, ElapsedCycleTime
-
     def values: Seq[EngineStateField] = EngineStateField.values.toSeq
 
   private final case class EngineStateImpl(
