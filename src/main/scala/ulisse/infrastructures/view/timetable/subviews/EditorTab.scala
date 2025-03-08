@@ -29,6 +29,7 @@ object EditorTab:
       extends SBoxPanel(Orientation.Vertical) with EditorTab:
     adapter.addTrainsObserver(this)
     private val trainCombo: ComboBox[String] = ComboBox[String](List.empty)
+    private val refreshTrainsBtn: SButton    = SButton("refresh")
     adapter.requestTrains()
     private val waitMinutesField = SNumberField(5)
     private val stationField     = ComposedSwing.createInfoTextField("Station")
@@ -40,7 +41,7 @@ object EditorTab:
     private val saveBtn          = SButton("Save")
 
     private val falseBtnStyle = List(resetBtn, undoBtn)
-    private val trueBtnStyle  = List(saveBtn, insertBtn)
+    private val trueBtnStyle  = List(saveBtn, insertBtn, refreshTrainsBtn)
     falseBtnStyle.foreach(_.rect = Styles.formFalseButtonRect)
     trueBtnStyle.foreach(_.rect = Styles.formTrueButtonRect)
     trueBtnStyle.concat(falseBtnStyle).foreach(_.fontEffect = Styles.whiteFont)
@@ -49,6 +50,9 @@ object EditorTab:
       private def andUpdatePreview(): Unit = listPreview.update(l)
 
     private val formButtonsPane = resetBtn.createLeftRight(undoBtn.createLeftRight(insertBtn))
+    refreshTrainsBtn.reactions += {
+      case ButtonClicked(_) => adapter.requestTrains()
+    }
     undoBtn.reactions += {
       case ButtonClicked(_) => adapter.undoLastInsert().andUpdatePreview()
     }
@@ -90,7 +94,7 @@ object EditorTab:
     import ulisse.infrastructures.view.utils.SwingUtils.vSpaced
     private val fieldsSpace = 15
     private val spacedItems = List(
-      SFieldLabel("Train: ")(trainCombo).component,
+      SFieldLabel("Train: ")(trainCombo).component.createLeftRight(refreshTrainsBtn),
       SFieldLabel("Departure time")(
         SLabel("h").createLeftRight(hoursCombo.createLeftRight(SLabel("m").createLeftRight(minutesCombo)))
       ).component,

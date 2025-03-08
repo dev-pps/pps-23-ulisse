@@ -14,7 +14,7 @@ import ulisse.infrastructures.view.utils.SwingUtils.updateModel
 
 import scala.swing.Swing.onEDT
 import scala.swing.event.ButtonClicked
-import scala.swing.{BorderPanel, ComboBox, Orientation, ScrollPane, Swing}
+import scala.swing.{BorderPanel, ComboBox, Component, Label, ListView, Orientation, ScrollPane, Swing}
 
 /** Timetable consulting tab view: by selecting train and departure time, timetable is shown.
   * It gets `adapter` ([[TimetableViewAdapter]]) and observes updates from controller.
@@ -28,12 +28,28 @@ class TimetableViewerTab(adapter: TimetableViewAdapter) extends SBoxPanel(Orient
   adapter.addTimetablesObserver(this)
   adapter.addTrainsObserver(this)
   private val trainCombo: ComboBox[String] = ComboBox[String](List.empty)
+  private val refreshTrainsBtn: SButton    = SButton("refresh")
   adapter.requestTrains()
-  private val trainField                          = SFieldLabel("Train")(trainCombo)
-  private val timetableCombo: ComboBox[Timetable] = ComboBox[Timetable](List.empty)
-  private val timetableField                      = SFieldLabel("Timetable")(timetableCombo)
-  private val timetableView                       = TimetableListView(List.empty)
-  private val UNSELECTED                          = -1
+  private val trainField = SFieldLabel("Train")(trainCombo).component.createLeftRight(refreshTrainsBtn)
+  private val timetableCombo: ComboBox[Timetable] = new ComboBox[Timetable](List.empty) {
+    renderer = new ListView.Renderer[Timetable] {
+      def componentFor(
+          list: ListView[_ <: Timetable],
+          isSelected: Boolean,
+          focused: Boolean,
+          item: Timetable,
+          index: Int
+      ): Component = {
+        if item != null then
+          Label(s"${item.departureTime} - ${item.startStation.name} -> ${item.arrivingStation.name}")
+        else Label("")
+      }
+    }
+  }
+
+  private val timetableField = SFieldLabel("Timetable")(timetableCombo)
+  private val timetableView  = TimetableListView(List.empty)
+  private val UNSELECTED     = -1
   trainCombo.selection.index = UNSELECTED
 
   import ulisse.infrastructures.view.utils.SwingUtils.setDefaultFont
@@ -42,6 +58,10 @@ class TimetableViewerTab(adapter: TimetableViewAdapter) extends SBoxPanel(Orient
   deleteBtn.rect = Styles.formFalseButtonRect
   deleteBtn.fontEffect = Styles.whiteFont
   deleteBtn.enabled = false
+
+  refreshTrainsBtn.reactions += {
+    case ButtonClicked(_) => adapter.requestTrains()
+  }
 
   deleteBtn.reactions += {
     case ButtonClicked(_) =>
@@ -68,7 +88,7 @@ class TimetableViewerTab(adapter: TimetableViewAdapter) extends SBoxPanel(Orient
   import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
   import ulisse.infrastructures.view.utils.SwingUtils.vSpaced
   contents ++= List(
-    trainField.createLeftRight(timetableField),
+    trainField.createLeftRight(timetableField.component),
     borderTableView,
     deleteBtn.centerHorizontally()
   ).vSpaced(15)

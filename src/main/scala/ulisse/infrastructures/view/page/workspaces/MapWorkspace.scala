@@ -7,6 +7,7 @@ import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
 import ulisse.infrastructures.view.manager.FormManager
 import ulisse.infrastructures.view.map.MapPanel
+import ulisse.infrastructures.view.page.forms.Form.TimetableForm
 import ulisse.infrastructures.view.page.forms.StationForm.{CreationStationEvent, DeletionStationEvent}
 import ulisse.infrastructures.view.page.forms.{RouteForm, StationForm}
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
@@ -61,11 +62,12 @@ object MapWorkspace:
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private final case class MapWorkspaceImpl(adapterManager: InputAdapterManager) extends MapWorkspace:
     private val workspace   = BaseWorkspace()
-    private val formManager = FormManager.createMap()
+    private val formManager = FormManager.createMap(adapterManager.timetable)
 
-    private val mapPanel: MapPanel       = MapPanel()
-    private val stationForm: StationForm = formManager.stationForm
-    private val routeForm: RouteForm     = formManager.routeForm
+    private val mapPanel: MapPanel           = MapPanel()
+    private val stationForm: StationForm     = formManager.stationForm
+    private val routeForm: RouteForm         = formManager.routeForm
+    private val timetableForm: TimetableForm = formManager.timetableForm
 
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(formManager.component) = Position.East

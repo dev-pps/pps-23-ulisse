@@ -41,6 +41,6 @@ object Workspace:
 
   /** Represents the train workspace of the application. */
   case class TrainWorkspace(adapterManager: InputAdapterManager) extends Workspace:
-    private val workspace = TrainEditorView(adapterManager.trainAdapter)
+    private val workspace = TrainEditorView(adapterManager.train)
     export workspace.revalidate
     override def component[T >: Component]: T = workspace
