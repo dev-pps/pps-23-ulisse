@@ -27,8 +27,12 @@ trait InputPortManager:
 object InputPortManager:
 
   /** Creates a new instance of the input port manager. */
-  def apply(eventQueue: EventQueue, simulationInput: SimulationPorts.Input): InputPortManager =
-    new InputPortManagerImpl(eventQueue, simulationInput)
+  def apply(
+      eventQueue: EventQueue,
+      simulationInput: SimulationPorts.Input,
+      simulationInfo: SimulationInfoPorts.Input
+  ): InputPortManager =
+    new InputPortManagerImpl(eventQueue, simulationInput, simulationInfo)
 
   private case class InputPortManagerImpl(
       eventQueue: EventQueue,
@@ -40,7 +44,11 @@ object InputPortManager:
       simulationInfo: SimulationInfoPorts.Input
   ) extends InputPortManager:
 
-    def this(eventQueue: EventQueue, simulationInput: SimulationPorts.Input) =
+    def this(
+        eventQueue: EventQueue,
+        simulationInput: SimulationPorts.Input,
+        simulationInfo: SimulationInfoPorts.Input
+    ) =
       this(
         eventQueue,
         StationService(eventQueue),
@@ -48,5 +56,5 @@ object InputPortManager:
         TrainService(eventQueue),
         TimetableService(eventQueue),
         simulationInput,
-        SimulationInfoService(eventQueue)
+        simulationInfo
       )

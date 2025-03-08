@@ -1,7 +1,6 @@
 package ulisse.infrastructures.view.page.workspaces
 
 import ulisse.adapters.InputAdapterManager
-import ulisse.adapters.input.SimulationPageAdapter
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.manager.FormManager
@@ -17,15 +16,6 @@ trait Workspace extends ComposedSwing:
 
 /** Companion object of the [[Workspace]]. */
 object Workspace:
-  /** Creates a new instance of simulation workspace. */
-  def createSimulation(simulationAdapter: SimulationPageAdapter): SimulationWorkspace =
-    SimulationWorkspace(simulationAdapter)
-
-  /** Creates a new instance of map workspace. */
-  def createMap(adapterManager: InputAdapterManager): MapWorkspace = MapWorkspace(adapterManager)
-
-  /** Creates a new instance of train workspace. */
-  def createTrain(adapterManager: InputAdapterManager): TrainWorkspace = TrainWorkspace(adapterManager)
 
   final case class BaseWorkspace() extends Workspace:
     private val mainPanel      = new ExtendedSwing.SLayeredPanel()
