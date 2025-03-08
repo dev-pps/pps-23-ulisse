@@ -89,11 +89,11 @@ object SimulationManager:
         case _       => updateManager(identity, updateSimulationData)
 
     private def evaluateTermination(simulationManager: SimulationManager): SimulationManager =
-      if simulationData.simulationEnvironment.timetables.forall(_.completed) then
-        notificationService.foreach(_.simulationEnded(simulationData))
+      if simulationManager.simulationData.simulationEnvironment.timetables.forall(_.completed) then
+        notificationService.foreach(_.simulationEnded(simulationManager.simulationData))
         simulationManager.stop()
       else simulationManager
 
     override def doStep(): SimulationManager =
       given updatedEngineState: EngineState = engine.state.update(timeProvider.currentTimeMillis())
-      evaluateTermination(updateSimulation)
+      if engine.running then evaluateTermination(updateSimulation) else this
