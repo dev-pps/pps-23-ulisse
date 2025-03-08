@@ -30,7 +30,7 @@ trait Station:
       name === s.name &&
       coordinate === s.coordinate &&
       numberOfPlatforms === s.numberOfPlatforms
-    case _          => false
+    case _ => false
 
   /** Defines hashCode for Station */
   override def hashCode(): Int = coordinate.##

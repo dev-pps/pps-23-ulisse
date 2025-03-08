@@ -23,7 +23,7 @@ class StationManagerTest extends AnyWordSpec with Matchers:
 
     "another station with same name is added" should:
       "not be added and returns error" in:
-        StationManager().addStation(stationA.withCoordinate(stationA.coordinate + Coordinate(1,1))).flatMap(
+        StationManager().addStation(stationA.withCoordinate(stationA.coordinate + Coordinate(1, 1))).flatMap(
           _.addStation(stationA)
         ) shouldBe Left(Chain(StationManager.Error.DuplicateStationName))
 
