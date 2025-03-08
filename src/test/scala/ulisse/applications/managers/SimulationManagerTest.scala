@@ -1,15 +1,17 @@
 package ulisse.applications.managers
 
-import org.mockito.Mockito.{spy, when}
+import org.mockito.Mockito.{reset, spy, verify, when}
 import org.mockito.invocation.InvocationOnMock
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Utils.MatchersUtils.shouldBeBoolean
-import ulisse.applications.ports.UtilityPorts
+import ulisse.applications.ports.{SimulationPorts, UtilityPorts}
 import ulisse.dsl.comparison.FieldsComparators.compareTo
 import ulisse.entities.simulation.data.Engine.*
+import ulisse.entities.simulation.data.EngineConfiguration.{defaultBatch, defaultStepSize}
 import ulisse.entities.simulation.data.SimulationData.SimulationDataField.SimulationEnvironment
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
@@ -17,22 +19,13 @@ import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnviron
 import ulisse.entities.timetable.DynamicTimetableTest.dynamicTimetable1
 import ulisse.utils.Times.Time
 
-class SimulationManagerTest extends AnyWordSpec with Matchers:
-  private val sdtt = spy(dynamicTimetable1)
-  when(sdtt.completed).thenReturn(false)
-  private val mockedEnv = mock[RailwayEnvironment]
-  when(mockedEnv.doStep(1)).thenReturn(mockedEnv)
-  when(mockedEnv.timetables).thenReturn(Seq(sdtt))
+class SimulationManagerTest extends AnyWordSpec with Matchers with BeforeAndAfterEach:
   private val timeProvider  = mock[UtilityPorts.Output.TimeProviderPort]
   private val startTime     = 10L
   private val timeIncrement = 5L
-  private val sm            = SimulationManager.defaultBatchManager(timeProvider).setupEnvironment(mockedEnv)
   private def setupTimeProvider(): Unit =
     val timeIterator = LazyList.iterate(startTime)(_ + timeIncrement).iterator
     when(timeProvider.currentTimeMillis()).thenAnswer((_: InvocationOnMock) => timeIterator.next())
-
-  private def repeatDoStep(simulationManager: SimulationManager, times: Int): SimulationManager =
-    (1 to times).foldLeft(simulationManager)((manager, _) => manager.doStep())
 
   "Mocked TimeProvider" should:
     "return a sequence of increasing time values" in:
@@ -41,15 +34,45 @@ class SimulationManagerTest extends AnyWordSpec with Matchers:
       timeProvider.currentTimeMillis() shouldBe startTime + timeIncrement
       timeProvider.currentTimeMillis() shouldBe startTime + 2 * timeIncrement
 
+  private val mockedTT = spy(dynamicTimetable1)
+  private val mockedEnv = mock[RailwayEnvironment]
+
+  override def beforeEach(): Unit =
+    reset(mockedTT, mockedEnv)
+    when(mockedTT.completed).thenReturn(false)
+    when(mockedEnv.doStep(defaultStepSize)).thenReturn(mockedEnv)
+    when(mockedEnv.timetables).thenReturn(Seq(mockedTT))
+
+  private val mockedNotificationService = mock[SimulationPorts.Output]
+  private val ec = EngineConfiguration(10, Some(10))
+  private val sm            = SimulationManager.defaultBatchManager(timeProvider).setupEnvironment(mockedEnv)
+
+  private def repeatDoStep(simulationManager: SimulationManager, times: Int): SimulationManager =
+    (1 to times).foldLeft(simulationManager)((manager, _) => manager.doStep())
+
   def checkBaseConfiguration(sm: SimulationManager, ec: EngineConfiguration): Unit =
     sm.engine shouldBe Engine.emptyWithConfiguration(ec)
     sm.simulationData shouldBe SimulationData.empty()
-  private val ec = EngineConfiguration(10, Some(10))
 
   "SimulationManager" when:
     "created" should:
       "have base configuration" in:
-        checkBaseConfiguration(SimulationManager(None, timeProvider, ec), ec)
+        checkBaseConfiguration(SimulationManager(Some(mockedNotificationService), timeProvider, ec), ec)
+
+      "send notification on do step" in:
+        val manager = SimulationManager(Some(mockedNotificationService), timeProvider, defaultBatch()).start()
+        manager.doStep()
+        verify(mockedNotificationService).stepNotification(manager.simulationData.increaseStepByOne().simulationEnvironment = SimulationData.empty().simulationEnvironment.doStep(defaultStepSize))
+
+      "send notification on ended" in:
+        val manager = SimulationManager(Some(mockedNotificationService), timeProvider, defaultBatch())
+          .setupEnvironment(mockedEnv).start()
+        when(mockedTT.completed).thenReturn(true)
+        when(mockedEnv.doStep(defaultStepSize)).thenReturn(mockedEnv)
+
+        manager.doStep().engine.running shouldBe false
+        verify(mockedNotificationService).stepNotification(manager.simulationData.increaseStepByOne().simulationEnvironment = mockedEnv)
+        verify(mockedNotificationService).simulationEnded(manager.simulationData.increaseStepByOne().simulationEnvironment = mockedEnv)
 
     "configured" should:
       "have base configuration" in:

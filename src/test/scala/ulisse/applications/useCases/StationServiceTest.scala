@@ -54,10 +54,9 @@ class StationServiceTest extends AnyWordSpec with Matchers with BeforeAndAfterEa
     Await.result(stationMapResult, Duration.Inf) shouldBe List()
 
   override def beforeEach(): Unit =
-    reset(mockedRouteManager)
+    reset(mockedRouteManager, mockedTimetableManager)
     when(mockedRouteManager.routes).thenReturn(routeList)
     when(newMockedRouteManager.routes).thenReturn(updatedRouteList)
-    reset(mockedTimetableManager)
     when(mockedTimetableManager.routeDeleted(routeAB)).thenReturn(Right(mockedTimetableManager))
     when(mockedTimetableManager.routeDeleted(routeBC)).thenReturn(Right(mockedTimetableManager))
     when(mockedTimetableManager.routeUpdated(routeAB, routeCD)).thenReturn(Right(mockedTimetableManager))
