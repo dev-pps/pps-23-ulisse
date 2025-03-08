@@ -112,7 +112,9 @@ object SimulationManager:
         case _       => updateManager(identity, updateSimulationData)
 
     private def evaluateTermination(simulationManager: SimulationManager): SimulationManager =
-      if simulationManager.simulationData.simulationEnvironment.timetables.forall(_.completed) then
+      val timetables = simulationManager.simulationData.simulationEnvironment.timetables
+
+      if timetables.nonEmpty && timetables.forall(_.completed) then
         notificationService.foreach(_.simulationEnded(simulationManager.simulationData))
         simulationManager.stop()
       else simulationManager
