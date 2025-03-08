@@ -1,6 +1,7 @@
 package ulisse.infrastructures.view.page.forms
 
 import ulisse.adapters.input.SimulationPageAdapter
+import ulisse.entities.simulation.data.{EngineConfiguration, SimulationData}
 import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.ExtendedSwing
@@ -9,6 +10,8 @@ import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.page.forms.Form.BaseForm
 import ulisse.infrastructures.view.page.forms.SimulationForm.SimulationInfo
+import ulisse.entities.simulation.data.Statistics.*
+import ulisse.utils.Times.*
 
 import scala.swing.BorderPanel.Position
 import scala.swing.Component
@@ -21,6 +24,12 @@ trait SimulationForm extends Form:
 
   /** Attach the reset simulation observer to the form of type [[Unit]]. */
   def attachResetSimulation(observer: ClickObserver[Unit]): Unit
+
+  /** Sets the simulation information. */
+  def setEngineConfiguration(engine: EngineConfiguration): Unit
+
+  /** Prints the simulation information. */
+  def printInfoSimulation(info: SimulationData): Unit
 
 /** Companion object of the [[SimulationForm]]. */
 object SimulationForm:
@@ -50,11 +59,16 @@ object SimulationForm:
     private val cyclePerSecond: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Cycle"
     private val playButton  = ExtendedSwing createFormButtonWith ("Play", Styles.formButtonRect)
     private val resetButton = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
+    private val infoLabel   = ExtendedSwing SLabel ""
     private val form        = BaseForm("Simulation", stepSize, cyclePerSecond)
+
+    private val panelInfo = ExtendedSwing createFlowPanel (infoLabel, form.component)
+    panelInfo.contents += infoLabel
 
     buttonPanel.contents += playButton
     buttonPanel.contents += resetButton
 
+    mainPanel.layout(panelInfo) = Position.North
     mainPanel.layout(form.component) = Position.South
 
     private val playObservable  = Observers.createObservable[SimulationInfo]
@@ -70,5 +84,13 @@ object SimulationForm:
 
     override def attachResetSimulation(observer: ClickObserver[Unit]): Unit =
       resetObservable attachClick observer
+
+    override def setEngineConfiguration(engine: EngineConfiguration): Unit =
+      stepSize.text = s"${engine.stepSize}"
+      cyclePerSecond.text = s"${engine.cyclesPerSecond.getOrElse(0)}"
+
+    override def printInfoSimulation(info: SimulationData): Unit =
+      val infoStr = s"CYCLE PER SECOND: ${info.millisecondsElapsed.toTime}"
+      infoLabel.text = infoStr
 
     override def component[T >: Component]: T = mainPanel

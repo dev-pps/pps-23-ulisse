@@ -16,6 +16,9 @@ trait MapSimulation extends Panel with EnhancedLook:
   /** Draw the route on the screen. */
   def uploadRoutes(newRoutes: Seq[RouteEnvironmentElement]): Unit
 
+  /** Draw the train on the screen. */
+  def uploadTrain(newRoutes: Seq[RouteEnvironmentElement]): Unit
+
 /** Companion object for [[MapSimulation]]. */
 object MapSimulation:
 
@@ -43,7 +46,7 @@ object MapSimulation:
       routes update (routeCheck map MapElement.createRoute)
       updateGraphics()
 
-    def uploadTrain(newRoutes: Seq[RouteEnvironmentElement]): Unit =
+    override def uploadTrain(newRoutes: Seq[RouteEnvironmentElement]): Unit =
       newRoutes.foreach(route =>
         val env                 = route.containers
         val departureCoordinate = route.departure.coordinate

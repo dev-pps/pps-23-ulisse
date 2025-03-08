@@ -9,6 +9,9 @@ import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 import ulisse.infrastructures.view.utils.Swings.{given_ExecutionContext, *}
 
+import ulisse.entities.simulation.data.Statistics._
+import ulisse.utils.Times._
+
 import scala.swing.BorderPanel.Position
 import scala.swing.Swing
 
@@ -45,13 +48,16 @@ object SimulationWorkspace:
         (engine, data) =>
           mapPanel.uploadStation(data.simulationEnvironment.stations)
           mapPanel.uploadRoutes(data.simulationEnvironment.routes)
+          simulation.setEngineConfiguration(engine.configuration)
       ))
       println("Initializing simulation:")
 
     override def updateData(data: SimulationData): Unit =
-      Swing.onEDT(() =>
+      Swing.onEDT {
+        mapPanel.uploadTrain(data.simulationEnvironment.routes)
+        simulation.printInfoSimulation(data)
         println("Updating simulation data:")
-      )
+      }
 
     override def endSimulation(data: SimulationData): Unit =
       println("Ending simulation:")
