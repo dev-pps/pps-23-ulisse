@@ -34,10 +34,8 @@ object PerceptionProvider:
       for
         currentDTT   <- env.dynamicTimetableEnvironment.findCurrentTimetableFor(train)
         currentRoute <- currentDTT.currentRoute
-        _ = println(s"currentRoute: $currentRoute")
         arrivalStation <- env.stations.find(_.id == currentRoute._2.id)
       yield arrivalStation.isAvailable
-    println(s"arrivalStationIsFree: $arrivalStationIsFree")
     TrainRouteInfo(route.typology, route.length, trainAheadDistance, arrivalStationIsFree.getOrElse(false))
 
   /** Provide perception for TrainAgent in RailwayEnvironment */

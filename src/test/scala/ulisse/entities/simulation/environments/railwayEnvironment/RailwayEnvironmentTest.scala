@@ -62,13 +62,15 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
       for
         currentTT <- env.dynamicTimetableEnvironment.findCurrentTimetableFor(agent)
         route     <- r(currentTT)
-        _ = println(route)
         see <- env.stations.find(_ == route._1)
         rd = env.routeEnvironment.findRoutesWithTravelDirection(route)
       yield (currentTT, see, rd)
 
     private def completeCurrentTimetable(env: RailwayEnvironment): Option[RailwayEnvironment] =
       env.dynamicTimetableEnvironment.findCurrentTimetableFor(agent).map(tt => env.doSteps(tt.table.size + 2))
+
+    private def trackWithDirectionFromRouteInfo(rInfo: Seq[(RouteEnvironmentElement, TrackDirection)]): Option[(Option[RouteEnvironmentElement#TAC], TrackDirection)] =
+      rInfo.find(_._1.contains(trainAgent3905)).map(e => (e._1.containers.find(_.contains(trainAgent3905)), e._2))
 
   private def checkConfiguration(env: RailwayEnvironment, cd: ConfigurationData): Unit =
     env.stations shouldBe cd.stations
@@ -99,6 +101,11 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
     d shouldBe ree.departure
     a shouldBe ree.arrival
     see shouldBe ree.departure
+
+  def validateRoute(dtt: DynamicTimetable, startPosition: Int, rInfo: Seq[(RouteEnvironmentElement, TrackDirection)], see: StationEnvironmentElement): Unit =
+    (dtt.stationNr(startPosition).map(_._1), dtt.stationNr(startPosition + 1).map(_._1), rInfo.map(_._1).headOption) match
+      case (Some(d), Some(a), Some(ree)) => matchRouteInfo(d, a, see, ree)
+      case _ => fail()
 
   "RailwayEnvironment" when:
     "created" should:
@@ -140,24 +147,16 @@ class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
 
       "move train into route" in:
         val (dtt, see, rInfo) = extractInfo(1, _.currentRoute)
-        (dtt.stationNr(0).map(_._1), dtt.stationNr(1).map(_._1), rInfo.map(_._1).headOption) match
-          case (Some(d), Some(a), Some(ree)) => matchRouteInfo(d, a, see, ree)
-          case _                             => fail()
+        validateRoute(dtt, 0, rInfo, see)
         see.trains.contains(trainAgent3905) shouldBe false
-        rInfo.map(_._1).collectTrains.contains(trainAgent3905) shouldBe true
-        rInfo.find(_._1.contains(trainAgent3905)).map(e =>
-          (e._1.containers.find(_.contains(trainAgent3905)), e._2)
-        ) match
-          case Some(Some(container), dir) =>
-            container.currentDirection shouldBe Some(dir)
-            container.trains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)
+        rInfo.map(_._1).collectTrains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)
+        trainAgent3905.trackWithDirectionFromRouteInfo(rInfo) match
+          case Some(Some(container), dir) => container.currentDirection shouldBe Some(dir)
           case _ => fail()
 
       "move train into station" in:
         val (dtt, see, rInfo) = extractInfo(2, _.nextRoute)
-        (dtt.stationNr(1).map(_._1), dtt.stationNr(2).map(_._1), rInfo.map(_._1).headOption) match
-          case (Some(d), Some(a), Some(ree)) => matchRouteInfo(d, a, see, ree)
-          case _                             => fail()
+        validateRoute(dtt, 1, rInfo, see)
         see.trains.contains(trainAgent3905) shouldBe true
         rInfo.map(_._1).collectTrains.contains(trainAgent3905) shouldBe false
         see.trains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)

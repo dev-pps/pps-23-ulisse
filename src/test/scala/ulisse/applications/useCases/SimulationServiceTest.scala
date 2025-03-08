@@ -55,7 +55,6 @@ class SimulationServiceTest extends AnyWordSpec with Matchers with BeforeAndAfte
       case _                     => fail()
 
   private def evaluateSettings(engine: Engine, simulationData: SimulationData): Unit =
-    println(simulationData.simulationEnvironment.timetables)
     engine shouldBe Engine.emptyWithConfiguration(EngineConfiguration.defaultBatch())
     simulationData compareTo SimulationData.empty() ignoring SimulationEnvironment shouldBeBoolean true
     simulationData.simulationEnvironment shouldBe RailwayEnvironment.auto(simpleConfigurationData)
