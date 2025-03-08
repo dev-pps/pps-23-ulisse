@@ -35,7 +35,9 @@ object Form:
 
   /** Represents the clean form event. */
   final case class CleanFormEvent(form: Form) extends ClickObserver[MouseEvent]:
-    override def onClick(data: MouseEvent): Unit = form.cleanForm()
+    override def onClick(data: MouseEvent): Unit =
+      form.cleanForm()
+      form.resetError()
 
   final case class BaseForm(title: String, fields: ComposedSwing.InfoTextField*):
     private val mainPanel: ExtendedSwing.SBoxPanel    = ExtendedSwing SBoxPanel Orientation.Vertical
