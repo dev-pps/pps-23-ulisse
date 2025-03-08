@@ -1,3 +1,24 @@
+## [1.33.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.32.0...v1.33.0) (2025-03-08)
+
+### Features
+
+* attach obeservabe at simulation form ([cf4e93c](https://github.com/dev-pps/pps-23-ulisse/commit/cf4e93cfec56af55292d8e5d9226bf1d600cf26f))
+* attach simulation workspace ([e1aaea0](https://github.com/dev-pps/pps-23-ulisse/commit/e1aaea04bbbe33c41e33126592d378de655ec7ae))
+* compute train position ([2dbe4ed](https://github.com/dev-pps/pps-23-ulisse/commit/2dbe4ed68a4802c57d9e6e7e5b171dfdc65db0e6))
+* connect simulation at main ([4b76905](https://github.com/dev-pps/pps-23-ulisse/commit/4b7690561e6ea9b33e10f7b546a7ead5c55b1671))
+* connect train element ([725bb91](https://github.com/dev-pps/pps-23-ulisse/commit/725bb91635408c19cfb9d42106db1fae3c7b4847))
+* create init simulation ([ecc8981](https://github.com/dev-pps/pps-23-ulisse/commit/ecc89815a7272f842cda10ebe77f4e4394f718b2))
+* create label error ([657bd06](https://github.com/dev-pps/pps-23-ulisse/commit/657bd0666f82bbfb341a74dc73783d5ab039a6b2))
+* create listener to start simulation ([213d8f3](https://github.com/dev-pps/pps-23-ulisse/commit/213d8f385d03ebb9ad6c9a13334374ed6034c0f5))
+* create simulation form ([f2c4ac7](https://github.com/dev-pps/pps-23-ulisse/commit/f2c4ac7066cbe1425e637ad25eb22c6a6932b29d))
+* extract simulation workspace ([dc5e145](https://github.com/dev-pps/pps-23-ulisse/commit/dc5e1457c4d22a75007db46781bc14ee7553cda0))
+* init engine ([5ecd4f0](https://github.com/dev-pps/pps-23-ulisse/commit/5ecd4f0a3554f11a9ebbb9caf44d19184b0c42b0))
+* uploadp map simulation ([d7a1346](https://github.com/dev-pps/pps-23-ulisse/commit/d7a1346aaa5b5c03ffbe21830751f1640a53f128))
+
+### Bug Fixes
+
+* simulation form ([8685ceb](https://github.com/dev-pps/pps-23-ulisse/commit/8685ceb3606c32f3f8c91d9a9b165168b821a7f1))
+
 ## [1.32.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.31.0...v1.32.0) (2025-03-08)
 
 ### Features
