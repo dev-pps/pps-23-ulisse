@@ -14,6 +14,10 @@ import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.page.forms.Form.{BaseForm, CleanFormEvent}
 import ulisse.infrastructures.view.page.workspaces.MapWorkspace
 import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
+import ulisse.infrastructures.view.utils.ComponentUtils.*
+import ulisse.utils.ValidationUtils.mkMsgErrors
+
+import scala.swing.{Orientation, Swing}
 
 /** Represents the route form of the application. */
 trait RouteForm extends Form:
@@ -73,24 +77,27 @@ object RouteForm:
   def apply(): RouteForm = RouteFormImpl()
 
   /** Represents the creation route event. */
-  final case class CreationRouteEvent(adapter: RouteAdapter, workspace: MapWorkspace)
+  final case class CreationRouteEvent(adapter: RouteAdapter, workspace: MapWorkspace, form: RouteForm)
       extends ClickObserver[RouteCreationInfo]:
 
     private def creationRoute(data: RouteCreationInfo): Unit =
-      adapter save (Option.empty, data) onComplete (_ fold (println, _ fold (println, workspace.updateRoutes)))
+      adapter save (Option.empty, data) onComplete (_ fold (println, _ fold (error =>
+        form.showError(s"${error.mkMsgErrors}"), workspace.updateRoutes)))
 
     private def updateRoute(data: RouteCreationInfo, oldRoute: Route): Unit =
-      adapter save (Option(oldRoute), data) onComplete (_ fold (println, _ fold (println, workspace.updateRoutes)))
+      adapter save (Option(oldRoute), data) onComplete (_ fold (println, _ fold (error =>
+        form.showError(s"${error.mkMsgErrors}"), workspace.updateRoutes)))
 
     override def onClick(data: RouteCreationInfo): Unit =
       workspace.selectedRoute.fold(creationRoute(data))(updateRoute(data, _))
 
   /** Represents the deletion route event. */
-  final case class DeletionRouteEvent(adapter: RouteAdapter, workspace: MapWorkspace)
+  final case class DeletionRouteEvent(adapter: RouteAdapter, workspace: MapWorkspace, form: RouteForm)
       extends ClickObserver[RouteCreationInfo]:
 
     override def onClick(data: RouteCreationInfo): Unit =
-      adapter delete data onComplete (_ fold (println, _ fold (println, workspace.updateRoutes)))
+      adapter delete data onComplete (_ fold (println, _ fold (error =>
+        form.showError(s"${error.mkMsgErrors}"), workspace.updateRoutes)))
 
   /** Represents the take station from map event. */
   final case class TakeStationFromMapEvent(routeForm: RouteForm) extends ClickObserver[MapElement[Station]]:
@@ -116,10 +123,13 @@ object RouteForm:
     override val rails: ComposedSwing.InfoTextField            = ComposedSwing createInfoTextField "Rails"
     override val length: ComposedSwing.InfoTextField           = ComposedSwing createInfoTextField "Length"
 
-    private val cleanButton  = ExtendedSwing createFormButtonWith ("Clean", Styles.formButtonRect)
+    private val layoutButton = ExtendedSwing.SBoxPanel(Orientation.Vertical).transparent()
+    private val controlPanel = ExtendedSwing.SFlowPanel().transparent()
     private val saveButton   = ExtendedSwing createFormButtonWith ("Save", Styles.formTrueButtonRect)
     private val deleteButton = ExtendedSwing createFormButtonWith ("Delete", Styles.formFalseButtonRect)
-    private val form         = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
+    private val resetButton  = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
+
+    private val form = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
 
     private var _departure: Option[Station]   = Option.empty
     private var _arrival: Option[Station]     = Option.empty
@@ -128,11 +138,15 @@ object RouteForm:
     private val creationObservable = Observers.createObservable[RouteCreationInfo]
     private val deletionObservable = Observers.createObservable[RouteCreationInfo]
 
-    buttonPanel.contents += saveButton
-    buttonPanel.contents += cleanButton
-    buttonPanel.contents += deleteButton
+    controlPanel.hGap = form.space
+    controlPanel.contents += saveButton
+    controlPanel.contents += deleteButton
+    layoutButton.contents += controlPanel
+    layoutButton.contents += Swing.VStrut(form.space)
+    layoutButton.contents += resetButton.centerHorizontally()
+    buttonPanel.contents += layoutButton
 
-    cleanButton attachClick CleanFormEvent(this)
+    resetButton attachClick CleanFormEvent(this)
 
     saveButton attach (creationObservable toObserver (_ =>
       RouteCreationInfo(departure, arrival, routeType.text, rails.text, length.text)
