@@ -7,8 +7,9 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.Runner.runAll
 import ulisse.Utils.MatchersUtils.shouldBeBoolean
+import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.applications.managers.StationManager
+import ulisse.applications.managers.{SimulationManager, StationManager}
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.SimulationPorts
@@ -19,6 +20,7 @@ import ulisse.entities.simulation.data.SimulationData.SimulationDataField.Simula
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
 import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
+import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 
 import scala.annotation.tailrec
 import scala.concurrent.Await
@@ -40,6 +42,9 @@ class SimulationServiceTest extends AnyWordSpec with Matchers with BeforeAndAfte
     .updateRoute(_ => routeManager)
     .updateTrain((_, _) => trainManager)
     .updateTimetable(_ => timetableManager)
+    .updateSimulationManager(_ =>
+      SimulationManager.defaultBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
+    )
 
   private val eventQueue        = EventQueue()
   private val simulationService = SimulationService(eventQueue, notificationService)
