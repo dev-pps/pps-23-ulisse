@@ -1,3 +1,10 @@
+## [1.34.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.33.0...v1.34.0) (2025-03-08)
+
+### Features
+
+* train view and timetable form added and working, train refresh btn ([beaa4e0](https://github.com/dev-pps/pps-23-ulisse/commit/beaa4e07b9ba1dda2efcf9701148aee7363c2305))
+* **TrainEditorView:** added to Workspace and uses real app port, added to main gui ([a856d85](https://github.com/dev-pps/pps-23-ulisse/commit/a856d85d0cd231eb8552042799c80d1d950084ed))
+
 ## [1.33.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.32.0...v1.33.0) (2025-03-08)
 
 ### Features
