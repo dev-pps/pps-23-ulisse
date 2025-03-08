@@ -67,7 +67,7 @@ object RailwayDsl:
     case class AppStateDSL(var appState: AppState):
       /** Create an application state with a train. */
       def put(train: Train): AppStateDSL =
-        appState = appState.updateTrain((trainManager, _) => trainManager.addTrain(train).getOrElse(trainManager))
+        appState = appState.createTrain((trainManager, _) => trainManager.addTrain(train).getOrElse(trainManager))
         this
 
       /** Create an application state with a route. */

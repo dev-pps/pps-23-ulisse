@@ -25,7 +25,7 @@ class TrainServiceTest extends AnyWordSpec with Matchers with BeforeAndAfterEach
   private val technologyManager = TechnologyManager[TrainTechnology](List(AVTech, normalTech))
   private val trainManager      = TrainManager(initialSavedTrains)
   private val initialState =
-    AppState().updateTechnology(_ => technologyManager).updateTrain((_, _) => trainManager)
+    AppState().updateTechnology(_ => technologyManager).updateTrain((_, _, tm) => (trainManager, tm))
   private val eventQueue    = EventQueue()
   private val inputPort     = TrainService(eventQueue)
   private def updateState() = runAll(initialState, eventQueue.events)

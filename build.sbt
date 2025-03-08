@@ -9,7 +9,7 @@ hooks := {
 
 scalacOptions += "-deprecation"
 
-scalafmtOnCompile := true
+scalafmtOnCompile        := true
 coverageExcludedPackages := "*.view.*"
 
 wartremoverWarnings ++= Warts.all

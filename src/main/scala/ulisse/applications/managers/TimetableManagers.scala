@@ -38,7 +38,10 @@ object TimetableManagers:
     /** Updates timetables and recalculates times of all tables related to given `train`. */
     def trainUpdated(train: Train): Either[TimetableManagerErrors, TimetableManager]
 
-    /** Updates timetables and recalculates times of all tables that contains `oldRoute` with the `newRoute`. */
+    /** Updates timetables and recalculates times of all tables that contains `oldRoute` with the `newRoute`.
+      *
+      * Actually its real side effect is to delete all timetables saved that contains `oldRoute`.
+      */
     def routeUpdated(oldRoute: Route, newRoute: Route): Either[TimetableManagerErrors, TimetableManager]
 
   /** Errors that can returned by manager */
@@ -199,7 +202,6 @@ object TimetableManagers:
         )
 
       override def trainUpdated(train: Train): Either[TimetableManagerErrors, TimetableManager] =
-        // find timetables with same train name
         @SuppressWarnings(Array("org.wartremover.warts.OptionPartial", "org.wartremover.warts.IterableOps"))
         def update(oldTable: Timetable) =
           for
@@ -226,4 +228,4 @@ object TimetableManagers:
         yield updated
 
       override def routeUpdated(oldRoute: Route, newRoute: Route): Either[TimetableManagerErrors, TimetableManager] =
-        Right(this)
+        routeDeleted(oldRoute)
