@@ -59,10 +59,16 @@ object SimulationForm:
     override def onClick(info: Unit): Unit = adapter.reset()
 
   /** Represents the take station event. */
-  final class TakeStationEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
+  final case class TakeStationEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[StationEnvironmentElement]]:
     override def onClick(data: MapElement[StationEnvironmentElement]): Unit =
       println("Take station event")
+
+  /** Represents the take route event. */
+  final case class TakeRouteEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
+      extends ClickObserver[MapElement[RouteEnvironmentElement]]:
+    override def onClick(data: MapElement[RouteEnvironmentElement]): Unit =
+      println("Take route event")
 
   private case class SimulationFormImpl() extends SimulationForm:
     private val mainPanel: SBorderPanel                     = SBorderPanel()

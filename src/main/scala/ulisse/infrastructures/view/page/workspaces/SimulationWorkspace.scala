@@ -52,6 +52,7 @@ object SimulationWorkspace:
           mapPanel.uploadStation(data.simulationEnvironment.stations)
           mapPanel.uploadRoutes(data.simulationEnvironment.routes)
           mapPanel attachClickStation SimulationForm.TakeStationEvent(simulation, infoSimulation)
+          mapPanel attachClickRoute SimulationForm.TakeRouteEvent(simulation, infoSimulation)
           simulation.setEngineConfiguration(engine.configuration)
       ))
       println("Initializing simulation:")
