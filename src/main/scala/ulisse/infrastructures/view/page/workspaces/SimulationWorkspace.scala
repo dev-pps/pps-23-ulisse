@@ -9,6 +9,7 @@ import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 import ulisse.utils.Times.*
 
+import java.util.Currency
 import scala.swing.BorderPanel.Position
 import scala.swing.Swing
 
@@ -27,10 +28,13 @@ object SimulationWorkspace:
   /** Represents the simulation workspace of the application. */
   private case class SimulationWorkspaceImpl(adapter: SimulationPageAdapter, infoSimulation: SimulationInfoAdapter)
       extends SimulationWorkspace:
-    private val workspace = BaseWorkspace()
-
+    private val workspace                  = BaseWorkspace()
     private val mapPanel: MapSimulation    = MapSimulation()
     private val simulation: SimulationForm = SimulationForm()
+
+    private val minUpdate = 10
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
+    private var lastUpdate = 0L
 
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(simulation.component) = Position.East
@@ -41,23 +45,26 @@ object SimulationWorkspace:
     export workspace.{component, revalidate}
 
     override def initSimulation(): Unit =
-      val values = adapter.initSimulation()
-      values.onComplete(_.fold(
+      adapter.initSimulation() onComplete (_.fold(
         error => println(s"Error: $error"),
         (engine, data) =>
           updateData(data)
-          simulation.setEngineConfiguration(engine.configuration)
+          simulation setEngineConfiguration engine.configuration
+          lastUpdate = System.currentTimeMillis()
       ))
 
     override def updateData(data: SimulationData): Unit =
       Swing.onEDT:
-        mapPanel uploadStation data.simulationEnvironment.stations
-        mapPanel uploadRoutes data.simulationEnvironment.routes
-        mapPanel uploadTrain data.simulationEnvironment.routes
-        mapPanel attachClickStation SimulationForm.TakeStationEvent(simulation, infoSimulation)
-        mapPanel attachClickRoute SimulationForm.TakeRouteEvent(simulation, infoSimulation)
-        mapPanel attachClickTrain SimulationForm.TakeTrainEvent(simulation, infoSimulation)
-        simulation.showSimulationData(data)
+        val now = System.currentTimeMillis()
+        if now - lastUpdate > minUpdate then
+          lastUpdate = now
+          mapPanel uploadStation data.simulationEnvironment.stations
+          mapPanel uploadRoutes data.simulationEnvironment.routes
+          mapPanel uploadTrain data.simulationEnvironment.routes
+          mapPanel attachClickStation SimulationForm.TakeStationEvent(simulation, infoSimulation)
+          mapPanel attachClickRoute SimulationForm.TakeRouteEvent(simulation, infoSimulation)
+          mapPanel attachClickTrain SimulationForm.TakeTrainEvent(simulation, infoSimulation)
+          simulation.showSimulationData(data)
 
     override def endSimulation(data: SimulationData): Unit =
       println("Ending simulation:")
