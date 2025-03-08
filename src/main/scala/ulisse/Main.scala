@@ -1,10 +1,10 @@
 package ulisse
 
 import ulisse.adapters.InputAdapterManager
-import ulisse.adapters.input.SimulationPageAdapter
+import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
 import ulisse.adapters.output.SimulationNotificationAdapter
-import ulisse.applications.ports.SimulationPorts
-import ulisse.applications.useCases.SimulationService
+import ulisse.applications.ports.{SimulationInfoPorts, SimulationPorts}
+import ulisse.applications.useCases.{SimulationInfoService, SimulationService}
 import ulisse.applications.{AppState, EventQueue, InputPortManager}
 import ulisse.infrastructures.utilty.{SimulationNotificationAdapterRequirements, SimulationNotificationBridge}
 import ulisse.infrastructures.view.GUI
@@ -20,17 +20,22 @@ object Main:
     private val simulationBridge: SimulationNotificationBridge = SimulationNotificationBridge(() => workspace)
     private val simulationOutput: SimulationPorts.Output       = SimulationNotificationAdapter(simulationBridge)
     val simulationInput: SimulationPorts.Input                 = SimulationService(eventQueue, simulationOutput)
+    val simulationInfoInput: SimulationInfoPorts.Input         = SimulationInfoService(eventQueue)
     val simulationAdapter: SimulationPageAdapter               = SimulationPageAdapter(simulationInput)
-    val workspace: SimulationWorkspace                         = SimulationWorkspace(simulationAdapter)
+    val simulationInfoAdapter: SimulationInfoAdapter           = SimulationInfoAdapter(simulationInfoInput)
+
+    val workspace: SimulationWorkspace = SimulationWorkspace(simulationAdapter, simulationInfoAdapter)
 
   @main def launchApp(): Unit =
     val eventQueue = EventQueue()
 
-    val simulationSetting   = SimulationSetting(eventQueue)
-    val inputPortManager    = InputPortManager(eventQueue, simulationSetting.simulationInput)
-    val inputAdapterManager = InputAdapterManager(inputPortManager, simulationSetting.simulationAdapter)
+    val simulationSetup = SimulationSetting(eventQueue)
+    val inputPortManager =
+      InputPortManager(eventQueue, simulationSetup.simulationInput, simulationSetup.simulationInfoInput)
+    val inputAdapterManager =
+      InputAdapterManager(inputPortManager, simulationSetup.simulationAdapter, simulationSetup.simulationInfoAdapter)
 
-    val map = GUI(inputAdapterManager, simulationSetting.workspace)
+    val map = GUI(inputAdapterManager, simulationSetup.workspace)
 
     val initialState = AppState()
     eventQueue.startProcessing(initialState)

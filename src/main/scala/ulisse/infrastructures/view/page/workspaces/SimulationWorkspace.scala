@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.page.workspaces
 
-import ulisse.adapters.input.SimulationPageAdapter
+import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
 import ulisse.entities.route.Tracks
 import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.map.{MapPanel, MapSimulation}
@@ -8,9 +8,8 @@ import ulisse.infrastructures.view.page.forms.{Form, SimulationForm}
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 import ulisse.infrastructures.view.utils.Swings.{given_ExecutionContext, *}
-
-import ulisse.entities.simulation.data.Statistics._
-import ulisse.utils.Times._
+import ulisse.entities.simulation.data.Statistics.*
+import ulisse.utils.Times.*
 
 import scala.swing.BorderPanel.Position
 import scala.swing.Swing
@@ -24,10 +23,12 @@ trait SimulationWorkspace extends Workspace with SimulationNotificationListener:
 object SimulationWorkspace:
 
   /** Creates a new instance of simulation workspace. */
-  def apply(simulationAdapter: SimulationPageAdapter): SimulationWorkspace = SimulationWorkspaceImpl(simulationAdapter)
+  def apply(simulationAdapter: SimulationPageAdapter, infoSimulation: SimulationInfoAdapter): SimulationWorkspace =
+    SimulationWorkspaceImpl(simulationAdapter, infoSimulation)
 
   /** Represents the simulation workspace of the application. */
-  private case class SimulationWorkspaceImpl(adapter: SimulationPageAdapter) extends SimulationWorkspace:
+  private case class SimulationWorkspaceImpl(adapter: SimulationPageAdapter, infoSimulation: SimulationInfoAdapter)
+      extends SimulationWorkspace:
     private val workspace = BaseWorkspace()
 
     private val mapPanel: MapSimulation    = MapSimulation()
