@@ -10,20 +10,20 @@ import ulisse.utils.OptionUtils.{*, given}
 
 /** Defines a route for simulation. */
 trait RouteEnvironmentElement extends Route with TrainAgentEEWrapper[RouteEnvironmentElement]:
-  /** Type of the TrainAgentsContainer */
+  /** Type of the TrainAgentsContainer. */
   type TAC = Track
 
-  /** Try to put train inside a track given the desired direction */
+  /** Try to put train inside a track given the desired direction. */
   def putTrain(train: TrainAgent, direction: TrackDirection): Option[RouteEnvironmentElement]
 
-  /** Check if the route is available for a train to be put in */
+  /** Check if the route is available for a train to be put in. */
   def isAvailable(direction: TrackDirection): Boolean = containers.exists(_.isAvailable(direction))
 
-  /** Check if the train can take the route */
+  /** Check if the train can take the route. */
   def isAvailableFor(train: TrainAgent, direction: TrackDirection): Boolean =
     acceptTrainTechnology(train) && isAvailable(direction)
 
-  /** Defines equality for RouteEnvironmentElement */
+  /** Defines equality for RouteEnvironmentElement. */
   override def equals(that: Any): Boolean =
     that match
       case r: Route => this === r

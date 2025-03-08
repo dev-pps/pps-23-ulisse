@@ -14,12 +14,13 @@ import ulisse.infrastructures.commons.TimeProviders.*
 import scala.concurrent.{Future, Promise}
 import scala.util.chaining.scalaUtilChainingOps
 
-/** Service for simulation */
+/** Service for simulation. */
 final case class SimulationService(
     private val eventQueue: SimulationEventQueue,
     private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
   val minPermittedDistanceBetweenTrains: Double = 100.0
+
   override def initSimulation(): Future[(Engine, SimulationData)] =
     val p = Promise[(Engine, SimulationData)]()
     eventQueue.addSetupSimulationManagerEvent(simulationManagers =>

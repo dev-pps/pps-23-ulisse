@@ -9,14 +9,15 @@ import ulisse.entities.train.Trains.Train
 
 import scala.concurrent.Future
 
-/** Ports for Simulation Info */
+/** Ports for SimulationInfo. */
 object SimulationInfoPorts:
+  /** Input port for SimulationInfo. */
   trait Input:
-    /** Get station info */
+    /** Get station info. */
     def stationInfo(s: Station): Future[Option[StationEnvironmentInfo]]
 
-    /** Get route info */
+    /** Get route info. */
     def routeInfo(r: Route): Future[Option[RouteEnvironmentElement]]
 
-    /** Get train info */
+    /** Get train info. */
     def trainInfo(t: Train): Future[Option[TrainAgentInfo]]

@@ -74,7 +74,7 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
 
     "start from station" should:
       "travel 1 km after 12 seconds" in:
-        import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
+        import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProviders.given
         val dt          = 12
         val stationPerc = TrainPerceptionInStation(TrainStationInfo(hasToMove = true, routeTrackIsFree = true))
         val mockEnv     = mock[RailwayEnvironment]

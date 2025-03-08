@@ -8,7 +8,6 @@ import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
 
 class UtilityAdaptersTest extends AnyWordSpec with Matchers:
-
   private val mockedTimeProvider  = mock[TimeProvider]
   private val timeProviderAdapter = TimeProviderAdapter(mockedTimeProvider)
 

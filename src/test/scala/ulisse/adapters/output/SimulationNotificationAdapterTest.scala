@@ -8,7 +8,6 @@ import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.simulation.SimulationPage
 
 class SimulationNotificationAdapterTest extends AnyWordSpec with Matchers:
-
   private val simulationData            = mock[SimulationData]
   private val mockedSimulationPage      = mock[SimulationPage]
   private val otherMockedSimulationPage = mock[SimulationPage]

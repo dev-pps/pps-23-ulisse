@@ -4,7 +4,6 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class EngineTest extends AnyWordSpec with Matchers:
-
   private val running       = true
   private val configuration = EngineConfiguration.defaultBatch()
   private val state         = EngineState(Some(1), 2, 3)

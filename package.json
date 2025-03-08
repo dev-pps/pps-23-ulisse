@@ -27,7 +27,7 @@
     "branches": [
       "main",
       {
-        "name": "chore/simulation-refinement",
+        "name": "develop",
         "prerelease": true
       }
     ],

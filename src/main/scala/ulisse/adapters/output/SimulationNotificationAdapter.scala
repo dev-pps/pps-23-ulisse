@@ -1,9 +1,7 @@
 package ulisse.adapters.output
 
 import ulisse.applications.ports.SimulationPorts
-import ulisse.entities.Coordinate
 import ulisse.entities.simulation.data.SimulationData
-import ulisse.entities.station.Station
 import ulisse.infrastructures.view.simulation.SimulationPage
 
 /** Adapter for the SimulationPorts.Output port. */

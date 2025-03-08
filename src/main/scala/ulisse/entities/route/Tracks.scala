@@ -4,38 +4,36 @@ import cats.data.NonEmptyChain
 import cats.syntax.all.*
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentsContainer
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.utils.CollectionUtils.updateWhen
+import ulisse.utils.CollectionUtils.swapWhenEq
 import ulisse.utils.Errors.BaseError
 import ulisse.utils.OptionUtils.when
-import ulisse.utils.ValidationUtils.{validatePositive, validateRange, validateUniqueItems, validateUniqueItemsBy}
-import ulisse.utils.CollectionUtils.swapWhenEq
+import ulisse.utils.ValidationUtils.validatePositive
 
 object Tracks:
-
-  /** The possible directions in witch a Track can be used */
+  /** The possible directions in witch a Track can be used. */
   enum TrackDirection:
     case Forward, Backward
 
-  /** TrackDirection utility object */
+  /** TrackDirection utility object. */
   object TrackDirection:
     extension (direction: TrackDirection)
-      /** Return the opposite direction */
+      /** Return the opposite direction. */
       def opposite: TrackDirection = direction match
         case TrackDirection.Forward  => TrackDirection.Backward
         case TrackDirection.Backward => TrackDirection.Forward
 
   /** Defines a rail in a Route. */
   trait Track extends TrainAgentsContainer[Track]:
-    /** Try to put train inside the track given the desired direction */
+    /** Try to put train inside the track given the desired direction. */
     def putTrain(train: TrainAgent, direction: TrackDirection): Option[Track]
 
-    /** Return the current direction of the track */
+    /** Return the current direction of the track. */
     def currentDirection: Option[TrackDirection]
 
-    /** Return the minimum distance allowed between trains in the track */
+    /** Return the minimum distance allowed between trains in the track. */
     def minPermittedDistanceBetweenTrains: Double
 
-    /** Check if the track is available for a train to be put in */
+    /** Check if the track is available for a train to be put in. */
     def isAvailable(direction: TrackDirection): Boolean =
       trains.lastOption.forall(t =>
         t.motionData.distanceTravelled - t.lengthSize >= minPermittedDistanceBetweenTrains
@@ -46,11 +44,11 @@ object Tracks:
     /** Minimum track id. */
     val minTrackId: Int = 1
 
-    /** Creates a `Track` instance. If platform id is lower than minTrackId it's set to that value */
+    /** Creates a `Track` instance. If platform id is lower than minTrackId it's set to that value. */
     def apply(id: Int)(using minPermittedDistanceBetweenTrains: Double): Track =
       TrackImpl(math.max(minTrackId, id), Seq(), None)
 
-    /** Creates a `Track` instance with validation. If track id is lower than minTrackId an error is returned */
+    /** Creates a `Track` instance with validation. If track id is lower than minTrackId an error is returned. */
     def createCheckedTrack(
         id: Int
     )(using minPermittedDistanceBetweenTrains: Double): Either[NonEmptyChain[Track.Error], Track] =

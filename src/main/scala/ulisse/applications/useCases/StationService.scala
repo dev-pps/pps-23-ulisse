@@ -1,21 +1,19 @@
 package ulisse.applications.useCases
 
-import cats.data.{Chain, NonEmptyChain}
 import ulisse.applications.event.StationEventQueue
+import ulisse.applications.event.StationEventQueue.StationManagers
 import ulisse.applications.managers.RouteManagers.RouteManager
-import ulisse.applications.managers.{StationManager, TimetableManagers}
 import ulisse.applications.managers.TimetableManagers.TimetableManager
+import ulisse.applications.managers.{StationManager, TimetableManagers}
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
-import StationEventQueue.StationManagers
-import ulisse.utils.OptionUtils.when
+
 import scala.concurrent.{Future, Promise}
 
-/** Service for station */
+/** Service for station. */
 final case class StationService(private val eventQueue: StationEventQueue) extends StationPorts.Input:
-
   override def stationMap: Future[SM] =
     val p = Promise[SM]()
     eventQueue.addReadStationManagerEvent(stationManager => p.success(stationManager.stations))

@@ -13,50 +13,49 @@ import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.Train
 import ulisse.utils.Times.Time
 
-/** Simulation Environment for Railway simulations */
+/** Simulation Environment for Railway simulations. */
 trait RailwayEnvironment extends EnvironmentsCoordinator[RailwayEnvironment]:
-  /** Simulation time */
+  /** Simulation time. */
   def time: Time
 
-  /** Route environment of the simulation */
+  /** Route environment of the simulation. */
   def routeEnvironment: RouteEnvironment
 
-  /** Station environment of the simulation */
+  /** Station environment of the simulation. */
   def stationEnvironment: StationEnvironment
 
-  /** Dynamic timetable environment of the simulation */
+  /** Dynamic timetable environment of the simulation. */
   def dynamicTimetableEnvironment: DynamicTimetableEnvironment
 
-  /** The environment of the simulation */
+  /** The environment of the simulation. */
   override def environments: Seq[Environment[?]] =
     Seq(routeEnvironment, stationEnvironment, dynamicTimetableEnvironment)
 
-  /** Routes in the environment */
+  /** Routes in the environment. */
   def routes: Seq[RouteEnvironmentElement] = routeEnvironment.environmentElements
 
-  /** stations in the environment */
+  /** stations in the environment. */
   def stations: Seq[StationEnvironmentElement] = stationEnvironment.environmentElements
 
-  /** timetables in the environment */
+  /** timetables in the environment. */
   def timetables: Seq[DynamicTimetable] = dynamicTimetableEnvironment.environmentElements
 
-  /** timetables by train in the environment */
+  /** timetables by train in the environment. */
   def timetablesByTrain: Map[Train, Seq[DynamicTimetable]] = dynamicTimetableEnvironment.dynamicTimetablesByTrain
 
-  /** environment elements in the environment */
+  /** environment elements in the environment. */
   def environmentElements: List[EnvironmentElement] = (stations ++ routes ++ timetables).toList
 
-  /** trains in the environment */
+  /** trains in the environment. */
   def trains: Seq[TrainAgent] =
     (stations.flatMap(_.containers.flatMap(_.trains)) ++ routes.flatMap(_.containers.flatMap(_.trains))).distinct
 
-  /** agents in the environment */
+  /** agents in the environment. */
   override def agents: List[SimulationAgent[?]] = trains.toList
 
-/** Factory for [[RailwayEnvironment]] instances */
+/** Factory for [[RailwayEnvironment]] instances. */
 object RailwayEnvironment:
-
-  /** Create a new RailwayEnvironment */
+  /** Create a new RailwayEnvironment. */
   def apply(
       startTime: Time,
       configurationData: ConfigurationData
@@ -68,7 +67,7 @@ object RailwayEnvironment:
       DynamicTimetableEnvironment(configurationData)
     )
 
-  /** Create a new RailwayEnvironment with the start time set to the earliest departure time */
+  /** Create a new RailwayEnvironment with the start time set to the earliest departure time. */
   def auto(
       configurationData: ConfigurationData
   ): RailwayEnvironment =
@@ -77,14 +76,14 @@ object RailwayEnvironment:
       configurationData
     )
 
-  /** Create a new RailwayEnvironment with the start time set to 00:00 */
+  /** Create a new RailwayEnvironment with the start time set to 00:00. */
   def default(configurationData: ConfigurationData): RailwayEnvironment =
     apply(
       Time(0, 0, 0),
       configurationData
     )
 
-  /** Create a new empty RailwayEnvironment */
+  /** Create a new empty RailwayEnvironment. */
   def empty(): RailwayEnvironment =
     default(ConfigurationData.empty())
 

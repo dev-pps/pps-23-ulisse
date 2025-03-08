@@ -2,43 +2,43 @@ package ulisse.entities.simulation.data
 
 import ulisse.dsl.comparison.FieldsComparators.{Field, FieldComparator}
 
-/** Engine for simulation */
+/** Engine for simulation. */
 trait Engine:
-  /** running indication */
+  /** Running indication. */
   def running: Boolean
 
-  /** modify running state */
+  /** Modify running state. */
   def running_=(running: Boolean): Engine
 
-  /** configuration of the engine */
+  /** Configuration of the engine. */
   def configuration: EngineConfiguration
 
-  /** modify configuration */
+  /** Modify configuration. */
   def configuration_=(configuration: EngineConfiguration): Engine
 
-  /** state of the engine */
+  /** State of the engine. */
   def state: EngineState
 
-  /** modify state */
+  /** Modify state. */
   def state_=(state: EngineState): Engine
 
-  /** reset the engine state */
+  /** Reset the engine state. */
   def reset(): Engine
 
 /** Factory for [[Engine]] instances. */
 object Engine:
-  /** Create a new engine */
+  /** Create a new engine. */
   def apply(running: Boolean, configuration: EngineConfiguration, state: EngineState): Engine =
     EngineImpl(running, configuration, state)
 
-  /** Create an engine with the given configuration */
+  /** Create an engine with the given configuration. */
   def emptyWithConfiguration(configuration: EngineConfiguration): Engine =
     Engine(false, configuration, EngineState.empty())
 
-  /** Create an engine with empty configuration */
+  /** Create an engine with empty configuration. */
   def empty(): Engine = Engine.emptyWithConfiguration(EngineConfiguration.empty())
 
-  /** Create a FiledComparator for Engine */
+  /** Create a FiledComparator for Engine. */
   given FieldComparator[EngineField, Engine] with
     def fields: Seq[EngineField] = EngineField.values.toSeq
     def _compare(firstEngine: Engine, otherEngine: Engine, field: EngineField): Boolean =
@@ -47,7 +47,7 @@ object Engine:
         case EngineField.Configuration => firstEngine.configuration == otherEngine.configuration
         case EngineField.State         => firstEngine.state == otherEngine.state
 
-  /** Field of an engine */
+  /** Field of an engine. */
   enum EngineField extends Field[EngineField, Engine]:
     case Running, Configuration, State
     def values: Seq[EngineField] = EngineField.values.toSeq

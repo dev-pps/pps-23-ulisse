@@ -3,17 +3,16 @@ package ulisse.entities.station
 import ulisse.entities.simulation.environments.Environments.TrainAgentEnvironment
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationData
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.utils.CollectionUtils.updateWhen
 import ulisse.utils.CollectionUtils.swapWhenEq
 
-/** Environment that contains Stations for the Simulation */
+/** Environment that contains Stations for the Simulation. */
 trait StationEnvironment extends TrainAgentEnvironment[StationEnvironment, StationEnvironmentElement]:
-  /** Try to put a train in a station */
+  /** Try to put a train in a station. */
   def putTrain(train: TrainAgent, station: Station): Option[StationEnvironment]
 
-/** Factory for [[StationEnvironment]] instances */
+/** Factory for [[StationEnvironment]] instances. */
 object StationEnvironment:
-  /** Create a new [[StationEnvironment]] from a configurationData */
+  /** Create a new StationEnvironment from a configurationData. */
   def apply(configurationData: ConfigurationData): StationEnvironment =
     StationEnvironmentImpl(configurationData.stations)
 

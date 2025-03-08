@@ -8,17 +8,14 @@ import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.route.Tracks.{Track, TrackDirection}
 import ulisse.entities.route.{RouteEnvironment, RouteEnvironmentElement}
 import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
-import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
+import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProviders.given
 import ulisse.entities.station.{StationEnvironment, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetableEnvironment
-import ulisse.entities.station.StationEnvironmentElement
-import ulisse.entities.timetable.DynamicTimetableEnvironment
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
-import ulisse.entities.train.TrainAgentTest.{normalTrain, normalTrainAgent}
+import ulisse.entities.train.TrainAgentTest.normalTrainAgent
 import ulisse.entities.train.TrainAgents.*
 import ulisse.utils.Times.ClockTime
 class PerceptionProviderTest extends AnyWordSpec with Matchers:
-
   private val mockStationA = mock[StationEnvironmentElement]
   private val mockStationB = mock[StationEnvironmentElement]
   private val see          = mock[StationEnvironmentElement]

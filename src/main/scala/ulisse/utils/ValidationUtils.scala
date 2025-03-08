@@ -6,7 +6,6 @@ import ulisse.utils.Errors.{BaseError, ErrorMessage}
 
 /** Utility methods for validating input values. */
 object ValidationUtils:
-
   /** Validates that the value is within the specified range (inclusive). */
   def validateRange[N: Numeric, E <: BaseError](
       value: N,

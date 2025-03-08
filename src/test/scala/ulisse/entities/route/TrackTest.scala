@@ -6,11 +6,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.route.Tracks.Track
 import ulisse.entities.route.Tracks.Track.minTrackId
 import ulisse.entities.route.Tracks.TrackDirection.{Backward, Forward}
-import ulisse.entities.station.Platform
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906}
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 class TrackTest extends AnyWordSpec with Matchers:
   given minPermittedDistanceBetweenTrains: Double = 100.0

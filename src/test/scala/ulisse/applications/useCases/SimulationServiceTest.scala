@@ -25,7 +25,6 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class SimulationServiceTest extends AnyWordSpec with Matchers with BeforeAndAfterEach:
-
   private val notificationService = mock[SimulationPorts.Output]
 
   private val stationManager: StationManager = mock[StationManager]

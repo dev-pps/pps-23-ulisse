@@ -8,7 +8,7 @@ import ulisse.applications.useCases.{RouteService, SimulationService, StationSer
 import ulisse.applications.{AppState, EventQueue}
 import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.infrastructures.commons.TimeProviders.TimeProvider
-import ulisse.infrastructures.utilty.{SimulationNotificationAdapterRequirements, SimulationNotificationBridge}
+import ulisse.infrastructures.utils.{SimulationNotificationAdapterRequirements, SimulationNotificationBridge}
 import ulisse.infrastructures.view.simulation.SimulationPage
 import ulisse.infrastructures.view.station.StationEditorView
 

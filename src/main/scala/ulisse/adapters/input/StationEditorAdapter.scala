@@ -1,6 +1,6 @@
 package ulisse.adapters.input
 
-import cats.data.{Chain, NonEmptyChain}
+import cats.data.NonEmptyChain
 import cats.syntax.all.*
 import ulisse.adapters.input.StationEditorAdapter.StationCreationInfo
 import ulisse.applications.ports.StationPorts

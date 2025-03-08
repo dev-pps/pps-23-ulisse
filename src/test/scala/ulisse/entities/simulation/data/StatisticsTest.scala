@@ -1,22 +1,19 @@
 package ulisse.entities.simulation.data
 
 import cats.Id
-import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar.mock
+import ulisse.entities.simulation.data.Statistics.*
+import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.complexConfigurationData
+import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
+import ulisse.entities.station.StationTest.stationA
 import ulisse.entities.timetable.DynamicTimetableTest.{dynamicTimetable1, dynamicTimetable2}
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgentTest.{trainAgent3905, trainAgent3906}
 import ulisse.entities.train.TrainAgents.TrainAgentInfo
 import ulisse.utils.Times.{ClockTime, Time}
-import ulisse.entities.simulation.data.Statistics.*
-import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.complexConfigurationData
-import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
-import ulisse.entities.station.StationTest.stationA
 
 class StatisticsTest extends AnyWordSpec with Matchers:
-
   "Statistics for TrainAgentInfo" when:
     val delay = ClockTime(0, 10).getOrDefault
     val updatedDtt1 =
