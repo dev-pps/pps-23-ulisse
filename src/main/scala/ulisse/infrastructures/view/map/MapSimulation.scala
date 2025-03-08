@@ -3,8 +3,10 @@ package ulisse.infrastructures.view.map
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.route.{RouteEnvironmentElement, Tracks}
 import ulisse.entities.station.StationEnvironmentElement
+import ulisse.entities.train.TrainAgents
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
+import ulisse.infrastructures.view.map.MapSimulation.TrainMapElement
 import ulisse.infrastructures.view.utils.Swings.{computePosition, given_ExecutionContext, *}
 
 import java.awt.geom.Point2D
@@ -17,6 +19,9 @@ trait MapSimulation extends Panel with EnhancedLook:
 
   /** Attach the route form to the map panel. */
   def attachClickRoute(event: ClickObserver[MapElement[RouteEnvironmentElement]]): Unit
+
+  /** Attach the train form to the map panel. */
+  def attachClickTrain(event: ClickObserver[MapElement[TrainMapElement]]): Unit
 
   /** Draw the station on the screen. */
   def uploadStation(newStations: Seq[StationEnvironmentElement]): Unit
@@ -33,16 +38,22 @@ object MapSimulation:
   /** Create a new [[MapSimulation]]. */
   def apply(): MapSimulation = MapSimulationImpl()
 
+  /** Represents the map simulation implementation. */
+  final case class TrainMapElement(train: TrainAgents.TrainAgent, position: Point2D.Double)
+
   private case class MapSimulationImpl() extends MapSimulation:
     private val stations = MapElements[StationEnvironmentElement](observable)
     private val routes   = MapElements[RouteEnvironmentElement](observable)
-    private val trains   = MapElements[Point2D.Double](observable)
+    private val trains   = MapElements[TrainMapElement](observable)
 
     override def attachClickStation(event: ClickObserver[MapElement[StationEnvironmentElement]]): Unit =
       stations attachClick event
 
     override def attachClickRoute(event: ClickObserver[MapElement[RouteEnvironmentElement]]): Unit =
       routes attachClick event
+
+    override def attachClickTrain(event: ClickObserver[MapElement[TrainMapElement]]): Unit =
+      trains attachClick event
 
     override def uploadStation(newStations: Seq[StationEnvironmentElement]): Unit =
       stations update (newStations map MapElement.createStationEnvironmentElement)
@@ -67,15 +78,19 @@ object MapSimulation:
         val arrivalCoordinate   = route.arrival.coordinate
         env.foreach(rails =>
           val trainsEnv = rails.trains
-          val positions = trainsEnv.map(train =>
-            rails.currentDirection map {
+          val trainsWithPosition = trainsEnv.map(train =>
+            val pos = rails.currentDirection map {
               case Tracks.TrackDirection.Forward =>
                 departureCoordinate.toPoint2D computePosition (arrivalCoordinate.toPoint2D, train.distanceTravelled)
               case Tracks.TrackDirection.Backward =>
                 arrivalCoordinate.toPoint2D computePosition (departureCoordinate.toPoint2D, train.distanceTravelled)
             }
+            pos.map((_, train))
           )
-          val checkPosition = positions.foldLeft(List[Point2D.Double]())((acc, pos) => acc ++ pos)
+          val checkPosition =
+            trainsWithPosition.foldLeft(List[TrainMapElement]())((acc, value) =>
+              value.fold(acc)((pos, train) => TrainMapElement(train, pos) :: acc)
+            )
           trains update (checkPosition map MapElement.createTrain)
         )
       )

@@ -6,7 +6,6 @@ import ulisse.infrastructures.view.map.MapSimulation
 import ulisse.infrastructures.view.page.forms.{Form, SimulationForm}
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
-import ulisse.infrastructures.view.utils.Swings.*
 import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 import ulisse.utils.Times.*
 
@@ -56,7 +55,8 @@ object SimulationWorkspace:
 
     override def updateData(data: SimulationData): Unit =
       Swing.onEDT {
-        mapPanel.uploadTrain(data.simulationEnvironment.routes)
+        mapPanel uploadTrain data.simulationEnvironment.routes
+        mapPanel attachClickTrain SimulationForm.TakeTrainEvent(simulation, infoSimulation)
         simulation.showSimulationData(data)
       }
 

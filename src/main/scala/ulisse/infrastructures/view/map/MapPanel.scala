@@ -3,7 +3,6 @@ package ulisse.infrastructures.view.map
 import ulisse.applications.ports.StationPorts
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
-import ulisse.infrastructures.view.common.ImagePath
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
 

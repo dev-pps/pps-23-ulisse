@@ -1,17 +1,16 @@
 package ulisse.infrastructures.view.map
 
-import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.{Route, RouteType}
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.infrastructures.view.common.Observers.Observable
 import ulisse.infrastructures.view.common.{ImagePath, Observers}
 import ulisse.infrastructures.view.components.draw.DrawImages.DrawImage
 import ulisse.infrastructures.view.components.draw.{DrawImageSimple, DrawImageTiled, DrawImages}
+import ulisse.infrastructures.view.map.MapSimulation.TrainMapElement
 import ulisse.infrastructures.view.utils.Swings.*
 
 import java.awt
 import java.awt.Color
-import java.awt.geom.Point2D
 import java.awt.image.ImageObserver
 import scala.swing.{Dimension, Graphics2D, Point}
 
@@ -49,10 +48,10 @@ object MapElement:
       case RouteType.AV     => Color.red
     MapElementSimple(route, DrawImageTiled.createAt(start, end, color))
 
-  def createTrain(position: Point2D.Double): MapElement[Point2D.Double] =
+  def createTrain(train: TrainMapElement): MapElement[TrainMapElement] =
     val imagePath = ImagePath.train
     val dimension = new Dimension(20, 20)
-    MapElementSimple(position, DrawImageSimple(imagePath, position.toPoint, dimension))
+    MapElementSimple(train, DrawImageSimple(imagePath, train.position.toPoint, dimension))
 
   private case class MapElementSimple[T](element: T, image: DrawImage) extends MapElement[T]:
     private val observable = Observers.createObservable[MapElement[T]]
