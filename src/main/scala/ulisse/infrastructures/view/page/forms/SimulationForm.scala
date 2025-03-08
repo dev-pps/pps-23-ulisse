@@ -12,12 +12,12 @@ import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.page.forms.Form.BaseForm
 import ulisse.infrastructures.view.page.forms.SimulationForm.SimulationInfo
 import ulisse.entities.simulation.data.Statistics.*
+import ulisse.infrastructures.view.utils.ComponentUtils._
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, ShapeEffect}
 import ulisse.infrastructures.view.map.MapElement
 import ulisse.utils.Times.*
 
-import javax.swing.JTextArea
 import scala.swing.BorderPanel.Position
 import scala.swing.{Component, Orientation, Swing}
 
@@ -37,10 +37,10 @@ trait SimulationForm extends Form:
   def showSimulationData(info: SimulationData): Unit
 
   /** Shows the station simulation. */
-  def showStationSimulation(): Unit
+  def showStationSimulation(station: StationEnvironmentElement): Unit
 
   /** Shows the route simulation. */
-  def showRouteSimulation(): Unit
+  def showRouteSimulation(route: RouteEnvironmentElement): Unit
 
 /** Companion object of the [[SimulationForm]]. */
 object SimulationForm:
@@ -67,14 +67,12 @@ object SimulationForm:
   /** Represents the take station event. */
   final case class TakeStationEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[StationEnvironmentElement]]:
-    override def onClick(data: MapElement[StationEnvironmentElement]): Unit =
-      println("Take station event")
+    override def onClick(data: MapElement[StationEnvironmentElement]): Unit = form.showStationSimulation(data.element)
 
   /** Represents the take route event. */
   final case class TakeRouteEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[RouteEnvironmentElement]]:
-    override def onClick(data: MapElement[RouteEnvironmentElement]): Unit =
-      println("Take route event")
+    override def onClick(data: MapElement[RouteEnvironmentElement]): Unit = form.showRouteSimulation(data.element)
 
   private case class SimulationFormImpl() extends SimulationForm:
     private val mainPanel: SBorderPanel                     = SBorderPanel()
@@ -83,17 +81,24 @@ object SimulationForm:
     private val playButton  = ExtendedSwing createFormButtonWith ("Play", Styles.formButtonRect)
     private val resetButton = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
     private val form        = BaseForm("Simulation", stepSize, cyclePerSecond)
+    private val space       = 10
 
     private val infoArea        = ExtendedSwing.STextArea()
     private val elementInfoArea = ExtendedSwing.STextArea()
     private val infoPanel       = ExtendedSwing.SBoxPanel(Orientation.Vertical)
+    private val flowPanel       = ExtendedSwing.SFlowPanel().transparent()
+    infoPanel.contents += Swing.VGlue
     infoPanel.contents += Component.wrap(infoArea)
+    infoPanel.contents += Swing.VGlue
     infoPanel.contents += Component.wrap(elementInfoArea)
+    flowPanel.hGap = space
+    flowPanel.vGap = space + 5
+    flowPanel.contents += infoPanel
 
     buttonPanel.contents += playButton
     buttonPanel.contents += resetButton
 
-    mainPanel.layout(infoPanel) = Position.North
+    mainPanel.layout(flowPanel) = Position.North
     mainPanel.layout(form.component) = Position.South
 
     private val playObservable  = Observers.createObservable[SimulationInfo]
@@ -124,14 +129,14 @@ object SimulationForm:
          \nSTATION LOAD: ${info.simulationEnvironment.percStationsLoad} %"""
       infoArea.setText(infoStr)
 
-    override def showStationSimulation(): Unit =
+    override def showStationSimulation(statio: StationEnvironmentElement): Unit =
       val infoStr = s"""STATION SIMULATION:
              \nSTATION NAME: 
              \nSTATION COORDINATES: 
              \nSTATION TRACKS: """
       elementInfoArea.setText(infoStr)
 
-    override def showRouteSimulation(): Unit =
+    override def showRouteSimulation(route: RouteEnvironmentElement): Unit =
       val infoStr = s"""ROUTE SIMULATION:
                  \nROUTE NAME: 
                  \nROUTE DEPARTURE: 
