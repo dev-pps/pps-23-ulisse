@@ -21,7 +21,7 @@ import ulisse.entities.train.Wagons.Wagon
 import ulisse.utils.Times.Time
 
 import scala.Seq
-class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
+class RailwayDslTest extends AnyWordSpec with Matchers:
   private val dt = 1
 
   private final case class FakeTrainAgent(train: Train, state: StateBehavior) extends TrainAgent:

@@ -1,6 +1,6 @@
 package ulisse.entities.simulation.data
 
-import ulisse.dsl.comparison.FieldsComparators.{Field, FieldComparator}
+import ulisse.dsl.FieldsComparators.{Field, FieldComparator}
 
 /** Represent the state of the simulation engine. */
 trait EngineState:

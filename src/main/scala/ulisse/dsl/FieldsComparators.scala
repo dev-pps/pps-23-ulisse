@@ -1,4 +1,4 @@
-package ulisse.dsl.comparison
+package ulisse.dsl
 
 /** DSL for comparing fields of objects. */
 object FieldsComparators:
