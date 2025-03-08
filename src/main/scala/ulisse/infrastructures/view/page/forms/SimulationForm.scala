@@ -19,7 +19,7 @@ import ulisse.utils.Times.*
 
 import javax.swing.JTextArea
 import scala.swing.BorderPanel.Position
-import scala.swing.{Component, Swing}
+import scala.swing.{Component, Orientation, Swing}
 
 /** Represents the simulation form of the application. */
 trait SimulationForm extends Form:
@@ -34,7 +34,13 @@ trait SimulationForm extends Form:
   def setEngineConfiguration(engine: EngineConfiguration): Unit
 
   /** Prints the simulation information. */
-  def printInfoSimulation(info: SimulationData): Unit
+  def showSimulationData(info: SimulationData): Unit
+
+  /** Shows the station simulation. */
+  def showStationSimulation(): Unit
+
+  /** Shows the route simulation. */
+  def showRouteSimulation(): Unit
 
 /** Companion object of the [[SimulationForm]]. */
 object SimulationForm:
@@ -74,18 +80,20 @@ object SimulationForm:
     private val mainPanel: SBorderPanel                     = SBorderPanel()
     private val stepSize: ComposedSwing.InfoTextField       = ComposedSwing createInfoTextField "Step"
     private val cyclePerSecond: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Cycle"
-    private val playButton   = ExtendedSwing createFormButtonWith ("Play", Styles.formButtonRect)
-    private val resetButton  = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
-    private val textInfoArea = ExtendedSwing.STextArea()
-    private val form         = BaseForm("Simulation", stepSize, cyclePerSecond)
+    private val playButton  = ExtendedSwing createFormButtonWith ("Play", Styles.formButtonRect)
+    private val resetButton = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
+    private val form        = BaseForm("Simulation", stepSize, cyclePerSecond)
 
-    private val panelInfo = ExtendedSwing createFlowPanel (Component.wrap(textInfoArea), form.component)
-    panelInfo.contents += Component.wrap(textInfoArea)
+    private val infoArea        = ExtendedSwing.STextArea()
+    private val elementInfoArea = ExtendedSwing.STextArea()
+    private val infoPanel       = ExtendedSwing.SBoxPanel(Orientation.Vertical)
+    infoPanel.contents += Component.wrap(infoArea)
+    infoPanel.contents += Component.wrap(elementInfoArea)
 
     buttonPanel.contents += playButton
     buttonPanel.contents += resetButton
 
-    mainPanel.layout(panelInfo) = Position.North
+    mainPanel.layout(infoPanel) = Position.North
     mainPanel.layout(form.component) = Position.South
 
     private val playObservable  = Observers.createObservable[SimulationInfo]
@@ -106,7 +114,7 @@ object SimulationForm:
       stepSize.text = s"${engine.stepSize}"
       cyclePerSecond.text = s"${engine.cyclesPerSecond.getOrElse(0)}"
 
-    override def printInfoSimulation(info: SimulationData): Unit =
+    override def showSimulationData(info: SimulationData): Unit =
       val infoStr = s"""SIMULATION TIME: ${info.millisecondsElapsed.toTime}
          \nENVIRONMENT TIME: ${info.simulationEnvironment.time}
          \nCUMULATIVE DELAY: ${info.simulationEnvironment.cumulativeDelay}
@@ -114,6 +122,22 @@ object SimulationForm:
          \nTRAIN IN STATIONS: ${info.simulationEnvironment.percTrainsInStations} %
          \nTRAIN ON ROUTE: ${info.simulationEnvironment.percTrainsOnRoutes} %
          \nSTATION LOAD: ${info.simulationEnvironment.percStationsLoad} %"""
-      textInfoArea.setText(infoStr)
+      infoArea.setText(infoStr)
+
+    override def showStationSimulation(): Unit =
+      val infoStr = s"""STATION SIMULATION:
+             \nSTATION NAME: 
+             \nSTATION COORDINATES: 
+             \nSTATION TRACKS: """
+      elementInfoArea.setText(infoStr)
+
+    override def showRouteSimulation(): Unit =
+      val infoStr = s"""ROUTE SIMULATION:
+                 \nROUTE NAME: 
+                 \nROUTE DEPARTURE: 
+                 \nROUTE ARRIVAL: 
+                 \nROUTE DISTANCE: 
+                 \nROUTE DURATION: """
+      elementInfoArea.setText(infoStr)
 
     override def component[T >: Component]: T = mainPanel
