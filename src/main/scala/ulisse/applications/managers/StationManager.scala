@@ -23,8 +23,12 @@ trait StationManager:
   def addStation(station: Station): Either[NonEmptyChain[StationManager.Error], StationManager]
 
   /** Updates a station in the manager. If the old station is not recognized by the manager or the new one is not accepted an error is returned */
-  def updateStation(oldStation: Station, newStation: Station): Either[NonEmptyChain[StationManager.Error], StationManager] =
+  def updateStation(
+      oldStation: Station,
+      newStation: Station
+  ): Either[NonEmptyChain[StationManager.Error], StationManager] =
     removeStation(oldStation).flatMap(_.addStation(newStation))
+
   /** Remove a station from the manager. If the station is not recognized by the manager an error is returned */
   def removeStation(station: Station): Either[NonEmptyChain[StationManager.Error], StationManager]
 

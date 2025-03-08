@@ -82,10 +82,14 @@ class StationTest extends AnyWordSpec with Matchers:
         stationA shouldBe stationA
 
       "not be equal to a station with different name" in:
-        stationA should not be Station(stationA.name+"2", stationA.coordinate, stationA.numberOfPlatforms)
+        stationA should not be Station(stationA.name + "2", stationA.coordinate, stationA.numberOfPlatforms)
 
       "not be equal to a station with different coordinate" in:
-        stationA should not be Station(stationA.name, stationA.coordinate + Coordinate(1, 1), stationA.numberOfPlatforms)
+        stationA should not be Station(
+          stationA.name,
+          stationA.coordinate + Coordinate(1, 1),
+          stationA.numberOfPlatforms
+        )
 
       "not be equal to a station with different number of platforms" in:
         stationA should not be Station(stationA.name, stationA.coordinate, stationA.numberOfPlatforms + 1)
