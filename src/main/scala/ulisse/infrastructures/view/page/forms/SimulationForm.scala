@@ -111,6 +111,7 @@ object SimulationForm:
     override def onClick(data: MapElement[RouteEnvironmentElement]): Unit =
       form.showRouteSimulation(data.element)
 
+  /** Represents the take train event. */
   final case class TakeTrainEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[TrainMapElement]]:
     override def onClick(data: MapElement[TrainMapElement]): Unit =

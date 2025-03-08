@@ -16,8 +16,11 @@ trait RouteEventQueue:
   def addCreateRouteEvent(update: (StationManager, RouteManager) => (StationManager, RouteManager)): Unit
 
   /** Add an event to update a route. */
-  def addUpdateRouteEvent(update: (StationManager, RouteManager) => (StationManager, RouteManager)): Unit =
-    addCreateRouteEvent(update)
+  def addUpdateRouteEvent(update: (
+      StationManager,
+      RouteManager,
+      TimetableManager
+  ) => (StationManager, RouteManager, TimetableManager)): Unit
 
   /** Add an event to delete a route. */
   def addDeleteRouteEvent(update: (RouteManager, TimetableManager) => (RouteManager, TimetableManager)): Unit
@@ -34,6 +37,12 @@ object RouteEventQueue:
 
     override def addCreateRouteEvent(update: (StationManager, RouteManager) => (StationManager, RouteManager)): Unit =
       events.offer(_ updateRailwayNetwork update)
+
+    override def addUpdateRouteEvent(update: (
+        StationManager,
+        RouteManager,
+        TimetableManager
+    ) => (StationManager, RouteManager, TimetableManager)): Unit = events.offer(_ updateRailwayNetworkSchedule update)
 
     override def addDeleteRouteEvent(update: (RouteManager, TimetableManager) => (RouteManager, TimetableManager))
         : Unit = events.offer(_ updateRouteSchedule update)

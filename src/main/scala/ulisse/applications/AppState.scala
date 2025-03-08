@@ -75,6 +75,13 @@ trait AppState:
   def updateRailwayNetwork(update: (StationManager, RouteManager) => (StationManager, RouteManager)): AppState
 
   /** Update [[StationManager]], [[RouteManager]] and [[TimetableManager]]. */
+  def updateRailwayNetworkSchedule(update: (
+      StationManager,
+      RouteManager,
+      TimetableManager
+  ) => (StationManager, RouteManager, TimetableManager)): AppState
+
+  /** Update [[StationManager]], [[RouteManager]] and [[TimetableManager]]. */
   def updateStationManagers(update: StationManagers => StationManagers): AppState
 
   /** Update [[RouteManager]] and [[TimetableManager]]. */
@@ -141,6 +148,14 @@ object AppState:
         : AppState =
       val (newStation, newRoute) = update(stationManager, routeManager)
       copy(stationManager = newStation, routeManager = newRoute)
+
+    override def updateRailwayNetworkSchedule(update: (
+        StationManager,
+        RouteManager,
+        TimetableManager
+    ) => (StationManager, RouteManager, TimetableManager)): AppState =
+      val (newStation, newRoute, newTimetable) = update(stationManager, routeManager, timetableManager)
+      copy(stationManager = newStation, routeManager = newRoute, timetableManager = newTimetable)
 
     override def updateStationManagers(update: StationManagers => StationManagers): AppState =
       val StationManagers(newStation, newRoute, newTimetable) =
