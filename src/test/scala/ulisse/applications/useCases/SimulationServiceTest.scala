@@ -14,7 +14,7 @@ import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.{AppState, EventQueue}
 import ulisse.dsl.comparison.FieldsComparators.compareTo
-import ulisse.entities.simulation.data.Engine.EngineStateField.Running
+import ulisse.entities.simulation.data.Engine.EngineField.Running
 import ulisse.entities.simulation.data.SimulationData.SimulationDataField.SimulationEnvironment
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
