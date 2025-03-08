@@ -34,25 +34,13 @@ trait InputAdapterManager:
 object InputAdapterManager:
 
   /** Creates a new instance of the input adapter manager. */
-  def apply(ports: InputPortManager): InputAdapterManager =
-    InputAdapterManagerImpl(StationEditorAdapter(ports.station), TrainViewAdapter(ports.train))
-
-  private final case class InputAdapterManagerImpl(stationAdapter: StationEditorAdapter, trainAdapter: TrainViewAdapter)
-      extends InputAdapterManager
-
-  private final case class InputAdapterManagerImpl(
-      station: StationEditorAdapter,
-      route: RouteAdapter,
-      train: TrainViewAdapter
-  ) extends InputAdapterManager:
-
-
   def apply(ports: InputPortManager, simulationPage: SimulationPageAdapter): InputAdapterManager =
     new InputAdapterManagerImpl(ports, simulationPage)
   private final case class InputAdapterManagerImpl(
       station: StationEditorAdapter,
       route: RouteAdapter,
-      trainAdapter: TrainViewAdapter
+      train: TrainViewAdapter,
+      timetable: TimetableViewAdapter,
       simulationPage: SimulationPageAdapter,
       simulationInfo: SimulationInfoAdapter
   ) extends InputAdapterManager:
@@ -61,6 +49,7 @@ object InputAdapterManager:
         StationEditorAdapter(ports.station),
         RouteAdapter(ports.route),
         TrainViewAdapter(ports.train),
+        TimetableViewAdapter(ports.timetable, ports.train),
         simulationPage,
         SimulationInfoAdapter(ports.simulationInfo)
       )

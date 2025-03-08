@@ -113,12 +113,10 @@ final case class TimetableService(eventQueue: TimeTableEventQueue) extends Timet
   /** Returns list of all Timetable saved for a given `trainName` */
   def timetablesOf(trainName: String): Future[RequestResult] =
     val promise = Promise[RequestResult]()
-
     eventQueue.addReadTimetableEvent(timetableManager =>
       for res <- timetableManager.tablesOf(trainName)
       yield promise.success(Right(res))
     )
-
     promise.future
 
   extension (error: BaseError)
