@@ -35,8 +35,8 @@ object SimulationWorkspace:
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(simulation.component) = Position.East
 
-    simulation.attachStartSimulation(SimulationForm.PlaySimulationEvent(adapter))
-    simulation.attachResetSimulation(SimulationForm.ResetSimulationEvent(adapter))
+    simulation.attachStartSimulation(SimulationForm.PlaySimulationEvent(adapter, this, simulation))
+    simulation.attachResetSimulation(SimulationForm.ResetSimulationEvent(adapter, this))
 
     export workspace.{component, revalidate}
 

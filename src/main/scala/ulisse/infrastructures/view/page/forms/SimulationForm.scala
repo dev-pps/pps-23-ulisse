@@ -21,6 +21,7 @@ import ulisse.entities.train.TrainAgents.TrainAgentInfo
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, ShapeEffect}
 import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.map.MapSimulation.TrainMapElement
+import ulisse.infrastructures.view.page.workspaces.SimulationWorkspace
 import ulisse.utils.Times.*
 
 import java.awt.geom.Point2D
@@ -29,6 +30,12 @@ import scala.swing.{Component, Orientation, Swing}
 
 /** Represents the simulation form of the application. */
 trait SimulationForm extends Form:
+
+  /** Sets the button to play. */
+  def setButtonPlay(): Unit
+
+  /** Sets the button to pause. */
+  def setButtonPause(): Unit
 
   /** Attach the start simulation observer to the form of type [[SimulationInfo]]. */
   def attachStartSimulation(observer: ClickObserver[SimulationInfo]): Unit
@@ -62,16 +69,32 @@ object SimulationForm:
     def cyclePerSecondInt: Option[Int] = cyclePerSecond.toIntOption
 
   /** Represents the start simulation event. */
-  final case class PlaySimulationEvent(adapter: SimulationPageAdapter) extends ClickObserver[SimulationInfo]:
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
+  final case class PlaySimulationEvent(
+      adapter: SimulationPageAdapter,
+      workspace: SimulationWorkspace,
+      form: SimulationForm
+  ) extends ClickObserver[SimulationInfo]:
+    private var isPlaying = false
+
     override def onClick(info: SimulationInfo): Unit =
-      info.stepInt.fold(println("error"))(step =>
-        adapter.setupEngine(step, info.cyclePerSecondInt)
-        adapter.start()
-      )
+      if !isPlaying then
+        info.stepInt.fold(form.showError("error"))(step =>
+          adapter.setupEngine(step, info.cyclePerSecondInt)
+          adapter.start()
+          form.setButtonPause()
+        )
+      else
+        adapter.stop()
+        form.setButtonPlay()
+      isPlaying = !isPlaying
 
   /** Represents the reset simulation event. */
-  final case class ResetSimulationEvent(adapter: SimulationPageAdapter) extends ClickObserver[Unit]:
-    override def onClick(info: Unit): Unit = adapter.reset()
+  final case class ResetSimulationEvent(adapter: SimulationPageAdapter, workspace: SimulationWorkspace)
+      extends ClickObserver[Unit]:
+    override def onClick(info: Unit): Unit =
+      adapter.reset()
+      workspace.initSimulation()
 
   /** Represents the take station event. */
   final case class TakeStationEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
@@ -129,6 +152,14 @@ object SimulationForm:
     resetButton attachClick (resetObservable toObserver (_ => ()))
 
     export form.{component => _, _}
+
+    private def setButtonPlayText(text: String): Unit =
+      playButton.text = text
+      playButton.repaint()
+
+    override def setButtonPlay(): Unit = setButtonPlayText("Play")
+
+    override def setButtonPause(): Unit = setButtonPlayText("Pause")
 
     override def attachStartSimulation(observer: ClickObserver[SimulationInfo]): Unit =
       playObservable attachClick observer
