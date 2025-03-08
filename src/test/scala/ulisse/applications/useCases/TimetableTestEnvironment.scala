@@ -27,7 +27,7 @@ object TimetableTestEnvironment:
       routeCD <- Route(stationC, stationD, RouteType.AV, railsCount = 1, length = 30)
     yield AppState()
       .updateTechnology(_ => TechnologyManager(List(trainTechnology)))
-      .updateTrain((_, _) => TrainManager(List(AV1000Train, AV800Train)))
+      .createTrain((_, _) => TrainManager(List(AV1000Train, AV800Train)))
       .updateRoute(_ => RouteManager.createOf(List(routeAB, routeBC, routeCD)))
 
   def apply(): Either[RouteError, TestEnvConfig] =

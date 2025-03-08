@@ -52,9 +52,9 @@ class EventQueueTest extends AnyFlatSpec with Matchers:
     states.lastOption mustBe Some(initialState)
 
   "add create train event" should "update train manager" in:
-    eventQueue.addCreateTrainEvent(updateTrain)
+    eventQueue.addCreateTrainEvent(createTrain)
     val states = updateState()
-    states.lastOption mustBe Some(initialState.updateTrain(updateTrain))
+    states.lastOption mustBe Some(initialState.createTrain(createTrain))
 
   "add update train event" should "update train manager" in:
     eventQueue.addUpdateTrainEvent(updateTrain)

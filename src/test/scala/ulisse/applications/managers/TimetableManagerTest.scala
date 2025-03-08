@@ -172,7 +172,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
 //    timetableBuilder.arrivesTo(stationA)(railAV_10) should be(Left(DuplicatedStations(List(stationA))))
 
   Feature("Autoupdate of timetable when route, train or station are updated"):
-    Scenario("Train is updated and then all related timetables are too"):
+    Scenario("Train is updated and then all related timetables should be too"):
       import ulisse.entities.train.Wagons
       val trainAV8080 = Train("AV8080", TrainTechnology("Normal", 160, 1.0, 1.5), Wagons.PassengerWagon(200), 12)
 
@@ -197,7 +197,7 @@ class TimetableManagerTest extends AnyFeatureSpec with GivenWhenThen:
       val manager = TimetableManagers.TimetableManager(List(timetableAB, timetableABC, updatedIgnoredTimetable))
       When("I notify manager that a train has been updated")
       val updatedManager = manager.trainUpdated(updatedTrainRV_3905)
-      Then("all timetables related to train should be updated with the new train")
+      Then("just all timetables related to train should be updated with the new train")
       updatedManager match
         case Left(err) => fail(s"Manager wrong result: $err")
         case Right(updatedManager) =>

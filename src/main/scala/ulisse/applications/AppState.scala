@@ -62,8 +62,14 @@ trait AppState:
   /** Update TechnologyManager. */
   def updateTechnology(update: TechnologyManager[TrainTechnology] => TechnologyManager[TrainTechnology]): AppState
 
-  /** Update [[TrainManager]]. */
-  def updateTrain(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): AppState
+  /** Update [[TrainManager]] when train is created. */
+  def createTrain(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): AppState
+
+  /** Update [[TrainManager]] and [[TimetableManager]] when train is updated. */
+  def updateTrain(update: (TrainManager, TechnologyManager[TrainTechnology], TimetableManager) => (
+      TrainManager,
+      TimetableManager
+  )): AppState
 
   /** Update [[TimetableManager]]. */
   def updateTimetable(update: TimetableManager => TimetableManager): AppState
@@ -135,7 +141,14 @@ object AppState:
     override def updateTechnology(update: TechnologyManager[TrainTechnology] => TechnologyManager[TrainTechnology])
         : AppState = copy(technologyManager = update(technologyManager))
 
-    override def updateTrain(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): AppState =
+    override def updateTrain(update: (TrainManager, TechnologyManager[TrainTechnology], TimetableManager) => (
+        TrainManager,
+        TimetableManager
+    )): AppState =
+      val (updatedTrainManager, updatedTimetableManager) = update(trainManager, technologyManager, timetableManager)
+      copy(trainManager = updatedTrainManager, timetableManager = updatedTimetableManager)
+
+    override def createTrain(update: (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager): AppState =
       copy(trainManager = update(trainManager, technologyManager))
 
     override def updateTimetable(update: TimetableManager => TimetableManager): AppState =

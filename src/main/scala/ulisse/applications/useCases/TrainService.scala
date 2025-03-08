@@ -12,14 +12,25 @@ import ulisse.utils.Errors.BaseError
 
 import scala.concurrent.{Future, Promise}
 
+/** Implements of trait [[Input]].
+  *
+  * @see For more details [[TrainPorts]]
+  */
 final case class TrainService(eventQueue: TrainEventQueue) extends Input:
 
   def removeTrain(name: String): Future[Either[BaseError, List[Train]]] =
     val promise = Promise[Either[BaseError, List[Train]]]
 
     eventQueue.addDeleteTrainEvent((trainManager, timetableManager) =>
-      val managerResult = trainManager.removeTrain(name)
-      (unpackResult(managerResult)(promise, trainManager), timetableManager)
+      val train = trainManager.findTrain(name)
+      trainManager.removeTrain(name) match
+        case Left(err) =>
+          promise.success(Left(err))
+          (trainManager, timetableManager)
+        case Right(updatedTrainManager) =>
+          promise.success(Right(updatedTrainManager.trains))
+          val updatedTimetableManager = train.flatMap(timetableManager.trainDeleted).getOrElse(timetableManager)
+          (updatedTrainManager, updatedTimetableManager)
     )
     promise.future
 
@@ -47,18 +58,23 @@ final case class TrainService(eventQueue: TrainEventQueue) extends Input:
       wagonCount: Int
   ): Future[Either[BaseError, List[Train]]] =
     val promise = Promise[Either[BaseError, List[Train]]]
-
-    eventQueue.addUpdateTrainEvent((trainManager, technologyManager) =>
-      val res =
+    eventQueue.addUpdateTrainEvent: (trainManager, technologyManager, timetableManager) =>
+      val train = trainManager.findTrain(name)
+      val trainManagerRes =
         for
-          t <-
-            technologyManager.technologiesList.find(_.name.contentEquals(technologyName)).toRight(TechnologyNotExists(
-              technologyName
-            ))
-          r <- trainManager.updateTrain(name)(t, wagonUseTypeName, wagonCapacity, wagonCount)
-        yield r
-      unpackResult(res)(promise, trainManager)
-    )
+          technology     <- technologyManager.getBy(technologyName)
+          updatedManager <- trainManager.updateTrain(name)(technology, wagonUseTypeName, wagonCapacity, wagonCount)
+        yield updatedManager
+
+      trainManagerRes match
+        case Left(error) =>
+          promise.success(Left(error))
+          (trainManager, timetableManager)
+        case Right(updatedTrainManager) =>
+          promise.success(Right(updatedTrainManager.trains))
+          val updatedTimetableManager = train.flatMap(timetableManager.trainUpdated).getOrElse(timetableManager)
+          (updatedTrainManager, updatedTimetableManager)
+
     promise.future
 
   def trains: Future[List[Train]] =
@@ -83,10 +99,10 @@ final case class TrainService(eventQueue: TrainEventQueue) extends Input:
 
   private def unpackResult(managerResult: Either[BaseError, TrainManager])(
       promise: Promise[Either[BaseError, List[Train]]],
-      state: TrainManager
+      currentManager: TrainManager
   ) =
     managerResult match
-      case Left(error) => promise.success(Left(error)); state
+      case Left(error) => promise.success(Left(error)); currentManager
       case Right(newManager) =>
         promise.success(Right(newManager.trains))
         newManager

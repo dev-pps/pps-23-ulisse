@@ -40,7 +40,7 @@ class SimulationServiceTest extends AnyWordSpec with Matchers with BeforeAndAfte
 
   private val initialState = AppState().updateStationManager(_ => stationManager)
     .updateRoute(_ => routeManager)
-    .updateTrain((_, _) => trainManager)
+    .createTrain((_, _) => trainManager)
     .updateTimetable(_ => timetableManager)
     .updateSimulationManager(_ =>
       SimulationManager.defaultBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
