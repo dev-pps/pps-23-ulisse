@@ -3,12 +3,18 @@ import ulisse.utils.OptionUtils.when
 
 /** Configuration for simulation engine */
 trait EngineConfiguration:
+  /** delta time to run simulation step */
   def stepSize: Int
+
+  /** cycles per second for rendering the simulation */
   def cyclesPerSecond: Option[Int]
 
 /** Factory for [[EngineConfiguration]] instances */
 object EngineConfiguration:
-  val defaultStepSize: Int        = 1
+  /** Default step size */
+  val defaultStepSize: Int = 1
+
+  /** Default cycles per second */
   val defaultCyclesPerSecond: Int = 1
 
   /** Create a new Engine configuration, allowing only non-negative stepSize and positive cyclesPerSecond, otherwise it replaces the wrong values respectively with default and None values */

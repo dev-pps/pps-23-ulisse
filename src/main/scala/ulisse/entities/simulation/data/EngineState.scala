@@ -20,9 +20,14 @@ trait EngineState:
 
 /** Factory for [[EngineState]] instances */
 object EngineState:
+  /** Default last update */
   val defaultLastUpdate: Option[Long] = None
-  val defaultLastDelta: Long          = 0
-  val defaultElapsedCycleTime: Long   = 0
+
+  /** Default last delta */
+  val defaultLastDelta: Long = 0
+
+  /** Default elapsed cycle time */
+  val defaultElapsedCycleTime: Long = 0
 
   /** Create a new Engine state, allowing only non negative lastUpdate and positive lastDelta and elapsedCycleTime, otherwise substitute the wrong values with defaults */
   def apply(lastUpdate: Option[Long], lastDelta: Long, elapsedCycleTime: Long): EngineState =
