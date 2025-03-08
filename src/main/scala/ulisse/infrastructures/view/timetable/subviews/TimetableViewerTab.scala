@@ -30,20 +30,12 @@ class TimetableViewerTab(adapter: TimetableViewAdapter) extends SBoxPanel(Orient
   private val trainCombo: ComboBox[String] = ComboBox[String](List.empty)
   private val refreshTrainsBtn: SButton    = SButton("refresh")
   adapter.requestTrains()
-  private val trainField = SFieldLabel("Train")(trainCombo).component.createLeftRight(refreshTrainsBtn)
+  private val trainField = SFieldLabel("Train")(trainCombo)
   private val timetableCombo: ComboBox[Timetable] = new ComboBox[Timetable](List.empty) {
-    renderer = new ListView.Renderer[Timetable] {
-      def componentFor(
-          list: ListView[_ <: Timetable],
-          isSelected: Boolean,
-          focused: Boolean,
-          item: Timetable,
-          index: Int
-      ): Component = {
-        if item != null then
-          Label(s"${item.departureTime} - ${item.startStation.name} -> ${item.arrivingStation.name}")
-        else Label("")
-      }
+    renderer = (list: ListView[_ <: Timetable], isSelected: Boolean, focused: Boolean, item: Timetable, index: Int) => {
+      if item != null then
+        Label(s"${item.departureTime} - ${item.startStation.name} -> ${item.arrivingStation.name}")
+      else Label("")
     }
   }
 
@@ -58,6 +50,9 @@ class TimetableViewerTab(adapter: TimetableViewAdapter) extends SBoxPanel(Orient
   deleteBtn.rect = Styles.formFalseButtonRect
   deleteBtn.fontEffect = Styles.whiteFont
   deleteBtn.enabled = false
+
+  refreshTrainsBtn.rect = Styles.formTrueButtonRect
+  refreshTrainsBtn.fontEffect = Styles.whiteFont
 
   refreshTrainsBtn.reactions += {
     case ButtonClicked(_) => adapter.requestTrains()
@@ -88,7 +83,7 @@ class TimetableViewerTab(adapter: TimetableViewAdapter) extends SBoxPanel(Orient
   import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
   import ulisse.infrastructures.view.utils.SwingUtils.vSpaced
   contents ++= List(
-    trainField.createLeftRight(timetableField.component),
+    trainField.createLeftRight(timetableField).createLeftRight(refreshTrainsBtn),
     borderTableView,
     deleteBtn.centerHorizontally()
   ).vSpaced(15)

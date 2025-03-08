@@ -28,7 +28,7 @@ object SimulationWorkspace:
     private val workspace = BaseWorkspace()
 
     private val mapPanel: MapSimulation    = MapSimulation()
-    private val simulation: SimulationForm = Form.createSimulation()
+    private val simulation: SimulationForm = SimulationForm()
 
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(simulation.component) = Position.East

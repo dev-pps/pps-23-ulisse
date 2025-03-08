@@ -1,6 +1,5 @@
 package ulisse.applications.useCases
 
-import cats.data.NonEmptyChain
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -8,7 +7,6 @@ import ulisse.Utils.TestUtility.{and, in}
 import ulisse.applications.ports.TimetablePorts
 import ulisse.applications.ports.TimetablePorts.RequestResult
 import ulisse.applications.ports.TimetablePorts.TimetableServiceErrors.{GenericError, InvalidStation, UnavailableTracks}
-import ulisse.entities.route.Routes
 import ulisse.entities.route.Routes.RouteError
 import ulisse.entities.timetable.Timetables
 import ulisse.entities.timetable.Timetables.Timetable
@@ -89,7 +87,6 @@ class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
         val failRes = env.inputPort.createTimetable(AV800Train.name, departureTime, stationsSeq)
         env.updateState()
         Then("The second timetable should not be saved due to error UnavailableTracks")
-//        Await.result(doneRes, Duration.Inf) shouldBe Right
         Await.result(failRes, Duration.Inf) shouldBe Left(UnavailableTracks(departingStation.name))
 
   Feature("User can get timetables of a train"):
