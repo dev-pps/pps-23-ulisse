@@ -3,9 +3,11 @@ package ulisse.infrastructures.view.components
 import ulisse.infrastructures.view.components.decorators.ImageEffects.{PictureEffect, SVGEffect}
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, FontEffect, ShapeEffect}
 import ulisse.infrastructures.view.components.styles.Styles
+import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
+import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 
 import java.awt.FlowLayout
-import javax.swing.JLayeredPane
+import javax.swing.{JLayeredPane, JTextArea}
 import scala.swing.*
 
 object ExtendedSwing:
@@ -59,16 +61,17 @@ object ExtendedSwing:
     button.fontEffect = Styles.whiteFont
     button
 
+  /** Creates a button for the form, with the given text. */
   case class SButton(label: String) extends Button(label) with ShapeEffect with FontEffect:
     focusPainted = false
     contentAreaFilled = false
 
+  /** Creates a label for the form, with the given text. */
   case class SLabel(label: String) extends Label(label) with ShapeEffect with FontEffect
 
+  /** Creates a text area for the form, with the given text. */
   case class STextField(colum: Int) extends TextField(colum) with ShapeEffect with FontEffect
 
-  import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
-  import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
   extension (panes: Map[ComposedImageLabel, Component])
     /** Returns [[JTabbedPane]] given `panes`, a mapping of tab item [[ComposedImageLabel]] to theirs views. */
     def toTabbedPane: JTabbedPane =
@@ -106,3 +109,9 @@ object ExtendedSwing:
     mainPanel.contents += fieldComponent
 
     override def component[T >: Component]: T = mainPanel
+
+  /** Creates a text area for the form, with the given text. */
+  final case class STextArea() extends JTextArea:
+    setFont(Styles.defaultFont.swingFont)
+    setEditable(false)
+    setOpaque(false)

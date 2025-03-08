@@ -112,7 +112,7 @@ object AppState:
       TrainManager.empty(),
       TechnologyManager.empty(),
       TimetableManagers.empty(),
-      SimulationManager.defaultBatchManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
+      SimulationManager.defaultTimedManager(TimeProviderAdapter(TimeProvider.systemTimeProvider()))
     )
 
     override def updateStationManager(update: StationManager => StationManager): AppState =
