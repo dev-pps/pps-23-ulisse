@@ -36,18 +36,20 @@ class SimulationManagerTest extends AnyWordSpec with Matchers with BeforeAndAfte
       timeProvider.currentTimeMillis() shouldBe startTime + timeIncrement
       timeProvider.currentTimeMillis() shouldBe startTime + 2 * timeIncrement
 
-  private val mockedTT = spy(dynamicTimetable1)
+  private val mockedTT  = spy(dynamicTimetable1)
   private val mockedEnv = mock[RailwayEnvironment]
 
   override def beforeEach(): Unit =
+    setupTimeProvider()
     reset(mockedTT, mockedEnv)
     when(mockedTT.completed).thenReturn(false)
     when(mockedEnv.doStep(defaultStepSize)).thenReturn(mockedEnv)
     when(mockedEnv.timetables).thenReturn(Seq(mockedTT))
 
   private val mockedNotificationService = mock[SimulationPorts.Output]
-  private val ec = EngineConfiguration(10, Some(10))
-  private val sm            = SimulationManager.defaultBatchManager(timeProvider).setupEnvironment(mockedEnv)
+  private val ec                        = EngineConfiguration(10, Some(10))
+  private val sm                        = SimulationManager.defaultBatchManager(timeProvider)
+  private val smWithMockedEnv           = sm.setupEnvironment(mockedEnv)
 
   private def repeatDoStep(simulationManager: SimulationManager, times: Int): SimulationManager =
     (1 to times).foldLeft(simulationManager)((manager, _) => manager.doStep())
@@ -55,6 +57,21 @@ class SimulationManagerTest extends AnyWordSpec with Matchers with BeforeAndAfte
   def checkBaseConfiguration(sm: SimulationManager, ec: EngineConfiguration): Unit =
     sm.engine shouldBe Engine.emptyWithConfiguration(ec)
     sm.simulationData shouldBe SimulationData.empty()
+
+  extension (manager: SimulationManager)
+    def runEngine(block: => (SimulationManager, Int) => Unit): Unit =
+      for step <- 2 to 100 do
+        setupTimeProvider()
+        val updatedManager = repeatDoStep(manager, step)
+        val realUpdate     = step - 1
+        updatedManager.verifyCommonUpdate(realUpdate)
+        block(updatedManager, realUpdate)
+
+    def verifyCommonUpdate(step: Int): Unit =
+      manager.engine compareTo manager.engine ignoring State shouldBeBoolean true
+      manager.engine.state.lastUpdate shouldBe Some(startTime + step * timeIncrement)
+      manager.engine.state.lastDelta shouldBe timeIncrement
+      manager.simulationData.millisecondsElapsed shouldBe step * timeIncrement
 
   "SimulationManager" when:
     "created" should:
@@ -64,7 +81,10 @@ class SimulationManagerTest extends AnyWordSpec with Matchers with BeforeAndAfte
       "send notification on do step" in:
         val manager = SimulationManager(Some(mockedNotificationService), timeProvider, defaultBatch()).start()
         manager.doStep()
-        verify(mockedNotificationService).stepNotification(manager.simulationData.increaseStepByOne().simulationEnvironment = SimulationData.empty().simulationEnvironment.doStep(defaultStepSize))
+        verify(mockedNotificationService).stepNotification(
+          manager.simulationData.increaseStepByOne().simulationEnvironment =
+            SimulationData.empty().simulationEnvironment.doStep(defaultStepSize)
+        )
 
       "send notification on ended" in:
         val manager = SimulationManager(Some(mockedNotificationService), timeProvider, defaultBatch())
@@ -73,8 +93,12 @@ class SimulationManagerTest extends AnyWordSpec with Matchers with BeforeAndAfte
         when(mockedEnv.doStep(defaultStepSize)).thenReturn(mockedEnv)
 
         manager.doStep().engine.running shouldBe false
-        verify(mockedNotificationService).stepNotification(manager.simulationData.increaseStepByOne().simulationEnvironment = mockedEnv)
-        verify(mockedNotificationService).simulationEnded(manager.simulationData.increaseStepByOne().simulationEnvironment = mockedEnv)
+        verify(mockedNotificationService).stepNotification(
+          manager.simulationData.increaseStepByOne().simulationEnvironment = mockedEnv
+        )
+        verify(mockedNotificationService).simulationEnded(
+          manager.simulationData.increaseStepByOne().simulationEnvironment = mockedEnv
+        )
 
     "configured" should:
       "have base configuration" in:
@@ -98,20 +122,18 @@ class SimulationManagerTest extends AnyWordSpec with Matchers with BeforeAndAfte
 
     "setup engine" should:
       "update configuration" in:
-        val manager = SimulationManager.defaultBatchManager(timeProvider)
-        manager.setupEngine(10, Some(10)) match
+        sm.setupEngine(10, Some(10)) match
           case Some(newManager) =>
             newManager.engine.configuration shouldBe EngineConfiguration(10, Some(10))
-            newManager.simulationData shouldBe manager.simulationData
+            newManager.simulationData shouldBe sm.simulationData
           case _ => fail()
 
     "setup environment" should:
       "update environment" in:
-        val manager     = SimulationManager.defaultBatchManager(timeProvider)
         val environment = RailwayEnvironment.auto(simpleConfigurationData)
-        val newManager  = manager.setupEnvironment(environment)
-        newManager.engine shouldBe manager.engine
-        newManager.simulationData compareTo manager.simulationData ignoring SimulationEnvironment shouldBeBoolean true
+        val newManager  = sm.setupEnvironment(environment)
+        newManager.engine shouldBe sm.engine
+        newManager.simulationData compareTo sm.simulationData ignoring SimulationEnvironment shouldBeBoolean true
         newManager.simulationData.simulationEnvironment shouldBe environment
 
     "be running after starting simulation" in:
@@ -127,61 +149,45 @@ class SimulationManagerTest extends AnyWordSpec with Matchers with BeforeAndAfte
       sm.start().reset().engine.running shouldBe false
       sm.start().stop().reset().engine.running shouldBe false
 
+    "don't evolve if not running" in:
+      sm.doStep() shouldBe sm
+
     "preserve state on stop" in:
-      setupTimeProvider()
-      val manager       = SimulationManager.defaultBatchManager(timeProvider).start().doStep()
+      val manager       = sm.start().doStep()
       val pausedManager = manager.stop()
       pausedManager.engine compareTo manager.engine ignoring EngineField.Running shouldBeBoolean true
       pausedManager.simulationData shouldBe manager.simulationData
 
     "clear state on reset" in:
-      setupTimeProvider()
-      val manager      = SimulationManager.defaultBatchManager(timeProvider)
-      val resetManager = manager.start().doStep().reset()
-      resetManager.engine shouldBe manager.engine
-      resetManager.simulationData shouldBe manager.simulationData
+      val resetManager = sm.start().doStep().reset()
+      resetManager.engine shouldBe sm.engine
+      resetManager.simulationData shouldBe sm.simulationData
 
     "update state on step" in:
-      setupTimeProvider()
-      val manager        = SimulationManager.defaultBatchManager(timeProvider).setupEnvironment(mockedEnv).start()
+      val manager        = smWithMockedEnv.start()
       val updatedManager = manager.doStep()
       updatedManager.engine.state compareTo manager.engine.state ignoring LastUpdate shouldBeBoolean true
       updatedManager.engine.state compareTo manager.engine.state considering LastUpdate shouldBeBoolean false
       updatedManager.simulationData.step shouldBe 1
 
-  "BatchSimulationManager" should :
-    "update state on multiple steps" in :
-      for step <- 2 to 100 do
-        setupTimeProvider()
-        val realUpdate = step - 1
-        val manager = SimulationManager.defaultBatchManager(timeProvider).setupEnvironment(mockedEnv).start()
-        val updatedManager = repeatDoStep(manager, step)
-        updatedManager.verifyCommonUpdate(realUpdate)
-        updatedManager.engine.state.elapsedCycleTime shouldBe realUpdate * timeIncrement
-        updatedManager.simulationData.step shouldBe step
+  "BatchSimulationManager" should:
+    "update state on multiple steps" in:
+      smWithMockedEnv.start().runEngine: (updatedManager, step) =>
+        updatedManager.engine.state.elapsedCycleTime shouldBe step * timeIncrement
+        updatedManager.simulationData.step shouldBe step + 1
 
-  "TimedSimulationManager" should :
-    "update state on multiple steps" in :
-      val cps = 10
+  "TimedSimulationManager" should:
+    "update state on multiple steps" in:
+      val cps           = 10
       val cycleTimeStep = SimulationManager.calculateCycleTimeStep(cps)
-      for step <- 2 to 100 do
-        setupTimeProvider()
-        val manager = SimulationManager.configuredManager(
-          timeProvider,
-          EngineConfiguration.withCps(cps)
-        ).setupEnvironment(mockedEnv).start()
-        val updatedManager = repeatDoStep(manager, step)
-        val realUpdate = step - 1
+      val manager = SimulationManager.configuredManager(
+        timeProvider,
+        EngineConfiguration.withCps(cps)
+      ).setupEnvironment(mockedEnv).start()
+
+      manager.runEngine: (updatedManager, step) =>
         val expectedStep = (updatedManager.simulationData.millisecondsElapsed / cycleTimeStep).toInt
         updatedManager.engine.state compareTo manager.engine.state ignoring ElapsedCycleTime shouldBeBoolean false
-        updatedManager.engine.state compareTo manager.engine.state considering ElapsedCycleTime shouldBeBoolean realUpdate % (cycleTimeStep / timeIncrement) == 0
-        updatedManager.verifyCommonUpdate(realUpdate)
-        updatedManager.engine.state.elapsedCycleTime shouldBe realUpdate * timeIncrement - expectedStep * cycleTimeStep
+        updatedManager.engine.state compareTo manager.engine.state considering ElapsedCycleTime shouldBeBoolean step % (cycleTimeStep / timeIncrement) == 0
+        updatedManager.engine.state.elapsedCycleTime shouldBe step * timeIncrement - expectedStep * cycleTimeStep
         updatedManager.simulationData.step shouldBe expectedStep
-
-  extension (manager: SimulationManager)
-    def verifyCommonUpdate(step: Int): Unit =
-      manager.engine compareTo manager.engine ignoring State shouldBeBoolean true
-      manager.engine.state.lastUpdate shouldBe Some(startTime + step * timeIncrement)
-      manager.engine.state.lastDelta shouldBe timeIncrement
-      manager.simulationData.millisecondsElapsed shouldBe step * timeIncrement
