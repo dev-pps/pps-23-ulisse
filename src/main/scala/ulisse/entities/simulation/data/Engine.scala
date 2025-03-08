@@ -38,29 +38,24 @@ object Engine:
   /** Create an engine with empty configuration */
   def empty(): Engine = Engine.emptyWithConfiguration(EngineConfiguration.empty())
 
-  // TODO
-  given FieldComparator[EngineStateField, Engine] with
-    def fields: Seq[EngineStateField] = EngineStateField.values.toSeq
-    def _compare(firstEngine: Engine, otherEngine: Engine, field: EngineStateField): Boolean =
+  given FieldComparator[EngineField, Engine] with
+    def fields: Seq[EngineField] = EngineField.values.toSeq
+    def _compare(firstEngine: Engine, otherEngine: Engine, field: EngineField): Boolean =
       field match
-        case EngineStateField.Running => firstEngine.running == otherEngine.running
-        case EngineStateField.CyclesPerSecond =>
-          firstEngine.configuration.cyclesPerSecond == otherEngine.configuration.cyclesPerSecond
-        case EngineStateField.LastUpdate => firstEngine.state.lastUpdate == otherEngine.state.lastUpdate
-        case EngineStateField.LastDelta  => firstEngine.state.lastDelta == otherEngine.state.lastDelta
-        case EngineStateField.ElapsedCycleTime =>
-          firstEngine.state.elapsedCycleTime == otherEngine.state.elapsedCycleTime
-
-  enum EngineStateField extends Field[EngineStateField, Engine]:
-    case Running, CyclesPerSecond, LastUpdate, LastDelta, ElapsedCycleTime
-    def values: Seq[EngineStateField] = EngineStateField.values.toSeq
+        case EngineField.Running => firstEngine.running == otherEngine.running
+        case EngineField.Configuration => firstEngine.configuration == otherEngine.configuration
+        case EngineField.State => firstEngine.state == otherEngine.state
+  
+  enum EngineField extends Field[EngineField, Engine]:
+    case Running, Configuration, State
+    def values: Seq[EngineField] = EngineField.values.toSeq
 
   private final case class EngineImpl(
       running: Boolean,
       configuration: EngineConfiguration,
       state: EngineState
   ) extends Engine:
-    def reset(): Engine                              = Engine(false, configuration, EngineState.empty())
     override def running_=(running: Boolean): Engine = copy(running = running)
     override def configuration_=(configuration: EngineConfiguration): Engine = copy(configuration = configuration)
     override def state_=(state: EngineState): Engine                         = copy(state = state)
+    override def reset(): Engine                              = Engine(false, configuration, EngineState.empty())
