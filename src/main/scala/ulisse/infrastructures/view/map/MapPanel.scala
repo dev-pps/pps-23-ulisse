@@ -37,7 +37,7 @@ object MapPanel:
     def attachClickRoute(event: ClickObserver[MapElement[Route]]): Unit = routes attachClick event
 
     override def uploadStation(newStations: StationPorts.Input#SM): Unit =
-      stations update (newStations map (MapElement createStation (_, ImagePath.station)))
+      stations update (newStations map MapElement.createStation)
       updateGraphics()
 
     override def updateRoutes(newRoutes: List[Route]): Unit =

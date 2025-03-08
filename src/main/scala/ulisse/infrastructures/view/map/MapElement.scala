@@ -1,7 +1,8 @@
 package ulisse.infrastructures.view.map
 
+import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Routes.{Route, RouteType}
-import ulisse.entities.station.Station
+import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.infrastructures.view.common.Observers.Observable
 import ulisse.infrastructures.view.common.{ImagePath, Observers}
 import ulisse.infrastructures.view.components.draw.DrawImages.DrawImage
@@ -27,11 +28,17 @@ trait MapElement[T] extends Observable[MapElement[T]]:
 /** Companion object for [[MapElement]]. */
 object MapElement:
   /** Create a new [[MapElement]] with the given [[Station]], [[String]] and [[Point]]. */
-  def createStation(station: Station, imagePath: String): MapElement[Station] =
+  def createStation(station: Station): MapElement[Station] =
+    val imagePath = ImagePath.station
+    MapElementSimple(station, DrawImageSimple.createAt(imagePath, station.coordinate.toPoint))
+
+  /** Create a new [[MapElement]] with the given [[StationEnvironmentElement]]. */
+  def createStationEnvironmentElement(station: StationEnvironmentElement): MapElement[StationEnvironmentElement] =
+    val imagePath = ImagePath.station
     MapElementSimple(station, DrawImageSimple.createAt(imagePath, station.coordinate.toPoint))
 
   /** Create a new [[MapElement]] with the given [[Route]] and [[String]]. */
-  def createRoute(route: Route, findPath: Boolean): MapElement[Route] =
+  def createRoute[R <: Route](route: R, findPath: Boolean): MapElement[R] =
     val offset        = new Point(-10, -10)
     val offsetWithOld = if findPath then offset else new Point(0, 0)
     val start         = route.departure.coordinate.toPoint plus offsetWithOld

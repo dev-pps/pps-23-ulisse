@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.page.workspaces
 
 import ulisse.adapters.input.SimulationPageAdapter
 import ulisse.entities.simulation.data.SimulationData
-import ulisse.infrastructures.view.map.MapPanel
+import ulisse.infrastructures.view.map.{MapPanel, MapSimulation}
 import ulisse.infrastructures.view.page.forms.{Form, SimulationForm}
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
@@ -25,7 +25,7 @@ object SimulationWorkspace:
   private case class SimulationWorkspaceImpl(adapter: SimulationPageAdapter) extends SimulationWorkspace:
     private val workspace = BaseWorkspace()
 
-    private val mapPanel: MapPanel         = MapPanel()
+    private val mapPanel: MapSimulation    = MapSimulation()
     private val simulation: SimulationForm = Form.createSimulation()
 
     workspace.workPanel.layout(mapPanel) = Position.Center
@@ -40,7 +40,9 @@ object SimulationWorkspace:
       val values = adapter.initSimulation()
       values.onComplete(_.fold(
         error => println(s"Error: $error"),
-        (engine, data) => data
+        (engine, data) =>
+          mapPanel.uploadStation(data.simulationEnvironment.stations)
+          mapPanel.uploadRoutes(data.simulationEnvironment.routes)
       ))
       println("Initializing simulation:")
 
