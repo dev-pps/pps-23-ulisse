@@ -70,8 +70,8 @@ object MapWorkspace:
     workspace.menuPanel.layout(formManager.component) = Position.East
     workspace.revalidate()
 
-    formManager.stationForm attachCreation CreationStationEvent(adapterManager.station, this)
-    formManager.stationForm attachDeletion DeletionStationEvent(adapterManager.station, this)
+    formManager.stationForm attachCreation CreationStationEvent(adapterManager.station, this, stationForm)
+    formManager.stationForm attachDeletion DeletionStationEvent(adapterManager.station, this, stationForm)
 
     formManager.routeForm attachCreation RouteForm.CreationRouteEvent(adapterManager.route, this)
     formManager.routeForm attachDeletion RouteForm.DeletionRouteEvent(adapterManager.route, this)
@@ -83,9 +83,8 @@ object MapWorkspace:
       stationForm.resetSelectedStation, routeForm.selectedRoute, routeForm.selectedRoute_=, routeForm.resetSelectedRoute
 
     override def compileStationCoordinatesForm(point: Point): Unit =
-      if (selectedStation.isEmpty)
-        stationForm.xField.text = point.x.toString
-        stationForm.yField.text = point.y.toString
+      stationForm.xField.text = point.x.toString
+      stationForm.yField.text = point.y.toString
 
     override def updateStations(stations: StationPorts.Input#SM): Unit =
       mapPanel uploadStation stations

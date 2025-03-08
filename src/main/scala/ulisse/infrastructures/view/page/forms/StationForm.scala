@@ -13,6 +13,7 @@ import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.page.forms.Form.{BaseForm, CleanFormEvent}
 import ulisse.infrastructures.view.page.workspaces.MapWorkspace
 import ulisse.infrastructures.view.utils.ComponentUtils.*
+import ulisse.utils.ValidationUtils.mkErrors
 import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 
 import scala.swing.{Orientation, Swing}
@@ -69,25 +70,28 @@ object StationForm:
   def apply(): StationForm = StationFormImpl()
 
   /** Represents the creation station event. */
-  final case class CreationStationEvent(adapter: StationEditorAdapter, workspace: MapWorkspace)
+  final case class CreationStationEvent(adapter: StationEditorAdapter, workspace: MapWorkspace, form: StationForm)
       extends ClickObserver[StationCreationInfo]:
 
     private def createStation(data: StationCreationInfo): Unit =
-      adapter addStation data onComplete (_ fold (println, _ fold (println, workspace.updateStations)))
+      adapter addStation data onComplete (_ fold (println, _ fold (error =>
+        form.showError(s"${error.mkErrors}"), workspace.updateStations)))
 
     private def updateStation(data: StationCreationInfo, oldStation: Station): Unit =
-      adapter updateStation (data, oldStation) onComplete (_ fold (println, _ fold (println, workspace.update)))
+      adapter updateStation (data, oldStation) onComplete (_ fold (println, _ fold (error =>
+        form.showError(s"${error.mkErrors}"), workspace.update)))
 
     override def onClick(data: StationCreationInfo): Unit =
       workspace.selectedStation.fold(createStation(data))(updateStation(data, _))
 
   /** Represents the deletion station event. */
-  final case class DeletionStationEvent(adapter: StationEditorAdapter, workspace: MapWorkspace)
+  final case class DeletionStationEvent(adapter: StationEditorAdapter, workspace: MapWorkspace, form: StationForm)
       extends ClickObserver[StationCreationInfo]:
 
     override def onClick(data: StationCreationInfo): Unit =
-      workspace.selectedStation.fold(println("Error not found"))(
-        adapter removeStation _ onComplete (_ fold (println, _ fold (println, workspace.update)))
+      workspace.selectedStation.fold(form.showError("Error not found"))(
+        adapter removeStation _ onComplete (_ fold (println, _ fold (error =>
+          form.showError(s"${error.mkErrors}"), workspace.update)))
       )
 
   /** Represents the take point from map event. */
@@ -99,7 +103,7 @@ object StationForm:
   final case class TakeStationFromMapEvent(workspace: MapWorkspace) extends ClickObserver[MapElement[Station]]:
     override def onClick(data: MapElement[Station]): Unit =
       workspace.selectedStation = data.element
-      workspace.compileStationForm(data.element)
+      workspace compileStationForm data.element
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class StationFormImpl() extends StationForm:
@@ -119,11 +123,11 @@ object StationForm:
     private val deletionObservable                = Observers.createObservable[StationCreationInfo]
     private var _selectedStation: Option[Station] = Option.empty
 
-    controlPanel.hGap = 10
+    controlPanel.hGap = form.space
     controlPanel.contents += saveButton
     controlPanel.contents += deleteButton
     layoutButton.contents += controlPanel
-    layoutButton.contents += Swing.VStrut(10)
+    layoutButton.contents += Swing.VStrut(form.space)
     layoutButton.contents += resetButton.centerHorizontally()
     buttonPanel.contents += layoutButton
 

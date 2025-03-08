@@ -9,7 +9,7 @@ import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes.{Route, RouteError, RouteType}
 import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
-import ulisse.utils.ValidationUtils.mkStringErrors
+import ulisse.utils.ValidationUtils.mkMsgErrors
 
 object RouteTest:
   type ValidationRoute = Either[RouteError, Route]
@@ -28,7 +28,7 @@ class RouteTest extends AnyFlatSpec with Matchers:
 
   "create routes" should "set core parameters: typology, railsCount, path" in:
     validateRoute match
-      case Left(errors) => fail(errors.mkStringErrors)
+      case Left(errors) => fail(errors.mkMsgErrors)
       case Right(route) =>
         route.departure mustBe departure
         route.arrival mustBe arrival
