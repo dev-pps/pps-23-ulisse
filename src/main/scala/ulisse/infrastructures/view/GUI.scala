@@ -16,8 +16,8 @@ object GUI:
   def apply(adapterManager: InputAdapterManager, workspace: SimulationWorkspace): GUI =
     GUIImpl(adapterManager, workspace)
 
-  private case class GUIImpl(adapterManager: InputAdapterManager, workspace: SimulationWorkspace) extends MainFrame,
-        GUI:
+  private case class GUIImpl(adapterManager: InputAdapterManager, simulationWorkspace: SimulationWorkspace)
+      extends MainFrame, GUI:
     title = "Ulisse"
     preferredSize = new Dimension(1300, 1000)
 
@@ -26,7 +26,7 @@ object GUI:
 
     private val menu             = Menu()
     private val dashboard        = Dashboard()
-    private val workspaceManager = WorkspaceManager(workspace, mapWorkspace, trainWorkspace)
+    private val workspaceManager = WorkspaceManager(simulationWorkspace, mapWorkspace, trainWorkspace)
 
     private val pageManager = PageManager(menu, dashboard, workspaceManager)
 
