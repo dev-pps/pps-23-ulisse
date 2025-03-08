@@ -9,14 +9,18 @@ import ulisse.infrastructures.view.components.styles.Styles
 import scala.swing.event.MouseEvent
 import scala.swing.{Component, Orientation}
 
+/** Represents the form of the application. */
 trait Form extends ComposedSwing:
+  /** Cleans the form. */
   def cleanForm(): Unit = ()
 
+/** Companion object of the [[Form]]. */
 object Form:
 
-  def createRoute(): RouteForm       = RouteForm()
-  def createStation(): StationForm   = StationForm()
-  def createSchedule(): ScheduleForm = ScheduleForm()
+  def createRoute(): RouteForm           = RouteForm()
+  def createStation(): StationForm       = StationForm()
+  def createSchedule(): ScheduleForm     = ScheduleForm()
+  def createSimulation(): SimulationForm = SimulationForm()
 
   /** Represents the clean form event. */
   final case class CleanFormEvent(form: Form) extends ClickObserver[MouseEvent]:
