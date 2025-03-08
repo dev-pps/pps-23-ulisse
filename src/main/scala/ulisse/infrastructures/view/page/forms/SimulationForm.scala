@@ -11,10 +11,12 @@ import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.page.forms.Form.BaseForm
 import ulisse.infrastructures.view.page.forms.SimulationForm.SimulationInfo
 import ulisse.entities.simulation.data.Statistics.*
+import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, ShapeEffect}
 import ulisse.utils.Times.*
 
+import javax.swing.JTextArea
 import scala.swing.BorderPanel.Position
-import scala.swing.Component
+import scala.swing.{Component, Swing}
 
 /** Represents the simulation form of the application. */
 trait SimulationForm extends Form:
@@ -57,13 +59,13 @@ object SimulationForm:
     private val mainPanel: SBorderPanel                     = SBorderPanel()
     private val stepSize: ComposedSwing.InfoTextField       = ComposedSwing createInfoTextField "Step"
     private val cyclePerSecond: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Cycle"
-    private val playButton  = ExtendedSwing createFormButtonWith ("Play", Styles.formButtonRect)
-    private val resetButton = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
-    private val infoLabel   = ExtendedSwing SLabel ""
-    private val form        = BaseForm("Simulation", stepSize, cyclePerSecond)
+    private val playButton   = ExtendedSwing createFormButtonWith ("Play", Styles.formButtonRect)
+    private val resetButton  = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
+    private val textInfoArea = ExtendedSwing.STextArea()
+    private val form         = BaseForm("Simulation", stepSize, cyclePerSecond)
 
-    private val panelInfo = ExtendedSwing createFlowPanel (infoLabel, form.component)
-    panelInfo.contents += infoLabel
+    private val panelInfo = ExtendedSwing createFlowPanel (Component.wrap(textInfoArea), form.component)
+    panelInfo.contents += Component.wrap(textInfoArea)
 
     buttonPanel.contents += playButton
     buttonPanel.contents += resetButton
@@ -90,7 +92,13 @@ object SimulationForm:
       cyclePerSecond.text = s"${engine.cyclesPerSecond.getOrElse(0)}"
 
     override def printInfoSimulation(info: SimulationData): Unit =
-      val infoStr = s"CYCLE PER SECOND: ${info.millisecondsElapsed.toTime}"
-      infoLabel.text = infoStr
+      val infoStr = s"""SIMULATION TIME: ${info.millisecondsElapsed.toTime}
+         \nENVIRONMENT TIME: ${info.simulationEnvironment.time}
+         \nCUMULATIVE DELAY: ${info.simulationEnvironment.cumulativeDelay}
+         \nAVERAGE DELAY: ${info.simulationEnvironment.averageDelay}
+         \nTRAIN IN STATIONS: ${info.simulationEnvironment.percTrainsInStations} %
+         \nTRAIN ON ROUTE: ${info.simulationEnvironment.percTrainsOnRoutes} %
+         \nSTATION LOAD: ${info.simulationEnvironment.percStationsLoad} %"""
+      textInfoArea.setText(infoStr)
 
     override def component[T >: Component]: T = mainPanel

@@ -56,7 +56,6 @@ object SimulationWorkspace:
       Swing.onEDT {
         mapPanel.uploadTrain(data.simulationEnvironment.routes)
         simulation.printInfoSimulation(data)
-        println("Updating simulation data:")
       }
 
     override def endSimulation(data: SimulationData): Unit =
