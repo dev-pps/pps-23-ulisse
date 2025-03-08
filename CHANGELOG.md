@@ -1,3 +1,21 @@
+## [1.35.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.34.0...v1.35.0) (2025-03-08)
+
+### Features
+
+* add label info for similation ([e165e95](https://github.com/dev-pps/pps-23-ulisse/commit/e165e9587552a08bb5225e512ece2bb7a8e124f3))
+* add statistics ([af542f0](https://github.com/dev-pps/pps-23-ulisse/commit/af542f018c57f851b67de8f5d559c4593e511dae))
+* attach route simulation at form ([f8b53a4](https://github.com/dev-pps/pps-23-ulisse/commit/f8b53a471499a67825668b01ba753df9f043ac35))
+* attach simulation info ([c51c619](https://github.com/dev-pps/pps-23-ulisse/commit/c51c61922c465010c806121f2172eb025ea4ba0f))
+* attach station simulation at form ([407c69a](https://github.com/dev-pps/pps-23-ulisse/commit/407c69a71b78e8bf23e2720239386a775fe8e5e3))
+* attach train simulation on form ([d4de785](https://github.com/dev-pps/pps-23-ulisse/commit/d4de785afb5a1b363f771379ce6c0e0f75fc8546))
+* check simulation elements when click event ([a778c92](https://github.com/dev-pps/pps-23-ulisse/commit/a778c92dfd35f047edcbe430d80ac323a3e1bb8f))
+* create text field to show simulation elements ([148a89c](https://github.com/dev-pps/pps-23-ulisse/commit/148a89c72b6b653e63a68ba582f8f891f66e71c9))
+* show simulation statistics ([7f8d732](https://github.com/dev-pps/pps-23-ulisse/commit/7f8d732b5a54edc77effb3b7db0de2cf47ff5b66))
+
+### Bug Fixes
+
+* Architecture ([82d8ba2](https://github.com/dev-pps/pps-23-ulisse/commit/82d8ba216c31c3deab1040412cda4e707c3bcc0e))
+
 ## [1.34.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.33.0...v1.34.0) (2025-03-08)
 
 ### Features
