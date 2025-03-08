@@ -3,6 +3,7 @@ package ulisse.infrastructures.view.page.workspaces
 import ulisse.adapters.input.SimulationPageAdapter
 import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.map.MapPanel
+import ulisse.infrastructures.view.page.forms.{Form, SimulationForm}
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 
@@ -21,10 +22,13 @@ object SimulationWorkspace:
   private case class SimulationWorkspaceImpl(simulationAdapter: SimulationPageAdapter) extends SimulationWorkspace:
     private val workspace = BaseWorkspace()
 
-    private val mapPanel: MapPanel = MapPanel()
-//    private val simulation: SimulationForm =
+    private val mapPanel: MapPanel         = MapPanel()
+    private val simulation: SimulationForm = Form.createSimulation()
 
     workspace.workPanel.layout(mapPanel) = Position.Center
+    workspace.menuPanel.layout(simulation.component) = Position.East
+    workspace.revalidate()
+    workspace.component.repaint()
 
     export workspace.{component, revalidate}
 
