@@ -28,18 +28,29 @@ object SimulationForm:
   def apply(): SimulationForm = SimulationFormImpl()
 
   /** Represents the simulation form data. */
-  final case class SimulationInfo(step: String, cyclePerSecond: String)
+  final case class SimulationInfo(step: String, cyclePerSecond: String):
+    def stepInt: Option[Int]           = step.toIntOption
+    def cyclePerSecondInt: Option[Int] = cyclePerSecond.toIntOption
 
   /** Represents the start simulation event. */
-  private final case class PlaySimulationEvent(adapter: SimulationPageAdapter) extends ClickObserver[SimulationInfo]:
-    override def onClick(info: SimulationInfo): Unit = ()
+  final case class PlaySimulationEvent(adapter: SimulationPageAdapter) extends ClickObserver[SimulationInfo]:
+    override def onClick(info: SimulationInfo): Unit =
+      adapter.initSimulation()
+      info.stepInt.fold(println("error"))(step =>
+        adapter.setupEngine(step, info.cyclePerSecondInt)
+        adapter.start()
+      )
+
+  /** Represents the reset simulation event. */
+  final case class ResetSimulationEvent(adapter: SimulationPageAdapter) extends ClickObserver[Unit]:
+    override def onClick(info: Unit): Unit = adapter.reset()
 
   private case class SimulationFormImpl() extends SimulationForm:
     private val mainPanel: SBorderPanel                     = SBorderPanel()
     private val stepSize: ComposedSwing.InfoTextField       = ComposedSwing createInfoTextField "Step"
     private val cyclePerSecond: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Cycle"
     private val playButton  = ExtendedSwing createFormButtonWith ("Play", Styles.formButtonRect)
-    private val resetButton = ExtendedSwing createFormButtonWith ("Delete", Styles.formButtonRect)
+    private val resetButton = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
     private val form        = BaseForm("Simulation", stepSize, cyclePerSecond)
 
     buttonPanel.contents += playButton
