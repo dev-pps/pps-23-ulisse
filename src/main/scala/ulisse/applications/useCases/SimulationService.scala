@@ -20,6 +20,7 @@ final case class SimulationService(
     private val notificationService: SimulationPorts.Output
 ) extends SimulationPorts.Input:
   val minPermittedDistanceBetweenTrains: Double = 100.0
+  eventQueue.addUpdateSimulationManagerEvent(_.withNotificationService(Some(notificationService)))
 
   override def initSimulation(): Future[(Engine, SimulationData)] =
     val p = Promise[(Engine, SimulationData)]()
