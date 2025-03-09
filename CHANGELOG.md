@@ -1,3 +1,10 @@
+## [1.36.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.35.0...v1.36.0) (2025-03-09)
+
+### Features
+
+* play end pause simulation ([ffda256](https://github.com/dev-pps/pps-23-ulisse/commit/ffda2566193c58e33ee3f199cf913dc02926ef4c))
+* update simulation graphics ([2befb8f](https://github.com/dev-pps/pps-23-ulisse/commit/2befb8f0870e44935d48b9f9dc0a59e9e7c5b749))
+
 ## [1.35.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.34.0...v1.35.0) (2025-03-08)
 
 ### Features
