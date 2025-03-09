@@ -19,7 +19,7 @@ trait Form extends ComposedSwing:
   def showError(error: String): Unit
 
   /** Resets the error message. */
-  def resetError(): Unit = showError("")
+  def resetError(): Unit = showError("---")
 
 /** Companion object of the [[Form]]. */
 object Form:
@@ -61,7 +61,7 @@ object Form:
     mainPanel.contents += insertForm.component
     mainPanel.contents += boxPanel
 
-    def showError(error: String): Unit = errorLabel.text = s"ERROR: $error"
+    def showError(error: String): Unit = errorLabel.text = s"$error"
 
     def component[T >: Component]: T = mainPanel
 

@@ -13,8 +13,8 @@ import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.page.forms.Form.{BaseForm, CleanFormEvent}
 import ulisse.infrastructures.view.page.workspaces.MapWorkspace
-import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 import ulisse.infrastructures.view.utils.ComponentUtils.*
+import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 import ulisse.utils.ValidationUtils.mkMsgErrors
 
 import scala.swing.{Orientation, Swing}
@@ -89,6 +89,7 @@ object RouteForm:
         form.showError(s"${error.mkMsgErrors}"), workspace.updateRoutes)))
 
     override def onClick(data: RouteCreationInfo): Unit =
+      form.resetError()
       workspace.selectedRoute.fold(creationRoute(data))(updateRoute(data, _))
 
   /** Represents the deletion route event. */
@@ -96,6 +97,7 @@ object RouteForm:
       extends ClickObserver[RouteCreationInfo]:
 
     override def onClick(data: RouteCreationInfo): Unit =
+      form.resetError()
       adapter delete data onComplete (_ fold (println, _ fold (error =>
         form.showError(s"${error.mkMsgErrors}"), workspace.updateRoutes)))
 

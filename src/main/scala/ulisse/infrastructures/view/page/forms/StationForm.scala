@@ -13,11 +13,11 @@ import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.page.forms.Form.{BaseForm, CleanFormEvent}
 import ulisse.infrastructures.view.page.workspaces.MapWorkspace
 import ulisse.infrastructures.view.utils.ComponentUtils.*
-import ulisse.utils.ValidationUtils.mkErrors
 import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
+import ulisse.utils.ValidationUtils.mkErrors
 
-import scala.swing.{Orientation, Swing}
 import scala.swing.event.MouseEvent
+import scala.swing.{Orientation, Swing}
 
 /** Represents the station form of the application. */
 trait StationForm extends Form:
@@ -82,6 +82,7 @@ object StationForm:
         form.showError(s"${error.mkErrors}"), workspace.update)))
 
     override def onClick(data: StationCreationInfo): Unit =
+      form.resetError()
       workspace.selectedStation.fold(createStation(data))(updateStation(data, _))
 
   /** Represents the deletion station event. */
@@ -89,6 +90,7 @@ object StationForm:
       extends ClickObserver[StationCreationInfo]:
 
     override def onClick(data: StationCreationInfo): Unit =
+      form.resetError()
       workspace.selectedStation.fold(form.showError("Error not found"))(
         adapter removeStation _ onComplete (_ fold (println, _ fold (error =>
           form.showError(s"${error.mkErrors}"), workspace.update)))
