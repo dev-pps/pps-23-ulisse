@@ -1,3 +1,9 @@
+## [1.36.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.36.0...v1.36.1) (2025-03-09)
+
+### Bug Fixes
+
+* **Timetable:** fix UnrealTimeEstimator overflow time estimation ([7ad82f5](https://github.com/dev-pps/pps-23-ulisse/commit/7ad82f51609e04849fc998a46d79f1d2aee74943))
+
 ## [1.36.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.35.0...v1.36.0) (2025-03-09)
 
 ### Features
