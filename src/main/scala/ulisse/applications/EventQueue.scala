@@ -1,17 +1,16 @@
 package ulisse.applications
 
-import ulisse.applications.event._
+import ulisse.applications.event.*
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.TrainManagers.TrainManager
 import ulisse.applications.managers.{SimulationManager, StationManager}
-import ulisse.entities.simulation.data.SimulationData
 import ulisse.entities.train.Trains.TrainTechnology
 
 import java.util.concurrent.LinkedBlockingQueue
 
-/** Event queue to update the application state. */
+/** Event queue to update the application state, it contains all the events to process. */
 trait EventQueue
     extends StationEventQueue
     with RouteEventQueue
