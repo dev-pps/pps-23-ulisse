@@ -42,13 +42,17 @@ object ValidationUtils:
     Either.cond(items.distinctBy(transform).size === items.size, items, error)
 
   extension [A, E](value: A)
+    /** Validates that the value satisfies the specified condition. */
     def cond(f: A => Boolean, error: E): Either[E, A] = Either.cond(f(value), value, error)
 
+    /** Validates that the value satisfies the specified conditions. */
     def validateChain(f: (A => Boolean, E)*): Either[NonEmptyChain[E], A] =
       f.map(value.cond).traverse(_.toValidatedNec).map(_ => value).toEither
 
   extension [A <: ErrorMessage](chainErrors: NonEmptyChain[A])
+    /** Converts a chain of error messages to a single error message. */
     def mkMsgErrors: String = chainErrors.toList.map(_.msg).mkString(", ")
 
   extension [A <: BaseError](chainErrors: NonEmptyChain[A])
+    /** Converts a chain of errors to a single error message. */
     def mkErrors: String = chainErrors.toList.map(e => s"$e").mkString(", ")
