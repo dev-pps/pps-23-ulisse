@@ -7,12 +7,20 @@ import ulisse.infrastructures.view.page.forms.{Form, RouteForm, StationForm}
 
 import scala.swing.{Component, Orientation}
 
+/** Manager of the forms. */
 trait FormManager extends ComposedSwing:
+  /** The station form. */
   def stationForm: StationForm
+
+  /** The route form. */
   def routeForm: RouteForm
+
+  /** The timetable form. */
   def timetableForm: TimetableForm
 
+/** Factory of the form manager. */
 object FormManager:
+  /** Create a form manager. */
   def createMap(adapter: TimetableViewAdapter): FormManager = new FormManagerImpl(adapter)
 
   private case class BaseFormManager(iconLabels: ComposedImageLabel*)(forms: Form*):
@@ -21,8 +29,11 @@ object FormManager:
 
     page.map(tabbedPane.paneOf(_).contents += _.component)
 
+    /** Return the form of the label. */
     def pageOf(label: ComposedImageLabel): Form = page(label)
-    def component[T >: Component]: T            = tabbedPane.component
+
+    /** Return the component of the form manager. */
+    def component[T >: Component]: T = tabbedPane.component
 
   private case class FormManagerImpl(stationForm: StationForm, routeForm: RouteForm, timetableForm: TimetableForm)
       extends FormManager:

@@ -17,7 +17,7 @@ trait MapPanel extends Panel with EnhancedLook:
   def attachClickRoute(event: ClickObserver[MapElement[Route]]): Unit
 
   /** Draw the station on the screen. */
-  def uploadStation(newStations: StationPorts.Input#SM): Unit
+  def updateStation(newStations: StationPorts.Input#SM): Unit
 
   /** Draw the route on the screen. */
   def updateRoutes(newRoutes: List[Route]): Unit
@@ -31,11 +31,11 @@ object MapPanel:
     private val stations = MapElements[Station](observable)
     private val routes   = MapElements[Route](observable)
 
-    def attachClickStation(event: ClickObserver[MapElement[Station]]): Unit = stations attachClick event
+    override def attachClickStation(event: ClickObserver[MapElement[Station]]): Unit = stations attachClick event
 
-    def attachClickRoute(event: ClickObserver[MapElement[Route]]): Unit = routes attachClick event
+    override def attachClickRoute(event: ClickObserver[MapElement[Route]]): Unit = routes attachClick event
 
-    override def uploadStation(newStations: StationPorts.Input#SM): Unit =
+    override def updateStation(newStations: StationPorts.Input#SM): Unit =
       stations update (newStations map MapElement.createStation)
       updateGraphics()
 

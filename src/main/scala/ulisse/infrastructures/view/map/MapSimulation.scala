@@ -1,13 +1,12 @@
 package ulisse.infrastructures.view.map
 
-import ulisse.entities.route.Routes.Route
 import ulisse.entities.route.{RouteEnvironmentElement, Tracks}
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.train.TrainAgents
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.EnhancedLook
 import ulisse.infrastructures.view.map.MapSimulation.TrainMapElement
-import ulisse.infrastructures.view.utils.Swings.{computePosition, given_ExecutionContext, *}
+import ulisse.infrastructures.view.utils.Swings.*
 
 import java.awt.geom.Point2D
 import scala.swing.{Graphics2D, Panel}
@@ -24,13 +23,13 @@ trait MapSimulation extends Panel with EnhancedLook:
   def attachClickTrain(event: ClickObserver[MapElement[TrainMapElement]]): Unit
 
   /** Draw the station on the screen. */
-  def uploadStation(newStations: Seq[StationEnvironmentElement]): Unit
+  def updateStation(newStations: Seq[StationEnvironmentElement]): Unit
 
   /** Draw the route on the screen. */
-  def uploadRoutes(newRoutes: Seq[RouteEnvironmentElement]): Unit
+  def updateRoutes(newRoutes: Seq[RouteEnvironmentElement]): Unit
 
   /** Draw the train on the screen. */
-  def uploadTrain(newRoutes: Seq[RouteEnvironmentElement]): Unit
+  def updateTrain(newRoutes: Seq[RouteEnvironmentElement]): Unit
 
 /** Companion object for [[MapSimulation]]. */
 object MapSimulation:
@@ -55,12 +54,12 @@ object MapSimulation:
     override def attachClickTrain(event: ClickObserver[MapElement[TrainMapElement]]): Unit =
       trains attachClick event
 
-    override def uploadStation(newStations: Seq[StationEnvironmentElement]): Unit =
+    override def updateStation(newStations: Seq[StationEnvironmentElement]): Unit =
       stations update (newStations map MapElement.createStationEnvironmentElement)
       updateGraphics()
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    override def uploadRoutes(newRoutes: Seq[RouteEnvironmentElement]): Unit =
+    override def updateRoutes(newRoutes: Seq[RouteEnvironmentElement]): Unit =
       var routeCheck: List[(RouteEnvironmentElement, Boolean)] = List.empty
       newRoutes.foreach(route =>
         if routeCheck.exists((a, b) => a.isPath(route.departure, route.arrival) && !b) then
@@ -71,7 +70,7 @@ object MapSimulation:
       routes update (routeCheck map MapElement.createRoute)
       updateGraphics()
 
-    override def uploadTrain(newRoutes: Seq[RouteEnvironmentElement]): Unit =
+    override def updateTrain(newRoutes: Seq[RouteEnvironmentElement]): Unit =
       val trainsWithPosition = newRoutes.flatten(route =>
         val env                 = route.containers
         val departureCoordinate = route.departure.coordinate

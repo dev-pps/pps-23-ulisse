@@ -57,9 +57,9 @@ object SimulationWorkspace:
       if now - lastUpdate > minUpdate then
         lastUpdate = now
         Swing.onEDT:
-          mapPanel uploadStation data.simulationEnvironment.stations
-          mapPanel uploadRoutes data.simulationEnvironment.routes
-          mapPanel uploadTrain data.simulationEnvironment.routes
+          mapPanel updateStation data.simulationEnvironment.stations
+          mapPanel updateRoutes data.simulationEnvironment.routes
+          mapPanel updateTrain data.simulationEnvironment.routes
           mapPanel attachClickStation SimulationForm.TakeStationEvent(simulation, infoSimulation)
           mapPanel attachClickRoute SimulationForm.TakeRouteEvent(simulation, infoSimulation)
           mapPanel attachClickTrain SimulationForm.TakeTrainEvent(simulation, infoSimulation)

@@ -88,7 +88,7 @@ object DrawImageTiled:
       val positions =
         val distance = start distance end
         val nStep    = distance / width
-        val i        = 0 until (nStep.toInt + 1)
+        val i        = 2 until (nStep.toInt + 1)
         i.map(i =>
           val step = (dir times (width * i)).toPoint
           start plus step

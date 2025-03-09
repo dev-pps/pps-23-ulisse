@@ -11,6 +11,7 @@ import java.awt.image.{BufferedImage, ImageObserver}
 import scala.swing.event.MouseEvent
 import scala.swing.{Dimension, Graphics2D, Point}
 
+/** Draw an image with a silhouette. */
 trait DrawImageSimple extends DrawImage
 
 /** Companion object for [[DrawImage]]. */
