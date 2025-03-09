@@ -1,4 +1,4 @@
-package ulisse.dsl
+package ulisse.applications
 
 import ulisse.applications.AppState
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager

@@ -1,11 +1,11 @@
 package ulisse.applications.useCases
 
+import ulisse.applications.RailwayConfig
 import ulisse.applications.event.SimulationEventQueue
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.ports.SimulationPorts.Input.Preset
 import ulisse.applications.ports.SimulationPorts.Input.Preset.*
-import ulisse.dsl.RailwayConfig
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.data.{Engine, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}

@@ -63,11 +63,11 @@ class SimulationManagerTest extends AnyWordSpec with Matchers with BeforeAndAfte
         setupTimeProvider()
         val updatedManager = repeatDoStep(manager, step)
         val realUpdate     = step - 1
-        updatedManager.verifyCommonUpdate(realUpdate)
+        updatedManager.verifyCommonUpdate(manager, realUpdate)
         block(updatedManager, realUpdate)
 
-    def verifyCommonUpdate(step: Int): Unit =
-      manager.engine compareTo manager.engine ignoring State shouldBeBoolean true
+    def verifyCommonUpdate(oldManager: SimulationManager, step: Int): Unit =
+      manager.engine compareTo oldManager.engine ignoring State shouldBeBoolean true
       manager.engine.state.lastUpdate shouldBe Some(startTime + step * timeIncrement)
       manager.engine.state.lastDelta shouldBe timeIncrement
       manager.simulationData.millisecondsElapsed shouldBe step * timeIncrement
