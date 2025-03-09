@@ -63,7 +63,7 @@ object Times:
     private val ignoredSecondValue = 0
 
     def apply(h: Hour, m: Minute): Either[ClockTimeErrors, ClockTime] =
-      val time = Time(h, m, ignoredSecondValue)
+      val time = Id(Time(0, 0, 0)) overflowSum Id(Time(h, m, ignoredSecondValue))
       for
         h <- ValidationUtils.validateRange(h, minDayHours, maxDayHours, InvalidHours(time))
         m <- ValidationUtils.validateRange(m, minDayMinutes, maxDayMinutes, InvalidMinutes(time))
