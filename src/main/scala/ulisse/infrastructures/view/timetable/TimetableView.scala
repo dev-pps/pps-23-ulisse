@@ -2,7 +2,7 @@ package ulisse.infrastructures.view.timetable
 
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
-import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
+import ulisse.infrastructures.view.components.composed.ComposedSwing.STabbedPane
 import TimetableAdapterObservers.RequestResultObserver
 import ulisse.infrastructures.view.timetable.subviews.{EditorTab, TimetableViewerTab}
 
@@ -14,7 +14,7 @@ object TimetableView:
   def apply(adapter: TimetableViewAdapter): Component =
     TimetableTabbedPane(adapter).component
 
-  private class TimetableTabbedPane(adapter: TimetableViewAdapter) extends JTabbedPane with RequestResultObserver:
+  private class TimetableTabbedPane(adapter: TimetableViewAdapter) extends STabbedPane with RequestResultObserver:
     import ulisse.infrastructures.view.components.ExtendedSwing.toTabbedPane
     given orientation: Orientation.Value = Orientation.Horizontal
     private val formIcon                 = ComposedImageLabel.createIcon("icons/calendar_add_on.svg", "Create")

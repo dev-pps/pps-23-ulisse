@@ -42,7 +42,7 @@ object Form:
   /** Represents base layout of the form. */
   final case class BaseForm(title: String, fields: ComposedSwing.InfoTextField*):
     private val mainPanel: ExtendedSwing.SBoxPanel    = ExtendedSwing SBoxPanel Orientation.Vertical
-    private val insertForm: ComposedSwing.JInsertForm = ComposedSwing.createInsertForm(title, fields: _*)
+    private val insertForm: ComposedSwing.SInsertForm = ComposedSwing.createInsertForm(title, fields: _*)
     val space                                         = 10
 
     private val boxPanel                      = ExtendedSwing SBoxPanel Orientation.Vertical

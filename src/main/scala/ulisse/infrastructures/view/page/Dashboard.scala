@@ -69,7 +69,7 @@ object Dashboard:
     private val southLabelPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
 
     private val iconApp       = ComposedImageLabel.createTransparentPicture(ImgPath.logo, ulisse)
-    private val expandButton  = ComposedSwing.JToggleIconButton(ImgPath.rightCompact, ImgPath.rightCompact)
+    private val expandButton  = ComposedSwing.SToggleIconButton(ImgPath.rightCompact, ImgPath.rightCompact)
     private val mainLabels    = Map(simulationLabel, mapLabel, trainLabel)
     private val controlLabels = Map(settingsLabel)
 

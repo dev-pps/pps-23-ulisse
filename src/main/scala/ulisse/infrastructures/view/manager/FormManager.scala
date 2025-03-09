@@ -25,7 +25,7 @@ object FormManager:
 
   private case class BaseFormManager(iconLabels: ComposedImageLabel*)(forms: Form*):
     private val page: Map[ComposedImageLabel, Form]   = iconLabels.zip(forms).toMap
-    private val tabbedPane: ComposedSwing.JTabbedPane = ComposedSwing.createTabbedPane(iconLabels: _*)
+    private val tabbedPane: ComposedSwing.STabbedPane = ComposedSwing.createTabbedPane(iconLabels: _*)
 
     page.map(tabbedPane.paneOf(_).contents += _.component)
 

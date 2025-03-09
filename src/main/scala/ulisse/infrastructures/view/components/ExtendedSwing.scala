@@ -1,7 +1,7 @@
 package ulisse.infrastructures.view.components
 
 import ulisse.infrastructures.view.common.Themes.{withAlpha, Theme}
-import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
+import ulisse.infrastructures.view.components.composed.ComposedSwing.STabbedPane
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.components.decorators.ImageEffects.{PictureEffect, SVGEffect}
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, FontEffect, ShapeEffect}
@@ -86,8 +86,8 @@ object ExtendedSwing:
   case class STextField(colum: Int) extends TextField(colum) with ShapeEffect with FontEffect
 
   extension (panes: Map[ComposedImageLabel, Component])
-    /** Returns [[JTabbedPane]] given `panes`, a mapping of tab item [[ComposedImageLabel]] to theirs views. */
-    def toTabbedPane: JTabbedPane =
+    /** Returns [[STabbedPane]] given `panes`, a mapping of tab item [[ComposedImageLabel]] to theirs views. */
+    def toTabbedPane: STabbedPane =
       val tabbedPane = ComposedSwing.createTabbedPane(panes.keys.toList: _*)
       panes.foreach((k, p) => tabbedPane.paneOf(k).contents += p)
       tabbedPane
