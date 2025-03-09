@@ -1,7 +1,6 @@
 package ulisse.dsl
 
 import ulisse.applications.AppState
-import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes
 import ulisse.entities.route.Routes.Route
@@ -15,67 +14,71 @@ object RailwayDsl:
 
   export CreateStation._, CreateTrain._, CreateRoute._, CreateAppState._ // , CreateDynamicAppState._
 
-//  object CreateDynamicAppState:
-//    var appState: AppState = AppState()
-//    case class WithDeparture(departure: Station):
-//      def withType(routeType: Routes.RouteType): WithRouteType = WithRouteType(departure, routeType)
-//
-//    case class WithRouteType(departure: Station, routeType: Routes.RouteType):
-//      def withPlatform(platform: Int): WithPlatform = WithPlatform(departure, routeType, platform)
-//
-//    case class WithPlatform(departure: Station, routeType: Routes.RouteType, platform: Int):
-//      def withLength(length: Double): WithLength = WithLength(departure, routeType, platform, length)
-//
-//    case class WithLength(
-//        departure: Station,
-//        routeType: Routes.RouteType,
-//        platform: Int,
-//        length: Double
-//    ):
-//      def withArrival(arrival: Station): LoopCreation =
-//        appState =
-//          appState.updateStationManager(stationManager => stationManager.addStation(arrival).getOrElse(stationManager))
-//            .updateRoute(manager =>
-//              Route(departure, arrival, routeType, platform, length).fold(
-//                _ => manager,
-//                route => manager.save(route).getOrElse(manager)
-//              )
-//            )
-//        LoopCreation()
-//
-//    case class LoopCreation():
-//      def add(departure: Station): WithDeparture = WithDeparture(departure)
-//
-//    implicit class AppStateDynamicOps(start: CreateDynamicAppState.type):
-//      def ->(departure: Station): WithDeparture =
-//        appState = appState.updateStationManager(stationManager =>
-//          stationManager.addStation(departure).getOrElse(stationManager)
-//        )
-//        WithDeparture(departure)
+  given Conversion[AppStateDSL, AppState] = _.appState
+
+  object CreateDynamicAppState:
+
+    case class WithAppState(var appState: AppState):
+      def ->(departure: Station): WithDeparture =
+        appState = appState.updateStationManager(stationManager =>
+          stationManager.addStation(departure).getOrElse(stationManager)
+        )
+        WithDeparture(appState, departure)
+
+    case class WithDeparture(var appState: AppState, departure: Station):
+      def withType(routeType: Routes.RouteType): WithRouteType = WithRouteType(appState, departure, routeType)
+
+    case class WithRouteType(var appState: AppState, departure: Station, routeType: Routes.RouteType):
+      def withPlatform(platform: Int): WithPlatform = WithPlatform(appState, departure, routeType, platform)
+
+    case class WithPlatform(var appState: AppState, departure: Station, routeType: Routes.RouteType, platform: Int):
+      def withLength(length: Double): WithLength = WithLength(appState, departure, routeType, platform, length)
+
+    case class WithLength(
+        var appState: AppState,
+        departure: Station,
+        routeType: Routes.RouteType,
+        platform: Int,
+        length: Double
+    ):
+      def withArrival(arrival: Station): LoopCreation =
+        appState =
+          appState.updateStationManager(stationManager => stationManager.addStation(arrival).getOrElse(stationManager))
+            .updateRoute(manager =>
+              Route(departure, arrival, routeType, platform, length).fold(
+                _ => manager,
+                route => manager.save(route).getOrElse(manager)
+              )
+            )
+        LoopCreation(appState)
+
+    case class LoopCreation(var appState: AppState):
+      def add(departure: Station): WithDeparture = WithDeparture(appState, departure)
+
+    implicit class AppStateDynamicOps(start: CreateDynamicAppState.type):
+      def ->(departure: Station): WithAppState = WithAppState(AppState())
 
   /** Create an application state. */
   object CreateAppState:
 
     case class AppStateDSL(var appState: AppState):
-      def set(train: Train): AppStateDSL =
+      def put(train: Train): AppStateDSL =
         appState = appState.updateTrain((trainManager, _) => trainManager.addTrain(train).getOrElse(trainManager))
-        AppStateDSL(appState)
+        this
 
-      def connect(route: Either[Routes.RouteError, Route]): AppStateDSL =
+      def link(route: Either[Routes.RouteError, Route]): AppStateDSL =
         appState =
           appState.updateRoute(manager => route.fold(_ => manager, route => manager.save(route).getOrElse(manager)))
-        AppStateDSL(appState)
+        this
 
-      def put(station: Station): AppStateDSL =
+      def set(station: Station): AppStateDSL =
         appState =
           appState.updateStationManager(stationManager => stationManager.addStation(station).getOrElse(stationManager))
-        AppStateDSL(appState)
+        this
 
     /** Create an application state with technology. */
     implicit class AppStateOps(start: CreateAppState.type):
-      def network(appState: AppState): AppStateDSL = AppStateDSL(appState)
-      def technology(appState: AppState, manager: TechnologyManager[TrainTechnology]): AppStateDSL =
-        AppStateDSL(appState.updateTechnology(_ => manager))
+      def ->(appState: AppState): AppStateDSL = AppStateDSL(appState)
 
   /** Create a station. */
   object CreateStation:
