@@ -18,32 +18,32 @@ object ConfigRailway:
   private val initAppState: AppState  = AppState.withTechnology(technologyManager)
   private var uploadRailway: AppState = initAppState
 
-  private val stationA = CreateStation -> "A" at (409, 188) platforms 2
-  private val stationB = CreateStation -> "B" at (758, 377) platforms 2
-  private val stationC = CreateStation -> "C" at (505, 672) platforms 3
-  private val stationD = CreateStation -> "D" at (409, 188) platforms 3
-  private val stationE = CreateStation -> "E" at (758, 377) platforms 3
-  private val stationF = CreateStation -> "F" at (505, 672) platforms 4
-  private val stationG = CreateStation -> "G" at (409, 188) platforms 4
-  private val stationH = CreateStation -> "H" at (758, 377) platforms 4
-  private val stationI = CreateStation -> "I" at (505, 672) platforms 4
-  private val stationJ = CreateStation -> "J" at (409, 188) platforms 5
+  private val stationA = CreateStation -> "A" at (314, 263) platforms 2
+  private val stationB = CreateStation -> "B" at (528, 147) platforms 2
+  private val stationC = CreateStation -> "C" at (803, 219) platforms 3
+  private val stationD = CreateStation -> "D" at (927, 444) platforms 3
+  private val stationE = CreateStation -> "E" at (813, 768) platforms 3
+  private val stationF = CreateStation -> "F" at (462, 759) platforms 4
+  private val stationG = CreateStation -> "G" at (286, 514) platforms 4
+  private val stationH = CreateStation -> "H" at (492, 540) platforms 4
+  private val stationI = CreateStation -> "I" at (590, 365) platforms 4
+  private val stationJ = CreateStation -> "J" at (725, 568) platforms 5
 
-  private val routeA = CreateRoute -> stationF -> stationG on RouteType.Normal tracks 2 length 200
-  private val routeB = CreateRoute -> stationG -> stationA on RouteType.Normal tracks 2 length 200
-  private val routeC = CreateRoute -> stationA -> stationB on RouteType.Normal tracks 2 length 200
-  private val routeD = CreateRoute -> stationB -> stationC on RouteType.Normal tracks 2 length 200
-  private val routeE = CreateRoute -> stationC -> stationD on RouteType.Normal tracks 2 length 200
-  private val routeF = CreateRoute -> stationD -> stationE on RouteType.Normal tracks 2 length 200
-  private val routeG = CreateRoute -> stationE -> stationH on RouteType.Normal tracks 2 length 200
-  private val routeH = CreateRoute -> stationH -> stationF on RouteType.Normal tracks 2 length 200
-  private val routeI = CreateRoute -> stationH -> stationG on RouteType.Normal tracks 2 length 200
-  private val routeL = CreateRoute -> stationH -> stationB on RouteType.Normal tracks 2 length 200
-  private val routeM = CreateRoute -> stationB -> stationI on RouteType.Normal tracks 2 length 200
-  private val routeN = CreateRoute -> stationI -> stationD on RouteType.Normal tracks 2 length 200
-  private val routeO = CreateRoute -> stationJ -> stationE on RouteType.Normal tracks 2 length 200
-  private val routeP = CreateRoute -> stationI -> stationJ on RouteType.Normal tracks 2 length 200
-  private val routeQ = CreateRoute -> stationI -> stationH on RouteType.Normal tracks 2 length 200
+  private val routeA = CreateRoute -> stationF -> stationG on RouteType.Normal tracks 2 length 400
+  private val routeB = CreateRoute -> stationG -> stationA on RouteType.Normal tracks 2 length 400
+  private val routeC = CreateRoute -> stationA -> stationB on RouteType.Normal tracks 2 length 400
+  private val routeD = CreateRoute -> stationB -> stationC on RouteType.Normal tracks 2 length 400
+  private val routeE = CreateRoute -> stationC -> stationD on RouteType.Normal tracks 2 length 400
+  private val routeF = CreateRoute -> stationD -> stationE on RouteType.Normal tracks 2 length 400
+  private val routeG = CreateRoute -> stationE -> stationH on RouteType.Normal tracks 2 length 400
+  private val routeH = CreateRoute -> stationH -> stationF on RouteType.AV tracks 2 length 400
+  private val routeI = CreateRoute -> stationH -> stationG on RouteType.AV tracks 2 length 400
+  private val routeL = CreateRoute -> stationH -> stationB on RouteType.AV tracks 2 length 400
+  private val routeM = CreateRoute -> stationB -> stationI on RouteType.AV tracks 2 length 400
+  private val routeN = CreateRoute -> stationI -> stationD on RouteType.AV tracks 2 length 400
+  private val routeO = CreateRoute -> stationJ -> stationE on RouteType.AV tracks 2 length 400
+  private val routeP = CreateRoute -> stationI -> stationJ on RouteType.AV tracks 2 length 400
+  private val routeQ = CreateRoute -> stationI -> stationH on RouteType.AV tracks 2 length 400
 
   private val trainA_AV = CreateTrain -> "AV1" technology highSpeed wagon UseType.Passenger capacity 2 count 1
   private val trainB_AV = CreateTrain -> "AV2" technology highSpeed wagon UseType.Passenger capacity 2 count 1
@@ -79,3 +79,7 @@ object ConfigRailway:
   private var simpleRailway: AppState  = uploadRailway
   private var mediumRailway: AppState  = uploadRailway
   private var complexRailway: AppState = uploadRailway
+
+  def simpleRailwayConfig: AppState  = simpleRailway
+  def mediumRailwayConfig: AppState  = mediumRailway
+  def complexRailwayConfig: AppState = complexRailway
