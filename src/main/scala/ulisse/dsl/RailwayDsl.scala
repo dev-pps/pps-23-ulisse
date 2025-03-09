@@ -5,6 +5,7 @@ import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
+import ulisse.entities.timetable.Timetables.Timetable
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons
 import ulisse.entities.train.Wagons.Wagon
@@ -82,8 +83,11 @@ object RailwayDsl:
         appState =
           appState.updateStationManager(stationManager => stationManager.addStation(station).getOrElse(stationManager))
         this
-      
-      def schedule()
+
+      /** Create an application state with a timetable. */
+      def scheduleA(timetable: Timetable): AppStateDSL =
+        appState = appState.updateTimetable(manager => manager.save(timetable).getOrElse(manager))
+        this
 
     /** Create an application state with technology. */
     implicit class AppStateOps(start: CreateAppState.type):
