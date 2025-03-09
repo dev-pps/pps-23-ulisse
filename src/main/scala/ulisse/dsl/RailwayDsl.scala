@@ -1,19 +1,47 @@
 package ulisse.dsl
 
-import ulisse.adapters.input.TimetableViewAdapters.Error.EmptyDepartureTime
+import ulisse.applications.AppState
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
-import ulisse.entities.timetable.Timetables.TimetableBuilder
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons
-import ulisse.utils.Times.{ClockTime, ClockTimeErrors}
 
 /** DSL for creating railway entities. */
 object RailwayDsl:
 
-  export CreateStation._, CreateTrain._, CreateRoute._, CreateTimetable._
+  export CreateStation._, CreateTrain._, CreateRoute._
+
+  /** Create an application state. */
+//  object CreateAppState:
+//
+//    type UpdateState = Station | Route
+//
+//    /** Create an application state. */
+//    trait AppStateWith[T <: UpdateState](state: AppState):
+//      def ++(el: T): AppStateWith[T]
+//
+//    /** Create an application state with a station. */
+//    case class AppStateWithStation(appState: AppState) extends AppStateWith[Station](appState):
+//      def ++(station: Station): AppStateWith[UpdateState] =
+//        AppStateWithStation(appState.updateStationManager(manager => manager.addStation(station).getOrElse(manager)))
+//
+//    /** Create an application state with a route. */
+//    case class AppStateWithRoute(appState: AppState):
+//      def route(route: Route): AppState =
+//        appState.updateRoute(manager => manager.save(route).getOrElse(manager))
+//
+//    /** Create an application state with a train. */
+//    case class AppStateWithTrain(appState: AppState):
+//      def train(train: Train): AppState =
+//        appState.updateTrain((trainManager, _) => trainManager.addTrain(train).getOrElse(trainManager))
+//
+//    /** Create an application state with technology. */
+//    implicit class AppStateOps(start: CreateAppState.type):
+//      def trainTech(techManager: TechnologyManager[TrainTechnology]): AppStateWithStation =
+//        AppStateWithStation(AppState.withTechnology(techManager))
 
   /** Create a station. */
   object CreateStation:
@@ -72,19 +100,3 @@ object RailwayDsl:
     /** Create a route with a departure, an arrival station, a route type, a platform, and a length. */
     implicit class RouteOps(start: CreateRoute.type):
       def ->(departure: Station): RouteDSL = RouteDSL(departure)
-
-  /** Create a timetable. */
-  object CreateTimetable:
-
-    /** Create a timetable with a train. */
-    case class TimetableDSL(train: Train):
-      def ->(start: Station): TimetableWithStart = TimetableWithStart(train, start)
-
-    /** Create a timetable with a train and a start station. */
-    case class TimetableWithStart(train: Train, start: Station):
-      def at(departureTime: Either[ClockTimeErrors, ClockTime]): TimetableBuilder =
-        TimetableBuilder(train, start, departureTime.getOrDefault)
-
-    /** Create a timetable with a train, a start station, and a departure time. */
-    implicit class TimetableOps(start: CreateTimetable.type):
-      def ->(train: Train): TimetableDSL = TimetableDSL(train)

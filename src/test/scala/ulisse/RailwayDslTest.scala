@@ -4,15 +4,15 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.mustBe
 import org.scalatest.matchers.should.Matchers
 import ulisse.applications.AppState
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.dsl.RailwayDsl.*
 import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes
 import ulisse.entities.route.Routes.{Route, RouteType}
 import ulisse.entities.station.Station
-import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
+import ulisse.entities.timetable.Timetables.RailInfo
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
-import ulisse.utils.Times.FluentDeclaration.h
 
 class RailwayDslTest extends AnyFlatSpec with Matchers:
   private val appState  = AppState()
@@ -22,8 +22,6 @@ class RailwayDslTest extends AnyFlatSpec with Matchers:
   private val trainTest = Train("test", highSpeed, Wagon(UseType.Passenger, 1), 1)
   private val routeTest = Route(departure, arrival, Routes.RouteType.Normal, 1, 100.0)
   private val railInfo  = RailInfo(length = 450, typeRoute = RouteType.Normal)
-  private val timetableTest: Timetable =
-    TimetableBuilder(trainTest, departure, h(8).m(0).getOrDefault).arrivesTo(arrival)(railInfo)
 
   "create station with dsl" should "create a station" in:
     val station = CreateStation -> "departure" at (0, 0) platforms 1
@@ -37,6 +35,10 @@ class RailwayDslTest extends AnyFlatSpec with Matchers:
     val route = CreateRoute -> departure -> arrival on RouteType.Normal tracks 1 length 100.0
     route mustBe routeTest
 
-  "create timetable with dsl" should "create a timetable" in:
-    val timetable = CreateTimetable -> trainTest -> departure at h(8).m(0) arrivesTo arrival
-    timetable(railInfo) mustBe timetableTest
+//  "create app state with dsl" should "create an app state" in:
+//    val technologyManager = TechnologyManager(List(highSpeed))
+//
+//    val appStateWithStation =
+//      AppStateWithStation -> technologyManager station departure stations arrival routes routeTest
+//
+//    appStateWithStation mustBe appState.withTechnology(List(highSpeed))
