@@ -110,12 +110,14 @@ object SimulationForm:
   final case class TakeRouteEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[RouteEnvironmentElement]]:
     override def onClick(data: MapElement[RouteEnvironmentElement]): Unit =
+      form.resetError()
       form.showRouteSimulation(data.element)
 
   /** Represents the take train event. */
   final case class TakeTrainEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[TrainMapElement]]:
     override def onClick(data: MapElement[TrainMapElement]): Unit =
+      form.resetError()
       infoSimulation.trainInfo(data.element.train).onComplete(_.fold(
         println,
         train => train.foreach(form.showTrainSimulation(_, data.element.position))
