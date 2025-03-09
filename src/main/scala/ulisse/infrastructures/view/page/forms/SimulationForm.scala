@@ -213,10 +213,11 @@ object SimulationForm:
       elementInfoArea.setText(infoStr)
 
     override def showTrainSimulation(trainInfo: TrainAgentInfo, position: Point2D.Double): Unit =
+      val distance = BigDecimal(trainInfo.train.distanceTravelled).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
       val infoStr = s"""TRAIN [${trainInfo.train.name}]:
                      \nName: ${trainInfo.delayInCurrentTimetable.getOrElse("No Timetable")}
-                     \nPosition: ${position.x} - ${position.y}
-                     \nDistance Travelled: ${trainInfo.train.distanceTravelled}
+                     \nPosition: ${position.x.toInt} - ${position.y.toInt}
+                     \nDistance Travelled: $distance
                      \nSpeed: ${trainInfo.train.state.motionData.speed}"""
       elementInfoArea.setText(infoStr)
 
