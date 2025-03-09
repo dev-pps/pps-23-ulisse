@@ -10,38 +10,72 @@ import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons
 
 /** DSL for creating railway entities. */
+@SuppressWarnings(Array("org.wartremover.warts.Var"))
 object RailwayDsl:
 
-  export CreateStation._, CreateTrain._, CreateRoute._
+  export CreateStation._, CreateTrain._, CreateRoute._, CreateAppState._ // , CreateDynamicAppState._
+
+//  object CreateDynamicAppState:
+//    var appState: AppState = AppState()
+//    case class WithDeparture(departure: Station):
+//      def withType(routeType: Routes.RouteType): WithRouteType = WithRouteType(departure, routeType)
+//
+//    case class WithRouteType(departure: Station, routeType: Routes.RouteType):
+//      def withPlatform(platform: Int): WithPlatform = WithPlatform(departure, routeType, platform)
+//
+//    case class WithPlatform(departure: Station, routeType: Routes.RouteType, platform: Int):
+//      def withLength(length: Double): WithLength = WithLength(departure, routeType, platform, length)
+//
+//    case class WithLength(
+//        departure: Station,
+//        routeType: Routes.RouteType,
+//        platform: Int,
+//        length: Double
+//    ):
+//      def withArrival(arrival: Station): LoopCreation =
+//        appState =
+//          appState.updateStationManager(stationManager => stationManager.addStation(arrival).getOrElse(stationManager))
+//            .updateRoute(manager =>
+//              Route(departure, arrival, routeType, platform, length).fold(
+//                _ => manager,
+//                route => manager.save(route).getOrElse(manager)
+//              )
+//            )
+//        LoopCreation()
+//
+//    case class LoopCreation():
+//      def add(departure: Station): WithDeparture = WithDeparture(departure)
+//
+//    implicit class AppStateDynamicOps(start: CreateDynamicAppState.type):
+//      def ->(departure: Station): WithDeparture =
+//        appState = appState.updateStationManager(stationManager =>
+//          stationManager.addStation(departure).getOrElse(stationManager)
+//        )
+//        WithDeparture(departure)
 
   /** Create an application state. */
-//  object CreateAppState:
-//
-//    type UpdateState = Station | Route
-//
-//    /** Create an application state. */
-//    trait AppStateWith[T <: UpdateState](state: AppState):
-//      def ++(el: T): AppStateWith[T]
-//
-//    /** Create an application state with a station. */
-//    case class AppStateWithStation(appState: AppState) extends AppStateWith[Station](appState):
-//      def ++(station: Station): AppStateWith[UpdateState] =
-//        AppStateWithStation(appState.updateStationManager(manager => manager.addStation(station).getOrElse(manager)))
-//
-//    /** Create an application state with a route. */
-//    case class AppStateWithRoute(appState: AppState):
-//      def route(route: Route): AppState =
-//        appState.updateRoute(manager => manager.save(route).getOrElse(manager))
-//
-//    /** Create an application state with a train. */
-//    case class AppStateWithTrain(appState: AppState):
-//      def train(train: Train): AppState =
-//        appState.updateTrain((trainManager, _) => trainManager.addTrain(train).getOrElse(trainManager))
-//
-//    /** Create an application state with technology. */
-//    implicit class AppStateOps(start: CreateAppState.type):
-//      def trainTech(techManager: TechnologyManager[TrainTechnology]): AppStateWithStation =
-//        AppStateWithStation(AppState.withTechnology(techManager))
+  object CreateAppState:
+
+    case class AppStateDSL(var appState: AppState):
+      def set(train: Train): AppStateDSL =
+        appState = appState.updateTrain((trainManager, _) => trainManager.addTrain(train).getOrElse(trainManager))
+        AppStateDSL(appState)
+
+      def connect(route: Either[Routes.RouteError, Route]): AppStateDSL =
+        appState =
+          appState.updateRoute(manager => route.fold(_ => manager, route => manager.save(route).getOrElse(manager)))
+        AppStateDSL(appState)
+
+      def put(station: Station): AppStateDSL =
+        appState =
+          appState.updateStationManager(stationManager => stationManager.addStation(station).getOrElse(stationManager))
+        AppStateDSL(appState)
+
+    /** Create an application state with technology. */
+    implicit class AppStateOps(start: CreateAppState.type):
+      def network(appState: AppState): AppStateDSL = AppStateDSL(appState)
+      def technology(appState: AppState, manager: TechnologyManager[TrainTechnology]): AppStateDSL =
+        AppStateDSL(appState.updateTechnology(_ => manager))
 
   /** Create a station. */
   object CreateStation:
