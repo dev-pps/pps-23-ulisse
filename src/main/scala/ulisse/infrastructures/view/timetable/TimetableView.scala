@@ -3,17 +3,18 @@ package ulisse.infrastructures.view.timetable
 import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
-import TimetableAdapterObservers.ErrorObserver
+import TimetableAdapterObservers.RequestResultObserver
 import ulisse.infrastructures.view.timetable.subviews.{EditorTab, TimetableViewerTab}
 
 import scala.swing.{Component, Orientation}
 
+/** Root timetable view. */
 object TimetableView:
   /** Creates timetable root view given its `adapter`. */
   def apply(adapter: TimetableViewAdapter): Component =
     TimetableTabbedPane(adapter).component
 
-  private class TimetableTabbedPane(adapter: TimetableViewAdapter) extends JTabbedPane with ErrorObserver:
+  private class TimetableTabbedPane(adapter: TimetableViewAdapter) extends JTabbedPane with RequestResultObserver:
     import ulisse.infrastructures.view.components.ExtendedSwing.toTabbedPane
     given orientation: Orientation.Value = Orientation.Horizontal
     private val formIcon                 = ComposedImageLabel.createIcon("icons/calendar_add_on.svg", "Create")
@@ -26,23 +27,16 @@ object TimetableView:
         savedIcon -> timetableViewer
       ).toTabbedPane
 
-    adapter.addErrorObserver(this)
+    adapter.addRequestResultObserver(this)
 
     override def component[T >: Component]: T = tabbedPane.component
 
-    override def showError(title: String, descr: String): Unit =
+    override def showRequestResult(title: String, descr: String): Unit =
       import scala.swing.Dialog
       import scala.swing.Dialog.Message
       Dialog.showMessage(
         this.component,
         descr,
         title,
-        Message.Error
+        Message.Info
       )
-
-@main def timetableViewDemoGUI(): Unit =
-  import ulisse.infrastructures.view.utils.SwingUtils.showPreview
-  import ulisse.adapters.MockedPortAdapters.TrainServiceMock
-  import ulisse.adapters.MockedPortAdapters.TimetableServiceMock
-  val adapter = TimetableViewAdapter(TimetableServiceMock(), TrainServiceMock())
-  TimetableView(adapter).showPreview()

@@ -6,15 +6,14 @@ import ulisse.infrastructures.view.components.ExtendedSwing.{SBoxPanel, SButton,
 import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.adapters.input.TimetableViewAdapters.TimetableViewAdapter
 import ulisse.entities.train.Trains.Train
-import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.{TimetablesUpdatable, TrainsUpdatable, Updatable}
+import ulisse.infrastructures.view.timetable.TimetableAdapterObservers.{TimetablesUpdatable, TrainsUpdatable}
 import ulisse.infrastructures.view.timetable.TimetableViewModel
 import ulisse.infrastructures.view.utils.ComponentUtils.createLeftRight
-import ulisse.infrastructures.view.utils.SwingUtils.selectedItemOption
-import ulisse.infrastructures.view.utils.SwingUtils.updateModel
+import ulisse.infrastructures.view.utils.SwingUtils.{selectedItemOption, updateModel}
 
 import scala.swing.Swing.onEDT
 import scala.swing.event.ButtonClicked
-import scala.swing.{BorderPanel, ComboBox, Component, Label, ListView, Orientation, ScrollPane, Swing}
+import scala.swing.{BorderPanel, ComboBox, Label, ListView, Orientation, ScrollPane, Swing}
 
 /** Timetable consulting tab view: by selecting train and departure time, timetable is shown.
   * It gets `adapter` ([[TimetableViewAdapter]]) and observes updates from controller.
@@ -42,7 +41,6 @@ class TimetableViewerTab(adapter: TimetableViewAdapter) extends SBoxPanel(Orient
   private val timetableField = SFieldLabel("Timetable")(timetableCombo)
   private val timetableView  = TimetableListView(List.empty)
   private val UNSELECTED     = -1
-  trainCombo.selection.index = UNSELECTED
 
   import ulisse.infrastructures.view.utils.SwingUtils.setDefaultFont
   List(trainCombo, timetableCombo).setDefaultFont()

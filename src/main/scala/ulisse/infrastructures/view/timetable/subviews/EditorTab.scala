@@ -39,6 +39,7 @@ object EditorTab:
     private val listPreview      = TimetableListView(List.empty)
     private val previewPane      = ScrollPane(listPreview)
     private val saveBtn          = SButton("Save")
+    private val UNSELECTED       = -1
 
     private val falseBtnStyle = List(resetBtn, undoBtn)
     private val trueBtnStyle  = List(saveBtn, insertBtn, refreshTrainsBtn)
@@ -116,7 +117,7 @@ object EditorTab:
 
     private def clearFields(): Unit =
       clearStationFields()
-      trainCombo.selection.index = -1
+      trainCombo.selection.index = UNSELECTED
       hoursCombo.selection.index = 0
       minutesCombo.selection.index = 0
 
