@@ -82,6 +82,8 @@ object RailwayDsl:
         appState =
           appState.updateStationManager(stationManager => stationManager.addStation(station).getOrElse(stationManager))
         this
+      
+      def schedule()
 
     /** Create an application state with technology. */
     implicit class AppStateOps(start: CreateAppState.type):
