@@ -1,13 +1,9 @@
 package ulisse.entities
 
-import cats.data.NonEmptyChain
 import cats.syntax.all.*
-import ulisse.utils.Errors.BaseError
-import ulisse.utils.ValidationUtils.{validateNonNegative, validateRange}
 
 import scala.annotation.targetName
 import scala.math.{atan2, pow, sqrt}
-import scala.util.Random
 
 /** 2D coordinate (x, y). */
 trait Coordinate:
