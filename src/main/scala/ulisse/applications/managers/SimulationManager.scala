@@ -77,7 +77,7 @@ object SimulationManager:
       notificationService: Option[SimulationPorts.Output],
       timeProvider: UtilityPorts.Output.TimeProviderPort
   ) extends SimulationManager:
-    override def start(): SimulationManager = copy(engine.running = true)
+    override def start(): SimulationManager = copy(engine.reset().running = true)
     override def stop(): SimulationManager  = copy(engine.running = false)
     override def reset(): SimulationManager = copy(engine.reset(), simulationData.reset())
 
