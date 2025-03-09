@@ -56,6 +56,15 @@ class TimetableTest extends AnyFlatSpec:
         .arrivesTo(stationF)(RailInfo(length = 5, typeRoute = AV))                // 1 min from D = 9:11
     timetableWithTransits.arrivingTime should be(ClockTime(9, 11).toOption)
 
+  "timetable" should "calculate correctly arriving time in case of minutes overflows" in:
+    val timetableWithTransits =
+      TimetableBuilder(train = AV1000Train, startStation = stationA, departureTime = h(9).m(59).getOrDefault)
+        .arrivesTo(stationB)(RailInfo(
+          length = 10,
+          typeRoute = AV
+        )) // takes 2 min to arrive from A with these route chars
+    timetableWithTransits.arrivingTime should be(h(10).m(1).toOption)
+
   "timetable" should "provide couple with nearest stations names" in:
     val AV1000TimeTable =
       timetableBuilder
