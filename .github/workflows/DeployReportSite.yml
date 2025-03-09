@@ -55,6 +55,16 @@ jobs:
         run: |
           mkdir -p ./docs/public/coverage
           cp -r target/scala-*/scoverage-report/* ./docs/public/coverage
+      - name: Generate Scoverage Report2
+        run: |
+          sbt 'set coverageEnabled := true'
+          sbt 'set coverageExcludedPackages := ""'
+          sbt clean coverage test
+          sbt coverageReport
+      - name: Move Scoverage Report to docs/public/coverage2
+        run: |
+          mkdir -p ./docs/public/coverage2
+          cp -r target/scala-*/scoverage-report/* ./docs/public/coverage2
       - name: Install dependencies
         run: npm install
         working-directory: ./docs

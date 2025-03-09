@@ -15,8 +15,11 @@ hero:
       link: https://dev-pps.github.io/pps-23-ulisse/scaladoc/index.html
     - theme: alt
       text: Coverage
-      link: https://dev-pps.github.io/pps-23-ulisse/coverage/index.html  
-      
+      link: https://dev-pps.github.io/pps-23-ulisse/coverage/index.html
+    - theme: alt
+      text: CoverageStrict
+      link: https://dev-pps.github.io/pps-23-ulisse/coverage2/index.html
+
 features:
   - title: Feature A
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
