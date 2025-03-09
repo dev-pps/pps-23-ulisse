@@ -1,3 +1,7 @@
 ![An image](/resources/architecture/staticEntitiesManagers.svg)
-<img src="/resources/architecture/staticEntitiesManagers.svg" alt="An image" height="500">
 ![An image](/resources/architecture/queuingsystem.svg)
+![An image](/resources/architecture/EnvironmentElementsArchitecture.svg)
+![An image](/resources/architecture/EnvironmentArchitecture.svg)
+![An image](/resources/architecture/RailwayEnvironment.svg)
+![An image](/resources/architecture/SimulationEngineWithManager.svg)
+
