@@ -39,7 +39,7 @@ object SimulationPorts:
     /** Reset simulation environment to the initialized state maintaining the engine configuration. */
     def reset(): Future[(Engine, SimulationData)]
 
-  /** Configuration presets for the simulation. */
+  /** Utility for [[SimulationPorts.Input]]. */
   object Input:
 
     /** Preset for the simulation. */
