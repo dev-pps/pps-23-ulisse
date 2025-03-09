@@ -1,10 +1,11 @@
 package ulisse.entities.timetable
 
+import cats.Id
 import ulisse.entities.route.Routes.RouteType
 import ulisse.entities.station.Station
 import ulisse.entities.timetable.TrainStationTime.{ArrivingStationTime, AutoStationTime, DepartureStationTime}
 import ulisse.entities.train.Trains.Train
-import ulisse.utils.Times.ClockTime
+import ulisse.utils.Times.{ClockTime, Time}
 import ulisse.utils.Times.FluentDeclaration.h
 
 import scala.collection.immutable.ListMap
@@ -80,10 +81,11 @@ object Timetables:
     def ETA(lastTime: Option[StationTime], railInfo: RailInfo, train: Train): Option[ClockTime] =
       val travelMinutes =
         (railInfo.length / Math.min(train.maxSpeed, railInfo.typeRoute.technology.maxSpeed) * 60).toInt
+
       for
         offsetTime      <- lastTime
         travelStartTime <- offsetTime.departure
-        arrivingTime    <- (travelStartTime ++ h(0).m(travelMinutes)).toOption
+        arrivingTime    <- (Id(travelStartTime.asTime) + Id(Time(0, travelMinutes, 0))).toClockTime.toOption
       yield arrivingTime
 
   /** Default time estimator just considers given distance between stations ([[RailInfo.length]]),

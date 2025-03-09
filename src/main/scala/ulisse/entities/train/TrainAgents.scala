@@ -1,6 +1,5 @@
 package ulisse.entities.train
 
-import ulisse.entities.simulation.agents.Perceptions.{Perception, PerceptionData}
 import ulisse.entities.simulation.agents.SimulationAgent
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
@@ -72,6 +71,5 @@ object TrainAgents:
         import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProviders.given
         val perception: Option[TrainAgentPerception[?]] = simulationEnvironment.perceptionFor[TrainAgent](this)
         copy(state = state.next(this, dt, perception))
-//        updateDistanceTravelled(20)
 
       override def distanceTravelled: Double = state.motionData.distanceTravelled

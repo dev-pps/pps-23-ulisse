@@ -3,13 +3,21 @@ package ulisse
 import ulisse.adapters.InputAdapterManager
 import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
 import ulisse.adapters.output.SimulationNotificationAdapter
+import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.ports.{SimulationInfoPorts, SimulationPorts}
 import ulisse.applications.useCases.{SimulationInfoService, SimulationService}
 import ulisse.applications.{AppState, EventQueue, InputPortManager}
+import ulisse.entities.Coordinate
+import ulisse.entities.route.Routes.{Route, RouteType}
+import ulisse.entities.station.Station
+import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
+import ulisse.entities.train.Trains.{Train, TrainTechnology}
+import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.infrastructures.utilty.SimulationNotificationBridge
 import ulisse.infrastructures.view.GUI
 import ulisse.infrastructures.view.page.workspaces.SimulationWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
+import ulisse.utils.Times.FluentDeclaration.h
 
 object Main:
 
@@ -64,7 +72,7 @@ object Main:
 //        train = train3906,
 //        startStation = stationC,
 //        departureTime = h(8).m(0).getOrDefault
-//      ).stopsIn(stationB, waitTime = 0)(routeTEOa)
+//      ).transitIn(stationB)(routeTEOa)
 //        .arrivesTo(stationA)(routeTEOb)
 //
 //    // TIME-TABLE
@@ -73,7 +81,7 @@ object Main:
 //        train = train3905,
 //        startStation = stationA,
 //        departureTime = h(8).m(0).getOrDefault
-//      ).stopsIn(stationB, waitTime = 0)(routeTEOa)
+//      ).stopsIn(stationB, waitTime = 5)(routeTEOa)
 //        .arrivesTo(stationC)(routeTEOb)
 //
 //    val initialState = AppState.withTechnology(technologyManager)
