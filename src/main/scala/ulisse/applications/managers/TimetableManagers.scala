@@ -15,6 +15,16 @@ import ulisse.entities.train.Trains.Train
 import ulisse.utils.Errors.{BaseError, ErrorMessage, ErrorNotExist}
 import ulisse.utils.Times.{===, >=, ClockTime, Time}
 
+/** Object containing:
+  *
+  *  - `DeletionListener`, `UpdateListener` traits for consistency update of timetable manager
+  *
+  *  - `TimetableManagerErrors` trait declaration of timetable manager errors
+  *
+  *  - `AcceptanceTimetablePolicy` strategy for accepting new added timetable and
+  * a default given policy `NoOverlappingTimePolicy`
+  *  - `TimetableManager` responsible keep saved `Timetables`
+  */
 object TimetableManagers:
 
   /** Responsible to guarantee consistent deletion of [[Timetable]] when entities
@@ -89,6 +99,7 @@ object TimetableManagers:
   /** Return an empty manager */
   def empty(): TimetableManager = TimetableManager(List.empty)
 
+  /** Manager responsible to save, remove and retrieve timetables. */
   trait TimetableManager extends DeletionListener with UpdateListener:
     /** Save new `timetable` for a train. Timetable is accepted if passes the `acceptancePolicy` rules and has distinct stations.
       * Returns `Right` of updated `TimetableManager` otherwise `Left` of `TimetableManagerErrors` in case of errors.
@@ -110,6 +121,7 @@ object TimetableManagers:
       */
     def tablesOf(trainName: String): Either[TimetableNotFound, List[Timetable]]
 
+  /** Companion object of trait [[TimetableManager]] */
   object TimetableManager:
     /** Returns TimetableManager initialized with given list of `timetables`. The `timetables` are checked by the
       * [[AcceptanceTimetablePolicy]].

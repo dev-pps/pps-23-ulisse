@@ -13,6 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.Swing
 import scala.util.{Failure, Success}
 
+/** Contains TimetableViewAdapter and the related error definition */
 object TimetableViewAdapters:
   /** Timetable view error. It contains a `title` and a `descr` (description). */
   sealed trait Error(val title: String, val descr: String) extends BaseError
@@ -58,6 +59,7 @@ object TimetableViewAdapters:
     /** Save timetable draft. A request on service port is requested. */
     def save(): Unit
 
+  /** Companion object of trait [[TimetableViewAdapter]] */
   object TimetableViewAdapter:
     /** Creates view controller for the timetables views. It requires `port` to which communicate to save and get required infos. */
     def apply(timetablePort: TimetablePorts.Input, trainPort: TrainPorts.Input): TimetableViewAdapter =

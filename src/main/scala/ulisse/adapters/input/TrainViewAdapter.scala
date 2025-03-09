@@ -37,6 +37,7 @@ trait TrainViewAdapter:
   /** Bind view to that adapter. */
   def setView(editorView: TrainEditorView): Unit
 
+/** Companion object of trait [[TrainViewAdapter]] */
 object TrainViewAdapter:
   /** Returns [[TrainViewAdapter]] given `trainService` port. */
   def apply(trainService: TrainPorts.Input): TrainViewAdapter =

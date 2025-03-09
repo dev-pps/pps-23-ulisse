@@ -3,6 +3,7 @@ package ulisse.entities.train
 import ulisse.entities.Technology
 import ulisse.entities.train.Wagons.Wagon
 
+/** Object containing [[Train]] and [[TrainTechnology]] */
 object Trains:
 
   /** Technology used by train */
@@ -13,6 +14,7 @@ object Trains:
     /** Returns value of deceleration in m/s */
     def deceleration: Double
 
+  /** Companion object of [[TrainTechnology]] */
   object TrainTechnology:
     def apply(name: String, maxSpeed: Int, acceleration: Double, deceleration: Double): TrainTechnology =
       TrainTechnologyImpl(name, maxSpeed, acceleration, deceleration)

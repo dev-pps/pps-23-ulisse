@@ -6,7 +6,7 @@ import ulisse.adapters.output.{SimulationNotificationAdapter, SimulationNotifica
 import ulisse.applications.ports.{SimulationInfoPorts, SimulationPorts}
 import ulisse.applications.useCases.{SimulationInfoService, SimulationService}
 import ulisse.applications.{AppState, EventQueue, InputPortManager}
-import ulisse.infrastructures.utilty.SimulationNotificationBridge
+import ulisse.infrastructures.utils.SimulationNotificationBridge
 import ulisse.infrastructures.view.GUI
 import ulisse.infrastructures.view.page.workspaces.SimulationWorkspace
 
