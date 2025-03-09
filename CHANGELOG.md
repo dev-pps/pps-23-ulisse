@@ -1,3 +1,11 @@
+## [1.38.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.37.1...v1.38.0) (2025-03-09)
+
+### Features
+
+* implemented routeUpdated method like routeDeleted in TimetableManager ([5af8020](https://github.com/dev-pps/pps-23-ulisse/commit/5af8020d454e30c8bc35894bbb6f4a008af026bb))
+* **TimetableManager:** timetables updates on train update ([d6ab346](https://github.com/dev-pps/pps-23-ulisse/commit/d6ab346a13af6288de0d86450219c3f60f1ced10))
+* **TrainService:** update timetable on train update in Trainservice ([dad43a6](https://github.com/dev-pps/pps-23-ulisse/commit/dad43a63a3e3af5e8fe4fe71cce4f5d8aaf56681))
+
 ## [1.37.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.37.0...v1.37.1) (2025-03-09)
 
 ### Bug Fixes
