@@ -1,3 +1,9 @@
+## [1.37.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.37.0...v1.37.1) (2025-03-09)
+
+### Bug Fixes
+
+* fixed timetable ETA method, extensions method converts time-> clocktime ([48ebf51](https://github.com/dev-pps/pps-23-ulisse/commit/48ebf51518d49a2098793e8622124c39df4627a5))
+
 ## [1.37.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.36.1...v1.37.0) (2025-03-09)
 
 ### Features
