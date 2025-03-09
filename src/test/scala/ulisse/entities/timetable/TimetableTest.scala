@@ -3,6 +3,7 @@ package ulisse.entities.timetable
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.should
+import ulisse.Utils.MatchersUtils.shouldBe
 import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.route.Routes.RouteType
 import ulisse.entities.station.Station
@@ -11,6 +12,8 @@ import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.ClockTime
 import ulisse.entities.TestMockedEntities.*
 import ulisse.entities.timetable.TrainStationTime.{ArrivingStationTime, AutoStationTime, DepartureStationTime}
+import ulisse.entities.train.Trains.{Train, TrainTechnology}
+import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 import scala.collection.immutable.ListMap
 import scala.language.postfixOps

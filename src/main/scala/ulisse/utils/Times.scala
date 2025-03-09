@@ -3,6 +3,7 @@ package ulisse.utils
 import cats.syntax.all.*
 import cats.{Functor, Id, Monad}
 import ulisse.utils.Errors.{BaseError, ErrorMessage}
+import ulisse.utils.Times.FluentDeclaration.h
 
 import scala.annotation.targetName
 
@@ -119,6 +120,10 @@ object Times:
       time2 <- t2
       res   <- f(time1, time2)
     yield res
+
+  extension (time: Time)
+    def toClockTime: Either[ClockTimeErrors, ClockTime] =
+      h(time.h).m(time.m)
 
   extension (time: Either[ClockTimeErrors, ClockTime])
     def greaterEqThan(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
