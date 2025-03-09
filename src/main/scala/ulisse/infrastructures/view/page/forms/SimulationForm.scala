@@ -135,9 +135,9 @@ object SimulationForm:
     private val elementInfoArea = ExtendedSwing.STextArea()
     private val infoPanel       = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     private val flowPanel       = ExtendedSwing.SFlowPanel().transparent()
-    infoPanel.contents += Swing.VGlue
+    infoPanel.contents += Swing.VStrut(space)
     infoPanel.contents += Component.wrap(infoArea)
-    infoPanel.contents += Swing.VGlue
+    infoPanel.contents += Swing.VStrut(space + 5)
     infoPanel.contents += Component.wrap(elementInfoArea)
     flowPanel.hGap = space
     flowPanel.vGap = space + 5
@@ -189,38 +189,42 @@ object SimulationForm:
       cyclePerSecond.text = s"${engine.cyclesPerSecond.getOrElse(0)}"
 
     override def showSimulationData(info: SimulationData): Unit =
-      val infoStr = s"""SIMULATION TIME: ${info.millisecondsElapsed.toTime}
-         \nENVIRONMENT TIME: ${info.simulationEnvironment.time}
-         \nCUMULATIVE DELAY: ${info.simulationEnvironment.cumulativeDelay}
-         \nAVERAGE DELAY: ${info.simulationEnvironment.averageDelay}
-         \nTRAIN IN STATIONS: ${info.simulationEnvironment.percTrainsInStations} %
-         \nTRAIN ON ROUTE: ${info.simulationEnvironment.percTrainsOnRoutes} %
-         \nSTATION LOAD: ${info.simulationEnvironment.percStationsLoad} %"""
+      val simuTime       = s"Simulation time: ${info.millisecondsElapsed.toTime}"
+      val envTime        = s"Environment time: ${info.simulationEnvironment.time}"
+      val cumDelay       = s"Cumulative delay: ${info.simulationEnvironment.cumulativeDelay}"
+      val avgDelay       = s"Average delay: ${info.simulationEnvironment.averageDelay}"
+      val trainInStation = s"Train in stations: ${info.simulationEnvironment.percTrainsInStations} %"
+      val trainOnRoute   = s"Train on route: ${info.simulationEnvironment.percTrainsOnRoutes} %"
+      val stationLoad    = s"Station load: ${info.simulationEnvironment.percStationsLoad} %"
+      val infoStr =
+        s"SIMULATION: \n$simuTime \n$envTime \n$cumDelay \n$avgDelay \n$trainInStation \n$trainOnRoute \n$stationLoad"
       infoArea.setText(infoStr)
 
     override def showStationSimulation(station: StationEnvironmentInfo): Unit =
       val StationEnvironmentInfo(env, cumulativeDelay, averageDelay) = station
-
-      val infoStr = s"""STATION [${env.name}]:
-             \nTrains: ${env.trains.size} / ${env.numberOfPlatforms}
-             \nCumulative Delay: $cumulativeDelay
-             \nAverage Delay: $averageDelay """
+      val stationName                                                = s"STATION [${env.name}]:"
+      val trains   = s"Trains: ${env.trains.size} / ${env.numberOfPlatforms}"
+      val cumDelay = s"Cumulative Delay: $cumulativeDelay"
+      val avgDelay = s"Average Delay: $averageDelay "
+      val infoStr  = s"$stationName \n$trains \n$cumDelay \n$avgDelay"
       elementInfoArea.setText(infoStr)
 
     override def showRouteSimulation(route: RouteEnvironmentElement): Unit =
-      val infoStr = s"""ROUTE:
-                 \nStations: ${route.departure.name} - ${route.arrival.name}
-                 \nTrains: ${route.trains.size}
-                 \nType: ${route.typology}"""
+      val stations = s"Stations: ${route.departure.name} - ${route.arrival.name}"
+      val trains   = s"Trains: ${route.trains.size}"
+      val typology = s"Type: ${route.typology}"
+      val infoStr  = s"ROUTE: \n$stations \n$trains \n$typology"
       elementInfoArea.setText(infoStr)
 
     override def showTrainSimulation(trainInfo: TrainAgentInfo, position: Point2D.Double): Unit =
       val distance = BigDecimal(trainInfo.train.distanceTravelled).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-      val infoStr = s"""TRAIN [${trainInfo.train.name}]:
-                     \nName: ${trainInfo.delayInCurrentTimetable.getOrElse("No Timetable")}
-                     \nPosition: ${position.x.toInt} - ${position.y.toInt}
-                     \nDistance Travelled: $distance
-                     \nSpeed: ${trainInfo.train.state.motionData.speed}"""
+
+      val name      = s"TRAIN [${trainInfo.train.name}]:"
+      val curDelay  = s"Current Delay: ${trainInfo.delayInCurrentTimetable.getOrElse("No Timetable")}"
+      val pos       = s"Position: ${position.x.toInt} - ${position.y.toInt}"
+      val travelled = s"Distance Travelled: $distance"
+      val speed     = s"Speed: ${trainInfo.train.state.motionData.speed}"
+      val infoStr   = s"$name \n$curDelay \n$pos \n$travelled \n$speed"
       elementInfoArea.setText(infoStr)
 
     override def component[T >: Component]: T = mainPanel
