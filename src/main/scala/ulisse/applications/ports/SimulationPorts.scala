@@ -1,11 +1,13 @@
 package ulisse.applications.ports
 
+import ulisse.applications.ports.SimulationPorts.Input.Preset
 import ulisse.entities.simulation.data.{Engine, SimulationData}
 
 import scala.concurrent.Future
 
 /** Ports for Simulation. */
 object SimulationPorts:
+
   /** Output port for Simulation. */
   trait Output:
     /** Notify that a step has been completed. */
@@ -22,6 +24,9 @@ object SimulationPorts:
       */
     def initSimulation(): Future[(Engine, SimulationData)]
 
+    /** Setup simulation with a preset. */
+    def initSimulationUsing(preset: Preset): Future[(Engine, SimulationData)]
+
     /** Setup engine with step size and cycles per second, if cyclesPerSecond are none works in batch mode. */
     def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Future[Option[Engine]]
 
@@ -33,3 +38,10 @@ object SimulationPorts:
 
     /** Reset simulation environment to the initialized state maintaining the engine configuration. */
     def reset(): Future[(Engine, SimulationData)]
+
+  /** Configuration presets for the simulation. */
+  object Input:
+
+    /** Preset for the simulation. */
+    enum Preset:
+      case Simple, Normal, Complex

@@ -6,7 +6,6 @@ import ulisse.adapters.output.{SimulationNotificationAdapter, SimulationNotifica
 import ulisse.applications.ports.{SimulationInfoPorts, SimulationPorts}
 import ulisse.applications.useCases.{SimulationInfoService, SimulationService}
 import ulisse.applications.{AppState, EventQueue, InputPortManager}
-import ulisse.dsl.ConfigRailway
 import ulisse.infrastructures.utilty.SimulationNotificationBridge
 import ulisse.infrastructures.view.GUI
 import ulisse.infrastructures.view.page.workspaces.SimulationWorkspace
@@ -36,4 +35,4 @@ object Main:
 
     val gui = GUI(inputAdapterManager, simulationSetup.workspace)
 
-    eventQueue.startProcessing(ConfigRailway.simpleRailwayConfig)
+    eventQueue.startProcessing(AppState())

@@ -21,6 +21,9 @@ trait SimulationEventQueue:
   /** Add an event to update the simulationManager. */
   def addUpdateSimulationManagerEvent(update: SimulationManager => SimulationManager): Unit
 
+  /** Add an event to set up the app state. */
+  def addSetupAppStateEvent(update: AppState => AppState): Unit
+
 /** Companion object for the [[SimulationEventQueue]] trait. */
 object SimulationEventQueue:
   /** Simulation managers. */
@@ -43,3 +46,4 @@ object SimulationEventQueue:
       events.offer(_ setupSimulationManager update)
     override def addUpdateSimulationManagerEvent(update: SimulationManager => SimulationManager): Unit =
       events.offer(_ updateSimulationManager update)
+    override def addSetupAppStateEvent(update: AppState => AppState): Unit = events.offer(update)

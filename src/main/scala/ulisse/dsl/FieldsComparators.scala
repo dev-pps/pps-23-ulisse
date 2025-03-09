@@ -50,7 +50,7 @@ object FieldsComparators:
     def compare: Boolean =
       fieldComparator.compare(objects, ignoredFields)
 
-  /** Extension for comparing two objects. */
   extension [T <: Field[T, O], O <: Any](obj: O)
+    /** Extension for comparing two objects. */
     def compareTo(otherObj: O)(using fieldComparator: FieldComparator[T, O]): ComparisonBuilder[T, O] =
       ComparisonBuilder(List(obj, otherObj), Seq[T]())
