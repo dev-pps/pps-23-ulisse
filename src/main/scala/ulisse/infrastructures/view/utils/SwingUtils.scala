@@ -1,13 +1,20 @@
 package ulisse.infrastructures.view.utils
 
-import ulisse.infrastructures.view.components.ExtendedSwing.{SFlowPanel, STextField}
+import ulisse.infrastructures.view.components.ExtendedSwing.SFlowPanel
 import ulisse.infrastructures.view.components.styles.Styles
+
 import scala.swing.*
 
+/** Utility methods for Swing components. */
 object SwingUtils:
 
-  val nameFont  = new Font("Arial", java.awt.Font.BOLD, 18)
+  /** Default font for Swing components */
+  val nameFont = new Font("Arial", java.awt.Font.BOLD, 18)
+
+  /** Default font for Swing components */
   val labelFont = new Font("Arial", java.awt.Font.BOLD, 14)
+
+  /** Default font for Swing components */
   val valueFont = new Font("Arial", java.awt.Font.PLAIN, 14)
 
   /** Returns default string "N/A" if string `s` is not present */

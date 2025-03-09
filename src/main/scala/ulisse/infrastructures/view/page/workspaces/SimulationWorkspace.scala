@@ -1,6 +1,6 @@
 package ulisse.infrastructures.view.page.workspaces
 
-import ulisse.adapters.input.{ SimulationInfoAdapter, SimulationPageAdapter }
+import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
 import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.map.MapSimulation
 import ulisse.infrastructures.view.page.forms.SimulationForm
