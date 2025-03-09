@@ -1,22 +1,25 @@
 package ulisse.dsl
 
+import ulisse.adapters.input.TimetableViewAdapters.Error.EmptyDepartureTime
 import ulisse.entities.Coordinate
 import ulisse.entities.route.Routes
 import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
+import ulisse.entities.timetable.Timetables.TimetableBuilder
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons
+import ulisse.utils.Times.{ClockTime, ClockTimeErrors}
 
 /** DSL for creating railway entities. */
 object RailwayDsl:
 
-  export CreateStation._, CreateTrain._, CreateRoute._
+  export CreateStation._, CreateTrain._, CreateRoute._, CreateTimetable._
 
   /** Create a station. */
   object CreateStation:
 
     /** Create a station with a name. */
-    case class StationBuilder(name: String):
+    case class StationDSL(name: String):
       def at(coord: (Int, Int)): StationWithCoord = StationWithCoord(name, Coordinate(coord._1, coord._2))
 
     /** Create a station with a name and a coordinate. */
@@ -25,13 +28,13 @@ object RailwayDsl:
 
     /** Create a station with a name and a coordinate. */
     implicit class StationOps(start: CreateStation.type):
-      def ->(name: String): StationBuilder = StationBuilder(name)
+      def ->(name: String): StationDSL = StationDSL(name)
 
   /** Create a train. */
   object CreateTrain:
 
     /** Create a train with a name. */
-    case class TrainBuilder(name: String):
+    case class TrainDSL(name: String):
       def technology(technology: TrainTechnology): TrainWithTechnology = TrainWithTechnology(name, technology)
 
     /** Create a train with a name and a technology. */
@@ -44,13 +47,13 @@ object RailwayDsl:
 
     /** Create a train with a name, a technology, a wagon, and a number. */
     implicit class TrainOps(start: CreateTrain.type):
-      def ->(name: String): TrainBuilder = TrainBuilder(name)
+      def ->(name: String): TrainDSL = TrainDSL(name)
 
   /** Create a route. */
   object CreateRoute:
 
     /** Create a route with a departure station. */
-    case class RouteBuilder(departure: Station):
+    case class RouteDSL(departure: Station):
       def ->(arrival: Station): RouteWithArrival = RouteWithArrival(departure, arrival)
 
     /** Create a route with a departure and an arrival station. */
@@ -68,4 +71,20 @@ object RailwayDsl:
 
     /** Create a route with a departure, an arrival station, a route type, a platform, and a length. */
     implicit class RouteOps(start: CreateRoute.type):
-      def ->(departure: Station): RouteBuilder = RouteBuilder(departure)
+      def ->(departure: Station): RouteDSL = RouteDSL(departure)
+
+  /** Create a timetable. */
+  object CreateTimetable:
+
+    /** Create a timetable with a train. */
+    case class TimetableDSL(train: Train):
+      def ->(start: Station): TimetableWithStart = TimetableWithStart(train, start)
+
+    /** Create a timetable with a train and a start station. */
+    case class TimetableWithStart(train: Train, start: Station):
+      def at(departureTime: Either[ClockTimeErrors, ClockTime]): TimetableBuilder =
+        TimetableBuilder(train, start, departureTime.getOrDefault)
+
+    /** Create a timetable with a train, a start station, and a departure time. */
+    implicit class TimetableOps(start: CreateTimetable.type):
+      def ->(train: Train): TimetableDSL = TimetableDSL(train)
