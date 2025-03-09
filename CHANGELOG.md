@@ -1,3 +1,21 @@
+## [1.37.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.36.1...v1.37.0) (2025-03-09)
+
+### Features
+
+* app state dsl ([a94cda7](https://github.com/dev-pps/pps-23-ulisse/commit/a94cda7340e35a484dea553394fb90bf10c30d37))
+* create appState ([7fa6d64](https://github.com/dev-pps/pps-23-ulisse/commit/7fa6d649d799d6690db048bdf947b80c92e4695b))
+* create class ([1007288](https://github.com/dev-pps/pps-23-ulisse/commit/10072881404ab1a0153a7da3092cbbd3d18ac443))
+* create route  dsl ([31175a1](https://github.com/dev-pps/pps-23-ulisse/commit/31175a1f6f9b058febabb0acb8473ba9768e743b))
+* create station dsl ([a13cfef](https://github.com/dev-pps/pps-23-ulisse/commit/a13cfef08a0d28fa1b36774680a9ec40fb16f513))
+* create time-table dsl ([cb691b0](https://github.com/dev-pps/pps-23-ulisse/commit/cb691b09c152245bf4e11f5531982f1978989f63))
+* finish dsl ([587d3ed](https://github.com/dev-pps/pps-23-ulisse/commit/587d3edc7027fe6f4a2bef711589b71b2beca96b))
+* init app state dsl ([4e8065b](https://github.com/dev-pps/pps-23-ulisse/commit/4e8065babeea532f6969fdf9cac772c49723f00c))
+* update route and timetable ([4bf6f50](https://github.com/dev-pps/pps-23-ulisse/commit/4bf6f506676b625ab45f5e27a77627d914a61376))
+
+### Bug Fixes
+
+* architecture for dsl ([5d5c683](https://github.com/dev-pps/pps-23-ulisse/commit/5d5c68340a35c6d2da2592f2b0c143e7ddcd28a5))
+
 ## [1.36.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.36.0...v1.36.1) (2025-03-09)
 
 ### Bug Fixes
