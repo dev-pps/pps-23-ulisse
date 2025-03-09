@@ -1,5 +1,6 @@
 package ulisse.entities.train
 
+/** Contains constructor and methods to create wagons. */
 object Wagons:
 
   private object DefaultLength:

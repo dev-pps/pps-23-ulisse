@@ -14,11 +14,11 @@ import scala.concurrent.{Future, Promise}
 
 /** Implements of trait [[Input]].
   *
-  * @see For more details [[TrainPorts]]
+  * @see For more details [[Input]]
   */
 final case class TrainService(eventQueue: TrainEventQueue) extends Input:
 
-  def removeTrain(name: String): Future[Either[BaseError, List[Train]]] =
+  override def removeTrain(name: String): Future[Either[BaseError, List[Train]]] =
     val promise = Promise[Either[BaseError, List[Train]]]
 
     eventQueue.addDeleteTrainEvent((trainManager, timetableManager) =>
@@ -34,7 +34,7 @@ final case class TrainService(eventQueue: TrainEventQueue) extends Input:
     )
     promise.future
 
-  def createTrain(
+  override def createTrain(
       name: String,
       technologyName: String,
       wagonUseTypeName: String,
@@ -51,7 +51,7 @@ final case class TrainService(eventQueue: TrainEventQueue) extends Input:
     )
     promise.future
 
-  def updateTrain(name: String)(
+  override def updateTrain(name: String)(
       technologyName: String,
       wagonUseTypeName: String,
       wagonCapacity: Int,
@@ -77,17 +77,17 @@ final case class TrainService(eventQueue: TrainEventQueue) extends Input:
 
     promise.future
 
-  def trains: Future[List[Train]] =
+  override def trains: Future[List[Train]] =
     val promise = Promise[List[Train]]
     eventQueue.addReadTrainEvent((traintManager, technologyManager) => promise.success(traintManager.trains))
     promise.future
 
-  def technologies: Future[List[TrainTechnology]] =
+  override def technologies: Future[List[TrainTechnology]] =
     itemsRequest[List[TrainTechnology]]((trainManager, technologyManager) => technologyManager.technologiesList)(
       eventQueue
     )
 
-  def wagonTypes: Future[List[UseType]] =
+  override def wagonTypes: Future[List[UseType]] =
     itemsRequest[List[UseType]]((trainManager, technologyManager) => trainManager.wagonTypes)(eventQueue)
 
   private def itemsRequest[T](items: (TrainManager, TechnologyManager[TrainTechnology]) => T)(queue: TrainEventQueue) =

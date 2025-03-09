@@ -6,11 +6,18 @@ import ulisse.entities.timetable.Timetables.Timetable
   * utility method to convert service application data type into view one.
   */
 object TimetableViewModel:
-
+  /** Timetable entry of view. */
   trait TimetableEntry:
+    /** Station name */
     def name: String
+
+    /** Arriving time into station */
     def arrivingTime: Option[String]
+
+    /** Departure time from station */
     def departureTime: Option[String]
+
+    /** Waiting time in station */
     def waitMinutes: Option[Int]
 
     override def toString: String =

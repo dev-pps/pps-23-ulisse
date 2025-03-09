@@ -7,7 +7,7 @@ import java.awt.Color
 import scala.swing.Swing.{EmptyBorder, HGlue, HStrut}
 import scala.swing.{BoxPanel, Component, Label, ListView, Orientation, Swing}
 
-/** View for the list of trains. */
+/** Custom list view with customized train item renderer. */
 object TrainListView:
 
   private val selectedColor = Color.decode("#fff3d0")
@@ -48,15 +48,12 @@ object TrainListView:
           background = if isSelected then selectedColor else Color.WHITE
         }
       }
-      private val trainIcon = Label("icon train") // ImagePanel.createImagePanel("train-icon.png")
       private val titleLabel = new Label(trainData.name.getOrElse("N/A")) {
         font = nameFont
       }
       private val titlePane = new BoxPanel(Orientation.Horizontal) {
         contents += HStrut(20)
         contents += titleLabel
-        contents += HGlue
-        contents += trainIcon
         contents += HGlue
       }
       contents += titlePane
