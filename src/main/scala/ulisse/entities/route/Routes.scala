@@ -200,18 +200,22 @@ object Routes:
       export typology._
       override val id: IdRoute = hashCode()
 
+      private def checkMinLength(a: Station, b: Station): Double =
+        val distance = a.coordinate distance b.coordinate
+        if length < distance then distance else length
+
       override def changeAutomaticDeparture(departure: Station): Route =
         copy(
           departure = departure,
           railsCount = min(departure.numberOfPlatforms, arrival.numberOfPlatforms),
-          length = departure.coordinate distance arrival.coordinate
+          length = checkMinLength(departure, arrival)
         )
 
       override def changeAutomaticArrival(arrival: Station): Route =
         copy(
           arrival = arrival,
           railsCount = min(departure.numberOfPlatforms, arrival.numberOfPlatforms),
-          length = departure.coordinate distance arrival.coordinate
+          length = checkMinLength(departure, arrival)
         )
 
       override def withTypology(typeRoute: RouteType): Route = copy(typology = typeRoute)

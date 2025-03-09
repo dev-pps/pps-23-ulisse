@@ -126,7 +126,7 @@ object RouteManagers:
           routes.filter(_ isArrival oldStation).map(route => route.id -> (route changeAutomaticArrival newStation)))
 
       override def deleteBy(id: IdRoute): Either[Errors, RouteManager] =
-        findBy(id).map(_ => copy(manager - id).asRight).getOrElse(Errors.NotExist.asLeft)
+        findBy(id).map(_ => copy(manager - id).asRight) getOrElse Errors.NotExist.asLeft
 
       override def deleteByDeparture(station: Station): Either[Errors, RouteManager] =
         deleteByStation(findByDeparture)(station)
