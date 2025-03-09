@@ -7,6 +7,7 @@ import ulisse.utils.Times.FluentDeclaration.h
 
 import scala.annotation.targetName
 
+/** Contains time-related utilities. */
 object Times:
   private type Hour   = Int
   private type Minute = Int
