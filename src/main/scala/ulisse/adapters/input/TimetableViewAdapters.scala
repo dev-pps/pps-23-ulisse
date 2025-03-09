@@ -28,7 +28,7 @@ object TimetableViewAdapters:
     *
     * It is observable for list of [[Train]]
     */
-  trait TimetableViewAdapter extends TrainsObservable with TimetablesObservable with ErrorObservable:
+  trait TimetableViewAdapter extends TrainsObservable with TimetablesObservable with RequestResultObservable:
     /** Requests train names. */
     def requestTrains(): Unit
 
@@ -67,24 +67,26 @@ object TimetableViewAdapters:
     private class ViewAdapterImpl(tablePort: TimetablePorts.Input, trainPort: TrainPorts.Input)
         extends TimetableViewAdapter:
       import TimetableViewAdapters.Error.*
-      private var stations: List[TimetableEntry]                = List.empty
-      private var selectedTrain: Option[String]                 = None
-      private var startTime: Option[ClockTime]                  = None
-      private var errorObserver: Option[ErrorObserver]          = None
-      private var trainsObserver: List[TrainsUpdatable]         = List.empty
-      private var timetablesObserver: List[TimetablesUpdatable] = List.empty
+      private var stations: List[TimetableEntry]                       = List.empty
+      private var selectedTrain: Option[String]                        = None
+      private var startTime: Option[ClockTime]                         = None
+      private var requestResultObserver: Option[RequestResultObserver] = None
+      private var trainsObserver: List[TrainsUpdatable]                = List.empty
+      private var timetablesObserver: List[TimetablesUpdatable]        = List.empty
 
       given executionContext: ExecutionContext = ExecutionContext.fromExecutorService(
         Executors.newFixedThreadPool(1)
       )
 
-      private def showError(err: Error): Unit =
-        errorObserver.foreach(o => Swing.onEDT(o.showError(err.title, err.descr)))
+      private def showRequestResult(title: String, descr: String): Unit =
+        requestResultObserver.foreach(o => Swing.onEDT(o.showRequestResult(title, descr)))
 
       override def requestTrains(): Unit =
         trainPort.trains.onComplete {
-          case Failure(e) => showError(RequestException(e.getMessage))
-          case Success(l) => trainsObserver.foreach(_.updateNewTrains(l))
+          case Failure(e) => showRequestResult("Request error", e.getMessage)
+          case Success(l) =>
+            selectedTrain = None
+            trainsObserver.foreach(_.updateNewTrains(l))
         }
 
       override def insertStation(stationName: String, waitTime: Option[Int]): List[TimetableEntry] =
@@ -100,7 +102,7 @@ object TimetableViewAdapters:
             stations.appended(TableEntryData(stationName, None, departString, waitTime))
         res match
           case Left(err) =>
-            showError(err)
+            showRequestResult(err.title, err.descr)
             stations
           case Right(updatedStations) =>
             stations = updatedStations
@@ -115,7 +117,6 @@ object TimetableViewAdapters:
           t       <- trainName
           depTime <- departureTime
         yield tablePort.deleteTimetable(t, depTime).handleOnComplete: updatedTimetables =>
-          // TODO: notify the view interested
           println(updatedTimetables)
 
       override def save(): Unit =
@@ -127,13 +128,16 @@ object TimetableViewAdapters:
           yield tablePort.createTimetable(trainName, departureTime, stations.map(e => (e.name, e.waitMinutes)))
 
         res match
-          case Left(err) => showError(TimetableSaveError(err.descr))
-          case Right(fs) => fs.handleOnComplete(_ => reset())
+          case Left(err) => showRequestResult(err.title, err.descr)
+          case Right(fs) =>
+            fs.handleOnComplete: timetables =>
+              showRequestResult("Timetable SAVED!", "Timetable has saved correctly")
+              reset()
 
       override def requestTimetables(trainName: String): Unit =
         tablePort.timetablesOf(trainName).onComplete {
-          case Failure(exc)       => showError(RequestException(exc.getMessage))
-          case Success(Left(err)) => showError(RequestException(s"SERVICE: $err"))
+          case Failure(exc)       => showRequestResult("Request error", exc.getMessage)
+          case Success(Left(err)) => showRequestResult("Request timetables error", s"$err")
           case Success(Right(timetables)) =>
             timetablesObserver.foreach(_.updateTimetables(timetables))
         }
@@ -152,8 +156,8 @@ object TimetableViewAdapters:
         startTime.foreach(_ => reset())
         startTime = ClockTime(h, m).toOption
 
-      override def addErrorObserver(errObserver: ErrorObserver): Unit =
-        errorObserver = Some(errObserver)
+      override def addRequestResultObserver(resObserver: RequestResultObserver): Unit =
+        requestResultObserver = Some(resObserver)
 
       override def addTimetablesObserver(observer: TimetablesUpdatable): Unit =
         timetablesObserver = observer :: timetablesObserver
@@ -166,7 +170,7 @@ object TimetableViewAdapters:
       extension (toComplete: Future[RequestResult])
         private def handleOnComplete(onSuccess: List[Timetable] => Unit): Unit =
           toComplete.onComplete {
-            case Failure(e)         => showError(RequestException(e.getMessage))
-            case Success(Left(err)) => showError(RequestException(s"SERVICE: $err"))
+            case Failure(e)         => showRequestResult("Request error", e.getMessage)
+            case Success(Left(err)) => showRequestResult("Service error", s"$err")
             case Success(Right(r))  => onSuccess(r)
           }
