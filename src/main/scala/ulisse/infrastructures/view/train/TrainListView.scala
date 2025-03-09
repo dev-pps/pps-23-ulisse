@@ -7,15 +7,18 @@ import java.awt.Color
 import scala.swing.Swing.{EmptyBorder, HGlue, HStrut}
 import scala.swing.{BoxPanel, Component, Label, ListView, Orientation, Swing}
 
+/** View for the list of trains. */
 object TrainListView:
 
   private val selectedColor = Color.decode("#fff3d0")
 
+  /** Create a view for the list of trains. */
   case class TrainListView(trains: List[TrainViewModel.TrainData]) extends ListView(trains):
     import scala.swing.ListView.IntervalMode
     selection.intervalMode = IntervalMode.Single
     renderer = new ItemRenderer[TrainViewModel.TrainData]
 
+    /** Update the data model of the view. */
     def updateDataModel(data: List[TrainViewModel.TrainData]): Unit =
       listData = data
       revalidate()

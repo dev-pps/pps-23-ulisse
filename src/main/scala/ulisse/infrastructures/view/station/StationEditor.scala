@@ -1,20 +1,16 @@
 package ulisse.infrastructures.view.station
 
 import ulisse.adapters.input.StationEditorAdapter
-import ulisse.applications.managers.StationManager
 import ulisse.entities.Coordinate
 import ulisse.entities.Coordinate.*
 import ulisse.entities.station.Station
+import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 
 import java.awt.Color
-import scala.concurrent.ExecutionContext
 import scala.swing.*
 import scala.swing.Swing.LineBorder
 import scala.swing.event.*
 import scala.util.Success
-
-given ExecutionContext = ExecutionContext.fromExecutor: (runnable: Runnable) =>
-  Swing.onEDT(runnable.run())
 
 /** A Card displaying station information.
   *
