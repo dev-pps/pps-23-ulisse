@@ -1,4 +1,4 @@
-package ulisse.infrastructures.utilty
+package ulisse.infrastructures.utils
 
 import ulisse.adapters.output.SimulationNotificationListener
 import ulisse.entities.simulation.data.SimulationData

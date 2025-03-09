@@ -7,7 +7,7 @@ import ulisse.utils.Times.FluentDeclaration.h
 
 import scala.annotation.targetName
 
-/** Contains time-related utilities. */
+/** Contains all entities and utility about [[Time]] and [[TimeClock]] */
 object Times:
   private type Hour   = Int
   private type Minute = Int
@@ -23,9 +23,15 @@ object Times:
   final case class InvalidMinutes(t: Time)     extends ClockTimeErrors(t)
       with ErrorMessage("minutes not in range [0,59]")
 
+  /** Trait representing concept of time with hours, minutes and seconds. */
   trait Time:
+    /** Hours value */
     def h: Hour
+
+    /** Minutes value */
     def m: Minute
+
+    /** Seconds value */
     def s: Second
     override def toString: String = s"$h:$m:$s"
     override def equals(that: Any): Boolean =
@@ -33,6 +39,7 @@ object Times:
         case t: Time => t.h == h && t.m == m && t.s == s
         case _       => false
 
+  /** Companion object of trait [[Time]] */
   object Time:
     /** Creates a `Time` instance. */
     def apply(h: Hour, m: Minute, s: Second): Time = TimeImpl(h, m, s)
@@ -54,9 +61,14 @@ object Times:
 
     private case class TimeImpl(h: Hour, m: Minute, s: Second) extends Time
 
+  /** A particular type of [[Time]] of time with constrain that minutes and hours must be valid on creation.
+    * Valid is mean that minutes must be between o to 59 and hours between 0 and 23.
+    */
   trait ClockTime extends Time:
+    /** Returns equivalent [[Time]] entity of ClockTime. Seconds value of returned Time is always zero. */
     def asTime: Time
 
+  /** Companion object of trait [[ClockTime]] */
   object ClockTime:
     private val maxDayHours        = 23
     private val minDayHours        = 0
@@ -64,6 +76,7 @@ object Times:
     private val minDayMinutes      = 0
     private val ignoredSecondValue = 0
 
+    /** Creates ClockTime returning a Left in case of violation of ClockTime boundaries. */
     def apply(h: Hour, m: Minute): Either[ClockTimeErrors, ClockTime] =
       val time = Id(Time(0, 0, 0)) overflowSum Id(Time(h, m, ignoredSecondValue))
       for
@@ -71,20 +84,29 @@ object Times:
         m <- ValidationUtils.validateRange(m, minDayMinutes, maxDayMinutes, InvalidMinutes(time))
       yield ClockTimeImpl(h, m)
 
+    /** Unapply methods returning tuple with hours and minutes. */
     def unapply(ct: ClockTime): (Hour, Minute) = (ct.h, ct.m)
 
+    /** Creates new ClockTime. In case of some creation error is returned a
+      * default ClockTime using a [[DefaultTimeStrategy]]
+      */
     def withDefault(h: Hour, m: Minute): ClockTime =
       ClockTime(h, m).getOrDefault
 
+    /** Default time strategy */
     trait DefaultTimeStrategy:
+      /** Given a `currentTime` returns a default one. */
       def defaultTime(currentTime: Time): Time
 
+    /** Strategy that return always as default a Time with hours, minutes and seconds zero valued. */
     private object FixedTimeDefault extends DefaultTimeStrategy:
       override def defaultTime(currentTime: Time): Time = Time(0, 0, ignoredSecondValue)
 
+    /** Default given instance of DefaultTimeStrategy */
     given predefinedDefaultTime: DefaultTimeStrategy = FixedTimeDefault
 
     extension (time: Either[ClockTimeErrors, ClockTime])
+      /** Returns a default ClockTime using [[DefaultTimeStrategy]] for calculation of default ClockTime. */
       def getOrDefault(using dts: DefaultTimeStrategy): ClockTime =
         time match
           case Left(e) =>
@@ -96,6 +118,7 @@ object Times:
       override def asTime: Time = Time(h, m, ignoredSecondValue)
       override def s: Second    = ignoredSecondValue
 
+  /** Contains classes and extension nmethods for creation of ClockTime in a more readable way. */
   object FluentDeclaration:
     /** ClockTime builder that contains `hours` */
     case class HoursBuilder(hours: Int)
@@ -123,6 +146,7 @@ object Times:
     yield res
 
   extension (time: Time)
+    /** Returns `time` into ClockTime. It returns Left if given Time */
     def toClockTime: Either[ClockTimeErrors, ClockTime] =
       h(time.h).m(time.m)
 
