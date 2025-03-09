@@ -1,5 +1,14 @@
-# Example of a Class Diagram
-F-Bounded polymorphism
+# Implementazione Federico Bravetti
+Il codice prodotto durante lo svolgimento del progetto riguarda prevalentemente le seguente parti:
+- **Station**: Implementazioni delle stazioni con relativo manager e servizio
+- **Simulation Environment**: implementazione dell'ambiente di simulazione comprese tutte le entità dinamiche costruite estendendo le componenti statiche, in particolare:
+  - **Platform & Track**: implementazione delle piattaforme e dei binari, necessari a contenere e gestire i `TrainAgent`.
+  - **StationEnvironmentElement & StationEnvironment**: implementazione di un elemento di ambiente per le stazioni.
+  - **RouteEnvironmentElement & RouteEnvironment**: implementazione di un elemento di ambiente per le rotte.
+  - **DynamicTimetable & DynamicTimetableEnvironment**: implementazione di un orario dinamico per le stazioni.
+  - **RailwayEnvironment**: implementazione dell'ambiente di simulazione.
+- **PerceptionSystem**: implementazione di un sistema di percezione per gli agenti di simulazione.
+- **Engine**: implementazione di un motore di simulazione.
 
 ```scala 3
 trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
