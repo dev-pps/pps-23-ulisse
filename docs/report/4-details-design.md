@@ -1,3 +1,4 @@
+![An image](/resources/architecture/staticEntitiesWithMangers.svg)
 ![An image](/resources/architecture/packages.svg)
 ![An image](/resources/architecture/staticEntitiesManagers.svg)
 ![An image](/resources/architecture/queuingsystem.svg)
