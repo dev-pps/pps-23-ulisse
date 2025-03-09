@@ -8,7 +8,7 @@ import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.event.MouseEvent
-import scala.swing.{Component, Orientation, Swing}
+import scala.swing.{ Component, Orientation, Swing }
 
 /** Represents the form of the application. */
 trait Form extends ComposedSwing:
@@ -39,6 +39,7 @@ object Form:
       form.cleanForm()
       form.resetError()
 
+  /** Represents base layout of the form. */
   final case class BaseForm(title: String, fields: ComposedSwing.InfoTextField*):
     private val mainPanel: ExtendedSwing.SBoxPanel    = ExtendedSwing SBoxPanel Orientation.Vertical
     private val insertForm: ComposedSwing.JInsertForm = ComposedSwing.createInsertForm(title, fields: _*)

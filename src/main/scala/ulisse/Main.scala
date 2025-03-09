@@ -4,6 +4,7 @@ import ulisse.adapters.InputAdapterManager
 import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
 import ulisse.adapters.output.SimulationNotificationAdapter
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
+import ulisse.adapters.output.{SimulationNotificationAdapter, SimulationNotificationListener}
 import ulisse.applications.ports.{SimulationInfoPorts, SimulationPorts}
 import ulisse.applications.useCases.{SimulationInfoService, SimulationService}
 import ulisse.applications.{AppState, EventQueue, InputPortManager}
@@ -16,7 +17,6 @@ import ulisse.entities.train.Wagons.{UseType, Wagon}
 import ulisse.infrastructures.utilty.SimulationNotificationBridge
 import ulisse.infrastructures.view.GUI
 import ulisse.infrastructures.view.page.workspaces.SimulationWorkspace
-import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 import ulisse.utils.Times.FluentDeclaration.h
 
 object Main:

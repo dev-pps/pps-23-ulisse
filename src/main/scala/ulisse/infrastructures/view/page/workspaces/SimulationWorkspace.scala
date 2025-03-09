@@ -1,11 +1,11 @@
 package ulisse.infrastructures.view.page.workspaces
 
 import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
+import ulisse.adapters.output.SimulationNotificationListener
 import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.map.MapSimulation
 import ulisse.infrastructures.view.page.forms.SimulationForm
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
-import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 import ulisse.utils.Times.*
 
