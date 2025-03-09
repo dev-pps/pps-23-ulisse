@@ -1,3 +1,10 @@
+## [1.38.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.38.0...v1.38.1) (2025-03-09)
+
+### Bug Fixes
+
+* double test in simulation form ([9e89b54](https://github.com/dev-pps/pps-23-ulisse/commit/9e89b54ca1a538d9149fa580d37fca0387a7dbb8))
+* reset simulation button ([92204ec](https://github.com/dev-pps/pps-23-ulisse/commit/92204ec93d00c403d53f66dc5aa7fcf3f6e11794))
+
 ## [1.38.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.37.1...v1.38.0) (2025-03-09)
 
 ### Features
