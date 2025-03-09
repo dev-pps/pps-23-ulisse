@@ -1,6 +1,8 @@
 package ulisse.infrastructures.view.page.forms
 
 import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
+import ulisse.applications.ports.SimulationPorts.Input.Preset
+import ulisse.applications.ports.SimulationPorts.Input.Preset.Simple
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.data.Statistics.*
 import ulisse.entities.simulation.data.{EngineConfiguration, SimulationData}
@@ -44,6 +46,15 @@ trait SimulationForm extends Form:
 
   /** Attach the reset simulation observer to the form of type [[Unit]]. */
   def attachResetSimulation(observer: ClickObserver[Unit]): Unit
+
+  /** Attach the simple simulation observer to the form of type [[Unit]]. */
+  def attachSimpleSimulation(observer: ClickObserver[Unit]): Unit
+
+  /** Attach the middle simulation observer to the form of type [[Unit]]. */
+  def attachNormalSimulation(observer: ClickObserver[Unit]): Unit
+
+  /** Attach the complex simulation observer to the form of type [[Unit]]. */
+  def attachComplexSimulation(observer: ClickObserver[Unit]): Unit
 
   /** Sets the simulation information. */
   def setEngineConfiguration(engine: EngineConfiguration): Unit
@@ -97,6 +108,18 @@ object SimulationForm:
       form.reset()
       workspace.initSimulation()
 
+  /** Represents the setup simulation event. */
+  final case class SetupSimulationEvent(
+      adapter: SimulationPageAdapter,
+      workspace: SimulationWorkspace,
+      form: SimulationForm,
+      preset: Preset
+  ) extends ClickObserver[Unit]:
+    override def onClick(info: Unit): Unit =
+      adapter.initSimulationUsing(preset)
+      form.reset()
+      workspace.initSimulation()
+
   /** Represents the take station event. */
   final case class TakeStationEvent(form: SimulationForm, infoSimulation: SimulationInfoAdapter)
       extends ClickObserver[MapElement[StationEnvironmentElement]]:
@@ -131,6 +154,21 @@ object SimulationForm:
     private val resetButton = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
     private val form        = BaseForm("Simulation", stepSize, cyclePerSecond)
 
+    private val settersPanel = ExtendedSwing.SFlowPanel().transparent()
+    private val simpleSim    = ExtendedSwing createFormButtonWith ("Simple", Styles.formButtonRect)
+    private val normalSim    = ExtendedSwing createFormButtonWith ("Normal", Styles.formButtonRect)
+    private val complexSim   = ExtendedSwing createFormButtonWith ("Complex", Styles.formButtonRect)
+
+    settersPanel.hGap = space
+    settersPanel.contents += simpleSim
+    settersPanel.contents += normalSim
+    settersPanel.contents += complexSim
+
+    private val southPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
+    southPanel.contents += form.component
+    southPanel.contents += settersPanel
+    southPanel.contents += Swing.VStrut(space)
+
     private val infoArea        = ExtendedSwing.STextArea()
     private val elementInfoArea = ExtendedSwing.STextArea()
     private val infoPanel       = ExtendedSwing.SBoxPanel(Orientation.Vertical)
@@ -147,16 +185,22 @@ object SimulationForm:
     buttonPanel.contents += resetButton
 
     mainPanel.layout(flowPanel) = Position.North
-    mainPanel.layout(form.component) = Position.South
+    mainPanel.layout(southPanel) = Position.South
 
-    private val playObservable  = Observers.createObservable[SimulationInfo]
-    private val resetObservable = Observers.createObservable[Unit]
+    private val playObservable    = Observers.createObservable[SimulationInfo]
+    private val resetObservable   = Observers.createObservable[Unit]
+    private val simpleObservable  = Observers.createObservable[Unit]
+    private val normalObservable  = Observers.createObservable[Unit]
+    private val complexObservable = Observers.createObservable[Unit]
 
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     private var _isPlaying = false
 
     playButton attachClick (playObservable toObserver (_ => SimulationInfo(stepSize.text, cyclePerSecond.text)))
     resetButton attachClick (resetObservable toObserver (_ => ()))
+    simpleSim attachClick (simpleObservable toObserver (_ => ()))
+    normalSim attachClick (normalObservable toObserver (_ => ()))
+    complexSim attachClick (complexObservable toObserver (_ => ()))
 
     export form.{component => _, _}
 
@@ -183,6 +227,15 @@ object SimulationForm:
 
     override def attachResetSimulation(observer: ClickObserver[Unit]): Unit =
       resetObservable attachClick observer
+
+    override def attachSimpleSimulation(observer: ClickObserver[Unit]): Unit =
+      simpleObservable attachClick observer
+
+    override def attachNormalSimulation(observer: ClickObserver[Unit]): Unit =
+      normalObservable attachClick observer
+
+    override def attachComplexSimulation(observer: ClickObserver[Unit]): Unit =
+      complexObservable attachClick observer
 
     override def setEngineConfiguration(engine: EngineConfiguration): Unit =
       stepSize.text = s"${engine.stepSize}"

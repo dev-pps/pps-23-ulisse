@@ -2,6 +2,7 @@ package ulisse.infrastructures.view.page.workspaces
 
 import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
 import ulisse.adapters.output.SimulationNotificationListener
+import ulisse.applications.ports.SimulationPorts.Input.Preset
 import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.map.MapSimulation
 import ulisse.infrastructures.view.page.forms.SimulationForm
@@ -38,8 +39,11 @@ object SimulationWorkspace:
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(simulation.component) = Position.East
 
-    simulation.attachStartSimulation(SimulationForm.PlaySimulationEvent(adapter, this, simulation))
-    simulation.attachResetSimulation(SimulationForm.ResetSimulationEvent(adapter, this, simulation))
+    simulation attachStartSimulation (SimulationForm PlaySimulationEvent (adapter, this, simulation))
+    simulation attachResetSimulation (SimulationForm ResetSimulationEvent (adapter, this, simulation))
+    simulation attachSimpleSimulation (SimulationForm SetupSimulationEvent (adapter, this, simulation, Preset.Simple))
+    simulation attachNormalSimulation (SimulationForm SetupSimulationEvent (adapter, this, simulation, Preset.Normal))
+    simulation attachComplexSimulation (SimulationForm SetupSimulationEvent (adapter, this, simulation, Preset.Complex))
 
     export workspace.{component, revalidate}
 

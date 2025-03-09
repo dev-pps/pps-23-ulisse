@@ -3,6 +3,9 @@ package ulisse.applications.useCases
 import ulisse.applications.event.SimulationEventQueue
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.ports.SimulationPorts
+import ulisse.applications.ports.SimulationPorts.Input.Preset
+import ulisse.applications.ports.SimulationPorts.Input.Preset.*
+import ulisse.dsl.RailwayConfig
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.data.{Engine, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
@@ -35,6 +38,15 @@ final case class SimulationService(
       )).tap(nsm => p.success((nsm.engine, nsm.simulationData)))
     )
     p.future
+
+  override def initSimulationUsing(preset: Preset): Future[(Engine, SimulationData)] =
+    eventQueue.addSetupAppStateEvent(_ =>
+      preset match
+        case Simple  => RailwayConfig.simpleRailwayConfig
+        case Normal  => RailwayConfig.normalRailwayConfig
+        case Complex => RailwayConfig.complexRailwayConfig
+    )
+    initSimulation()
 
   override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Future[Option[Engine]] =
     val p = Promise[Option[Engine]]()

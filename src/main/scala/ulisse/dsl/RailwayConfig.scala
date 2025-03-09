@@ -9,10 +9,10 @@ import ulisse.entities.train.Wagons.UseType
 
 /** Configuration for the railway. */
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
-object ConfigRailway:
+object RailwayConfig:
 
-  private val highSpeed         = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
-  private val normal            = TrainTechnology("Normal", 100, 0.5, 0.25)
+  private val highSpeed         = TrainTechnology("AV", 300, 2.0, 1.0)
+  private val normal            = TrainTechnology("Normal", 160, 1, 0.5)
   private val technologyManager = TechnologyManager(List(highSpeed, normal))
 
   private val initAppState: AppState  = AppState.withTechnology(technologyManager)
@@ -80,6 +80,11 @@ object ConfigRailway:
   private var mediumRailway: AppState  = uploadRailway
   private var complexRailway: AppState = uploadRailway
 
-  def simpleRailwayConfig: AppState  = simpleRailway
-  def mediumRailwayConfig: AppState  = mediumRailway
+  /** Get the simple railway configuration. */
+  def simpleRailwayConfig: AppState = simpleRailway
+
+  /** Get the normal railway configuration. */
+  def normalRailwayConfig: AppState = mediumRailway
+
+  /** Get the complex railway configuration. */
   def complexRailwayConfig: AppState = complexRailway
