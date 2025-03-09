@@ -36,7 +36,7 @@ class RailwayDslTest extends AnyFlatSpec with Matchers:
     departure mustBe station
 
   "create train with dsl" should "create a train" in:
-    val train = CreateTrain -> trainName technology highSpeed wagon UseType.Passenger numbers platform
+    val train = CreateTrain -> trainName technology highSpeed wagon UseType.Passenger capacity platform count 1
     trainTest mustBe train
 
   "create route with dsl" should "create a route" in:

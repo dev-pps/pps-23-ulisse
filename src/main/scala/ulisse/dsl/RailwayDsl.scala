@@ -7,6 +7,7 @@ import ulisse.entities.route.Routes.Route
 import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons
+import ulisse.entities.train.Wagons.Wagon
 
 import scala.annotation.targetName
 
@@ -118,7 +119,10 @@ object RailwayDsl:
 
     /** Create a train with a name, a technology, and a wagon. */
     case class TrainWithWagon(name: String, technology: TrainTechnology, wagon: Wagons.UseType):
-      def numbers(number: Int): Train = Train(name, technology, Wagons.Wagon(wagon, number), number)
+      def capacity(number: Int): TrainWithCapacity = TrainWithCapacity(name, technology, Wagons.Wagon(wagon, number))
+
+    case class TrainWithCapacity(name: String, technology: TrainTechnology, wagon: Wagon):
+      def count(number: Int): Train = Train(name, technology, wagon, number)
 
     /** Create a train with a name, a technology, a wagon, and a number. */
     implicit class TrainOps(start: CreateTrain.type):
