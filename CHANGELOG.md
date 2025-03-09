@@ -1,3 +1,17 @@
+## [1.39.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.38.1...v1.39.0) (2025-03-09)
+
+### Features
+
+* add method tu add timetable ([cbc3f0d](https://github.com/dev-pps/pps-23-ulisse/commit/cbc3f0d7d6b36e76fc6d6689e40a51116c7e3ecf))
+* connect preset at gui ([f725d38](https://github.com/dev-pps/pps-23-ulisse/commit/f725d38a85b99aa12c38fef25a0c426800306eb0))
+* create railway templait ([c7cb8c1](https://github.com/dev-pps/pps-23-ulisse/commit/c7cb8c15c502e1faf86101ba549efa9f6ea86092))
+* create station and train ([b2664cf](https://github.com/dev-pps/pps-23-ulisse/commit/b2664cf6d5701be57323a989c87a21a570f731c3))
+* set default railway ([bf5760e](https://github.com/dev-pps/pps-23-ulisse/commit/bf5760ed7ca69619d149896ffa883301aa02aaba))
+
+### Bug Fixes
+
+* architecture railway config ([7b24ed3](https://github.com/dev-pps/pps-23-ulisse/commit/7b24ed39152b6e331c6dd8f99605852edafbf2ee))
+
 ## [1.38.1](https://github.com/dev-pps/pps-23-ulisse/compare/v1.38.0...v1.38.1) (2025-03-09)
 
 ### Bug Fixes
