@@ -2,26 +2,25 @@ package ulisse.infrastructures.view.page.forms
 
 import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
 import ulisse.entities.route.RouteEnvironmentElement
+import ulisse.entities.simulation.data.Statistics.*
 import ulisse.entities.simulation.data.{EngineConfiguration, SimulationData}
+import ulisse.entities.station.StationEnvironmentElement
+import ulisse.entities.station.StationEnvironmentElement.StationEnvironmentInfo
+import ulisse.entities.train.TrainAgents
+import ulisse.entities.train.TrainAgents.TrainAgentInfo
 import ulisse.infrastructures.view.common.Observers
 import ulisse.infrastructures.view.common.Observers.ClickObserver
 import ulisse.infrastructures.view.components.ExtendedSwing
 import ulisse.infrastructures.view.components.ExtendedSwing.SBorderPanel
 import ulisse.infrastructures.view.components.composed.ComposedSwing
 import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.infrastructures.view.page.forms.Form.BaseForm
-import ulisse.infrastructures.view.page.forms.SimulationForm.SimulationInfo
-import ulisse.entities.simulation.data.Statistics.*
-import ulisse.infrastructures.view.utils.ComponentUtils.*
-import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
-import ulisse.entities.station.StationEnvironmentElement
-import ulisse.entities.station.StationEnvironmentElement.StationEnvironmentInfo
-import ulisse.entities.train.TrainAgents
-import ulisse.entities.train.TrainAgents.TrainAgentInfo
-import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, ShapeEffect}
 import ulisse.infrastructures.view.map.MapElement
 import ulisse.infrastructures.view.map.MapSimulation.TrainMapElement
+import ulisse.infrastructures.view.page.forms.Form.BaseForm
+import ulisse.infrastructures.view.page.forms.SimulationForm.SimulationInfo
 import ulisse.infrastructures.view.page.workspaces.SimulationWorkspace
+import ulisse.infrastructures.view.utils.ComponentUtils.*
+import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 import ulisse.utils.Times.*
 
 import java.awt.geom.Point2D
@@ -32,10 +31,13 @@ import scala.swing.{Component, Orientation, Swing}
 trait SimulationForm extends Form:
 
   /** Sets the button to play. */
-  def setButtonPlay(): Unit
+  def play(): Unit
 
   /** Sets the button to pause. */
-  def setButtonPause(): Unit
+  def reset(): Unit
+
+  /** Checks if the simulation is playing. */
+  def isPlaying: Boolean
 
   /** Attach the start simulation observer to the form of type [[SimulationInfo]]. */
   def attachStartSimulation(observer: ClickObserver[SimulationInfo]): Unit
@@ -75,25 +77,24 @@ object SimulationForm:
       workspace: SimulationWorkspace,
       form: SimulationForm
   ) extends ClickObserver[SimulationInfo]:
-    private var isPlaying = false
-
     override def onClick(info: SimulationInfo): Unit =
-      if !isPlaying then
+      if !form.isPlaying then
         info.stepInt.fold(form.showError("error"))(step =>
           adapter.setupEngine(step, info.cyclePerSecondInt)
           adapter.start()
-          form.setButtonPause()
+          form.play()
         )
-      else
-        adapter.stop()
-        form.setButtonPlay()
-      isPlaying = !isPlaying
+      else adapter.stop()
 
   /** Represents the reset simulation event. */
-  final case class ResetSimulationEvent(adapter: SimulationPageAdapter, workspace: SimulationWorkspace)
-      extends ClickObserver[Unit]:
+  final case class ResetSimulationEvent(
+      adapter: SimulationPageAdapter,
+      workspace: SimulationWorkspace,
+      form: SimulationForm
+  ) extends ClickObserver[Unit]:
     override def onClick(info: Unit): Unit =
       adapter.reset()
+      form.reset()
       workspace.initSimulation()
 
   /** Represents the take station event. */
@@ -149,6 +150,9 @@ object SimulationForm:
     private val playObservable  = Observers.createObservable[SimulationInfo]
     private val resetObservable = Observers.createObservable[Unit]
 
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
+    private var _isPlaying = false
+
     playButton attachClick (playObservable toObserver (_ => SimulationInfo(stepSize.text, cyclePerSecond.text)))
     resetButton attachClick (resetObservable toObserver (_ => ()))
 
@@ -158,9 +162,19 @@ object SimulationForm:
       playButton.text = text
       playButton.repaint()
 
-    override def setButtonPlay(): Unit = setButtonPlayText("Play")
+    override def play(): Unit =
+      if isPlaying then
+        setButtonPlayText("Play")
+      else
+        setButtonPlayText("Pause")
+      isPlaying = !isPlaying
 
-    override def setButtonPause(): Unit = setButtonPlayText("Pause")
+    override def reset(): Unit =
+      setButtonPlayText("Play")
+      isPlaying = false
+
+    override def isPlaying: Boolean               = _isPlaying
+    private def isPlaying_=(value: Boolean): Unit = _isPlaying = value
 
     override def attachStartSimulation(observer: ClickObserver[SimulationInfo]): Unit =
       playObservable attachClick observer

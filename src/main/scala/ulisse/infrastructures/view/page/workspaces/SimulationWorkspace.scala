@@ -1,15 +1,14 @@
 package ulisse.infrastructures.view.page.workspaces
 
-import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
+import ulisse.adapters.input.{ SimulationInfoAdapter, SimulationPageAdapter }
 import ulisse.entities.simulation.data.SimulationData
 import ulisse.infrastructures.view.map.MapSimulation
-import ulisse.infrastructures.view.page.forms.{Form, SimulationForm}
+import ulisse.infrastructures.view.page.forms.SimulationForm
 import ulisse.infrastructures.view.page.workspaces.Workspace.BaseWorkspace
 import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 import ulisse.infrastructures.view.utils.Swings.given_ExecutionContext
 import ulisse.utils.Times.*
 
-import java.util.Currency
 import scala.swing.BorderPanel.Position
 import scala.swing.Swing
 
@@ -40,7 +39,7 @@ object SimulationWorkspace:
     workspace.menuPanel.layout(simulation.component) = Position.East
 
     simulation.attachStartSimulation(SimulationForm.PlaySimulationEvent(adapter, this, simulation))
-    simulation.attachResetSimulation(SimulationForm.ResetSimulationEvent(adapter, this))
+    simulation.attachResetSimulation(SimulationForm.ResetSimulationEvent(adapter, this, simulation))
 
     export workspace.{component, revalidate}
 
@@ -50,14 +49,14 @@ object SimulationWorkspace:
         (engine, data) =>
           updateData(data)
           simulation setEngineConfiguration engine.configuration
-          lastUpdate = System.currentTimeMillis()
       ))
+      lastUpdate = System.currentTimeMillis()
 
     override def updateData(data: SimulationData): Unit =
-      Swing.onEDT:
-        val now = System.currentTimeMillis()
-        if now - lastUpdate > minUpdate then
-          lastUpdate = now
+      val now = System.currentTimeMillis()
+      if now - lastUpdate > minUpdate then
+        lastUpdate = now
+        Swing.onEDT:
           mapPanel uploadStation data.simulationEnvironment.stations
           mapPanel uploadRoutes data.simulationEnvironment.routes
           mapPanel uploadTrain data.simulationEnvironment.routes
