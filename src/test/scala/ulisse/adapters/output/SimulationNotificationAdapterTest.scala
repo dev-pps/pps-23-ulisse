@@ -5,7 +5,6 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.entities.simulation.data.SimulationData
-import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 
 class SimulationNotificationAdapterTest extends AnyWordSpec with Matchers:
   private val simulationData            = mock[SimulationData]

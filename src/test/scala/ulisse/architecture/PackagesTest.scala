@@ -49,6 +49,13 @@ class PackagesTest extends AnyFlatSpec:
     val adapterEndingName   = "Adapter"
     val adaptersEndingName  = "Adapters"
     val adaptersManagerName = "AdapterManager"
-    val rule = endingNameRulePossible(Packages.ADAPTERS, adapterEndingName, adaptersEndingName, adaptersManagerName)
+    val listenerName        = "Listener"
+    val rule = endingNameRulePossible(
+      Packages.ADAPTERS,
+      adapterEndingName,
+      adaptersEndingName,
+      adaptersManagerName,
+      listenerName
+    )
 
     rule.check(IMPORT_ONLY_CLASSES_CREATED)

@@ -1,7 +1,7 @@
 package ulisse.infrastructures.utilty
 
+import ulisse.adapters.output.SimulationNotificationListener
 import ulisse.entities.simulation.data.SimulationData
-import ulisse.infrastructures.view.simulation.SimulationNotificationListener
 
 /** Adapter requirements for the simulation notification bridge. */
 trait SimulationNotificationAdapterRequirements:
