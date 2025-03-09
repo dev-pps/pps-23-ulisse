@@ -10,6 +10,7 @@ import java.awt.geom.{AffineTransform, RoundRectangle2D}
 import scala.swing.{Component, Graphics2D}
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
+/** Represent image effects. */
 object ImageEffects:
   private val identityTransform: AffineTransform = new AffineTransform()
 

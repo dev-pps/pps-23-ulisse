@@ -10,11 +10,14 @@ import scala.swing.*
 import scala.swing.event.MouseEvent
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
+/** Enhancements for swing components. */
 object SwingEnhancements:
 
   /** Base trait decorator to enhanced look of swing [[Component]] */
   trait EnhancedLook extends Component:
     self: Component =>
+
+    /** Read-only property to get the observable of the component. */
     val observable: Observers.Observable[MouseEvent] = Observers.createObservable[MouseEvent]
     opaque = false
     self.listenTo(mouseEvents: _*)

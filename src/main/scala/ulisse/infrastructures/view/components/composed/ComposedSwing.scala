@@ -25,19 +25,19 @@ object ComposedSwing:
   /** Creates a [[InfoTextField]] from a [[title]]. */
   def createInfoTextField(text: String): InfoTextField = InfoTextField(text)
 
-  /** Creates a [[JNavBar]] from a list of [[SVGIconLabel]]. */
-  def createNavbar(JIconLabel: ComposedImageLabel*): JNavBar = JNavBar(JIconLabel: _*)
+  /** Creates a [[SNavBar]] from a list of [[SVGIconLabel]]. */
+  def createNavbar(JIconLabel: ComposedImageLabel*): SNavBar = SNavBar(JIconLabel: _*)
 
-  /** Creates a [[JTabbedPane]] from a list of [[SVGIconLabel]]. */
-  def createTabbedPane(JIconLabel: ComposedImageLabel*): JTabbedPane = JTabbedPane(JIconLabel: _*)
+  /** Creates a [[STabbedPane]] from a list of [[SVGIconLabel]]. */
+  def createTabbedPane(JIconLabel: ComposedImageLabel*): STabbedPane = STabbedPane(JIconLabel: _*)
 
-  /** Creates a [[JInsertForm]] from a [[title]] and a list of [[InfoTextField]]. */
-  def createInsertForm(title: String, JInfoTextField: InfoTextField*): JInsertForm =
-    JInsertForm(title, JInfoTextField: _*)
+  /** Creates a [[SInsertForm]] from a [[title]] and a list of [[InfoTextField]]. */
+  def createInsertForm(title: String, JInfoTextField: InfoTextField*): SInsertForm =
+    SInsertForm(title, JInfoTextField: _*)
 
-  /** Creates a [[JToggleIconButton]] from an on and off icon path. */
-  def createToggleIconButton(onIconPath: String, offIconPath: String): JToggleIconButton =
-    JToggleIconButton(onIconPath, offIconPath)
+  /** Creates a [[SToggleIconButton]] from an on and off icon path. */
+  def createToggleIconButton(onIconPath: String, offIconPath: String): SToggleIconButton =
+    SToggleIconButton(onIconPath, offIconPath)
 
   /** Represents a text field with a [[title]] */
   case class InfoTextField(title: String) extends ComposedSwing:
@@ -60,7 +60,8 @@ object ComposedSwing:
     export textField.{editable, editable_=, text, text_=}
     override def component[T >: Component]: T = mainPanel
 
-  case class JNavBar(iconLabels: ComposedImageLabel*) extends ComposedSwing:
+  /** Represents a navigation bar with a list of [[ComposedImageLabel]]. */
+  case class SNavBar(iconLabels: ComposedImageLabel*) extends ComposedSwing:
     private val mainPanel = ExtendedSwing.SFlowPanel()
     private val padding   = Styles.createPadding(40, 20)
     private val width     = 150
@@ -85,7 +86,8 @@ object ComposedSwing:
 
     override def component[T >: Component]: T = mainPanel
 
-  case class JTabbedPane(iconLabels: ComposedImageLabel*) extends ComposedSwing:
+  /** Represents a tabbed pane with a list of [[ComposedImageLabel]]. */
+  case class STabbedPane(iconLabels: ComposedImageLabel*) extends ComposedSwing:
     private val mainPanel  = ExtendedSwing.SBorderPanel()
     private val pagesPanel = ExtendedSwing.SFlowPanel()
 
@@ -114,7 +116,8 @@ object ComposedSwing:
     def paneOf(label: ComposedImageLabel): ExtendedSwing.SFlowPanel = pages(label)
     override def component[T >: Component]: T                       = mainPanel
 
-  case class JInsertForm(title: String, infoTextField: InfoTextField*) extends ComposedSwing:
+  /** Represents a form with a [[title]] and a list of [[InfoTextField]]. */
+  case class SInsertForm(title: String, infoTextField: InfoTextField*) extends ComposedSwing:
     private val mainPanel = ExtendedSwing.SBorderPanel()
     private val formPanel = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     val titleLabel        = ExtendedSwing.SLabel(title)
@@ -134,7 +137,7 @@ object ComposedSwing:
 
     override def component[T >: Component]: T = mainPanel
 
-  case class JToggleIconButton(onIconPath: String, offIconPath: String) extends ComposedSwing:
+  case class SToggleIconButton(onIconPath: String, offIconPath: String) extends ComposedSwing:
     private val mainPanel = ExtendedSwing.SFlowPanel()
     private val onIcon    = SVGPanel()
     private val offIcon   = SVGPanel()
