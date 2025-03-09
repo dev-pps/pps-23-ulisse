@@ -1,1 +1,1 @@
-![An image](/resources/architecture/staticEntitiesWithMangers.svg)
+![An image](/resources/architecture/staticEntitiesManagers.svg)
