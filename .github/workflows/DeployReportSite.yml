@@ -3,7 +3,7 @@ name: Deploy Report site (using Vitepress) to Pages
 
 on:
   push:
-    branches: [main, docs/meeting-update, docs/scaladoc]
+    branches: [main, docs/meeting-update, docs/scaladoc, docs/report]
 
   workflow_dispatch:
 
