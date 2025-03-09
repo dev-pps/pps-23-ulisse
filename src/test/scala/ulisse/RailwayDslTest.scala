@@ -15,7 +15,10 @@ import ulisse.entities.train.Wagons.{UseType, Wagon}
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
 class RailwayDslTest extends AnyFlatSpec with Matchers:
-  private val highSpeed = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
+  private val highSpeed         = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
+  private val technologyManager = TechnologyManager(List(highSpeed))
+  private val initAppState      = AppState.withTechnology(technologyManager)
+
   private val departure = Station("departure", Coordinate(0, 0), 1)
   private val arrival   = Station("arrival", Coordinate(100, 100), 1)
   private val trainTest = Train("test", highSpeed, Wagon(UseType.Passenger, 1), 1)
@@ -34,18 +37,14 @@ class RailwayDslTest extends AnyFlatSpec with Matchers:
     route mustBe routeTest
 
   "create app state with dsl" should "create an app state" in:
-    val technologyManager = TechnologyManager(List(highSpeed))
-    val initAppState      = AppState.withTechnology(technologyManager)
-
     var state = initAppState
-    state = CreateAppState -> state set departure link routeTest set arrival
-    state = CreateAppState -> state set departure link routeTest set arrival
-    state = CreateAppState -> state set departure link routeTest set arrival
-    state = CreateAppState -> state set departure link routeTest set arrival
-    state = CreateAppState -> state put trainTest
+    state = CreateAppState ++ state set departure link routeTest set arrival
+    state = CreateAppState ++ state put trainTest
 
     state must not be initAppState
 
-//      CreateDynamicAppState -> departure withType RouteType.Normal withPlatform 1 withLength 100.0 withArrival arrival
+  "create station with route dsl" should "create a station" in:
+    var state = initAppState
+    state = CreateAppState -> state start departure withType RouteType.Normal tracks 1 length 100.0 end arrival
 
-//    appStateWithStation mustBe appState.withTechnology(List(highSpeed))
+    state must not be initAppState
