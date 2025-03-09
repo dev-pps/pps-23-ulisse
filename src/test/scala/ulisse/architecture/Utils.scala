@@ -18,6 +18,7 @@ object Packages:
 object ArchUnits:
   private val DO_NOT_INCLUDE_SCALA_COMPILED_FILE: Location => Boolean = !_.contains("$")
   private val DO_NOT_INCLUDE_CLASSES_TEST: Location => Boolean        = !_.contains("test-classes")
+  private val DO_NOT_INCLUDE_DSL: Location => Boolean                 = !_.contains("dsl")
   private val PRINT: Location => Boolean = location =>
     println(location)
     true
@@ -25,4 +26,5 @@ object ArchUnits:
   val IMPORT_ONLY_CLASSES_CREATED = new ClassFileImporter()
     .withImportOption(DO_NOT_INCLUDE_SCALA_COMPILED_FILE(_))
     .withImportOption(DO_NOT_INCLUDE_CLASSES_TEST(_))
+    .withImportOption(DO_NOT_INCLUDE_DSL(_))
     .importPackages(Packages.PROJECT)
