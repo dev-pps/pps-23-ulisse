@@ -5,6 +5,7 @@ import ulisse.utils.Errors.ErrorMessage
 import ulisse.utils.Times.{ClockTime, Time}
 import scala.concurrent.Future
 
+/** Contains Timetable service errors, type alias and Input port definition. */
 object TimetablePorts:
 
   type StationId     = String
@@ -14,6 +15,7 @@ object TimetablePorts:
   import ulisse.utils.Errors.{BaseError, ErrorNotExist, ErrorValidation}
   trait TimetableServiceErrors extends BaseError
 
+  /** Timetable Service Errors */
   object TimetableServiceErrors:
     final case class TrainTablesNotExist(trainName: String) extends ErrorNotExist(s"train $trainName")
         with TimetableServiceErrors
@@ -25,6 +27,7 @@ object TimetablePorts:
     final case class InvalidStation(reason: String) extends ErrorValidation(reason) with TimetableServiceErrors
     final case class GenericError(reason: String)   extends ErrorMessage(reason) with TimetableServiceErrors
 
+  /** Input port of timetable service */
   trait Input:
     /**   Returns updated list of timetables when `trainName`, `departureTime` and `stations`
       * (list of stations where first element is starting station, last one is arriving).

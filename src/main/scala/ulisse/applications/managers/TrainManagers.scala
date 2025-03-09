@@ -8,6 +8,7 @@ import ulisse.utils.ValidationUtils
 
 import scala.util.Either
 
+/** Object containing definition of timetable manager and its errors. */
 object TrainManagers:
 
   /** Train Manager errors that can be returned after a request. */

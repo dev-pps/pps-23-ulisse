@@ -14,7 +14,7 @@ import ulisse.entities.station.Station
 import ulisse.entities.timetable.Timetables.{RailInfo, Timetable, TimetableBuilder}
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
-import ulisse.infrastructures.utilty.SimulationNotificationBridge
+import ulisse.infrastructures.utils.SimulationNotificationBridge
 import ulisse.infrastructures.view.GUI
 import ulisse.infrastructures.view.page.workspaces.SimulationWorkspace
 import ulisse.utils.Times.FluentDeclaration.h
