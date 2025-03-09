@@ -19,21 +19,28 @@ class RailwayDslTest extends AnyFlatSpec with Matchers:
   private val technologyManager = TechnologyManager(List(highSpeed))
   private val initAppState      = AppState.withTechnology(technologyManager)
 
-  private val departure = Station("departure", Coordinate(0, 0), 1)
-  private val arrival   = Station("arrival", Coordinate(100, 100), 1)
-  private val trainTest = Train("test", highSpeed, Wagon(UseType.Passenger, 1), 1)
-  private val routeTest = Route(departure, arrival, Routes.RouteType.Normal, 1, 100.0)
+  private val platform            = 1
+  private val routeLength         = 100.0
+  private val departureCoordinate = Coordinate(0, 0)
+  private val arrivalCoordinate   = Coordinate(100, 100)
+  private val departureName       = "departure"
+  private val arrivalName         = "arrival"
+  private val trainName           = "test"
+  private val departure           = Station(departureName, departureCoordinate, platform)
+  private val arrival             = Station(arrivalName, arrivalCoordinate, platform)
+  private val trainTest           = Train(trainName, highSpeed, Wagon(UseType.Passenger, platform), platform)
+  private val routeTest           = Route(departure, arrival, Routes.RouteType.Normal, platform, routeLength)
 
   "create station with dsl" should "create a station" in:
-    val station = CreateStation -> "departure" at (0, 0) platforms 1
+    val station = CreateStation -> departureName at (0, 0) platforms platform
     departure mustBe station
 
   "create train with dsl" should "create a train" in:
-    val train = CreateTrain -> "test" technology highSpeed wagon UseType.Passenger numbers 1
+    val train = CreateTrain -> trainName technology highSpeed wagon UseType.Passenger numbers platform
     trainTest mustBe train
 
   "create route with dsl" should "create a route" in:
-    val route = CreateRoute -> departure -> arrival on RouteType.Normal tracks 1 length 100.0
+    val route = CreateRoute -> departure -> arrival on RouteType.Normal tracks platform length routeLength
     route mustBe routeTest
 
   "create app state with dsl" should "create an app state" in:
@@ -42,9 +49,15 @@ class RailwayDslTest extends AnyFlatSpec with Matchers:
     state = CreateAppState ++ state put trainTest
 
     state must not be initAppState
+    state.stationManager.stations must contain allOf (departure, arrival)
+    routeTest.foreach(route => state.routeManager.routes must contain(route))
+    state.trainManager.trains must contain(trainTest)
 
   "create station with route dsl" should "create a station" in:
     var state = initAppState
-    state = CreateAppState -> state start departure withType RouteType.Normal tracks 1 length 100.0 end arrival
+    state =
+      CreateAppState -> state start departure withType RouteType.Normal tracks platform length routeLength end arrival
 
     state must not be initAppState
+    state.stationManager.stations must contain allOf (departure, arrival)
+    routeTest.foreach(route => state.routeManager.routes must contain(route))
