@@ -3,6 +3,7 @@ package ulisse.dsl
 import ulisse.applications.AppState
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.dsl.RailwayDsl.*
+import ulisse.entities.route.Routes.RouteType
 import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.entities.train.Wagons.UseType
 
@@ -14,10 +15,8 @@ object ConfigRailway:
   private val normal            = TrainTechnology("Normal", 100, 0.5, 0.25)
   private val technologyManager = TechnologyManager(List(highSpeed, normal))
 
-  private val initAppState: AppState   = AppState.withTechnology(technologyManager)
-  private var simpleRailway: AppState  = initAppState
-  private var mediumRailway: AppState  = initAppState
-  private var complexRailway: AppState = initAppState
+  private val initAppState: AppState  = AppState.withTechnology(technologyManager)
+  private var uploadRailway: AppState = initAppState
 
   private val stationA = CreateStation -> "A" at (409, 188) platforms 2
   private val stationB = CreateStation -> "B" at (758, 377) platforms 2
@@ -29,6 +28,22 @@ object ConfigRailway:
   private val stationH = CreateStation -> "H" at (758, 377) platforms 4
   private val stationI = CreateStation -> "I" at (505, 672) platforms 4
   private val stationJ = CreateStation -> "J" at (409, 188) platforms 5
+
+  private val routeA = CreateRoute -> stationF -> stationG on RouteType.Normal tracks 2 length 200
+  private val routeB = CreateRoute -> stationG -> stationA on RouteType.Normal tracks 2 length 200
+  private val routeC = CreateRoute -> stationA -> stationB on RouteType.Normal tracks 2 length 200
+  private val routeD = CreateRoute -> stationB -> stationC on RouteType.Normal tracks 2 length 200
+  private val routeE = CreateRoute -> stationC -> stationD on RouteType.Normal tracks 2 length 200
+  private val routeF = CreateRoute -> stationD -> stationE on RouteType.Normal tracks 2 length 200
+  private val routeG = CreateRoute -> stationE -> stationH on RouteType.Normal tracks 2 length 200
+  private val routeH = CreateRoute -> stationH -> stationF on RouteType.Normal tracks 2 length 200
+  private val routeI = CreateRoute -> stationH -> stationG on RouteType.Normal tracks 2 length 200
+  private val routeL = CreateRoute -> stationH -> stationB on RouteType.Normal tracks 2 length 200
+  private val routeM = CreateRoute -> stationB -> stationI on RouteType.Normal tracks 2 length 200
+  private val routeN = CreateRoute -> stationI -> stationD on RouteType.Normal tracks 2 length 200
+  private val routeO = CreateRoute -> stationJ -> stationE on RouteType.Normal tracks 2 length 200
+  private val routeP = CreateRoute -> stationI -> stationJ on RouteType.Normal tracks 2 length 200
+  private val routeQ = CreateRoute -> stationI -> stationH on RouteType.Normal tracks 2 length 200
 
   private val trainA_AV = CreateTrain -> "AV1" technology highSpeed wagon UseType.Passenger capacity 2 count 1
   private val trainB_AV = CreateTrain -> "AV2" technology highSpeed wagon UseType.Passenger capacity 2 count 1
@@ -50,3 +65,17 @@ object ConfigRailway:
   private val trainR_NR = CreateTrain -> "NR8" technology normal wagon UseType.Passenger capacity 2 count 1
   private val trainS_NR = CreateTrain -> "NR9" technology normal wagon UseType.Passenger capacity 2 count 1
   private val trainT_NR = CreateTrain -> "NR10" technology normal wagon UseType.Passenger capacity 2 count 1
+
+  uploadRailway = CreateAppState ++ uploadRailway set stationA set stationB set stationC set stationD set stationE
+  uploadRailway = CreateAppState ++ uploadRailway set stationF set stationG set stationH set stationI set stationJ
+  uploadRailway = CreateAppState ++ uploadRailway link routeA link routeB link routeC link routeD link routeE
+  uploadRailway = CreateAppState ++ uploadRailway link routeF link routeG link routeH link routeI link routeL
+  uploadRailway = CreateAppState ++ uploadRailway link routeM link routeN link routeO link routeP link routeQ
+  uploadRailway = CreateAppState ++ uploadRailway put trainA_AV put trainB_AV put trainC_AV put trainD_AV put trainE_AV
+  uploadRailway = CreateAppState ++ uploadRailway put trainF_AV put trainG_AV put trainH_AV put trainI_AV put trainJ_AV
+  uploadRailway = CreateAppState ++ uploadRailway put trainK_NR put trainL_NR put trainM_NR put trainN_NR put trainO_NR
+  uploadRailway = CreateAppState ++ uploadRailway put trainP_NR put trainQ_NR put trainR_NR put trainS_NR put trainT_NR
+
+  private var simpleRailway: AppState  = uploadRailway
+  private var mediumRailway: AppState  = uploadRailway
+  private var complexRailway: AppState = uploadRailway
