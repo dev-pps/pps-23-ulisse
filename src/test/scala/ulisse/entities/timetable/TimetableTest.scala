@@ -9,7 +9,7 @@ import ulisse.entities.station.Station
 import ulisse.entities.timetable.Timetables.{toWaitTime, RailInfo, StationInfo, Timetable, TimetableBuilder}
 import ulisse.utils.Times.FluentDeclaration.h
 import ulisse.utils.Times.ClockTime
-import ulisse.entities.timetable.TestMockedEntities.*
+import ulisse.entities.TestMockedEntities.*
 import ulisse.entities.timetable.TrainStationTime.{ArrivingStationTime, AutoStationTime, DepartureStationTime}
 
 import scala.collection.immutable.ListMap

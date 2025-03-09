@@ -18,7 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue
 /** Configuration of test environment. Initialization of manager needed in tests */
 object TimetableTestEnvironment:
   import ulisse.entities.route.Routes.{Route, RouteType}
-  import ulisse.entities.timetable.TestMockedEntities.*
+  import ulisse.entities.TestMockedEntities.*
 
   private val initState: Either[RouteError, AppState] =
     for

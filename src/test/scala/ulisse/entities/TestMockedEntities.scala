@@ -1,4 +1,4 @@
-package ulisse.entities.timetable
+package ulisse.entities
 
 import ulisse.applications.AppState
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
