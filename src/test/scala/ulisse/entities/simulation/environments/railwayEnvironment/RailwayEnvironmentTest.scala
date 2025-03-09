@@ -13,10 +13,9 @@ import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetableTest.*
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.MotionDatas.emptyMotionData
+import ulisse.entities.train.TrainAgentStates.{StateBehavior, Stopped}
 import ulisse.entities.train.TrainAgentTest.{train3905, train3906, train3907}
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates
-import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates.{StateBehavior, Stopped}
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.Wagon
 import ulisse.utils.Times.Time

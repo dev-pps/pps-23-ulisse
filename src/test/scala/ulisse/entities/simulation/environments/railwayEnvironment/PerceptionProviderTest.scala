@@ -12,6 +12,13 @@ import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProv
 import ulisse.entities.station.{StationEnvironment, StationEnvironmentElement}
 import ulisse.entities.timetable.DynamicTimetableEnvironment
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
+import ulisse.entities.train.TrainAgentPerceptions.{
+  TrainAgentPerception,
+  TrainPerceptionInRoute,
+  TrainPerceptionInStation,
+  TrainRouteInfo,
+  TrainStationInfo
+}
 import ulisse.entities.train.TrainAgentTest.normalTrainAgent
 import ulisse.entities.train.TrainAgents.*
 import ulisse.utils.Times.ClockTime

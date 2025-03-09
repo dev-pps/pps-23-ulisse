@@ -4,6 +4,13 @@ import cats.Id
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.agents.Perceptions.PerceptionProvider
 import ulisse.entities.simulation.environments.EnvironmentElements.TrainAgentEEWrapper.findIn
+import ulisse.entities.train.TrainAgentPerceptions.{
+  TrainAgentPerception,
+  TrainPerceptionInRoute,
+  TrainPerceptionInStation,
+  TrainRouteInfo,
+  TrainStationInfo
+}
 import ulisse.entities.train.TrainAgents.*
 
 /** Perception Providers for RailwayEnvironment. */

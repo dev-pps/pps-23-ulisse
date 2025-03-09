@@ -4,21 +4,14 @@ import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.train.TrainAgentTest.{train3905, trainAgent3905}
-import ulisse.entities.train.TrainAgents.{
-  TrainAgent,
-  TrainPerceptionInRoute,
-  TrainPerceptionInStation,
-  TrainRouteInfo,
-  TrainStationInfo
-}
+import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.{Train, TrainTechnology}
 import ulisse.entities.train.Wagons.{UseType, Wagon}
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.entities.route.Routes.RouteType.AV
 import ulisse.entities.simulation.environments.railwayEnvironment.RailwayEnvironment
 import ulisse.entities.train.MotionDatas.{emptyMotionData, MotionData}
-import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates
-import ulisse.entities.train.TrainAgents.TrainAgent.TrainStates.{Running, Stopped}
+import ulisse.entities.train.TrainAgentPerceptions.{TrainPerceptionInStation, TrainStationInfo}
+import ulisse.entities.train.TrainAgentStates.{Running, Stopped}
 
 object TrainAgentTest:
   val defaultTechnology     = TrainTechnology("HighSpeed", 300, 1.0, 0.5)
@@ -60,7 +53,7 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
       "be in state Stopped and have no speed and acceleration" in:
         val expectedMotionData = MotionData(distanceTravelled = 0.0, speed = 0.0, acceleration = 0.0)
         trainAgent3905.state match
-          case TrainStates.Stopped(motionData) =>
+          case TrainAgentStates.Stopped(motionData) =>
             motionData.distanceTravelled shouldBe expectedMotionData.distanceTravelled
           case _ => fail()
 
@@ -84,9 +77,9 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
         val tolerance                  = 0.05
         updatedAgent match
           case agent: TrainAgent => agent.state match
-              case TrainStates.Running(motionData) =>
+              case TrainAgentStates.Running(motionData) =>
                 motionData.distanceTravelled shouldBe expectedKilometerTravelled +- tolerance
-              case _ => fail()
+              case s => fail(s"$s")
           case _ => fail()
 
 //    "is running on route" should:
