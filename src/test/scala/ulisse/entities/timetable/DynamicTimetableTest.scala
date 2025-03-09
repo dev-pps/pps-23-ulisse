@@ -6,7 +6,7 @@ import ulisse.entities.station.Station
 import ulisse.entities.station.StationTest.{stationA, stationB, stationC, stationD}
 import ulisse.entities.timetable.DynamicTimetableTest.*
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
-import ulisse.entities.timetable.TestMockedEntities.railAV_10
+import ulisse.entities.TestMockedEntities.railAV_10
 import ulisse.entities.timetable.Timetables.{Timetable, TimetableBuilder}
 import ulisse.entities.train.TrainAgentTest.*
 import ulisse.entities.train.Trains.Train

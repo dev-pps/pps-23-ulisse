@@ -17,7 +17,7 @@ import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 class TimetableServiceTest extends AnyFeatureSpec with GivenWhenThen:
-  import ulisse.entities.timetable.TestMockedEntities.*
+  import ulisse.entities.TestMockedEntities.*
   def TestEnvironment(): Either[RouteError, TimetableTestEnvironment.TestEnvConfig] =
     TimetableTestEnvironment()
 

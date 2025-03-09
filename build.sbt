@@ -10,6 +10,7 @@ hooks := {
 scalacOptions += "-deprecation"
 
 scalafmtOnCompile := true
+coverageExcludedPackages := "*.view.*"
 
 wartremoverWarnings ++= Warts.all
 wartremoverWarnings --= Seq(
