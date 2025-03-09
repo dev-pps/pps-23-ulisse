@@ -3,6 +3,7 @@ package ulisse.infrastructures.view.map
 import ulisse.entities.route.Routes.{Route, RouteType}
 import ulisse.entities.station.{Station, StationEnvironmentElement}
 import ulisse.infrastructures.view.common.Observers.Observable
+import ulisse.infrastructures.view.common.Themes.Theme
 import ulisse.infrastructures.view.common.{ImagePath, Observers}
 import ulisse.infrastructures.view.components.draw.DrawImages.DrawImage
 import ulisse.infrastructures.view.components.draw.{DrawImageSimple, DrawImageTiled, DrawImages}
@@ -44,10 +45,11 @@ object MapElement:
     val start         = route.departure.coordinate.toPoint plus offsetWithOld
     val end           = route.arrival.coordinate.toPoint plus offsetWithOld
     val color = route.typology match
-      case RouteType.Normal => Color.black
-      case RouteType.AV     => Color.red
+      case RouteType.Normal => Theme.light.text
+      case RouteType.AV     => Theme.light.falseClick
     MapElementSimple(route, DrawImageTiled.createAt(start, end, color))
 
+  /** Create a new [[MapElement]] with the given [[TrainMapElement]]. */
   def createTrain(train: TrainMapElement): MapElement[TrainMapElement] =
     val imagePath = ImagePath.train
     val dimension = new Dimension(20, 20)

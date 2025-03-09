@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import scala.util.Try
 
+/** Styles for images. */
 object Images:
   /** Default angle for images. */
   val defaultAngle: Int = 0

@@ -95,7 +95,7 @@ object MapWorkspace:
       stationForm.yField.text = point.y.toString
 
     override def updateStations(stations: StationPorts.Input#SM): Unit =
-      mapPanel uploadStation stations
+      mapPanel updateStation stations
       mapPanel attachClickStation StationForm.TakeStationFromMapEvent(this)
       mapPanel attachClickStation RouteForm.TakeStationFromMapEvent(routeForm)
       stationForm.cleanForm()

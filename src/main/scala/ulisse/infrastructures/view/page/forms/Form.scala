@@ -8,7 +8,7 @@ import ulisse.infrastructures.view.components.styles.Styles
 import ulisse.infrastructures.view.utils.ComponentUtils.*
 
 import scala.swing.event.MouseEvent
-import scala.swing.{ Component, Orientation, Swing }
+import scala.swing.{Component, Orientation, Swing}
 
 /** Represents the form of the application. */
 trait Form extends ComposedSwing:

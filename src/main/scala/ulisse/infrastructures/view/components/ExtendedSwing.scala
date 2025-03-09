@@ -1,21 +1,25 @@
 package ulisse.infrastructures.view.components
 
+import ulisse.infrastructures.view.common.Themes.{withAlpha, Theme}
+import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
+import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 import ulisse.infrastructures.view.components.decorators.ImageEffects.{PictureEffect, SVGEffect}
 import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{EnhancedLook, FontEffect, ShapeEffect}
 import ulisse.infrastructures.view.components.styles.Styles
-import ulisse.infrastructures.view.components.composed.ComposedSwing.JTabbedPane
-import ulisse.infrastructures.view.components.composed.{ComposedImageLabel, ComposedSwing}
 
 import java.awt.FlowLayout
 import javax.swing.{JLayeredPane, JTextArea}
 import scala.swing.*
 
+/** Extended Swing components. */
 object ExtendedSwing:
 
+  /** Creates a layered panel. */
   case class SLayeredPanel private (private val layeredPane: JLayeredPane) extends BorderPanel with EnhancedLook:
     def this() = this(JLayeredPane())
     layout(Component.wrap(layeredPane)) = BorderPanel.Position.Center
 
+    /** Adds a component to the layered panel. */
     def add(component: Component): Unit =
       layeredPane.add(component.peer)
       revalidate()
@@ -24,34 +28,43 @@ object ExtendedSwing:
       layeredPane.getComponents.foreach(_.setBounds(0, 0, layeredPane.getWidth, layeredPane.getHeight))
       super.revalidate()
 
+  /** Creates a border panel with shape effect. */
   case class SBorderPanel() extends BorderPanel with ShapeEffect
 
+  /** Creates a flow panel with shape effect and the given components. */
   def createFlowPanel(component: Component*): FlowPanel =
     val panel = SFlowPanel()
     panel.contents ++= component
     panel
 
+  /** Creates a flow panel with shape effect. */
   case class SFlowPanel() extends FlowPanel with ShapeEffect with FontEffect:
     private val layout = new FlowLayout(FlowLayout.CENTER, 0, 0)
     peer.setLayout(layout)
     export layout._
 
+  /** Creates a box panel with shape effect. */
   case class SBoxPanel(orientation: Orientation.Value) extends BoxPanel(orientation) with ShapeEffect
 
+  /** Creates a panel with shape effect. */
   case class SPanel() extends Panel with ShapeEffect
 
+  /** Creates a panel with picture effect and the given path. */
   def createPicturePanel(path: String): PicturePanel =
     val panel = PicturePanel()
     panel.picture = path
     panel
 
+  /** Creates a panel with SVG effect and the given path. */
   def createSVGPanel(path: String): SVGPanel =
     val panel = SVGPanel()
     panel.svgIcon = path
     panel
 
+  /** Creates a panel with picture effect. */
   case class PicturePanel() extends Panel with PictureEffect
 
+  /** Creates a panel with SVG effect. */
   case class SVGPanel() extends Panel with SVGEffect
 
   /** Creates a button for the form, with the given text and rect. */
@@ -92,12 +105,8 @@ object ExtendedSwing:
       case ValueChanged(_) => Swing.onEDT(if (!text.matches("^[0-9]*$")) text = text.filter(_.isDigit))
     }
 
-  import ulisse.infrastructures.view.components.composed.ComposedSwing
-  import ulisse.infrastructures.view.common.Themes.withAlpha
-
   /** A themed field label for given `fieldComponent` */
   class SFieldLabel[A <: Component](text: String)(fieldComponent: A) extends ComposedSwing:
-    import ulisse.infrastructures.view.common.Themes.Theme
     private val fieldBackground = Theme.light.background.withAlpha(50)
     private val mainPanel       = ExtendedSwing.SBoxPanel(Orientation.Vertical)
     private val labelPanel      = ExtendedSwing.SFlowPanel()
