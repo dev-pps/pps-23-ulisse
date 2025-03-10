@@ -68,6 +68,6 @@ object MediumRailwayConfig:
   ).getOrDefault startFrom stationE thenOnRail railN400 travelsTo stationF thenOnRail railN400 arrivesTo stationD
 
   mediumRailway =
-    CreateAppState ++ mediumRailway set stationA set stationB set stationC set stationD set stationE set stationF link routeAB link routeBC link routeCD link routeDE link routeEF put trainA_AV put trainB_AV put trainN_NR put trainC_AV scheduleA table1 scheduleA table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table10
+    CreateAppState || mediumRailway set stationA set stationB set stationC set stationD set stationE set stationF link routeAB link routeBC link routeCD link routeDE link routeEF put trainA_AV put trainB_AV put trainN_NR put trainC_AV scheduleA table1 scheduleA table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table10
 
   def mediumRailwayConfig: AppState = mediumRailway
