@@ -214,38 +214,83 @@ object OptionUtils:
     given [A]: Conversion[Option[Option[A]], Option[A]] = _.flatten
 ```
 
-## TimeUtils  
+## Time Operation
+Per gestire la simulazione è stato necessario introdurre un tipo `Time` essendo questo strettamente legato alla gestione delle `Timetable`. Di conseguenza è stato necessario definire le operazioni di somma e differenza per calcolare:
+- Aggiornamento del tempo dell'ambiente
+- Calcolo degli orari effettivi
+- Calcolo dei ritardi
 
+In particolare, per quanto riguarda l'aggiornamento del tempo dell'ambiente si vuole trattare il tempo in modo ciclico, mentre negli altri due casi
+si vuole tenere conto di eventuali overflow/underflow e accumulare i valori in eccesso nel campo delle ore.
+
+Per ottenere un risultato `DRY` è stato utilizzato il pattern `Strategy` in combinazione con i parametri contestuali per determinare la stategia da utilizzare.
+
+>NOTA: Oltre a gestire le diverse stategie di somma si è dovuta gestire anche la possibilità che i tempi siano wrappati in tipi Higher-Order come Option o Either.
+
+Di seguito sono riportate le implementazioni delle operazioni di somma.
+```scala 3
+extension [M[_]: Monad, T <: Time](time: M[T])
+  def +(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
+    extractAndPerform(time, time2): (t, t2) =>
+      calculateSum(t, t2)
+
+  def overflowSum(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
+    extractAndPerform(time, time2): (t, t2) =>
+      calculateOverflowSum(t, t2)
+```
+Essendo in generale i tempi incapsulati prima è necessario spacchettarli, per questo è stata definita la funzione `extractAndPerform`.
 ```scala 3
 private def extractAndPerform[M[_]: Monad, T <: Time, R](t1: M[T],t2: M[T])(f: (T, T) => M[R]): M[R] =
     for
         time1 <- t1
         time2 <- t2
-        res   <- f(time1, time2)
-    yield res
-
+        result   <- f(time1, time2)
+    yield result
+```
+Dovendo mantenere la coerenza con il tipo di ritorno è stato definita la Type Class `TimeConstructor` così da fornire il costruttore specifico per il tempo a seconda della situazione.
+```scala 3
 trait TimeConstructor[T]:
   def construct(h: Int, m: Int, s: Int): T
-
+```
+Ad esempio è stato poi definito il costruttore di default per il tipo `Time`.
+```scala 3
 given TimeConstructor[Time] with
   def construct(h: Int, m: Int, s: Int): Time = Time(h, m, s)
+```
 
+Successivamente sono riportate le implementazioni delle operazioni di somma.
+```scala 3
+private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
+  using constructor: TimeConstructor[M[T]]): M[T] =
+    given TimeBuildStrategy = defaultStrategy
+    buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
 
-extension [M[_]: Monad, T <: Time](time: M[T])
-  /** Adds two times */
-  @targetName("add")
-  def +(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
-    extractAndPerform(time, time2): (t, t2) =>
-      calculateSum(t, t2)
+private def calculateOverflowSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
+  using constructor: TimeConstructor[M[T]]): M[T] =
+    given TimeBuildStrategy = overflowStrategy
+    buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
+```
+La funzione `buildTimeFromSeconds`, riportata di seguito, permette di costruire un nuovo oggetto `Time` a partire dal numero di secondi a seconda della particolare strategia.
 
-  /** Adds two times with overflow */
-  def overflowSum(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
-    extractAndPerform(time, time2): (t, t2) =>
-      calculateOverflowSum(t, t2)
+```scala 3
+  private def buildTimeFromSeconds[M[_]: Monad, T <: Time](seconds: Int)
+    (using constructor: TimeConstructor[M[T]])
+    (using buildStrategy: TimeBuildStrategy): M[T] =
+  constructor.construct.tupled(buildStrategy.buildTimeValue(
+    seconds / (Time.secondsInMinute * Time.minutesInHour),
+    seconds / Time.secondsInMinute,
+    seconds
+  ))
+```
+Questa funzione adatta il tempo in secondi al formato `h:m:s` accumulando di default gli eccessi nel campo delle ore, poi utilizzando la stategia contestuale determina il risultato finale.
 
+Per la strategia è stata definita la seguente Type Class
+```scala 3
 private trait TimeBuildStrategy:
   def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int)
-
+```
+E le seguenti strategie di costruzione:
+```scala 3
 private given defaultStrategy: TimeBuildStrategy with
   def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int) =
     (
@@ -255,26 +300,9 @@ private given defaultStrategy: TimeBuildStrategy with
     )
 
 private given overflowStrategy: TimeBuildStrategy with
-def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int) = (h, m % Time.minutesInHour, s % Time.secondsInMinute)
-
-private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
-  using constructor: TimeConstructor[M[T]]): M[T] =
-    given TimeBuildStrategy = defaultStrategy
-    buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
-
-  private def calculateOverflowSum[M[_]: Monad, T <: Time](time1: T, time2: T)(using
-                                                                               constructor: TimeConstructor[M[T]]
-  ): M[T] =
-    given TimeBuildStrategy = overflowStrategy
-    buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
-
-  private def buildTimeFromSeconds[M[_]: Monad, T <: Time](seconds: Int)(using
-                                                                         constructor: TimeConstructor[M[T]]
-  )(using buildStrategy: TimeBuildStrategy): M[T] =
-    constructor.construct.tupled(buildStrategy.buildTimeValue(
-      seconds / (Time.secondsInMinute * Time.minutesInHour),
-      seconds / Time.secondsInMinute,
-      seconds
-    ))
+  def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int) = (h, m % Time.minutesInHour, s % Time.secondsInMinute)
 ```
+nel primo caso l'orario viene formattato secondo il formato 24, nel secondo caso invece vengono accumulati anche gli eccessi.
+
+
 
