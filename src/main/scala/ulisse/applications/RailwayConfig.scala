@@ -68,13 +68,13 @@ object RailwayConfig:
 
   import ulisse.dsl.TimetableDSL.*
   private val table1 = trainA_AV at h(0).m(0).getOrDefault startFrom stationA thenOnRail
-    railAV400 andStopIn stationB waitingForMinutes 5 thenOnRail
+    railAV400 stopsIn stationB waitingForMinutes 5 thenOnRail
     railAV400 travelsTo stationC thenOnRail
-    railAV400 andStopIn stationD waitingForMinutes 10 thenOnRail
+    railAV400 stopsIn stationD waitingForMinutes 10 thenOnRail
     railAV400 arrivesTo stationE
 
   private val table2 = trainB_AV at h(1).m(0).getOrDefault startFrom stationD thenOnRail
-    railAV400 andStopIn stationC waitingForMinutes 5 thenOnRail
+    railAV400 stopsIn stationC waitingForMinutes 5 thenOnRail
     railAV400 travelsTo stationB thenOnRail
     railAV400 arrivesTo stationA
 
@@ -85,7 +85,7 @@ object RailwayConfig:
 
   private val table4 = trainD_AV at h(2).m(0).getOrDefault startFrom stationA thenOnRail
     railAV400 travelsTo stationG thenOnRail
-    railN400 andStopIn stationH waitingForMinutes 20 thenOnRail
+    railN400 stopsIn stationH waitingForMinutes 20 thenOnRail
     railAV400 arrivesTo stationF
 
   private val table5 = trainE_AV at h(2).m(0).getOrDefault startFrom stationA thenOnRail
@@ -95,32 +95,32 @@ object RailwayConfig:
 
   private val table6 = trainF_AV at h(4).m(0).getOrDefault startFrom stationE thenOnRail
     railAV400 travelsTo stationD thenOnRail
-    railAV400 andStopIn stationC waitingForMinutes 5 thenOnRail
+    railAV400 stopsIn stationC waitingForMinutes 5 thenOnRail
     railAV400 travelsTo stationB thenOnRail
     railAV400 arrivesTo stationA
 
   private val table7 = trainG_AV at h(5).m(0).getOrDefault startFrom stationA thenOnRail
     railAV400 travelsTo stationB thenOnRail
     railAV400 travelsTo stationI thenOnRail
-    railAV400 andStopIn stationJ waitingForMinutes 10 thenOnRail
+    railAV400 stopsIn stationJ waitingForMinutes 10 thenOnRail
     railAV400 arrivesTo stationE
 
   private val table8 = trainH_AV at h(6).m(0).getOrDefault startFrom stationF thenOnRail
     railAV400 travelsTo stationH thenOnRail
     railAV400 travelsTo stationI thenOnRail
-    railAV400 andStopIn stationD waitingForMinutes 15 thenOnRail
+    railAV400 stopsIn stationD waitingForMinutes 15 thenOnRail
     railAV400 arrivesTo stationC
 
   private val table9 = trainN_NR at h(2).m(30).getOrDefault startFrom stationA thenOnRail
     railN400 travelsTo stationB thenOnRail
-    railN400 andStopIn stationC waitingForMinutes 5 thenOnRail
+    railN400 stopsIn stationC waitingForMinutes 5 thenOnRail
     railN400 travelsTo stationD thenOnRail
     railN400 arrivesTo stationE
 
   private val table10 = trainO_NR at h(3).m(30).getOrDefault startFrom stationF thenOnRail
     railN400 travelsTo stationG thenOnRail
     railN400 travelsTo stationA thenOnRail
-    railN400 andStopIn stationB waitingForMinutes 10 thenOnRail
+    railN400 stopsIn stationB waitingForMinutes 10 thenOnRail
     railN400 arrivesTo stationC
 
   private val table11 = trainP_NR at h(4).m(30).getOrDefault startFrom stationE thenOnRail
@@ -131,7 +131,7 @@ object RailwayConfig:
   private val table12 = trainQ_NR at h(5).m(30).getOrDefault startFrom stationJ thenOnRail
     railN400 travelsTo stationI thenOnRail
     railN400 travelsTo stationH thenOnRail
-    railN400 andStopIn stationG waitingForMinutes 10 thenOnRail
+    railN400 stopsIn stationG waitingForMinutes 10 thenOnRail
     railN400 arrivesTo stationA
 
   uploadRailway = CreateAppState ++ uploadRailway set stationA set stationB set stationC set stationD set stationE set

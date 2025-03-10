@@ -10,9 +10,17 @@ Il mio contributo in questo progetto ha previsto lo sviluppo delle parti seguend
 - __Times__: implementazione delle entità `ClockTime` e `Time` (con integrazioni di Federico Bravetti) per rappresentare il concetto di tempo con sfumature diverse  sia all'interno della simulazione che nella definizione delle tabelle orarie del treno.
 - **Interfaccia utente** per la costruzione delle *Timetable* e creazione dei *Train*
 
+Nello sviluppo del codice si è cercato di massimizzare l'uso di `trait` insieme al `companion-object` tenendo nascoste le effettive implementazioni sviluppate usando
+invece class o case-class.
+
+## Sviluppo funzionale ed immutabilità
+Nello sviluppo si è cercato di abbracciare completamente la programmazione funzionale e per fare ciò si è fatto uso di `Option`, `Try` e specialmente di `Either` come tipo di ritorno dei metodi che modificano o aggiornano entità immutabili.
+
+Analizzando per esempio il manager `TimetableManager` qualsiasi metodo che prevede l'aggiunta/cancellazione di una timetable o che tipicamente lancerebbe una eccezione restituisce un `Either[TimetableManagerErrors, TimetableManager]`. In questo modo viene sempre restituito qualcosa, che sia un errore che deve essere gestito o che sia il manager stesso aggiornato.
 
 ## Train
-- definizione e sviluppo della entità `Train` e di `TrainTechnology` (sottotipo di `Technology`), le classi come `Wagons` e `Train` non sono così entusiasmanti
+
+definizione e sviluppo della entità `Train` e di `TrainTechnology` (sottotipo di `Technology`), le classi come `Wagons` e `Train` non sono così entusiasmanti
 
 ## Train Agent
 
@@ -53,8 +61,7 @@ class Train {
   TrainAgent *-- StateBehavior 
 
 ```
-
-- `TrainAgent` e il suo comportamento dinamico (FSM) in base ai percepts ricevuti (sviluppati dal collega Federico Bravetti)
+`TrainAgent` e il suo comportamento dinamico (FSM) in base ai percepts ricevuti (sviluppati dal collega Federico Bravetti)
   - MotionData: modellazione in una entità dedicata delle informazioni dinamiche del movimento del treno come *velocità*, *accelerazione* e *spazio percorso*.
   - `TrainAgentsStates` (concetto base `StateBehavior` con mixins trait per rendere modulare la logica di fermata con metodo `shouldStop` e il calcolo delle distanza di sicurezza fornita dal metodo `enoughSpace` del trait `SpaceManagement`)
   
@@ -121,9 +128,42 @@ direction TB
 
 
 ## Timetable
+Nella costruzione della `Timetable` si è fatto uso del meccanismo delle **given instance** per  il calcolo del tempo stimato di arrivo (*ETA - Estimation Time of Arrivial*) in una stazione conoscendo l'orario di partenza di quella precendete, la velocità del treno e le caratteristiche della route su cui viaggia.
+
+Il trait che definisce il metodo di stima è il seguente:
+``` scala
+  trait TimeEstimator:
+    /** Return optionally arrival ClockTime to travel rail length ([[railInfo.length]]) */
+    def ETA(lastTime: Option[StationTime], railInfo: RailInfo, train: Train): Option[ClockTime]
+```
+
+All'interno dell'oggetto `Timetables` viene fornita una implementazione di default, `defaultTimeEstimator`, che considera unicamente velocità del treno più compatibile con quella della rotaia e la lunghezza delle rotaie. Non vengono considerate le accelerazioni.
+
+```scala 
+  given defaultTimeEstimator: TimeEstimator = UnrealTimeEstimator
+  
+```
+``` scala 
+  /** Default implementation of [[TimeEstimator]]
+    * It uses minimum speed between train and rail ones; it doesn't consider train's acceleration and deceleration specs
+    */
+  private object UnrealTimeEstimator extends TimeEstimator:
+    def ETA(lastTime: Option[StationTime], railInfo: RailInfo, train: Train): Option[ClockTime] =
+      val travelMinutes =
+        (railInfo.length / Math.min(train.maxSpeed, railInfo.typeRoute.technology.maxSpeed) * 60).toInt
+
+      for
+        offsetTime      <- lastTime
+        travelStartTime <- offsetTime.departure
+        arrivingTime    <- (Id(travelStartTime.asTime) + Id(Time(0, travelMinutes, 0))).toClockTime.toOption
+      yield arrivingTime
+```
+
+> **NOTA** Anche all'interno di `TimetableManager` è stata definita una *contextual given* per definire la policy di accettazione di una timetable (`AcceptanceTimetablePolicy`) che deve essere salvata.
+
+Di seguito viene mostrato uno schema UML riassuntivo dei trait definiti all'intenro dell'oggetto `Timetables`.
 
 ```mermaid
-
 ---
 title: Entities defined inside Timetables object
 config:
@@ -161,28 +201,41 @@ direction BT
         + getPartialTimetable(): PartialTimetable
     }
 
+    class UnrealTimeEstimator {
+      <<defaultTimeEstimator>>
+    }
+
     TrainTimetable --|> PartialTimetable
     TrainTimetableImpl ..|> TrainTimetable : implements
     PartialTrainTimetable ..|> PartialTimetable : implements
     TimetableBuilder ..> TimeEstimator : using
     TimetableBuilder ..> PartialTimetable : creates
     TimetableBuilder ..> TrainTimetable : creates
-
+    UnrealTimeEstimator ..|> TimeEstimator : implements
 ```
-
 
 ## DSL per la dichiarazione di una Timetable
 
-Per la creazione del DSL è stato fatto uso di ***case class*** e di ***extension method***. Queste rendono più fluente e leggibile la costruzione di una `Timetable` per un treno mascherando il `TimetableBuilder` sottostante.
+Per la creazione del DSL (reperibile nel package `dsl`) è stato fatto uso di ***case class***, ***extension method*** e ***costruttori fluenti***. Queste rendono più fluente e leggibile la costruzione di una `Timetable` per un treno mascherando il `TimetableBuilder` sottostante.
+
+Una volta indicato il treno, l'ora di partenza e la stazione di partenza, occorre specificare le informazioni della route per raggiungere la stazione seguente.
+
+> _train_name_ **at** _clock_time_ **startFrom** _station1_ **thenOnRail** _rail_info1_ [**stopsIn** or **travelsTo**] _station2_ **thenOnRail** ... _rail_infoX_ **arrivesTo** _stationY_
+> 
+In una stazione è possibile:
+- raggiungere e sostare per un certo numero di minuti con "**stopsIn** _station_ waitingForMinutes _x_"
+- solo transitare con: "**travelsTo** _station_"
+
+Per finalizzare la costruzione basta indicare la stazione di arrivo con "**arrivesTo** _stationF_"
 
 Di seguito si mostra il codice per la costruzione di una *timetable* utilizando il DSL creato e la corrispettiva costruzione con il builder.
 
 Risultato finale ottenuto grazie al dsl.
 ```scala 3
 AV1000Train at h(9).m(0).getOrDefault startFrom stationA thenOnRail
-  railAV_10 andStopIn stationB waitingForMinutes 5 thenOnRail
+  railAV_10 stopsIn stationB waitingForMinutes 5 thenOnRail
   railAV_10 travelsTo stationC thenOnRail
-  railAV_10 andStopIn stationD waitingForMinutes 10 thenOnRail
+  railAV_10 stopsIn stationD waitingForMinutes 10 thenOnRail
   railAV_10 arrivesTo stationF
 ```
 
