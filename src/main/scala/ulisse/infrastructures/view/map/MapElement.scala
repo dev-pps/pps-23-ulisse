@@ -12,6 +12,7 @@ import ulisse.infrastructures.view.utils.Swings.*
 
 import java.awt
 import java.awt.Color
+import java.awt.geom.Point2D
 import java.awt.image.ImageObserver
 import scala.swing.{Dimension, Graphics2D, Point}
 
@@ -31,12 +32,20 @@ object MapElement:
   /** Create a new [[MapElement]] with the given [[Station]], [[String]] and [[Point]]. */
   def createStation(station: Station): MapElement[Station] =
     val imagePath = ImagePath.station
-    MapElementSimple(station, DrawImageSimple.createAt(imagePath, station.coordinate.toPoint))
+    MapElementSimple(
+      station,
+      DrawImageSimple.createAt(imagePath, station.coordinate.toPoint),
+      station.name
+    )
 
   /** Create a new [[MapElement]] with the given [[StationEnvironmentElement]]. */
   def createStationEnvironmentElement(station: StationEnvironmentElement): MapElement[StationEnvironmentElement] =
     val imagePath = ImagePath.station
-    MapElementSimple(station, DrawImageSimple.createAt(imagePath, station.coordinate.toPoint))
+    MapElementSimple(
+      station,
+      DrawImageSimple(imagePath, station.coordinate.toPoint, new Dimension(40, 40)),
+      station.name
+    )
 
   /** Create a new [[MapElement]] with the given [[Route]] and [[String]]. */
   def createRoute[R <: Route](route: R, findPath: Boolean): MapElement[R] =
@@ -47,17 +56,27 @@ object MapElement:
     val color = route.typology match
       case RouteType.Normal => Theme.light.text
       case RouteType.AV     => Theme.light.falseClick
-    MapElementSimple(route, DrawImageTiled.createAt(start, end, color))
+    MapElementSimple(route, DrawImageTiled.createAt(start, end, color), "")
 
   /** Create a new [[MapElement]] with the given [[TrainMapElement]]. */
   def createTrain(train: TrainMapElement): MapElement[TrainMapElement] =
     val imagePath = ImagePath.train
-    val dimension = new Dimension(20, 20)
-    MapElementSimple(train, DrawImageSimple(imagePath, train.position.toPoint, dimension))
+    val dimension = new Dimension(30, 30)
+    MapElementSimple(
+      train,
+      DrawImageSimple(imagePath, train.position.toPoint, dimension),
+      train.train.name
+    )
 
-  private case class MapElementSimple[T](element: T, image: DrawImage) extends MapElement[T]:
+  private case class MapElementSimple[T](element: T, image: DrawImage, label: String)
+      extends MapElement[T]:
     private val observable = Observers.createObservable[MapElement[T]]
     image.attach(observable.toObserver(_ => this))
     export observable._
 
-    override def drawItem(g: Graphics2D, observer: ImageObserver): Unit = g.drawImage(image, observer)
+    override def drawItem(g: Graphics2D, observer: ImageObserver): Unit =
+      g.drawImage(image, observer)
+      g.setColor(Color.BLUE)
+      val y: Float = (image.center.getY + image.dimension.getHeight + 20).toFloat
+      val x: Float = (image.center.x + (image.dimension.getWidth / 2)).toFloat
+      g.drawString(label, x, y)
