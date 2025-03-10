@@ -46,6 +46,7 @@ final case class SimulationService(
         case Normal  => RailwayConfig.normalRailwayConfig
         case Complex => RailwayConfig.complexRailwayConfig
     )
+    eventQueue.addUpdateSimulationManagerEvent(_.withNotificationService(Some(notificationService)))
     initSimulation()
 
   override def setupEngine(stepSize: Int, cyclesPerSecond: Option[Int]): Future[Option[Engine]] =
