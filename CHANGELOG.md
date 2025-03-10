@@ -1,3 +1,14 @@
+## [1.41.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.40.0...v1.41.0) (2025-03-10)
+
+### Features
+
+* improv railway config ([dc21c19](https://github.com/dev-pps/pps-23-ulisse/commit/dc21c1939f0ace030a11d52dd4be5df70307d7d3))
+
+### Bug Fixes
+
+* **DynamicTimetableEnvironment:** find train by name ([f1fac2f](https://github.com/dev-pps/pps-23-ulisse/commit/f1fac2f529ac99db6ca98ca344e879e64dc689ca))
+* **SimulationService:** setup notification service on init simulation with preset ([6418450](https://github.com/dev-pps/pps-23-ulisse/commit/6418450dac518dce5b2220a8c141223f8565b5c9))
+
 ## [1.40.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.39.0...v1.40.0) (2025-03-10)
 
 ### Features
