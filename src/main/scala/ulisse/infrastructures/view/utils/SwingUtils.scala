@@ -14,7 +14,7 @@ object SwingUtils:
   /** Default font for labels components */
   val labelFont = new Font("Arial", java.awt.Font.BOLD, 14)
 
-  /** Default font for values components of a pair label-value.*/
+  /** Default font for values components of a pair label-value. */
   val valueFont = new Font("Arial", java.awt.Font.PLAIN, 14)
 
   /** Returns default string "N/A" if string `s` is not present */
