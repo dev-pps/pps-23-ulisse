@@ -13,7 +13,11 @@ import ulisse.entities.train.Wagons.Wagon
 import scala.annotation.targetName
 
 /** DSL for creating railway entities. */
-@SuppressWarnings(Array("org.wartremover.warts.Var", "org.wartremover.warts.ImplicitConversion"))
+@SuppressWarnings(Array(
+  "org.wartremover.warts.Var",
+  "org.wartremover.warts.ImplicitConversion",
+  "org.wartremover.warts.Overloading"
+))
 object RailwayDsl:
 
   export CreateStation._, CreateTrain._, CreateRoute._, CreateAppState._
@@ -51,22 +55,22 @@ object RailwayDsl:
 
     extension (withDeparture: WithDeparture)
       /** Create an application state with a departure station and a route type. */
-      def withType(routeType: Routes.RouteType): WithRouteType =
+      infix def withType(routeType: Routes.RouteType): WithRouteType =
         WithRouteType(withDeparture.appState, withDeparture.departure, routeType)
 
     extension (withRouteType: WithRouteType)
       /** Create an application state with a departure station, a route type, and a platform. */
-      def tracks(platform: Int): WithPlatform =
+      infix def tracks(platform: Int): WithPlatform =
         WithPlatform(withRouteType.appState, withRouteType.departure, withRouteType.routeType, platform)
 
     extension (withPlatform: WithPlatform)
       /** Create an application state with a departure station, a route type, a platform, and a length. */
-      def length(length: Double): WithLength =
+      infix def length(length: Double): WithLength =
         WithLength(withPlatform.appState, withPlatform.departure, withPlatform.routeType, withPlatform.platform, length)
 
     extension (withLength: WithLength)
       /** Create an application state with a departure station, a route type, a platform, a length, and an arrival station. */
-      def end(arrival: Station): AppState =
+      infix def end(arrival: Station): AppState =
         withLength.appState.updateStationManager(stationManager =>
           stationManager.addStation(arrival).getOrElse(stationManager)
         )
@@ -80,20 +84,20 @@ object RailwayDsl:
     extension (appStateDsl: AppStateDSL)
 
       /** Create an application state with a departure station form a route. */
-      def start(departure: Station): WithDeparture =
+      infix def start(departure: Station): WithDeparture =
         appStateDsl.appState = appStateDsl.appState.updateStationManager(stationManager =>
           stationManager.addStation(departure).getOrElse(stationManager)
         )
         WithDeparture(appStateDsl.appState, departure)
 
       /** Create an application state with a train. */
-      def put(train: Train): AppStateDSL =
+      infix def put(train: Train): AppStateDSL =
         appStateDsl.appState =
           appStateDsl.appState.createTrain((trainManager, _) => trainManager.addTrain(train).getOrElse(trainManager))
         appStateDsl
 
       /** Create an application state with a route. */
-      def link(route: Either[Routes.RouteError, Route]): AppStateDSL =
+      infix def link(route: Either[Routes.RouteError, Route]): AppStateDSL =
         appStateDsl.appState =
           appStateDsl.appState.updateRoute(manager =>
             route.fold(_ => manager, route => manager save route getOrElse manager)
@@ -101,7 +105,7 @@ object RailwayDsl:
         appStateDsl
 
       /** Create an application state with a station. */
-      def set(station: Station): AppStateDSL =
+      infix def set(station: Station): AppStateDSL =
         appStateDsl.appState =
           appStateDsl.appState.updateStationManager(stationManager =>
             stationManager.addStation(station).getOrElse(stationManager)
@@ -109,7 +113,7 @@ object RailwayDsl:
         appStateDsl
 
       /** Create an application state with a timetable. */
-      def scheduleA(timetable: Timetable): AppStateDSL =
+      infix def scheduleA(timetable: Timetable): AppStateDSL =
         appStateDsl.appState =
           appStateDsl.appState.updateTimetable(manager => manager.save(timetable).getOrElse(manager))
         appStateDsl
@@ -118,11 +122,11 @@ object RailwayDsl:
     implicit class AppStateOps(start: CreateAppState.type):
       /** Create an application state with technology. */
       @targetName("To put element on app state")
-      def ++(appState: AppState): AppStateDSL = AppStateDSL(appState)
+      infix def ||(appState: AppState): AppStateDSL = AppStateDSL(appState)
 
       /** Create an application state with technology. */
       @targetName("To create route")
-      def ->(appState: AppState): AppStateDSL = AppStateDSL(appState)
+      infix def |->(appState: AppState): AppStateDSL = AppStateDSL(appState)
 
   /** Dsl for creating a station. */
   object CreateStation:
@@ -134,15 +138,15 @@ object RailwayDsl:
 
     extension (station: StationDSL)
       /** Create a station with a coordinate. */
-      def at(coord: (Int, Int)): StationWithCoord = StationWithCoord(station.name, Coordinate(coord._1, coord._2))
+      infix def at(coord: (Int, Int)): StationWithCoord = StationWithCoord(station.name, Coordinate(coord._1, coord._2))
 
     extension (station: StationWithCoord)
-      def platforms(capacity: Int): Station = Station(station.name, station.coordinate, capacity)
+      infix def platforms(capacity: Int): Station = Station(station.name, station.coordinate, capacity)
 
     /** Create a station with a name and a coordinate. */
     implicit class StationOps(start: CreateStation.type):
       @targetName("To set name")
-      def ->(name: String): StationDSL = StationDSL(name)
+      infix def ->(name: String): StationDSL = StationDSL(name)
 
   /** Dsl for creating a train. */
   object CreateTrain:
@@ -161,26 +165,27 @@ object RailwayDsl:
 
     extension (train: TrainDSL)
       /** Create a train with a technology. */
-      def technology(technology: TrainTechnology): TrainWithTechnology = TrainWithTechnology(train.name, technology)
+      infix def technology(technology: TrainTechnology): TrainWithTechnology =
+        TrainWithTechnology(train.name, technology)
 
     extension (train: TrainWithTechnology)
       /** Create a train with a wagon. */
-      def wagon(wagon: Wagons.UseType): TrainWithWagon = TrainWithWagon(train.name, train.technology, wagon)
+      infix def wagon(wagon: Wagons.UseType): TrainWithWagon = TrainWithWagon(train.name, train.technology, wagon)
 
     extension (train: TrainWithWagon)
       /** Create a train with a capacity. */
-      def capacity(number: Int): TrainWithCapacity =
+      infix def capacity(number: Int): TrainWithCapacity =
         TrainWithCapacity(train.name, train.technology, Wagon(train.wagon, number))
 
     extension (train: TrainWithCapacity)
       /** Create a train with a number. */
-      def count(number: Int): Train = Train(train.name, train.technology, train.wagon, number)
+      infix def count(number: Int): Train = Train(train.name, train.technology, train.wagon, number)
 
     /** Create a train with a name, a technology, a wagon, and a number. */
     implicit class TrainOps(start: CreateTrain.type):
       /** Create a train with a name. */
       @targetName("To set name")
-      def ->(name: String): TrainDSL = TrainDSL(name)
+      infix def ->(name: String): TrainDSL = TrainDSL(name)
 
   /** Dsl for creating a route. */
   object CreateRoute:
@@ -199,23 +204,24 @@ object RailwayDsl:
     extension (departure: RouteDSL)
       /** Create a route with an arrival station. */
       @targetName("To add arrival")
-      def ->(arrival: Station): RouteWithArrival = RouteWithArrival(departure.departure, arrival)
+      infix def ->(arrival: Station): RouteWithArrival = RouteWithArrival(departure.departure, arrival)
 
     extension (route: RouteWithArrival)
       /** Create a route with a route type. */
-      def on(routeType: Routes.RouteType): RouteWithType = RouteWithType(route.departure, route.arrival, routeType)
+      infix def on(routeType: Routes.RouteType): RouteWithType =
+        RouteWithType(route.departure, route.arrival, routeType)
 
     extension (route: RouteWithType)
       /** Create a route with a platform. */
-      def tracks(platform: Int): RouteWithPlatform =
+      infix def tracks(platform: Int): RouteWithPlatform =
         RouteWithPlatform(route.departure, route.arrival, route.routeType, platform)
 
     extension (route: RouteWithPlatform)
       /** Create a route with a length. */
-      def length(length: Double): Either[Routes.RouteError, Route] =
+      infix def length(length: Double): Either[Routes.RouteError, Route] =
         Route(route.departure, route.arrival, route.routeType, route.platform, length)
 
     /** Create a route with a departure, an arrival station, a route type, a platform, and a length. */
     implicit class RouteOps(start: CreateRoute.type):
       @targetName("To add departure")
-      def ->(departure: Station): RouteDSL = RouteDSL(departure)
+      infix def ->(departure: Station): RouteDSL = RouteDSL(departure)

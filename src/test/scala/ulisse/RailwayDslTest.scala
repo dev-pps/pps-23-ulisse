@@ -45,8 +45,8 @@ class RailwayDslTest extends AnyFlatSpec with Matchers:
 
   "create app state with dsl" should "create an app state" in:
     var state = initAppState
-    state = CreateAppState ++ state set departure link routeTest set arrival
-    state = CreateAppState ++ state put trainTest
+    state = CreateAppState || state set departure link routeTest set arrival
+    state = CreateAppState || state put trainTest
 
     state must not be initAppState
     state.stationManager.stations must contain allOf (departure, arrival)
@@ -56,7 +56,7 @@ class RailwayDslTest extends AnyFlatSpec with Matchers:
   "create station with route dsl" should "create a station" in:
     var state = initAppState
     state =
-      CreateAppState -> state start departure withType RouteType.Normal tracks platform length routeLength end arrival
+      CreateAppState |-> state start departure withType RouteType.Normal tracks platform length routeLength end arrival
 
     state must not be initAppState
     state.stationManager.stations must contain allOf (departure, arrival)
