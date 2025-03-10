@@ -37,7 +37,7 @@ In questo modo, il tipo `TAC` è parametrizzato con il proprio sottotipo, permet
 
 Considerazioni su questo costrutto:
 - L'utilizzo di un semplice generico non permette di garantire che il tipo `TAC` sia un sottotipo di `TrainAgentsContainer[TAC]`.
-- L'utilizzo di del `Self-Type` permette di vincolare il tipo `TAC` a dover essere mixato con il trait `TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]`. 
+- L'utilizzo di del Self-Type permette di vincolare il tipo `TAC` a dover essere mixato con il trait `TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]`. 
 
 Così facendo non si permette di creare sotto tipi della forma:
 ```scala 3
@@ -165,6 +165,10 @@ given FieldComparator[EngineField, Engine] with
       case EngineField.State         => firstEngine.state == otherEngine.state
 ```
 ## CollectionUtils e OptionUtils
+Per le dinamiche di aggiornamento dei `TrainAgent` nei diversi  `EnvironmentElement` e `TrainAgentContainer` è risultato spesso necessario dover effettuare operazioni di ricerca e modifica(e.g. ricerca della track/platform libera, ricerca del treno da sostituire).
+Inoltre queste modifiche dovevano essere effettuate solo al verificarsi di determinate condizioni.
+Per rendere queste operazioni più compatte e leggibili sono stati introdotti dei metodi di utilità per le `Collection` e `Option`.
+Considerando l'esempio seguente
 ```scala 3
 private final case class RouteEnvironmentElementImpl(route: Route, containers: Seq[Track])
         extends RouteEnvironmentElement:
@@ -177,52 +181,40 @@ private final case class RouteEnvironmentElementImpl(route: Route, containers: S
       firstAvailableContainer <- containers.find(_.isAvailable(direction))
       updatedContainers <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
     yield constructor(updatedContainers)) when !contains(train) && isAvailableFor(train, direction)
-    
 ```    
+si nota l'utilizzo delle funzioni:
+- `updateWhenWithEffects`: per inserire il treno nella prima rotaia disponibile  
+- `when`; per valutare la condizione di inserimento del treno prima di procedere con l'aggiornamento effettivo.
 
-
+### CollectionUtils
+Riguardo le `Collection` è stato definito oltre al metodo `updateWhenWithEffects` anche il metodo `updateWhen` da utilizzare nel caso in cui l'aggiornamento 
+ritorni direttamente l'oggetto aggionato senza incapsularlo in un Higher-Order Type. Per implementare le due funzioni rispettando il principio `DRY` 
+è stato definito un metodo `wrappedUpdate` che tramite l'utilizzo del Type Alias `Id` incapsula la funzione di aggiornamento adattandola per l'utilizzo nel metodo `updateWhenWithEffects`.
 ```scala 3
-
-
 object CollectionUtils:
     private def wrappedUpdate[A](update: A => A)(in: A): Id[A] = Id(update(in))
     
     extension [F[_]: Traverse, A](collection: F[A])
-    /** Update all elements in the collection that satisfy the condition. */
-    def updateWhen(condition: A => Boolean)(update: A => A): F[A] =
-    collection.updateWhenWithEffects(condition)(wrappedUpdate(update))
-    
-        /** Swap all elements in the collection that satisfy the condition. */
-        def swapWhen(condition: A => Boolean)(element: A): F[A] =
-          collection.updateWhen(condition)(_ => element)
-    
-        /** Update all elements in the collection that are equal to the given element. */
-        def swapWhenEq(find: A)(replace: A): F[A] =
-          collection.updateWhen(_ == find)(_ => replace)
-    
-        /** Update all elements in the collection that satisfy the condition, handling effects. */
-        def updateWhenWithEffects[W[_]: Monad](condition: A => Boolean)(update: A => W[A]): W[F[A]] =
-          collection.traverse(item => if condition(item) then update(item) else item.pure[W])
-    
-        /** Swap all elements in the collection that satisfy the condition, handling effects. */
-        def swapWhenWithEffects[W[_]: Monad](condition: A => Boolean)(element: W[A]): W[F[A]] =
-          collection.updateWhenWithEffects(condition)(_ => element)
-    
-        /** Swap all elements in the collection that are equal to the given element, handling effects. */
-        def swapWhenEqWithEffects[W[_]: Monad](find: A)(replace: W[A]): W[F[A]] =
-          collection.updateWhenWithEffects(_ == find)(_ => replace)
+      def updateWhen(condition: A => Boolean)(update: A => A): F[A] =
+        collection.updateWhenWithEffects(condition)(wrappedUpdate(update))
+      
+      def updateWhenWithEffects[W[_]: Monad](condition: A => Boolean)(update: A => W[A]): W[F[A]] =
+        collection.traverse(item => if condition(item) then update(item) else item.pure[W])
 
+```
+### OptionUtils
+Per quanto riguarda gli `Option` è stato definito il metodo `when` come wrap del metodo `Option.when` per renderne l'uso più fluente, si noti l'utilizzo del parametro `by-name` così da valutare il risultato solo nel momento in cui la condizione risulta verificata.
+Una nota di dettaglio riguarda la definizione della conversione implicita da `Option[Option[A]]` a `Option[A]` che è risultata utile nel caso in cui l'`optionalResult` sia esso stesso un `Option[A]`.
+```scala 3
 object OptionUtils:
     extension [A](optionalResult: => A)
-      /** Compute and returns an `Option` containing the result if the condition is `true`, otherwise `None`. */
       def when(condition: Boolean): Option[A] =
         Option.when(condition)(optionalResult)
     
-    /** Defines the conversion from flatten `Option[Option[A]]` to `Option[A]`. */
     given [A]: Conversion[Option[Option[A]], Option[A]] = _.flatten
-
-  
 ```
+
+## TimeUtils  
 
 ```scala 3
 private def extractAndPerform[M[_]: Monad, T <: Time, R](t1: M[T],t2: M[T])(f: (T, T) => M[R]): M[R] =
