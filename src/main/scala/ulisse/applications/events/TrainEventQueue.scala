@@ -1,4 +1,4 @@
-package ulisse.applications.event
+package ulisse.applications.events
 import ulisse.applications.AppState
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager

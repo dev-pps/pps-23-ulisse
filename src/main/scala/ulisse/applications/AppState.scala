@@ -1,8 +1,8 @@
 package ulisse.applications
 
 import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
-import ulisse.applications.event.SimulationEventQueue.SimulationManagers
-import ulisse.applications.event.StationEventQueue.StationManagers
+import ulisse.applications.events.SimulationEventQueue.SimulationManagers
+import ulisse.applications.events.StationEventQueue.StationManagers
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
@@ -12,7 +12,7 @@ import ulisse.entities.route.Routes.Route
 import ulisse.entities.simulation.data.SimulationData
 import ulisse.entities.station.Station
 import ulisse.entities.train.Trains.TrainTechnology
-import ulisse.infrastructures.commons.TimeProviders.TimeProvider
+import ulisse.infrastructures.utils.TimeProviders.TimeProvider
 
 import scala.compiletime.{erasedValue, summonInline}
 

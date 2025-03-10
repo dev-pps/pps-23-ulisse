@@ -1,7 +1,7 @@
 package ulisse.adapters.output
 
 import ulisse.applications.ports.UtilityPorts.Output.TimeProviderPort
-import ulisse.infrastructures.commons.TimeProviders.TimeProvider
+import ulisse.infrastructures.utils.TimeProviders.TimeProvider
 
 /** Adapter for the UtilityPorts. */
 object UtilityAdapters:
