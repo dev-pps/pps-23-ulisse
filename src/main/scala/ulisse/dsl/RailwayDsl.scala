@@ -23,89 +23,121 @@ object RailwayDsl:
 
   /** Dsl for creating an application state. */
   object CreateAppState:
-
-    /** Create an application state with possible to add a station. */
-    case class WithAppState(var appState: AppState):
-      def start(departure: Station): WithDeparture =
-        appState = appState.updateStationManager(stationManager =>
-          stationManager.addStation(departure).getOrElse(stationManager)
-        )
-        WithDeparture(appState, departure)
+    /** Create an application state with possible to add a train, a route, and a station. */
+    final case class AppStateDSL(var appState: AppState)
 
     /** Create an application state with a departure station with possible to add a route type. */
-    case class WithDeparture(var appState: AppState, departure: Station):
-      /** Create an application state with a departure station and a route type. */
-      def withType(routeType: Routes.RouteType): WithRouteType = WithRouteType(appState, departure, routeType)
+    final case class WithDeparture(var appState: AppState, departure: Station)
 
     /** Create an application state with a departure station, a route type, and possible to add a platform. */
-    case class WithRouteType(var appState: AppState, departure: Station, routeType: Routes.RouteType):
-      /** Create an application state with a departure station, a route type, and a platform. */
-      def tracks(platform: Int): WithPlatform = WithPlatform(appState, departure, routeType, platform)
+    final case class WithRouteType(var appState: AppState, departure: Station, routeType: Routes.RouteType)
 
     /** Create an application state with a departure station, a route type, a platform, and possible to add a length. */
-    case class WithPlatform(var appState: AppState, departure: Station, routeType: Routes.RouteType, platform: Int):
-      /** Create an application state with a departure station, a route type, a platform, and a length. */
-      def length(length: Double): WithLength = WithLength(appState, departure, routeType, platform, length)
+    final case class WithPlatform(
+        var appState: AppState,
+        departure: Station,
+        routeType: Routes.RouteType,
+        platform: Int
+    )
 
     /** Create an application state with a departure station, a route type, a platform, a length, and possible to add an arrival station. */
-    case class WithLength(
+    final case class WithLength(
         var appState: AppState,
         departure: Station,
         routeType: Routes.RouteType,
         platform: Int,
         length: Double
-    ):
+    )
+
+    extension (withDeparture: WithDeparture)
+      /** Create an application state with a departure station and a route type. */
+      def withType(routeType: Routes.RouteType): WithRouteType =
+        WithRouteType(withDeparture.appState, withDeparture.departure, routeType)
+
+    extension (withRouteType: WithRouteType)
+      /** Create an application state with a departure station, a route type, and a platform. */
+      def tracks(platform: Int): WithPlatform =
+        WithPlatform(withRouteType.appState, withRouteType.departure, withRouteType.routeType, platform)
+
+    extension (withPlatform: WithPlatform)
+      /** Create an application state with a departure station, a route type, a platform, and a length. */
+      def length(length: Double): WithLength =
+        WithLength(withPlatform.appState, withPlatform.departure, withPlatform.routeType, withPlatform.platform, length)
+
+    extension (withLength: WithLength)
       /** Create an application state with a departure station, a route type, a platform, a length, and an arrival station. */
       def end(arrival: Station): AppState =
-        appState.updateStationManager(stationManager => stationManager.addStation(arrival).getOrElse(stationManager))
+        withLength.appState.updateStationManager(stationManager =>
+          stationManager.addStation(arrival).getOrElse(stationManager)
+        )
           .updateRoute(manager =>
-            Route(departure, arrival, routeType, platform, length).fold(
+            Route(withLength.departure, arrival, withLength.routeType, withLength.platform, withLength.length).fold(
               _ => manager,
               route => manager.save(route).getOrElse(manager)
             )
           )
 
-    /** Create an application state with possible to add a train, a route, and a station. */
-    case class AppStateDSL(var appState: AppState):
+    extension (appStateDsl: AppStateDSL)
+
+      /** Create an application state with a departure station form a route. */
+      def start(departure: Station): WithDeparture =
+        appStateDsl.appState = appStateDsl.appState.updateStationManager(stationManager =>
+          stationManager.addStation(departure).getOrElse(stationManager)
+        )
+        WithDeparture(appStateDsl.appState, departure)
+
       /** Create an application state with a train. */
       def put(train: Train): AppStateDSL =
-        appState = appState.createTrain((trainManager, _) => trainManager.addTrain(train).getOrElse(trainManager))
-        this
+        appStateDsl.appState =
+          appStateDsl.appState.createTrain((trainManager, _) => trainManager.addTrain(train).getOrElse(trainManager))
+        appStateDsl
 
       /** Create an application state with a route. */
       def link(route: Either[Routes.RouteError, Route]): AppStateDSL =
-        appState =
-          appState.updateRoute(manager => route.fold(_ => manager, route => manager.save(route).getOrElse(manager)))
-        this
+        appStateDsl.appState =
+          appStateDsl.appState.updateRoute(manager =>
+            route.fold(_ => manager, route => manager save route getOrElse manager)
+          )
+        appStateDsl
 
       /** Create an application state with a station. */
       def set(station: Station): AppStateDSL =
-        appState =
-          appState.updateStationManager(stationManager => stationManager.addStation(station).getOrElse(stationManager))
-        this
+        appStateDsl.appState =
+          appStateDsl.appState.updateStationManager(stationManager =>
+            stationManager.addStation(station).getOrElse(stationManager)
+          )
+        appStateDsl
 
       /** Create an application state with a timetable. */
       def scheduleA(timetable: Timetable): AppStateDSL =
-        appState = appState.updateTimetable(manager => manager.save(timetable).getOrElse(manager))
-        this
+        appStateDsl.appState =
+          appStateDsl.appState.updateTimetable(manager => manager.save(timetable).getOrElse(manager))
+        appStateDsl
 
     /** Create an application state with technology. */
     implicit class AppStateOps(start: CreateAppState.type):
+      /** Create an application state with technology. */
       @targetName("To put element on app state")
       def ++(appState: AppState): AppStateDSL = AppStateDSL(appState)
+
+      /** Create an application state with technology. */
       @targetName("To create route")
-      def ->(appState: AppState): WithAppState = WithAppState(appState)
+      def ->(appState: AppState): AppStateDSL = AppStateDSL(appState)
 
   /** Dsl for creating a station. */
   object CreateStation:
-
     /** Create a station with a name. */
-    case class StationDSL(name: String):
-      def at(coord: (Int, Int)): StationWithCoord = StationWithCoord(name, Coordinate(coord._1, coord._2))
+    final case class StationDSL(name: String)
 
     /** Create a station with a name and a coordinate. */
-    case class StationWithCoord(name: String, coordinate: Coordinate):
-      def platforms(capacity: Int): Station = Station(name, coordinate, capacity)
+    final case class StationWithCoord(name: String, coordinate: Coordinate)
+
+    extension (station: StationDSL)
+      /** Create a station with a coordinate. */
+      def at(coord: (Int, Int)): StationWithCoord = StationWithCoord(station.name, Coordinate(coord._1, coord._2))
+
+    extension (station: StationWithCoord)
+      def platforms(capacity: Int): Station = Station(station.name, station.coordinate, capacity)
 
     /** Create a station with a name and a coordinate. */
     implicit class StationOps(start: CreateStation.type):
@@ -116,45 +148,72 @@ object RailwayDsl:
   object CreateTrain:
 
     /** Create a train with a name. */
-    case class TrainDSL(name: String):
-      def technology(technology: TrainTechnology): TrainWithTechnology = TrainWithTechnology(name, technology)
+    final case class TrainDSL(name: String)
 
     /** Create a train with a name and a technology. */
-    case class TrainWithTechnology(name: String, technology: TrainTechnology):
-      def wagon(wagon: Wagons.UseType): TrainWithWagon = TrainWithWagon(name, technology, wagon)
+    final case class TrainWithTechnology(name: String, technology: TrainTechnology)
 
     /** Create a train with a name, a technology, and a wagon. */
-    case class TrainWithWagon(name: String, technology: TrainTechnology, wagon: Wagons.UseType):
-      def capacity(number: Int): TrainWithCapacity = TrainWithCapacity(name, technology, Wagons.Wagon(wagon, number))
+    final case class TrainWithWagon(name: String, technology: TrainTechnology, wagon: Wagons.UseType)
 
-    case class TrainWithCapacity(name: String, technology: TrainTechnology, wagon: Wagon):
-      def count(number: Int): Train = Train(name, technology, wagon, number)
+    /** Create a train with a name, a technology, a wagon, and a capacity. */
+    final case class TrainWithCapacity(name: String, technology: TrainTechnology, wagon: Wagon)
+
+    extension (train: TrainDSL)
+      /** Create a train with a technology. */
+      def technology(technology: TrainTechnology): TrainWithTechnology = TrainWithTechnology(train.name, technology)
+
+    extension (train: TrainWithTechnology)
+      /** Create a train with a wagon. */
+      def wagon(wagon: Wagons.UseType): TrainWithWagon = TrainWithWagon(train.name, train.technology, wagon)
+
+    extension (train: TrainWithWagon)
+      /** Create a train with a capacity. */
+      def capacity(number: Int): TrainWithCapacity =
+        TrainWithCapacity(train.name, train.technology, Wagon(train.wagon, number))
+
+    extension (train: TrainWithCapacity)
+      /** Create a train with a number. */
+      def count(number: Int): Train = Train(train.name, train.technology, train.wagon, number)
 
     /** Create a train with a name, a technology, a wagon, and a number. */
     implicit class TrainOps(start: CreateTrain.type):
+      /** Create a train with a name. */
       @targetName("To set name")
       def ->(name: String): TrainDSL = TrainDSL(name)
 
   /** Dsl for creating a route. */
   object CreateRoute:
-
     /** Create a route with a departure station. */
-    case class RouteDSL(departure: Station):
-      @targetName("To add arrival")
-      def ->(arrival: Station): RouteWithArrival = RouteWithArrival(departure, arrival)
+    final case class RouteDSL(departure: Station)
 
     /** Create a route with a departure and an arrival station. */
-    case class RouteWithArrival(departure: Station, arrival: Station):
-      def on(routeType: Routes.RouteType): RouteWithType = RouteWithType(departure, arrival, routeType)
+    final case class RouteWithArrival(departure: Station, arrival: Station)
 
     /** Create a route with a departure, an arrival station, and a route type. */
-    case class RouteWithType(departure: Station, arrival: Station, routeType: Routes.RouteType):
-      def tracks(platform: Int): RouteWithPlatform = RouteWithPlatform(departure, arrival, routeType, platform)
+    final case class RouteWithType(departure: Station, arrival: Station, routeType: Routes.RouteType)
 
     /** Create a route with a departure, an arrival station, a route type, and a platform. */
-    case class RouteWithPlatform(departure: Station, arrival: Station, routeType: Routes.RouteType, platform: Int):
+    final case class RouteWithPlatform(departure: Station, arrival: Station, routeType: Routes.RouteType, platform: Int)
+
+    extension (departure: RouteDSL)
+      /** Create a route with an arrival station. */
+      @targetName("To add arrival")
+      def ->(arrival: Station): RouteWithArrival = RouteWithArrival(departure.departure, arrival)
+
+    extension (route: RouteWithArrival)
+      /** Create a route with a route type. */
+      def on(routeType: Routes.RouteType): RouteWithType = RouteWithType(route.departure, route.arrival, routeType)
+
+    extension (route: RouteWithType)
+      /** Create a route with a platform. */
+      def tracks(platform: Int): RouteWithPlatform =
+        RouteWithPlatform(route.departure, route.arrival, route.routeType, platform)
+
+    extension (route: RouteWithPlatform)
+      /** Create a route with a length. */
       def length(length: Double): Either[Routes.RouteError, Route] =
-        Route(departure, arrival, routeType, platform, length)
+        Route(route.departure, route.arrival, route.routeType, route.platform, length)
 
     /** Create a route with a departure, an arrival station, a route type, a platform, and a length. */
     implicit class RouteOps(start: CreateRoute.type):

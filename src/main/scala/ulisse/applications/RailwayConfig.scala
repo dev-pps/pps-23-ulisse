@@ -1,6 +1,5 @@
 package ulisse.applications
 
-import ulisse.applications.AppState
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.dsl.RailwayDsl.*
 import ulisse.entities.route.Routes.RouteType
@@ -66,15 +65,15 @@ object RailwayConfig:
   private val trainS_NR = CreateTrain -> "NR9" technology normal wagon UseType.Passenger capacity 2 count 1
   private val trainT_NR = CreateTrain -> "NR10" technology normal wagon UseType.Passenger capacity 2 count 1
 
-  uploadRailway = CreateAppState ++ uploadRailway set stationA set stationB set stationC set stationD set stationE
-  uploadRailway = CreateAppState ++ uploadRailway set stationF set stationG set stationH set stationI set stationJ
-  uploadRailway = CreateAppState ++ uploadRailway link routeA link routeB link routeC link routeD link routeE
-  uploadRailway = CreateAppState ++ uploadRailway link routeF link routeG link routeH link routeI link routeL
-  uploadRailway = CreateAppState ++ uploadRailway link routeM link routeN link routeO link routeP link routeQ
-  uploadRailway = CreateAppState ++ uploadRailway put trainA_AV put trainB_AV put trainC_AV put trainD_AV put trainE_AV
-  uploadRailway = CreateAppState ++ uploadRailway put trainF_AV put trainG_AV put trainH_AV put trainI_AV put trainJ_AV
-  uploadRailway = CreateAppState ++ uploadRailway put trainK_NR put trainL_NR put trainM_NR put trainN_NR put trainO_NR
-  uploadRailway = CreateAppState ++ uploadRailway put trainP_NR put trainQ_NR put trainR_NR put trainS_NR put trainT_NR
+  uploadRailway = CreateAppState ++ uploadRailway set stationA set stationB set stationC set stationD set stationE set
+    stationF set stationG set stationH set stationI set stationJ link
+    routeA link routeB link routeC link routeD link routeE link
+    routeF link routeG link routeH link routeI link routeL link
+    routeM link routeN link routeO link routeP link routeQ put
+    trainA_AV put trainB_AV put trainC_AV put trainD_AV put trainE_AV put
+    trainF_AV put trainG_AV put trainH_AV put trainI_AV put trainJ_AV put
+    trainK_NR put trainL_NR put trainM_NR put trainN_NR put trainO_NR put
+    trainP_NR put trainQ_NR put trainR_NR put trainS_NR put trainT_NR
 
   private var simpleRailway: AppState  = uploadRailway
   private var mediumRailway: AppState  = uploadRailway
