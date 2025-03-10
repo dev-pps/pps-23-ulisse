@@ -249,7 +249,7 @@ private def extractAndPerform[M[_]: Monad, T <: Time, R](t1: M[T],t2: M[T])(f: (
 ```
 Dovendo mantenere la coerenza con il tipo di ritorno è stato definita la Type Class `TimeConstructor` così da fornire il costruttore specifico per il tempo a seconda della situazione.
 ```scala 3
-trait TimeConstructor[T]:
+sealed trait TimeConstructor[T]:
   def construct(h: Int, m: Int, s: Int): T
 ```
 Ad esempio è stato poi definito il costruttore di default per il tipo `Time`.
