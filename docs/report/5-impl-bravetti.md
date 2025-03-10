@@ -1,32 +1,52 @@
 # Implementazione Federico Bravetti
 Il codice prodotto durante lo svolgimento del progetto riguarda prevalentemente le seguente parti:
-- **Station**: Implementazioni delle stazioni con relativo manager e servizio
+- **Station**: Implementazioni delle stazioni con relativo `StationManager` e `StationService`
 - **Simulation Environment**: implementazione dell'ambiente di simulazione comprese tutte le entità dinamiche costruite estendendo le componenti statiche, in particolare:
   - **Platform & Track**: implementazione delle piattaforme e dei binari, necessari a contenere e gestire i `TrainAgent`.
-  - **StationEnvironmentElement & StationEnvironment**: implementazione di un elemento di ambiente per le stazioni.
-  - **RouteEnvironmentElement & RouteEnvironment**: implementazione di un elemento di ambiente per le rotte.
-  - **DynamicTimetable & DynamicTimetableEnvironment**: implementazione di un orario dinamico per le stazioni.
-  - **RailwayEnvironment**: implementazione dell'ambiente di simulazione.
-- **PerceptionSystem**: implementazione di un sistema di percezione per gli agenti di simulazione.
-- **Engine**: implementazione di un motore di simulazione.
+  - **StationEnvironmentElement & StationEnvironment**: implementazione delle `Station` come elementi dell'ambiente composte da `Platform` e relativo ambiente per la loro gestione.
+  - **RouteEnvironmentElement & RouteEnvironment**: implementazione delle `Route` come elementi dell'ambiente composte da `Track` e relativo ambiente per la loro gestione.
+  - **DynamicTimetable & DynamicTimetableEnvironment**: implementazione delle `Timetable` come elementi dell'ambiente contenenti le informazioni dinamiche degli orari e relativo ambiente per la loro gestione.
+  - **RailwayEnvironment**: implementazione dell'ambiente di simulazione che contiene e coordina `StationEnvironment`, `RouteEnvironment`, `DynamicTimetableEnvironment` e `TrainAgent`.
+- **PerceptionSystem**: implementazione del sistema di percezione per i `SimulationAgent`.
+- **Engine**: implementazione del motore per l'avanzamento della simulazione con relativi `SimulationManager`, `SimulationService`, `SimulationInfoService`, `NotificationService`
+- **Statistics**: implementazione di metodi di utilità per il calcolo di statistiche relative al `RailwayEnvironment`.
 
+Di seguito saranno descritte con maggior dettaglio le parti più salienti.
+
+## F-Bounded Polymorphism
+Una strategia usata in modo diffuso nell'implementazioni delle classi relative alla simulazione è l'uso del F-Bounded Polymorphism. 
+Questa tecnica permette di parametrizzare un tipo dipendentemente da un suo sottotipo e si dimostra particolamente utile nel contesto funzionale, poiché è tipico avere come tipo di ritorno una nuova instanza modificata dell'oggetto piuttosto che effettuare side-effect di modifica. 
+Ad esempio, si consideri la definizione del tipo `TrainAgentsContainer`.
+
+Normalmente, si potrebbe definire il tipo `TrainAgentsContainer` come segue:
+```scala 3
+trait TrainAgentsContainer:
+  def updateTrain(train: TrainAgent): TrainAgentsContainer
+  def removeTrain(train: TrainAgent): TrainAgentsContainer
+``` 
+Ma così facendo andando ad invocare la funzione `updateTrain` o `removeTrain` si otterrebbe un nuovo oggetto del tipo base `TrainAgentsContainer` andando a perdere le informazioni sul sottotipo da cui è stata invocata.
+
+La soluzione adottata prevede invece una definizione di questo tipo:
 ```scala 3
 trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
   self: TAC =>
   def updateTrain(train: TrainAgent): Option[TAC]
   def removeTrain(train: TrainAgent): Option[TAC]
 ```  
+In questo modo, il tipo `TAC` è parametrizzato con il proprio sottotipo, permettendo di mantenere le informazioni sul tipo effettivo dell'oggetto e di restituire un nuovo oggetto dello stesso tipo.
 
-```scala 3
-trait TrainAgentsContainer[TAC]
-```  
-```scala 3
-trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
-```
-```scala 3
-trait TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]:
-  self: TAC =>
-```  
+Considerazioni su questo costrutto:
+- L'utilizzo di un semplice generico non permette di garantire che il tipo `TAC` sia un sottotipo di `TrainAgentsContainer[TAC]`.
+- L'utilizzo di del `Self-Type` permette di vincolare il tipo `TAC` a dover essere mixato con il trait `TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]`. 
+  Così facendo non si permette di creare sotto tipi della forma:
+    ```scala 3
+    trait Platform extends TrainAgentsContainer[Track]
+    ```  
+    ma solo sotto tipi della forma 
+    ```scala 3
+    trait Track extends TrainAgentsContainer[Track]
+    ```  
+  
 PerceptionSystem
 ![An image](/resources/implementation/bravetti/PerceptionProvider.svg)
 ```scala 3
