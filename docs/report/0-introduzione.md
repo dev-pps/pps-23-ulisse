@@ -1,5 +1,7 @@
 # Ulisse
-![Logo generato con ai](/resources/logo.png)
+<img src="/resources/logo.png" style="width: 50%">
+
+[//]: # (![Logo generato con ai]&#40;/resources/logo.png&#41;)
 
 ## Obiettivo
 L'obiettivo di questo progetto riguarda lo sviluppo di un simulatore Agent-Based per la simulazione di un sistema ferroviario.
