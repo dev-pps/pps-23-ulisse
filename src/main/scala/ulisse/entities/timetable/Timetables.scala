@@ -15,7 +15,7 @@ object Timetables:
 
   private type Length      = Double
   private type StationTime = TrainStationTime
-  private type WaitTime    = Int
+  type WaitTime            = Int
 
   /** Rail info `length` and [[RouteType]] used to estimate `ScheduleTime` of station. */
   case class RailInfo(length: Length, typeRoute: RouteType)

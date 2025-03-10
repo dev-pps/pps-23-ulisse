@@ -82,27 +82,6 @@ class TrainAgentTest extends AnyWordSpec with Matchers:
               case s => fail(s"$s")
           case _ => fail()
 
-//    "is running on route" should:
-//      "stop when reach route length" in:
-//        import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProvider.given
-//        val mockEnv = mock[RailwayEnvironment]
-//        when(mockEnv.perceptionFor(runningTrainAgent)).thenReturn(Some(routePerc))
-//        when(mockEnv.perceptionFor(runningTrainAgent)).thenReturn(Some(stationPerc))
-//        val partialMotionData =
-//          MotionData(travelledDistance3Km, speed = train3905.maxSpeed, acceleration = 0.0)
-//        val trainRouteInfo    = TrainRouteInfo(TypeRoute.AV, routeLengthKm, None, true)
-//        val routePerc         = TrainPerceptionInRoute(trainRouteInfo)
-//
-//        val agentReachStation = runningTrainAgent.doStep(timeToTravelRouteLength, mockEnv)
-//        agentReachStation.motionData.distanceTravelled shouldBe expectedDistanceTravelledKm
-//
-//        val stationEnvMock = mock[RailwayEnvironment]
-//        val stationPerc    = TrainPerceptionInStation(TrainStationInfo(hasToMove = true, routeTrackIsFree = true))
-//
-//        agentReachStation.doStep(timeToTravelRouteLength + 1, stationEnvMock).state match
-//          case Stopped(md) => md.distanceTravelled shouldBe 0.0
-//          case Running(_)  => fail()
-
     "distance is updated" should:
       "be updated correctly" in:
         val updatedTrainAgent3905 = trainAgent3905.updateDistanceTravelled(10)
