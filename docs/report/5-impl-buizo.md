@@ -24,7 +24,7 @@ e riduce i side effects.
 Questo approccio semplifica il testing e garantisce un controllo più rigoroso
 e una maggiore coerenza nella gestione dello stato.
 
-### Componente
+### Diagramma
 
 Di seguito è mostrata una rappresentazione parziale delle classi che compongono `AppState`.
 
@@ -76,7 +76,7 @@ scalabile, che assicura una gestione funzionale della creazione e dell'aggiornam
 dello stato dell'applicazione.
 // dire high-order type
 
-### Componente
+### Diagramma
 
 La definizione di una coda dedicata per ciascun concetto di `Service` consente di aderire
 ai principi di *Single Responsibility SRP* e *Dependency Inversion DIP*, assicurando
@@ -137,7 +137,7 @@ di validità definiti.
 una costruzione sicura e funzionale dell'entità, sfruttando le capacità di Scala
 per la gestione degli errori e la validazione dei dati in modo dichiarativo.
 
-### Componente
+### Diagramma
 
 Di seguito sono riportate alcune funzionalità per la modifica e la
 validazione dei campi di `Route`.
@@ -192,41 +192,38 @@ extension [A, E](value: A)
 
 **Motivazione**
 
-### Componente
+### Diagramma
 
 ```mermaid
-
+flowchart LR
+    A[CreateAppState] -->|AppState| B(AppStateDSL)
+    B -->|Create| AppState
+    B -->|set| D[AppState + Station]
+    B -->|link| E[AppState + Route]
+    B -->|put| F[AppState + Train]
+    B -->|scheduleA| G[AppState + TimeTable]
+    D --> B
+    E --> B
+    F --> B
+    G --> B
 ```
 
 ### Descrizione tecnica
 
 ```scala 3
-implicit class AppStateOps(start: CreateAppState.type):
-  @targetName("To put element on app state") @targetName("")
-  def ++(appState: AppState): AppStateDSL = AppStateDSL(appState)
-
-  @targetName("To create route")
-  def ->(appState: AppState): AppStateDSL = AppStateDSL(appState)
-```
-
-```scala 3
 object CreateAppState:
   final case class AppStateDSL(var appState: AppState)
 
-  final case class WithDeparture(var appState: AppState, departure: Station)
+  extension (appStateDsl: AppStateDSL)
+    infix def put(train: Train): AppStateDSL
+    infix def link(route: Either[Routes.RouteError, Route]): AppStateDSL
+    infix def set(station: Station): AppStateDSL
+    infix def scheduleA(timetable: Timetable): AppStateDSL
 
-  final case class WithRouteType(var appState: AppState, departure: Station, routeType: Routes.RouteType)
+  implicit class AppStateOps(start: CreateAppState.type):
+    def ||(appState: AppState): AppStateDSL = AppStateDSL(appState)
 
-  final case class WithPlatform(var appState: AppState,
-                                departure: Station,
-                                routeType: Routes.RouteType,
-                                platform: Int)
-
-  final case class WithLength(var appState: AppState,
-                              departure: Station,
-                              routeType: Routes.RouteType,
-                              platform: Int,
-                              length: Double)
+    def |->(appState: AppState): AppStateDSL = AppStateDSL(appState)
 
   val state = AppState()
   CreateAppState || state set departure set arrival
@@ -253,7 +250,7 @@ appState = CreateAppState || initState set
 
 **Motivazione**
 
-### Componente
+### Diagramma
 
 ```mermaid
 classDiagram
@@ -324,7 +321,7 @@ trait ShapeEffect extends EnhancedLook:
 
 **Motivazione**
 
-### Componente
+### Diagramma
 
 ```mermaid
 classDiagram
@@ -370,7 +367,7 @@ classDiagram
 
 ### Descrizione tecnica
 
-// export e componente gia fatto per l'observable
+// export e Diagramma gia fatto per l'observable
 
 ```scala 3
 def toObserver[I](newData: I => T): Observer[I]
@@ -386,7 +383,7 @@ def toObserver[I](newData: I => T): Observer[I]
 
 **Motivazione**
 
-### Componente
+### Diagramma
 
 ### Descrizione tecnica
 

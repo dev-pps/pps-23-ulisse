@@ -12,6 +12,7 @@ import javax.swing.{JLayeredPane, JTextArea}
 import scala.swing.*
 
 /** Extended Swing components. */
+@SuppressWarnings(Array("org.wartremover.warts.MutableDataStructures"))
 object ExtendedSwing:
 
   /** Creates a layered panel. */
