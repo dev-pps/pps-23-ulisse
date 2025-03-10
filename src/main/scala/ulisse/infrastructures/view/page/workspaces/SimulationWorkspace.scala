@@ -70,4 +70,5 @@ object SimulationWorkspace:
           simulation.showSimulationData(data)
 
     override def endSimulation(data: SimulationData): Unit =
+      simulation.reset()
       println("Ending simulation:")
