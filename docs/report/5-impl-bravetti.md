@@ -165,13 +165,25 @@ given FieldComparator[EngineField, Engine] with
       case EngineField.State         => firstEngine.state == otherEngine.state
 ```
 ## CollectionUtils e OptionUtils
-  
+```scala 3
+private final case class RouteEnvironmentElementImpl(route: Route, containers: Seq[Track])
+        extends RouteEnvironmentElement:
+  export route.*
+  override def constructor(containers: Seq[Track]): RouteEnvironmentElement =
+    copy(containers = containers)
 
+  override def putTrain(train: TrainAgent, direction: TrackDirection): Option[RouteEnvironmentElement] =
+    (for
+      firstAvailableContainer <- containers.find(_.isAvailable(direction))
+      updatedContainers <- containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
+    yield constructor(updatedContainers)) when !contains(train) && isAvailableFor(train, direction)
     
-    
+```    
 
 
 ```scala 3
+
+
 object CollectionUtils:
     private def wrappedUpdate[A](update: A => A)(in: A): Id[A] = Id(update(in))
     
@@ -209,18 +221,7 @@ object OptionUtils:
     /** Defines the conversion from flatten `Option[Option[A]]` to `Option[A]`. */
     given [A]: Conversion[Option[Option[A]], Option[A]] = _.flatten
 
-  private final case class RouteEnvironmentElementImpl(route: Route, containers: Seq[Track])
-    extends RouteEnvironmentElement:
-  export route.*
-  override def constructor(containers: Seq[Track]): RouteEnvironmentElement =
-    copy(containers = containers)
-
-  override def putTrain(train: TrainAgent, direction: TrackDirection): Option[RouteEnvironmentElement] =
-    (for
-      firstAvailableContainer <- containers.find(_.isAvailable(direction))
-      updatedContainers <-
-        containers.updateWhenWithEffects(_ == firstAvailableContainer)(_.putTrain(train, direction))
-    yield constructor(updatedContainers)) when !contains(train) && isAvailableFor(train, direction)
+  
 ```
 
 ```scala 3
