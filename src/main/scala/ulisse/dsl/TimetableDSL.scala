@@ -44,7 +44,7 @@ object TimetableDSL:
     infix def thenOnRail(railInfo: RailInfo): TravelOnRailInfo = TravelOnRailInfo(railInfo, builder)
 
   extension (tri: TravelOnRailInfo)
-    infix def andStopIn(station: Station): TravelRailInfoStation =
+    infix def stopsIn(station: Station): TravelRailInfoStation =
       TravelRailInfoStation(tri.railInfo, station, tri.builder)
 
     infix def travelsTo(station: Station): TimetableBuilder =

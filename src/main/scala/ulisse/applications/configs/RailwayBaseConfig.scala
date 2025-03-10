@@ -34,7 +34,7 @@ object RailwayBaseConfig:
 
   import ulisse.dsl.TimetableDSL.*
   private val table1 = trainA_AV at h(0).m(0).getOrDefault startFrom stationA thenOnRail
-    railN400 andStopIn stationB waitingForMinutes 5 thenOnRail
+    railN400 stopsIn stationB waitingForMinutes 5 thenOnRail
     railN400 arrivesTo stationC
 
   private val table2 = trainB_NR at h(1).m(0).getOrDefault startFrom stationC thenOnRail

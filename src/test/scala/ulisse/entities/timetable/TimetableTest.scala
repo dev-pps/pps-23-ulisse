@@ -20,12 +20,12 @@ class TimetableTest extends AnyFlatSpec:
   val timetableBuilder: TimetableBuilder =
     TimetableBuilder(train = AV1000Train, startStation = stationA, departureTime = h(9).m(0).getOrDefault)
 
-  import ulisse.entities.timetable.TimetableDSL.*
+  import ulisse.dsl.TimetableDSL.*
   val AV1000TimeTable: Timetable =
-    AV1000Train at h(9).m(0).getOrDefault startFrom stationA travelOn
-      railAV_10 andStopIn stationB waitingForMinutes 5 travelOn
-      railAV_10 travelsTo stationC travelOn
-      railAV_10 andStopIn stationD waitingForMinutes 10 travelOn
+    AV1000Train at h(9).m(0).getOrDefault startFrom stationA thenOnRail
+      railAV_10 stopsIn stationB waitingForMinutes 5 thenOnRail
+      railAV_10 travelsTo stationC thenOnRail
+      railAV_10 stopsIn stationD waitingForMinutes 10 thenOnRail
       railAV_10 arrivesTo stationF
 
   "timetable" should "provide list of all stations, where train stops, where it only transits" in:
@@ -37,8 +37,8 @@ class TimetableTest extends AnyFlatSpec:
     val railInfoAB = RailInfo(length = 10, typeRoute = AV)
     val railInfoBC = RailInfo(length = 15, typeRoute = AV)
     val timeTableWithStops =
-      AV1000Train at h(9).m(0).getOrDefault startFrom stationA travelOn
-        railInfoAB andStopIn stationB waitingForMinutes 5 travelOn
+      AV1000Train at h(9).m(0).getOrDefault startFrom stationA thenOnRail
+        railInfoAB stopsIn stationB waitingForMinutes 5 thenOnRail
         railInfoBC arrivesTo stationC
 
     timeTableWithStops.table should be(ListMap(
@@ -69,9 +69,9 @@ class TimetableTest extends AnyFlatSpec:
 
   "timetable" should "provide couple with nearest stations names" in:
     val AV1000TimeTable =
-      AV1000Train at h(9).m(0).getOrDefault startFrom stationA travelOn
-        railAV_10 andStopIn stationB waitingForMinutes 5 travelOn
-        railAV_10 andStopIn stationC waitingForMinutes 5 travelOn
+      AV1000Train at h(9).m(0).getOrDefault startFrom stationA thenOnRail
+        railAV_10 stopsIn stationB waitingForMinutes 5 thenOnRail
+        railAV_10 stopsIn stationC waitingForMinutes 5 thenOnRail
         railAV_10 arrivesTo stationD
 
     AV1000TimeTable.routes should be(List(
