@@ -3,8 +3,8 @@ package ulisse.applications
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar.mock
-import ulisse.applications.event.SimulationEventQueue.SimulationManagers
-import ulisse.applications.event.StationEventQueue.StationManagers
+import ulisse.applications.events.SimulationEventQueue.SimulationManagers
+import ulisse.applications.events.StationEventQueue.StationManagers
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.{SimulationManager, StationManager}

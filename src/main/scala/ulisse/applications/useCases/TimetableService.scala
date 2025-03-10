@@ -1,6 +1,6 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.event.TimeTableEventQueue
+import ulisse.applications.events.TimeTableEventQueue
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.TimetableManagers.{TimetableManager, TimetableManagerErrors}

@@ -20,7 +20,7 @@ import ulisse.entities.simulation.data.SimulationData.SimulationDataField.Simula
 import ulisse.entities.simulation.data.{Engine, EngineConfiguration, SimulationData}
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.simpleConfigurationData
 import ulisse.entities.simulation.environments.railwayEnvironment.{ConfigurationData, RailwayEnvironment}
-import ulisse.infrastructures.commons.TimeProviders.TimeProvider
+import ulisse.infrastructures.utils.TimeProviders.TimeProvider
 
 import scala.annotation.tailrec
 import scala.concurrent.Await

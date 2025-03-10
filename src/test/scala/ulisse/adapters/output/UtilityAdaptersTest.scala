@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.adapters.output.UtilityAdapters.TimeProviderAdapter
-import ulisse.infrastructures.commons.TimeProviders.TimeProvider
+import ulisse.infrastructures.utils.TimeProviders.TimeProvider
 
 class UtilityAdaptersTest extends AnyWordSpec with Matchers:
   private val mockedTimeProvider  = mock[TimeProvider]
