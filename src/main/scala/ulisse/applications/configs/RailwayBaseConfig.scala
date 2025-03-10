@@ -41,7 +41,7 @@ object RailwayBaseConfig:
     railN400 travelsTo stationB thenOnRail
     railN400 arrivesTo stationA
 
-  uploadRailway = CreateAppState ++ uploadRailway set stationA set stationB set stationC link
+  uploadRailway = CreateAppState || uploadRailway set stationA set stationB set stationC link
     routeAB link routeBC put trainA_AV put trainB_NR scheduleA table1 scheduleA table2
 
   def railwayConfig: AppState = uploadRailway

@@ -199,6 +199,53 @@ extension [A, E](value: A)
 
 ### Descrizione tecnica
 
+```scala 3
+implicit class AppStateOps(start: CreateAppState.type):
+  @targetName("To put element on app state") @targetName("")
+  def ++(appState: AppState): AppStateDSL = AppStateDSL(appState)
+
+  @targetName("To create route")
+  def ->(appState: AppState): AppStateDSL = AppStateDSL(appState)
+```
+
+```scala 3
+object CreateAppState:
+  final case class AppStateDSL(var appState: AppState)
+
+  final case class WithDeparture(var appState: AppState, departure: Station)
+
+  final case class WithRouteType(var appState: AppState, departure: Station, routeType: Routes.RouteType)
+
+  final case class WithPlatform(var appState: AppState,
+                                departure: Station,
+                                routeType: Routes.RouteType,
+                                platform: Int)
+
+  final case class WithLength(var appState: AppState,
+                              departure: Station,
+                              routeType: Routes.RouteType,
+                              platform: Int,
+                              length: Double)
+
+  val state = AppState()
+  CreateAppState || state set departure set arrival
+  CreateAppState || state link routeA link routeB
+  CreateAppState || state put trainA put trainB
+```
+
+```scala 3
+given Conversion[AppStateDSL, AppState] = _.appState
+```
+
+```scala 3
+val initState = AppState()
+appState = CreateAppState || initState set
+  stationA set stationB set stationC set stationD set stationE set
+  routeFG link routeGA link routeAB link routeBC link routeCD link
+  trainA_AV put trainB_AV put trainC_AV put trainD_AV scheduleA
+  table9 scheduleA table10 scheduleA table11 scheduleA table12
+```
+
 ## Toolkit per la Customizzazione Visiva dell'UI: `EnhancedLook`
 
 **Obiettivo**
@@ -254,6 +301,7 @@ trait ShapeEffect extends EnhancedLook:
 ### Componente
 
 ```mermaid
+
 ```
 
 ### Descrizione tecnica

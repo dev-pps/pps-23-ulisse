@@ -134,7 +134,7 @@ object RailwayConfig:
     railN400 stopsIn stationG waitingForMinutes 10 thenOnRail
     railN400 arrivesTo stationA
 
-  uploadRailway = CreateAppState ++ uploadRailway set stationA set stationB set stationC set stationD set stationE set
+  uploadRailway = CreateAppState || uploadRailway set stationA set stationB set stationC set stationD set stationE set
     stationF set stationG set stationH set stationI set stationJ link
     routeFG link routeGA link routeAB link routeBC link routeCD link
     routeDE link routeEH link routeHF link routeHG link routeHB link
