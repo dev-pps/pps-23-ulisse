@@ -52,6 +52,7 @@ object SwingEnhancements:
 
   /** Trait to enhance the shape of swing component and [[_rect]] control shape params. */
   trait ShapeEffect extends EnhancedLook:
+    self: Component =>
     private var _rect: Styles.Rect         = Styles.defaultRect
     private val currentColor: CurrentColor = CurrentColor(rectPalette.background)
 
@@ -89,6 +90,7 @@ object SwingEnhancements:
 
   /** Trait to enhance the font of swing component and [[_font]] control font params. */
   trait FontEffect extends EnhancedLook:
+    self: Component =>
     private var _font: Styles.Font         = Styles.defaultFont
     private val currentColor: CurrentColor = CurrentColor(fontEffect.background)
 
