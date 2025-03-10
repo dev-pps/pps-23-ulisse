@@ -23,6 +23,7 @@ object FormManager:
   /** Create a form manager. */
   def createMap(adapter: TimetableViewAdapter): FormManager = new FormManagerImpl(adapter)
 
+  @SuppressWarnings(Array("org.wartremover.warts.MutableDataStructures"))
   private case class BaseFormManager(iconLabels: ComposedImageLabel*)(forms: Form*):
     private val page: Map[ComposedImageLabel, Form]   = iconLabels.zip(forms).toMap
     private val tabbedPane: ComposedSwing.STabbedPane = ComposedSwing.createTabbedPane(iconLabels: _*)
