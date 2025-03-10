@@ -242,13 +242,17 @@ object SimulationForm:
       cyclePerSecond.text = s"${engine.cyclesPerSecond.getOrElse(0)}"
 
     override def showSimulationData(info: SimulationData): Unit =
+      val trainInStationPerc = String.format("%.2f", info.simulationEnvironment.percTrainsInStations)
+      val trainInRoutePerc   = String.format("%.2f", info.simulationEnvironment.percTrainsOnRoutes)
+      val statLoadPerc       = String.format("%.2f", info.simulationEnvironment.percStationsLoad)
+
       val simuTime       = s"Simulation time: ${info.millisecondsElapsed.toTime}"
       val envTime        = s"Environment time: ${info.simulationEnvironment.time}"
       val cumDelay       = s"Cumulative delay: ${info.simulationEnvironment.cumulativeDelay}"
       val avgDelay       = s"Average delay: ${info.simulationEnvironment.averageDelay}"
-      val trainInStation = s"Train in stations: ${info.simulationEnvironment.percTrainsInStations} %"
-      val trainOnRoute   = s"Train on route: ${info.simulationEnvironment.percTrainsOnRoutes} %"
-      val stationLoad    = s"Station load: ${info.simulationEnvironment.percStationsLoad} %"
+      val trainInStation = s"Train in stations: $trainInStationPerc %"
+      val trainOnRoute   = s"Train on route: $trainInRoutePerc %"
+      val stationLoad    = s"Station load: $statLoadPerc %"
       val infoStr =
         s"SIMULATION: \n$simuTime \n$envTime \n$cumDelay \n$avgDelay \n$trainInStation \n$trainOnRoute \n$stationLoad"
       infoArea.setText(infoStr)
