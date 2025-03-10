@@ -77,6 +77,62 @@ object RailwayConfig:
     railAV400 travelsTo stationB thenOnRail
     railAV400 arrivesTo stationA
 
+  private val table3 = trainC_AV at h(3).m(0).getOrDefault startFrom stationF thenOnRail
+    railAV400 travelsTo stationH thenOnRail
+    railN400 travelsTo stationG thenOnRail
+    railAV400 arrivesTo stationA
+
+  private val table4 = trainD_AV at h(2).m(0).getOrDefault startFrom stationA thenOnRail
+    railAV400 travelsTo stationG thenOnRail
+    railN400 andStopIn stationH waitingForMinutes 20 thenOnRail
+    railAV400 arrivesTo stationF
+
+  private val table5 = trainE_AV at h(2).m(0).getOrDefault startFrom stationA thenOnRail
+    railAV400 travelsTo stationG thenOnRail
+    railN400 travelsTo stationH thenOnRail
+    railAV400 arrivesTo stationF
+
+  private val table6 = trainF_AV at h(4).m(0).getOrDefault startFrom stationE thenOnRail
+    railAV400 travelsTo stationD thenOnRail
+    railAV400 andStopIn stationC waitingForMinutes 5 thenOnRail
+    railAV400 travelsTo stationB thenOnRail
+    railAV400 arrivesTo stationA
+
+  private val table7 = trainG_AV at h(5).m(0).getOrDefault startFrom stationA thenOnRail
+    railAV400 travelsTo stationB thenOnRail
+    railAV400 travelsTo stationI thenOnRail
+    railAV400 andStopIn stationJ waitingForMinutes 10 thenOnRail
+    railAV400 arrivesTo stationE
+
+  private val table8 = trainH_AV at h(6).m(0).getOrDefault startFrom stationF thenOnRail
+    railAV400 travelsTo stationH thenOnRail
+    railAV400 travelsTo stationI thenOnRail
+    railAV400 andStopIn stationD waitingForMinutes 15 thenOnRail
+    railAV400 arrivesTo stationC
+
+  private val table9 = trainN_NR at h(2).m(30).getOrDefault startFrom stationA thenOnRail
+    railN400 travelsTo stationB thenOnRail
+    railN400 andStopIn stationC waitingForMinutes 5 thenOnRail
+    railN400 travelsTo stationD thenOnRail
+    railN400 arrivesTo stationE
+
+  private val table10 = trainO_NR at h(3).m(30).getOrDefault startFrom stationF thenOnRail
+    railN400 travelsTo stationG thenOnRail
+    railN400 travelsTo stationA thenOnRail
+    railN400 andStopIn stationB waitingForMinutes 10 thenOnRail
+    railN400 arrivesTo stationC
+
+  private val table11 = trainP_NR at h(4).m(30).getOrDefault startFrom stationE thenOnRail
+    railN400 travelsTo stationH thenOnRail
+    railN400 travelsTo stationF thenOnRail
+    railN400 arrivesTo stationG
+
+  private val table12 = trainQ_NR at h(5).m(30).getOrDefault startFrom stationJ thenOnRail
+    railN400 travelsTo stationI thenOnRail
+    railN400 travelsTo stationH thenOnRail
+    railN400 andStopIn stationG waitingForMinutes 10 thenOnRail
+    railN400 arrivesTo stationA
+
   uploadRailway = CreateAppState ++ uploadRailway set stationA set stationB set stationC set stationD set stationE set
     stationF set stationG set stationH set stationI set stationJ link
     routeFG link routeGA link routeAB link routeBC link routeCD link
@@ -84,7 +140,9 @@ object RailwayConfig:
     routeBI link routeID link routeJE link routeIJ link routeIH put
     trainA_AV put trainB_AV put trainC_AV put trainD_AV put trainE_AV put
     trainF_AV put trainG_AV put trainH_AV put trainN_NR put trainO_NR put
-    trainP_NR put trainQ_NR put trainR_NR put trainS_NR put trainT_NR scheduleA table1 scheduleA table2
+    trainP_NR put trainQ_NR put trainR_NR put trainS_NR put trainT_NR scheduleA table1 scheduleA
+    table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7 /*scheduleA
+    table8 scheduleA table9 scheduleA table10 scheduleA table11 scheduleA table12*/
 
   private var simpleRailway: AppState  = uploadRailway
   private var mediumRailway: AppState  = uploadRailway
