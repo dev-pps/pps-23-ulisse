@@ -161,7 +161,7 @@ object Times:
       checkCondition(time, time2)(_ == 0)
 
   /** Typeclass to provide different time constructors */
-  trait TimeConstructor[T]:
+  sealed trait TimeConstructor[T]:
     def construct(h: Int, m: Int, s: Int): T
 
   /** Time constructor for plain time */
