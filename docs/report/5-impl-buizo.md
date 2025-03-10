@@ -301,7 +301,45 @@ trait ShapeEffect extends EnhancedLook:
 ### Componente
 
 ```mermaid
+classDiagram
+    direction BT
+    class ClickObserver~T~ 
+    class ReleaseObserver~T~ 
+    class HoverObserver~T~ 
+    class ExitObserver~T~
+    class MovedObserver~T~
+    class Observer~T~
+    class Observable~T~
+    <<Trait>> ClickObserver
+    <<Trait>> ReleaseObserver
+    <<Trait>> HoverObserver
+    <<Trait>> ExitObserver
+    <<Trait>> MovedObserver
+    <<Trait>> Observer
+    <<Trait>> Observable
 
+    Observable: attach...(data ...Observer[T]) Unit
+    Observable: detach...(data ...Observer[T]) Unit
+    Observable: notify...(data T) Unit
+    Observable: toObserver[I](newData I => T) Observer[I]
+    ClickObserver: onClick(data T) Unit = ()
+    ReleaseObserver: onRelease(data T) Unit = ()
+    HoverObserver: onHover(data T) Unit = ()
+    ExitObserver: onExit(data T) Unit = ()
+    MovedObserver: onMoved(data T) Unit = ()
+    
+    Observer --> ClickObserver
+    Observer --> ReleaseObserver
+    Observer --> HoverObserver
+    Observer --> ExitObserver
+    Observer --> MovedObserver
+    Observable ..|> Observer : transformInto
+    Observable o--> Observer
+    Observable o--> ClickObserver
+    Observable o--> ReleaseObserver
+    Observable o--> HoverObserver
+    Observable o--> ExitObserver
+    Observable o--> MovedObserver
 ```
 
 ### Descrizione tecnica
