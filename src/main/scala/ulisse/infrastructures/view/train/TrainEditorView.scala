@@ -10,6 +10,7 @@ import ulisse.infrastructures.view.utils.SwingUtils
 import scala.swing.event.*
 import scala.swing.*
 import scala.swing.Dialog.Message
+import scala.swing.Swing.VGlue
 
 /** Train editor view that can updates showed trains, technologies, wagon types and shows errors. */
 trait TrainEditorView:
@@ -44,14 +45,19 @@ object TrainEditorView:
     private val updateBtn                               = SButton("Update")
     private val deleteBtn                               = SButton("Delete")
     private val clearBtn                                = SButton("Clear")
-    List(saveBtn, updateBtn).foreach(_.rect = Styles.formTrueButtonRect)
+    private val refreshBtn                              = SButton("refresh")
+    List(saveBtn, updateBtn, refreshBtn).foreach(_.rect = Styles.formTrueButtonRect)
     List(deleteBtn, clearBtn).foreach(_.rect = Styles.formFalseButtonRect)
-    List(saveBtn, updateBtn, deleteBtn, clearBtn).foreach(_.fontEffect = Styles.whiteFont)
+    List(saveBtn, updateBtn, deleteBtn, clearBtn, refreshBtn).foreach(_.fontEffect = Styles.whiteFont)
     modelAdapter.requestTechnologies()
     modelAdapter.requestWagonTypes()
     modelAdapter.requestTrains()
     updateBtn.enabled = false
     deleteBtn.enabled = false
+
+    refreshBtn.reactions += {
+      case ButtonClicked(_) => modelAdapter.requestTrains()
+    }
 
     clearBtn.reactions += {
       case ButtonClicked(_) => clearFields()
@@ -94,10 +100,13 @@ object TrainEditorView:
       ).vSpaced(15)
     import ulisse.infrastructures.view.utils.SwingUtils.setDefaultFont
     List(trainTechCombo, wagonTypeCombo).setDefaultFont()
-
-    private val mainPanel = new BorderPanel {
-      preferredSize = new Dimension(800, 400)
-      layout(trainsFleetPanel) = BorderPanel.Position.Center
+    private val mainPanel: BorderPanel = new BorderPanel {
+      preferredSize = new Dimension(800, 500)
+      val listAndRefreshBtn: SBoxPanel = new SBoxPanel(Orientation.Vertical) {
+        import ulisse.infrastructures.view.utils.ComponentUtils.centerHorizontally
+        contents ++= List(trainsFleetPanel, refreshBtn.centerHorizontally()).vSpaced(10)
+      }
+      layout(listAndRefreshBtn) = BorderPanel.Position.Center
       layout(editPane) = BorderPanel.Position.East
       listenTo(trainListView.selection)
 

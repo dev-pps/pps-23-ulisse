@@ -17,7 +17,7 @@ final case class TimetableListView(entries: List[TimetableEntry]) extends ListVi
   selection.intervalMode = IntervalMode.Single
   background = Color.white
   renderer = new ItemRenderer[TimetableEntry]
-  visibleRowCount = 3
+  visibleRowCount = 5
 
   private class ItemRenderer[T] extends ListView.Renderer[TimetableEntry] {
     override def componentFor(

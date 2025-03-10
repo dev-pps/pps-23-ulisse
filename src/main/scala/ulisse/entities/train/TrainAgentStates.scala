@@ -29,22 +29,28 @@ object TrainAgentStates:
     /** Returns next state depending on current state, train of `agent`, `dt`, percepts `p`. */
     def next(agent: TrainAgent, dt: Int, p: Percepts): StateBehavior
 
-  private def enoughSpace(d: Option[Double]): Boolean = true
+  /** Mixin trait that add capacity to know if there is enough space ahead of train. */
+  trait SpaceManagement:
+    private val defaultSpaceLimit = 10
+    def enoughSpace(d: Option[Double], agent: TrainAgent): Boolean =
+      d.forall { availableSpace => availableSpace >= defaultSpaceLimit }
 
-  private def shouldStop(ri: TrainRouteInfo): Boolean =
-    !enoughSpace(ri.trainAheadDistance) || !ri.arrivalStationIsFree
+  /** Mixin trait that provide rule to train state for stopping. */
+  trait StateLogic extends SpaceManagement:
+    def shouldStop(ri: TrainRouteInfo, agent: TrainAgent): Boolean =
+      !enoughSpace(ri.trainAheadDistance, agent) || !ri.arrivalStationIsFree
 
   /** Stopped state Behavior where train agent is not moving (speed and acceleration are zero).
     * It skips to next state [[Running]] when there are condition to move safely from station to route and vice versa.
     */
   final case class Stopped(motionData: MotionData)
-      extends StateBehavior:
+      extends StateBehavior with StateLogic:
     override def stateName: String = "Stopped"
 
     override def next(agent: TrainAgent, dt: Int, p: Percepts): StateBehavior =
       p.map {
         // train on route have no train ahead or arrival station is free
-        case TrainPerceptionInRoute(p) if !shouldStop(p) =>
+        case TrainPerceptionInRoute(p) if !shouldStop(p, agent) =>
           val speed = Math.min(p.routeTypology.technology.maxSpeed, agent.maxSpeed)
           Running(motionData.withSpeed(speed).updated(dt))
         // train stopped in station starts and run on route
@@ -59,13 +65,13 @@ object TrainAgentStates:
     * When some train ahead is present, arrival station is not free or have travelled the entire
     * route length it changes to [[Stopped]] otherwise continue running updating travelled distance.
     */
-  final case class Running(motionData: MotionData) extends StateBehavior:
+  final case class Running(motionData: MotionData) extends StateBehavior with StateLogic:
     override def stateName: String = "Running"
 
     override def next(agent: TrainAgent, dt: Int, p: Percepts): StateBehavior =
       p.map {
         // train on route have a train ahead stops
-        case TrainPerceptionInRoute(p) if !enoughSpace(p.trainAheadDistance) => Stopped(motionData)
+        case TrainPerceptionInRoute(p) if !enoughSpace(p.trainAheadDistance, agent) => Stopped(motionData)
         // train on route reach destination and can enter in free station then stops
         case TrainPerceptionInRoute(p) if motionData.distanceTravelled >= p.routeLength && p.arrivalStationIsFree =>
           Stopped(MotionDatas.emptyMotionData)
