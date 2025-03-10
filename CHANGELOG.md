@@ -1,3 +1,9 @@
+## [1.40.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.39.0...v1.40.0) (2025-03-10)
+
+### Features
+
+* **TimetableDSL:** faboulus DSL for timetable creation ([b17098f](https://github.com/dev-pps/pps-23-ulisse/commit/b17098f7b654e1976dfa9c7612eec6aa9c00f854))
+
 ## [1.39.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.38.1...v1.39.0) (2025-03-09)
 
 ### Features
