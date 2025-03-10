@@ -1,3 +1,28 @@
+# Ulisse
+![Logo generato con ai](/resources/logo.png)
+
+## Obiettivo
+L'obiettivo di questo progetto riguarda lo sviluppo di un simulatore Agent-Based per la simulazione di un sistema ferroviario.
+Nel simulatore è possibile definire:
+ - la struttura della rete ferroviaria, composta da stazioni e tratte
+ - i treni disponibili nel sistema
+ - gli orari di partenza dei treni
+
+Infine si può avviare la simulazione a partire dal sistema definito potendo:
+ - visualizzare l'evoluzione del sistema nel tempo 
+ - valutare le prestazioni del sistema attraverso l'analisi delle statistiche prodotte.
+
+Un'ulteriore sfida riguarda la scelta di implementare il sistema in modo immutabile, 
+sfuttando ove possibile i vantaggi dei costrutti funzionali di Scala (e.g. Type Class, Extension methods, Mixins, Parametri contestuali), 
+riducendo al minimo i side-effect implementando anche una gestione degli errori basata su Option/Either e Validated piuttosto che su eccezioni.
+## DEMO
+
+
+## Autori
+- [Federico Bravetti](https://github.com/Fede802)
+- [Manuel Buizo](https://github.com/JBmanu)
+- [Matteo Violani](https://github.com/TeoV00)
+
 # [Regole d'esame](https://virtuale.unibo.it/mod/page/view.php?route=1295910)
 # Note aggiuntive su come preparare la relazione
 1. Non si faccia mancare all'inizio una descrizione anche sommaria di cosa il sistema implementato realizza, con alcuni indicazioni  su quali caratteristiche potranno decretare se il progetto ha prodotto un buon risultato.
