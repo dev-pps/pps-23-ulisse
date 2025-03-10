@@ -187,11 +187,15 @@ extension [A, E](value: A)
 ```
 
 ## DSL per la creazione di entità infrastrutturali: `Station` `Route` `Train`
+
 **Obiettivo**
 
 **Motivazione**
 
 ### Componente
+
+```mermaid
+```
 
 ### Descrizione tecnica
 
@@ -203,7 +207,41 @@ extension [A, E](value: A)
 
 ### Componente
 
+```mermaid
+```
+
 ### Descrizione tecnica
+
+```scala 3
+trait EnhancedLook extends Component:
+  self: Component =>
+
+  def updateGraphics(): Unit =
+    revalidate()
+    repaint()
+
+  protected def paintLook(g: Graphics2D): Unit = ()
+
+  override protected def paintComponent(g: Graphics2D): Unit =
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+    paintLook(g)
+    super.paintComponent(g)
+```
+
+```scala 3
+trait ShapeEffect extends EnhancedLook:
+  private var _rect: Styles.Rect = Styles.defaultRect
+  private val currentColor: CurrentColor = CurrentColor(rectPalette.background)
+
+  override protected def paintLook(g: Graphics2D): Unit =
+    super.paintLook(g)
+    g.setColor(currentColor.current)
+    val clipShape =
+      new RoundRectangle2D.Float(0, 0, size.width.toFloat, size.height.toFloat, rect.arc.toFloat, rect.arc.toFloat)
+    g.setClip(clipShape)
+    g.fillRoundRect(0, 0, size.width, size.height, rect.arc, rect.arc)
+```
 
 ### Pattern
 
@@ -215,11 +253,21 @@ extension [A, E](value: A)
 
 ### Componente
 
+```mermaid
+```
+
 ### Descrizione tecnica
+
+// export e componente gia fatto per l'observable
+
+```scala 3
+def toObserver[I](newData: I => T): Observer[I]
+```
 
 ### Pattern
 
 ### testing della route adapter
+
 ### testing dell'architettura
 
 **Obiettivo**
