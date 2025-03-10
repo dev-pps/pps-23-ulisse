@@ -141,8 +141,8 @@ object RailwayConfig:
     trainA_AV put trainB_AV put trainC_AV put trainD_AV put trainE_AV put
     trainF_AV put trainG_AV put trainH_AV put trainN_NR put trainO_NR put
     trainP_NR put trainQ_NR put trainR_NR put trainS_NR put trainT_NR scheduleA table1 scheduleA
-    table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7 /*scheduleA
-    table8 scheduleA table9 scheduleA table10 scheduleA table11 scheduleA table12*/
+    table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7 scheduleA
+    table8 scheduleA table9 scheduleA table10 scheduleA table11 scheduleA table12
 
   private var simpleRailway: AppState  = uploadRailway
   private var mediumRailway: AppState  = uploadRailway

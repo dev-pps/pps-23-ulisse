@@ -24,7 +24,7 @@ trait DynamicTimetableEnvironment extends Environment[DynamicTimetable]:
 
   /** Find the current timetable for a train. */
   def findCurrentTimetableFor(agent: TrainAgent): Option[DynamicTimetable] =
-    dynamicTimetablesByTrain.get(agent).flatMap(_.find(!_.completed))
+    dynamicTimetablesByTrain.find((k, v) => k.name == agent.name).flatMap(_._2.find(!_.completed))
 
   /** The Seq of all timetable in the environment. */
   def timetables: Seq[DynamicTimetable] = dynamicTimetablesByTrain.values.flatten.toSeq
