@@ -1,13 +1,14 @@
 package ulisse.infrastructures.view.train
 
+import ulisse.infrastructures.view.components.ExtendedSwing.createPicturePanel
 import ulisse.infrastructures.view.utils.SwingUtils
 import ulisse.infrastructures.view.utils.SwingUtils.{defaultString, headerLabel, nameFont, valueLabel}
 
-import java.awt.Color
+import java.awt.{Color, Dimension}
 import scala.swing.Swing.{EmptyBorder, HGlue, HStrut}
 import scala.swing.{BoxPanel, Component, Label, ListView, Orientation, Swing}
 
-/** Custom list view with customized train item renderer. */
+/** View for the list of trains. */
 object TrainListView:
 
   private val selectedColor = Color.decode("#fff3d0")
@@ -17,6 +18,7 @@ object TrainListView:
     import scala.swing.ListView.IntervalMode
     selection.intervalMode = IntervalMode.Single
     renderer = new ItemRenderer[TrainViewModel.TrainData]
+    visibleRowCount = 5
 
     /** Update the data model of the view. */
     def updateDataModel(data: List[TrainViewModel.TrainData]): Unit =
@@ -48,12 +50,16 @@ object TrainListView:
           background = if isSelected then selectedColor else Color.WHITE
         }
       }
+      private val trainIcon = createPicturePanel("trains/train-icon.png")
+      trainIcon.preferredSize = Dimension(200, 20)
       private val titleLabel = new Label(trainData.name.getOrElse("N/A")) {
         font = nameFont
       }
       private val titlePane = new BoxPanel(Orientation.Horizontal) {
         contents += HStrut(20)
         contents += titleLabel
+        contents += HGlue
+        contents += trainIcon
         contents += HGlue
       }
       contents += titlePane
