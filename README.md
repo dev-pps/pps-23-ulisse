@@ -26,26 +26,31 @@
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-    </li>
-    <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
+    <li><a href="#authors">Authors</a></li>
   </ol>
 </details>
 
-<!-- ABOUT THE PROJECT -->
-
 ## About The Project
+This project is a **train simulation** system that allows users to create and manage a **train network**. Users can define key components of the network, including:
 
+- **Stations**: Set up train stations where trains can start, stop, or transfer.
+- **Routes**: Create and customize routes for trains to follow across the network.
+- **Trains**: Add and manage trains, specifying characteristics such as speed, capacity, and schedule.
+- **Schedules**: Configure train timetables to ensure efficient and realistic operations.
+
+The simulation allows users to visually **track the movement** of trains along their routes in real-time, providing a dynamic representation of the network. Additionally, users can monitor the performance of the railway system through **statistics**, enabling them to observe how the network behaves and possibly make adjustments for optimization.
+
+With this simulation, users can experiment with various scenarios, gain valuable insights and better understand the dynamics of a train network.
 ### Built With
 
 - Scala 3
 - Scala Swing
 - SBT
 - ScalaTest
+- Archunit
+- Cats
+- Mockito
 
 <!-- LICENSE -->
 
