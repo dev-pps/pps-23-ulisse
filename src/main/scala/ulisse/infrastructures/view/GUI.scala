@@ -19,7 +19,7 @@ object GUI:
   private case class GUIImpl(adapterManager: InputAdapterManager, simulationWorkspace: SimulationWorkspace)
       extends MainFrame, GUI:
     title = "Ulisse"
-    preferredSize = new Dimension(1300, 1000)
+    preferredSize = new Dimension(1500, 900)
 
     private val mapWorkspace   = MapWorkspace(adapterManager)
     private val trainWorkspace = TrainWorkspace(adapterManager)
