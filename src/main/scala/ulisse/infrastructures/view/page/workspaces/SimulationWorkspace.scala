@@ -56,19 +56,22 @@ object SimulationWorkspace:
       ))
       lastUpdate = System.currentTimeMillis()
 
+    private def refreshMap(data: SimulationData): Unit =
+      Swing.onEDT:
+        mapPanel updateStation data.simulationEnvironment.stations
+        mapPanel updateRoutes data.simulationEnvironment.routes
+        mapPanel updateTrain data.simulationEnvironment.routes
+        mapPanel attachClickStation SimulationForm.TakeStationEvent(simulation, infoSimulation)
+        mapPanel attachClickRoute SimulationForm.TakeRouteEvent(simulation, infoSimulation)
+        mapPanel attachClickTrain SimulationForm.TakeTrainEvent(simulation, infoSimulation)
+        simulation.showSimulationData(data)
+
     override def updateData(data: SimulationData): Unit =
       val now = System.currentTimeMillis()
       if now - lastUpdate > minUpdate then
         lastUpdate = now
-        Swing.onEDT:
-          mapPanel updateStation data.simulationEnvironment.stations
-          mapPanel updateRoutes data.simulationEnvironment.routes
-          mapPanel updateTrain data.simulationEnvironment.routes
-          mapPanel attachClickStation SimulationForm.TakeStationEvent(simulation, infoSimulation)
-          mapPanel attachClickRoute SimulationForm.TakeRouteEvent(simulation, infoSimulation)
-          mapPanel attachClickTrain SimulationForm.TakeTrainEvent(simulation, infoSimulation)
-          simulation.showSimulationData(data)
+        refreshMap(data)
 
     override def endSimulation(data: SimulationData): Unit =
+      refreshMap(data)
       simulation.reset()
-      println("Ending simulation:")

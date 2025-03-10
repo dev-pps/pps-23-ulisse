@@ -32,7 +32,7 @@ import scala.swing.{Component, Orientation, Swing}
 trait SimulationForm extends Form:
 
   /** Sets the button to play. */
-  def play(): Unit
+  def playOrPause(): Unit
 
   /** Sets the button to pause. */
   def reset(): Unit
@@ -92,9 +92,11 @@ object SimulationForm:
         info.stepInt.fold(form.showError("error"))(step =>
           adapter.setupEngine(step, info.cyclePerSecondInt)
           adapter.start()
-          form.play()
+          form.playOrPause()
         )
-      else adapter.stop()
+      else
+        adapter.stop()
+        form.playOrPause()
 
   /** Represents the reset simulation event. */
   final case class ResetSimulationEvent(
@@ -207,11 +209,11 @@ object SimulationForm:
       playButton.text = text
       playButton.repaint()
 
-    override def play(): Unit =
+    override def playOrPause(): Unit =
       if isPlaying then
-        setButtonPlayText("Pause")
-      else
         setButtonPlayText("Play")
+      else
+        setButtonPlayText("Pause")
       isPlaying = !isPlaying
 
     override def reset(): Unit =
@@ -242,9 +244,10 @@ object SimulationForm:
       cyclePerSecond.text = s"${engine.cyclesPerSecond.getOrElse(0)}"
 
     override def showSimulationData(info: SimulationData): Unit =
-      val trainInStationPerc = String.format("%.2f", info.simulationEnvironment.percTrainsInStations)
-      val trainInRoutePerc   = String.format("%.2f", info.simulationEnvironment.percTrainsOnRoutes)
-      val statLoadPerc       = String.format("%.2f", info.simulationEnvironment.percStationsLoad)
+      val x100               = 100
+      val trainInStationPerc = String.format("%.2f", info.simulationEnvironment.percTrainsInStations * x100)
+      val trainInRoutePerc   = String.format("%.2f", info.simulationEnvironment.percTrainsOnRoutes * x100)
+      val statLoadPerc       = String.format("%.2f", info.simulationEnvironment.percStationsLoad * x100)
 
       val simuTime       = s"Simulation time: ${info.millisecondsElapsed.toTime}"
       val envTime        = s"Environment time: ${info.simulationEnvironment.time}"
@@ -274,7 +277,7 @@ object SimulationForm:
       elementInfoArea.setText(infoStr)
 
     override def showTrainSimulation(trainInfo: TrainAgentInfo, position: Point2D.Double): Unit =
-      val distance = BigDecimal(trainInfo.train.distanceTravelled).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+      val distance = String.format("%.2f", trainInfo.train.distanceTravelled)
 
       val name      = s"TRAIN [${trainInfo.train.name}]:"
       val curDelay  = s"Current Delay: ${trainInfo.delayInCurrentTimetable.getOrElse("No Timetable")}"
