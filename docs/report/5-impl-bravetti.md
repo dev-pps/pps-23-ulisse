@@ -7,7 +7,7 @@ Il codice prodotto durante lo svolgimento del progetto riguarda prevalentemente 
   - **RouteEnvironmentElement & RouteEnvironment**: implementazione delle `Route` come elementi dell'ambiente composte da `Track` e relativo ambiente per la loro gestione.
   - **DynamicTimetable & DynamicTimetableEnvironment**: implementazione delle `Timetable` come elementi dell'ambiente contenenti le informazioni dinamiche degli orari e relativo ambiente per la loro gestione.
   - **RailwayEnvironment**: implementazione dell'ambiente di simulazione che contiene e coordina `StationEnvironment`, `RouteEnvironment`, `DynamicTimetableEnvironment` e `TrainAgent`.
-- **PerceptionSystem**: implementazione del sistema di percezione per i `SimulationAgent`.
+- **Perception System**: implementazione del sistema di percezione per i `SimulationAgent`.
 - **Engine**: implementazione del motore per l'avanzamento della simulazione con relativi `SimulationManager`, `SimulationService`, `SimulationInfoService`, `NotificationService`
 - **Statistics**: implementazione di metodi di utilità per il calcolo di statistiche relative al `RailwayEnvironment`.
 
@@ -38,31 +38,29 @@ In questo modo, il tipo `TAC` è parametrizzato con il proprio sottotipo, permet
 Considerazioni su questo costrutto:
 - L'utilizzo di un semplice generico non permette di garantire che il tipo `TAC` sia un sottotipo di `TrainAgentsContainer[TAC]`.
 - L'utilizzo di del `Self-Type` permette di vincolare il tipo `TAC` a dover essere mixato con il trait `TrainAgentsContainer[TAC <: TrainAgentsContainer[TAC]]`. 
-  Così facendo non si permette di creare sotto tipi della forma:
-    ```scala 3
-    trait Platform extends TrainAgentsContainer[Track]
-    ```  
-    ma solo sotto tipi della forma 
-    ```scala 3
-    trait Track extends TrainAgentsContainer[Track]
-    ```  
+
+Così facendo non si permette di creare sotto tipi della forma:
+```scala 3
+trait Platform extends TrainAgentsContainer[Track]
+```  
+ma solo sotto tipi della forma 
+```scala 3
+trait Track extends TrainAgentsContainer[Track]
+```  
   
-PerceptionSystem
+## Perception System
+Le percezioni sono fondamentali in un simulatore agent-based, in quanto permettono agli agenti di percepire l'ambiente circostante e di prendere decisioni 
+in base a queste informazioni. Per cui in generale le percezioni di un agente dipendono dal tipo dell'agente e dal tipo dell'ambiente dove si trova.
+
 ![An image](/resources/implementation/bravetti/PerceptionProvider.svg)
+
+Per fare ciò si è scelto di ultizzare la Type Class `PerceptionProvider` definita nel seguente modo:
 ```scala 3
 trait PerceptionProvider[EC <: EnvironmentsCoordinator[EC], SA <: SimulationAgent[SA]]:
     type P <: Perception[?]
     def perceptionFor(environment: EC, agent: SA): Option[P]
 ```
-
-```scala 3 
-  trait EnvironmentsCoordinator[EC <: EnvironmentsCoordinator[EC]]:
-    self: EC =>
-    def perceptionFor[SA <: SimulationAgent[SA]](simulationAgent: SA)(using
-        provider: PerceptionProvider[EC, SA]
-    ): Option[provider.P] =
-      provider.perceptionFor(this, simulationAgent)
-```
+In questo modo è possibile definire in maniera mirata solo le percezioni necessarie ad esempio:
 ```scala 3 
 given PerceptionProvider[RailwayEnvironment, TrainAgent] with
     type P = TrainAgentPerception[?]
@@ -72,15 +70,26 @@ given PerceptionProvider[RailwayEnvironment, TrainAgent] with
         case (_, Some(route)) => Some(TrainPerceptionInRoute(trainPerceptionInRoute(agent, route, env)))
         case _                => None
 ```
+Il `PerceptionProvider` è stato integrato nell'interazione EnvironmentsCoordinator-SimulationAgent nel seguente modo:
+```scala 3 
+  trait EnvironmentsCoordinator[EC <: EnvironmentsCoordinator[EC]]:
+    self: EC =>
+    def perceptionFor[SA <: SimulationAgent[SA]](simulationAgent: SA)(using provider: PerceptionProvider[EC, SA]): Option[provider.P] =
+      provider.perceptionFor(this, simulationAgent)
+```
 ```scala 3
 trait SimulationAgent[SA <: SimulationAgent[SA]]:
-  self: SA =>
-  type EC <: EnvironmentsCoordinator[EC]
-  def doStep(dt: Int, environment: EC): SA =
-    /* Then having in context a PerceptionProvider[EC, SA]*/
-    val perception = environment.perceptionFor(this)
+    self: SA =>
+    type EC <: EnvironmentsCoordinator[EC]
+    def doStep(dt: Int, environment: EC): SA =
+      /* Then having in context a PerceptionProvider[EC, SA]*/
+      environment.perceptionFor(this).map:
+        case p: TrainPerceptionInRoute => ...
+        case p: TrainPerceptionInStation => ...
 ```
+In particolare si sfrutta nell'environment il Path-Dependent Type `P` per rendere il tipo di ritorno della `perceptionFor` ad-hoc per il tipo di agente che successivamente potrà recuperare la percezione e facendo pattern-matching.
 
+## TrainAgentsEnvironment
 ```scala 3
 trait TrainAgentEnvironment[TAE <: TrainAgentEnvironment[TAE, EE], EE <: TrainAgentEEWrapper[EE]]:
     self: TAE =>
@@ -162,46 +171,65 @@ extension [T <: Field[T, O], O <: Any](obj: O)
 [//]: # ()
 [//]: # (//  case class EE&#40;environmentElements: Seq[RouteEnvironmentElement]&#41; extends TrainAgentEnvironment2[EE]:)
 
+[//]: # ()
 [//]: # (//      override type AA = TrainAgentEEWrapper[RouteEnvironmentElement])
 
+[//]: # ()
 [//]: # (//    override protected def constructor&#40;environmentElements: Seq[RouteEnvironmentElement]&#41;: EE =)
 
+[//]: # ()
 [//]: # (//      copy&#40;environmentElements&#41;)
 
+[//]: # ()
 [//]: # (//)
 
+[//]: # ()
 [//]: # (//  trait TrainAgentEnvironment2[TAE <: TrainAgentEnvironment2[TAE]]:)
 
+[//]: # ()
 [//]: # (//    self: TAE =>)
 
+[//]: # ()
 [//]: # (//    type AA <: TrainAgentEEWrapper[AA])
 
+[//]: # ()
 [//]: # (//    def environmentElements: Seq[AA])
 
+[//]: # ()
 [//]: # (//    protected def constructor&#40;environmentElements: Seq[AA]&#41;: TAE)
 
+[//]: # ()
 [//]: # (////    def updateTrain&#40;train: TrainAgent&#41;: Option[TAE] = doOperationOn&#40;train, _.updateTrain&#40;train&#41;&#41;)
 
+[//]: # ()
 [//]: # (//    def removeTrain&#40;train: TrainAgent&#41;: Option[TAE] = doOperationOn&#40;train, _.removeTrain&#40;train&#41;&#41;)
 
+[//]: # ()
 [//]: # (//    private def doOperationOn&#40;)
 
+[//]: # ()
 [//]: # (//                               train: TrainAgent,)
 
+[//]: # ()
 [//]: # (//                               operation: AA => Option[AA])
 
+[//]: # ()
 [//]: # (//                             &#41;: Option[TAE] =)
 
+[//]: # ()
 [//]: # (//      for)
 
+[//]: # ()
 [//]: # (//        ee <- environmentElements.find&#40;_.contains&#40;train&#41;&#41;)
 
+[//]: # ()
 [//]: # (//        updatedEE <- operation&#40;ee&#41;)
 
+[//]: # ()
 [//]: # (//      yield constructor&#40;environmentElements.swapWhenEq&#40;ee&#41;&#40;updatedEE&#41;&#41;)
 
-[//]: # ()
-[//]: # ()
+
+
 
 
 ```scala 3

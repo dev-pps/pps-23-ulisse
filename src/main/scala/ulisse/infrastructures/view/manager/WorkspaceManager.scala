@@ -34,9 +34,9 @@ object WorkspaceManager:
     private val mainPanel  = BorderPanel().transparent()
     private val workspaces = List(simulation, map, train)
 
-    showSimulation()
     showTrain()
     showMap()
+    showSimulation()
 
     private def showWorkspace(workspace: Workspace): Unit =
       mainPanel.layout(workspace.component) = Position.Center
