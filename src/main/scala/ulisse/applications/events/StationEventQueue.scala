@@ -1,6 +1,6 @@
-package ulisse.applications.event
+package ulisse.applications.events
 import ulisse.applications.AppState
-import ulisse.applications.event.StationEventQueue.StationManagers
+import ulisse.applications.events.StationEventQueue.StationManagers
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager

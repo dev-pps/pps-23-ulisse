@@ -1,4 +1,4 @@
-package ulisse.infrastructures.commons
+package ulisse.infrastructures.utils
 
 /** Provides time-related utilities. */
 object TimeProviders:

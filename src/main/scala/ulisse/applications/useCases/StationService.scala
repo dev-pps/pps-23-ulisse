@@ -1,7 +1,7 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.event.StationEventQueue
-import ulisse.applications.event.StationEventQueue.StationManagers
+import ulisse.applications.events.StationEventQueue
+import ulisse.applications.events.StationEventQueue.StationManagers
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager
 import ulisse.applications.managers.{StationManager, TimetableManagers}

@@ -1,6 +1,6 @@
 package ulisse.applications
 
-import ulisse.applications.event.*
+import ulisse.applications.events.*
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TimetableManagers.TimetableManager

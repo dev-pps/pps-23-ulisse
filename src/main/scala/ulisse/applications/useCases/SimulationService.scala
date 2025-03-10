@@ -1,7 +1,7 @@
 package ulisse.applications.useCases
 
 import ulisse.applications.RailwayConfig
-import ulisse.applications.event.SimulationEventQueue
+import ulisse.applications.events.SimulationEventQueue
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.ports.SimulationPorts
 import ulisse.applications.ports.SimulationPorts.Input.Preset
@@ -12,7 +12,7 @@ import ulisse.entities.simulation.environments.railwayEnvironment.{Configuration
 import ulisse.entities.station.StationEnvironmentElement
 import ulisse.entities.timetable.DynamicTimetables.DynamicTimetable
 import ulisse.entities.train.TrainAgents.TrainAgent
-import ulisse.infrastructures.commons.TimeProviders.*
+import ulisse.infrastructures.utils.TimeProviders.*
 
 import scala.concurrent.{Future, Promise}
 import scala.util.chaining.scalaUtilChainingOps
