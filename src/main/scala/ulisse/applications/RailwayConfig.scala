@@ -1,5 +1,6 @@
 package ulisse.applications
 
+import ulisse.applications.configs.{MediumRailwayConfig, RailwayBaseConfig}
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.dsl.RailwayDsl.*
 import ulisse.entities.route.Routes.RouteType
@@ -144,9 +145,9 @@ object RailwayConfig:
     table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7 scheduleA
     table8 scheduleA table9 scheduleA table10 scheduleA table11 scheduleA table12
 
-  private var simpleRailway: AppState  = uploadRailway
-  private var mediumRailway: AppState  = uploadRailway
-  private var complexRailway: AppState = uploadRailway
+  private val simpleRailway: AppState  = RailwayBaseConfig.railwayConfig
+  private val mediumRailway: AppState  = MediumRailwayConfig.mediumRailwayConfig
+  private val complexRailway: AppState = uploadRailway
 
   /** Get the simple railway configuration. */
   def simpleRailwayConfig: AppState = simpleRailway
