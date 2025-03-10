@@ -89,147 +89,86 @@ trait SimulationAgent[SA <: SimulationAgent[SA]]:
 ```
 In particolare si sfrutta nell'environment il Path-Dependent Type `P` per rendere il tipo di ritorno della `perceptionFor` ad-hoc per il tipo di agente che successivamente potrà recuperare la percezione e facendo pattern-matching.
 
-## TrainAgentsEnvironment
+# ComparisonDSL
+Lo scopo di questo DSL è quello di fornire un modo agile per confrontare due oggetti di tipo `O` rispetto a una serie di campi `T`, di modo da rendere più compatta la verifica degli aggiornamenti dei diversi oggetti.
+La sintassi che si vuole ottenere è del tipo:
 ```scala 3
-trait TrainAgentEnvironment[TAE <: TrainAgentEnvironment[TAE, EE], EE <: TrainAgentEEWrapper[EE]]:
-    self: TAE =>
-
-trait TrainAgentEnvironment[TAE <: TrainAgentEnvironment[TAE]]:
-  self: TAE =>
-  type EE <: TrainAgentEEWrapper[?] //No information about the type of the EE
+val manager, oldManager: SimulationManager
+manager.engine compareTo oldManager.engine ignoring State shouldBeBoolean true
 ```
-    
+Per fare questo si è definito il concetto di `Field` e la Type Class `FieldComparator`:
 ```scala 3
-def removeTrain(train: TrainAgent): Option[TAE] = doOperationOn(train, _.removeTrain(train))
-protected def constructor(environmentElements: Seq[EE]): TAE
-private def doOperationOn(train: TrainAgent, operation: EE => Option[EE]): Option[TAE] =
-      for
-        ee        <- environmentElements.find(_.contains(train))
-        updatedEE <- operation(ee) /* operation is like an update or remove */
-      yield constructor(environmentElements.swapWhenEq(ee)(updatedEE))
+trait Field[F <: Field[F, O], O <: Any]:
+  self: F =>
+  def values: Seq[F]
 ```
-
 ```scala 3
-trait Field[T <: Field[T, O], O <: Any]:
-  self: T =>
-  def values: Seq[T]
-
-
-trait FieldComparator[T <: Field[T, O], O <: Any]:
-  def fields: Seq[T]
-  final def compare(objects: List[O], ignoredFields: Seq[T]): Boolean =
+trait FieldComparator[F <: Field[F, O], O <: Any]:
+  def fields: Seq[F]
+  final def compare(objects: List[O], ignoredFields: Seq[F]): Boolean =
     val fieldsToCompare = fields.filterNot(ignoredFields.contains)
     objects match
       case firstObject :: tail => tail.forall: otherObject =>
            fieldsToCompare.forall(_compare(firstObject, otherObject, _))
       case _ => false
+  protected def _compare(obj: O, otherObj: O, field: F): Boolean
+```
+Successivamente si è definito il `ComparisonBuilder` che permette di ottenere la struttura sintattica desiderata.
 
-  protected def _compare(obj: O, otherObj: O, field: T): Boolean
+```scala 3
+case class ComparisonBuilder[F <: Field[F, O], O <: Any](objects: List[O], ignoredFields: Seq[F])(using fieldComparator: FieldComparator[F, O]):
+  def ignoring(field: F, fields: F*): ComparisonBuilder[F, O] =
+    copy(ignoredFields = ignoredFields ++ (fields :+ field))
+
+  def considering(field: F, fields: F*): ComparisonBuilder[F, O] =
+    copy(ignoredFields = field.values.filterNot((fields :+ field).contains).toIndexedSeq)
+  
+  def andTo(nextObj: O): ComparisonBuilder[F, O] =
+    copy(objects = nextObj +: objects)
     
+  def compare: Boolean =
+    fieldComparator.compare(objects, ignoredFields)
+
+extension [F <: Field[F, O], O <: Any](obj: O)
+  def compareTo(otherObj: O)(using fieldComparator: FieldComparator[F, O]): ComparisonBuilder[F, O] =
+    ComparisonBuilder(List(obj, otherObj), Seq[F]())
+```
+
+Infine la valutazione finale del confronto avviene tramite la conversione implicita di `ComparisonBuilder` in `Boolean`:
+```scala 3
 given [T <: Field[T, O], O <: Any]: Conversion[ComparisonBuilder[T, O], Boolean] with
   def apply(builder: ComparisonBuilder[T, O]): Boolean =
     builder.compare
-
-
-case class ComparisonBuilder[T <: Field[T, O], O <: Any](objects: List[O], ignoredFields: Seq[T])(using fieldComparator: FieldComparator[T, O]):
-    def ignoring(field: T, fields: T*): ComparisonBuilder[T, O] =
-      copy(ignoredFields = ignoredFields ++ (fields :+ field))
-
-    def considering(field: T, fields: T*): ComparisonBuilder[T, O] =
-      copy(ignoredFields = field.values.filterNot((fields :+ field).contains).toIndexedSeq)
-
-    def andTo(nextObj: O): ComparisonBuilder[T, O] =
-      copy(objects = nextObj +: objects)
-
-    def compare: Boolean =
-      fieldComparator.compare(objects, ignoredFields)
-
-extension [T <: Field[T, O], O <: Any](obj: O)
-    def compareTo(otherObj: O)(using fieldComparator: FieldComparator[T, O]): ComparisonBuilder[T, O] =
-    ComparisonBuilder(List(obj, otherObj), Seq[T]()
-
-  val manager, oldManager: SimulationManager
-  manager.engine compareTo oldManager.engine ignoring State shouldBeBoolean true
-
-    extension (b1: Boolean)
-      def shouldBeBoolean(b2: Boolean): Unit =
-        b1 shouldBe b2
-
-    given FieldComparator[EngineField, Engine] with
-      def fields: Seq[EngineField] = EngineField.values.toSeq
-      def _compare(firstEngine: Engine, otherEngine: Engine, field: EngineField): Boolean =
-        field match
-          case EngineField.Running       => firstEngine.running == otherEngine.running
-          case EngineField.Configuration => firstEngine.configuration == otherEngine.configuration
-          case EngineField.State         => firstEngine.state == otherEngine.state
-    
-    enum EngineField extends Field[EngineField, Engine]:
-      case Running, Configuration, State
-      def values: Seq[EngineField] = EngineField.values.toSeq      
 ```
 
-[//]: # ()
-[//]: # (//  case class EE&#40;environmentElements: Seq[RouteEnvironmentElement]&#41; extends TrainAgentEnvironment2[EE]:)
+Dato che la funzione base `shouldBe` per valutare le asserzioni è generica non viene effettuata la conversione implicita. 
+Per questo è stato necessario introdurre un metodo `shouldBeBoolean` per forzarne la valutazione
+```scala 3
+extension (b1: Boolean)
+  def shouldBeBoolean(b2: Boolean): Unit =
+    b1 shouldBe b2
+```
 
-[//]: # ()
-[//]: # (//      override type AA = TrainAgentEEWrapper[RouteEnvironmentElement])
+Infine, per utilizzare il DSL è necessario definire un `Field` specifico per il tipo di oggetto che si vuole confrontare e un `FieldComparator` che definisca come effettuare il confronto.
+```scala 3
+enum EngineField extends Field[EngineField, Engine]:
+  case Running, Configuration, State
+  def values: Seq[EngineField] = EngineField.values.toSeq      
+```
+```scala 3
+given FieldComparator[EngineField, Engine] with
+  def fields: Seq[EngineField] = EngineField.values.toSeq
+  def _compare(firstEngine: Engine, otherEngine: Engine, field: EngineField): Boolean =
+    field match
+      case EngineField.Running       => firstEngine.running == otherEngine.running
+      case EngineField.Configuration => firstEngine.configuration == otherEngine.configuration
+      case EngineField.State         => firstEngine.state == otherEngine.state
+```
+## CollectionUtils e OptionUtils
+  
 
-[//]: # ()
-[//]: # (//    override protected def constructor&#40;environmentElements: Seq[RouteEnvironmentElement]&#41;: EE =)
-
-[//]: # ()
-[//]: # (//      copy&#40;environmentElements&#41;)
-
-[//]: # ()
-[//]: # (//)
-
-[//]: # ()
-[//]: # (//  trait TrainAgentEnvironment2[TAE <: TrainAgentEnvironment2[TAE]]:)
-
-[//]: # ()
-[//]: # (//    self: TAE =>)
-
-[//]: # ()
-[//]: # (//    type AA <: TrainAgentEEWrapper[AA])
-
-[//]: # ()
-[//]: # (//    def environmentElements: Seq[AA])
-
-[//]: # ()
-[//]: # (//    protected def constructor&#40;environmentElements: Seq[AA]&#41;: TAE)
-
-[//]: # ()
-[//]: # (////    def updateTrain&#40;train: TrainAgent&#41;: Option[TAE] = doOperationOn&#40;train, _.updateTrain&#40;train&#41;&#41;)
-
-[//]: # ()
-[//]: # (//    def removeTrain&#40;train: TrainAgent&#41;: Option[TAE] = doOperationOn&#40;train, _.removeTrain&#40;train&#41;&#41;)
-
-[//]: # ()
-[//]: # (//    private def doOperationOn&#40;)
-
-[//]: # ()
-[//]: # (//                               train: TrainAgent,)
-
-[//]: # ()
-[//]: # (//                               operation: AA => Option[AA])
-
-[//]: # ()
-[//]: # (//                             &#41;: Option[TAE] =)
-
-[//]: # ()
-[//]: # (//      for)
-
-[//]: # ()
-[//]: # (//        ee <- environmentElements.find&#40;_.contains&#40;train&#41;&#41;)
-
-[//]: # ()
-[//]: # (//        updatedEE <- operation&#40;ee&#41;)
-
-[//]: # ()
-[//]: # (//      yield constructor&#40;environmentElements.swapWhenEq&#40;ee&#41;&#40;updatedEE&#41;&#41;)
-
-
-
+    
+    
 
 
 ```scala 3
