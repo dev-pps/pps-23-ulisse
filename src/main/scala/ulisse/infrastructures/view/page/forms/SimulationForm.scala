@@ -2,7 +2,6 @@ package ulisse.infrastructures.view.page.forms
 
 import ulisse.adapters.input.{SimulationInfoAdapter, SimulationPageAdapter}
 import ulisse.applications.ports.SimulationPorts.Input.Preset
-import ulisse.applications.ports.SimulationPorts.Input.Preset.Simple
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.simulation.data.Statistics.*
 import ulisse.entities.simulation.data.{EngineConfiguration, SimulationData}
@@ -210,13 +209,14 @@ object SimulationForm:
 
     override def play(): Unit =
       if isPlaying then
-        setButtonPlayText("Play")
-      else
         setButtonPlayText("Pause")
+      else
+        setButtonPlayText("Play")
       isPlaying = !isPlaying
 
     override def reset(): Unit =
       setButtonPlayText("Play")
+      resetError()
       isPlaying = false
 
     override def isPlaying: Boolean               = _isPlaying
