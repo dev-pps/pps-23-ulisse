@@ -195,6 +195,7 @@ extension [A, E](value: A)
 ### Componente
 
 ```mermaid
+
 ```
 
 ### Descrizione tecnica
@@ -255,6 +256,31 @@ appState = CreateAppState || initState set
 ### Componente
 
 ```mermaid
+classDiagram
+    direction BT
+    class EnhancedLook
+    class ShapeEffect
+    class BorderEffect
+    class FontEffect
+    class ImageEffect
+    class PictureEffect
+    class SVGEffect
+    <<Trait>> EnhancedLook
+    <<Trait>> ShapeEffect
+    <<Trait>> BorderEffect
+    <<Trait>> FontEffect
+    <<Trait>> ImageEffect
+    <<Trait>> PictureEffect
+    <<Trait>> SVGEffect
+    
+    ImageEffect <-- PictureEffect
+    ImageEffect <-- SVGEffect
+    EnhancedLook <-- ShapeEffect
+    EnhancedLook <-- BorderEffect
+    EnhancedLook <-- ReleaseObserver
+    EnhancedLook <-- FontEffect
+    EnhancedLook <-- ExitObserver
+    EnhancedLook <-- ImageEffect
 ```
 
 ### Descrizione tecnica
