@@ -1,6 +1,6 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.event.TrainEventQueue
+import ulisse.applications.events.TrainEventQueue
 import ulisse.applications.managers.TechnologyManagers.TechErrors.TechnologyNotExists
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.applications.managers.TrainManagers.TrainManager

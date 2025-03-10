@@ -1,4 +1,4 @@
-package ulisse.applications.event
+package ulisse.applications.events
 import ulisse.applications.AppState
 import ulisse.applications.managers.RouteManagers.RouteManager
 import ulisse.applications.managers.StationManager
