@@ -13,7 +13,7 @@ funzionali:
 
 Di seguito si propone un’analisi più approfondita delle componenti più rilevanti.
 
-## Immutabilità e aggiornamento dello stato: `AppState`
+## Immutabilità e aggiornamento dello stato dell'applicazione: `AppState`
 
 **Obiettivo**: Creare uno stato immutabile dell'applicazione e garantire
 la sua coerenza e integrità.
@@ -30,6 +30,7 @@ Di seguito è mostrata una rappresentazione parziale delle classi che compongono
 
 ```mermaid
 classDiagram
+    direction BT
     class AppState
     class StationManager
     class RouteManager
@@ -46,6 +47,7 @@ classDiagram
     StationManager --o AppState
     RouteManager --o AppState
     TrainManager --o AppState
+   
 ```
 
 ### Descrizione tecnica
@@ -63,7 +65,7 @@ override def updateRoute(update: RouteManager => RouteManager): AppState =
   copy(routeManager = update(routeManager))
 ```
 
-## Entry point e porte di comunicazione: `EventQueue`
+## Entry point e Porte dell'Architettura Esagonale: `EventQueue`
 
 **Obiettivo**: Implementare un sistema di comunicazione per leggere e aggiornare
 lo stato dell'applicazione (`AppState`) dell'esterno, preservando l'immutabilità.
@@ -72,6 +74,7 @@ lo stato dell'applicazione (`AppState`) dell'esterno, preservando l'immutabilit�
 dell'architettura esagonale, implementando un sistema di comunicazione robusto e
 scalabile, che assicura una gestione funzionale della creazione e dell'aggiornamento
 dello stato dell'applicazione.
+// dire high-order type
 
 ### Componente
 
@@ -117,6 +120,7 @@ Il metodo `startProcessing` utilizza` LazyList.continually` per estrarre continu
 eventi dalla coda. Ogni evento, rappresentato da una funzione, viene applicato
 allo stato corrente tramite `foldLeft`, producendo una nuova versione immutabile dello
 stato ad ogni iterazione.
+// dire high-order type
 
 ```Scala 3
 override def startProcessing(initState: AppState): Unit =
@@ -134,7 +138,8 @@ una costruzione sicura e funzionale dell'entità, sfruttando le capacità di Sca
 per la gestione degli errori e la validazione dei dati in modo dichiarativo.
 
 ### Componente
-Di seguito sono riportate alcune funzionalità per la modifica e la 
+
+Di seguito sono riportate alcune funzionalità per la modifica e la
 validazione dei campi di `Route`.
 
 ```mermaid
@@ -144,23 +149,78 @@ classDiagram
     Route: withRailsCount(railsCount Int) Either[RouteError, Route]
     Route: withLength(length Double) Either[RouteError, Route]
 ```
+
 ### Descrizione tecnica
-Spiegare che 
+
+// Alias per il tipo di error
+Spiegare che
+
 ```scala 3
 type RouteError = NonEmptyChain[Errors]
 
 object Route:
   def apply(departure: Station, arrival: Station, typeRoute: RouteType,
-            railsCount: Int, length: Double): Either[RouteError, Route]
+            railsCount: Int, length: Double): Either[RouteError, Route] =
+    validateAndCreateRoute(departure, arrival, typeRoute, railsCount, length)
 ```
 
-## DSL per la creazione della railway
+```scala 3
+private def validateRoute[T](departure: Station, arrival: Station,
+                             typeRoute: RouteType, railsCount: Int,
+                             length: Double,
+                             creation: (Station, Station, RouteType, Int, Double) => T
+                            ): Either[RouteError, T] = (
+  validateStation(departure, arrival),
+  validateStation(arrival, departure),
+  validateRailsCount(railsCount, departure, arrival),
+  validateLength(length, departure, arrival))
+  .mapN(creation(_, _, typeRoute, _, _))
+```
 
-## mixin decorator: graphics
+```scala 3
+extension [A, E](value: A)
+  def cond(f: A => Boolean, error: E): Either[E, A] =
+    Either.cond(f(value), value, error)
 
-# observer gui pattern
+  def validateChain(f: (A => Boolean, E)*): Either[NonEmptyChain[E], A] =
+    f.map(value.cond).traverse(_.toValidatedNec).map(_ => value).toEither
+```
 
-# testing della route adapter
+## DSL per la creazione di entità infrastrutturali: `Station` `Route` `Train`
+**Obiettivo**
+
+**Motivazione**
+
+### Componente
+
+### Descrizione tecnica
+
+## Toolkit per la Customizzazione Visiva dell'UI: `EnhancedLook`
+
+**Obiettivo**
+
+**Motivazione**
+
+### Componente
+
+### Descrizione tecnica
+
+### Pattern
+
+## Event system dei componenti grafici: `Observable` `Observer`
+
+**Obiettivo**
+
+**Motivazione**
+
+### Componente
+
+### Descrizione tecnica
+
+### Pattern
+
+### testing della route adapter
+### testing dell'architettura
 
 **Obiettivo**
 
