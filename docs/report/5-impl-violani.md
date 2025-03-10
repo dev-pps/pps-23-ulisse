@@ -1,7 +1,17 @@
 # Implementazione di Violani Matteo
 
+## Parti implementate
+Il mio contributo in questo progetto ha previsto lo sviluppo delle parti seguendo l'approccio TDD comportando il conseguente sviluppo dei relativi test. 
 
-## Train & Technology
+- __Train__: sviluppo delle entità `Train`, `Wagons` and `TrainTechnology`, dei relativi manager `TrainManager` e `TechnologyManager` e del `TrainService` con relativa porta `TrainPorts`.
+- __TrainAgent__: sviluppo dell'entità dinamica della simulazione `TrainAgent` con collaborazione del collega Bravetti per l'allineamento e uso delle *percepts* del treno (`TrainAgentPerception`) ricevute dall'`RailwayEnvironment` da lui sviluppate all'interno dell'agente e delle sotto entità sviluppate.
+- __TrainAgentState__: parte integrante del `TrainAgent` riguardante la dinamica del suo comportamento durante la simulazione e dell'aggiornamento dei dati dinamici `MotionData` anch'essi sviluppati.
+- __Timetable__: sviluppo della definizione della tabella oraria statica del treno `Timetable` con annessa implementazione del `TimetableManager` e del servizio di `TimetableService` per la loro gestione. Per questa entità è stato anche definito un DSL per la creazione di una Timetable per un treno.
+- __Times__: implementazione delle entità `ClockTime` e `Time` (con integrazioni di Federico Bravetti) per rappresentare il concetto di tempo con sfumature diverse  sia all'interno della simulazione che nella definizione delle tabelle orarie del treno.
+- **Interfaccia utente** per la costruzione delle *Timetable* e creazione dei *Train*
+
+
+## Train
 - definizione e sviluppo della entità `Train` e di `TrainTechnology` (sottotipo di `Technology`), le classi come `Wagons` e `Train` non sono così entusiasmanti
 
 ## Train Agent
@@ -161,10 +171,12 @@ direction BT
 ```
 
 
-- sviluppo della entità in se, con metologia TDD
-- 
+## DSL per la dichiarazione di una Timetable
 
-### Creazione DSL per la definizione di una Timetable
+Per la creazione del DSL è stato fatto uso di ***case class*** e di ***extension method***. Queste rendono più fluente e leggibile la costruzione di una `Timetable` per un treno mascherando il `TimetableBuilder` sottostante.
+
+Di seguito si mostra il codice per la costruzione di una *timetable* utilizando il DSL creato e la corrispettiva costruzione con il builder.
+
 Risultato finale ottenuto grazie al dsl.
 ```scala 3
 AV1000Train at h(9).m(0).getOrDefault startFrom stationA thenOnRail
