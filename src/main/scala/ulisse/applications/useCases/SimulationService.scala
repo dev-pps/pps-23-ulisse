@@ -42,9 +42,9 @@ final case class SimulationService(
   override def initSimulationUsing(preset: Preset): Future[(Engine, SimulationData)] =
     eventQueue.addSetupAppStateEvent(_ =>
       preset match
-        case Simple  => RailwayConfig.simpleRailwayConfig
-        case Normal  => RailwayConfig.normalRailwayConfig
-        case Complex => RailwayConfig.complexRailwayConfig
+        case Simple   => RailwayConfig.simpleRailwayConfig
+        case Complex  => RailwayConfig.complexRailwayConfig
+        case Examples => RailwayConfig.exampleRailwayConfig
     )
     eventQueue.addUpdateSimulationManagerEvent(_.withNotificationService(Some(notificationService)))
     initSimulation()
