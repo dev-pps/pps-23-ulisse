@@ -13,10 +13,10 @@ import ulisse.applications.InputPortManager
 /** Represents the input adapter manager of the application. */
 trait InputAdapterManager:
   /** The train editor adapter */
-  def train: TrainViewAdapter
+  val train: TrainViewAdapter
 
   /** The timetable editor adapter */
-  def timetable: TimetableViewAdapter
+  val timetable: TimetableViewAdapter
 
   /** The station editor adapter. */
   val station: StationEditorAdapter
