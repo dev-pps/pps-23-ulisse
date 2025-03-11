@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: Report
-      link: report/0-introduzione
+      link: report/0-intro
     - theme: alt
       text: Scala docs
       link: https://dev-pps.github.io/pps-23-ulisse/scaladoc/index.html

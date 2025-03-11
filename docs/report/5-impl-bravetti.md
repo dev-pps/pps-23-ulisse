@@ -10,6 +10,7 @@ Il codice prodotto durante lo svolgimento del progetto riguarda prevalentemente 
 - **Perception System**: implementazione del sistema di percezione per i `SimulationAgent`.
 - **Engine**: implementazione del motore per l'avanzamento della simulazione con relativi `SimulationManager`, `SimulationService`, `SimulationInfoService`, `NotificationService`
 - **Statistics**: implementazione di metodi di utilità per il calcolo di statistiche relative al `RailwayEnvironment`.
+Inoltre è stata gestita la parte di setup della repo github, e la configurazione delle pipeline di CI/CD per building, testing e delivery.
 
 Di seguito saranno descritte con maggior dettaglio le parti più salienti.
 
@@ -321,6 +322,37 @@ queue.add(_ + "B")
 queue.add(_ + "C")
 runAll("", queue) shouldEqual List("", "A", "AB", "ABC")
 ```
+## Mocks In Testing
+Uno dei vantaggi dell'architettura esagonale è quello di favorire l'utilizzo di mock come test doubles, 
+per cui nello sviluppo di alcuni test si è fatto uso di questi strumenti per simulare il comportamento di alcune parti del sistema.
 
-Immutabilità naturale – In un contesto funzionale, gli stati sono immutabili. Una lazy list permette di rappresentare la sequenza degli stati senza modificarli direttamente, ma piuttosto generando il nuovo stato a partire dal precedente.
-Backtracking e Time Travel – Grazie alla persistenza dei dati, è possibile navigare tra gli stati passati senza ricomputarli da zero, utile per debugging o simulazioni.
+L'efficacia dei mock si nota principalmente nello sviluppo dei test che coinvolgono le porte del sistema ad esempio:
+### SimulationInfoAdapter
+In questo caso è possibile effettuare dei test all'esterno del sistema simulando il comportamento della porta `SimulationInfoPorts.Input` e verificare il corretto funzionamento dell'adapter senza dover gestire l'evoluzione dello stato interagendo con la queue degli eventi.
+```scala 3
+private val mockedPort            = mock[SimulationInfoPorts.Input]
+private val simulationInfoAdapter = SimulationInfoAdapter(mockedPort)
+
+"SimulationInfoAdapter" when:
+  "query for station info" should:
+    val station                   = mock[Station]
+    val stationEnvironmentElement = mock[StationEnvironmentElement]
+    "return the station info if present" in:
+      when(mockedPort.stationInfo(station)).thenReturn(Future.successful(Some(stationEnvironmentElement)))
+      Await.result(simulationInfoAdapter.stationInfo(station), Duration.Inf) shouldBe Some(stationEnvironmentElement)
+
+    "return none if the station info is not present" in:
+      when(mockedPort.stationInfo(station)).thenReturn(Future.successful(None))
+      Await.result(simulationInfoAdapter.stationInfo(station), Duration.Inf) shouldBe None
+```
+### SimulationManager
+In questo caso si può verificare come la scelta di definire un provider esterno per il tempo ha permesso poi di utilizzare un comportamento mocked 
+per ottenere uno scorrimento deterministico del tempo e effettuare al meglio il test del motore di simulazione.
+```scala 3
+private val timeProvider  = mock[UtilityPorts.Output.TimeProviderPort]
+private val startTime     = 10L
+private val timeIncrement = 5L
+private def setupTimeProvider(): Unit =
+  val timeIterator = LazyList.iterate(startTime)(_ + timeIncrement).iterator
+  when(timeProvider.currentTimeMillis()).thenAnswer((_: InvocationOnMock) => timeIterator.next())
+```

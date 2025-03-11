@@ -109,9 +109,9 @@ object StationForm:
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private case class StationFormImpl() extends StationForm:
-    override val name: ComposedSwing.InfoTextField   = ComposedSwing createInfoTextField "Name"
-    override val xField: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "x"
-    override val yField: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "y"
+    override val name: ComposedSwing.InfoTextField      = ComposedSwing createInfoTextField "Name"
+    override val xField: ComposedSwing.InfoTextField    = ComposedSwing createInfoTextField "x"
+    override val yField: ComposedSwing.InfoTextField    = ComposedSwing createInfoTextField "y"
     override val platforms: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Platforms"
 
     private val layoutButton = ExtendedSwing.SBoxPanel(Orientation.Vertical).transparent()

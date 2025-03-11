@@ -141,7 +141,6 @@ All'interno dell'oggetto `Timetables` viene fornita una implementazione di defau
 
 ```scala 
   given defaultTimeEstimator: TimeEstimator = UnrealTimeEstimator
-  
 ```
 ``` scala 
   /** Default implementation of [[TimeEstimator]]
@@ -159,7 +158,7 @@ All'interno dell'oggetto `Timetables` viene fornita una implementazione di defau
       yield arrivingTime
 ```
 
-> **NOTA** Anche all'interno di `TimetableManager` è stata definita una *contextual given* per definire la policy di accettazione di una timetable (`AcceptanceTimetablePolicy`) che deve essere salvata.
+> **NOTA** Anche all'interno di `TimetableManager` è stata definita una *contextual given* per definire la policy di accettazione per una timetable (`AcceptanceTimetablePolicy`) che deve essere salvata.
 
 Di seguito viene mostrato uno schema UML riassuntivo dei trait definiti all'intenro dell'oggetto `Timetables`.
 
