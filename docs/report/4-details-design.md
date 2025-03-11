@@ -711,28 +711,28 @@ classDiagram
     direction TB
     class EnvironmentElement
     class TrainAgentEEWrapper {
-        def updateTrain(TrainAgent) Option[TrainAgentEEWrapper]
-        def removeTrain(TrainAgent) Option[TrainAgentEEWrapper]
+        + updateTrain(TrainAgent) Option[TrainAgentEEWrapper]
+        + removeTrain(TrainAgent) Option[TrainAgentEEWrapper]
     }
     class TrainAgentContainers {
-        def updateTrain(TrainAgent) Option[TrainAgentContainers]
-        def removeTrain(TrainAgent) Option[TrainAgentContainers]
+        + updateTrain(TrainAgent) Option[TrainAgentContainers]
+        + removeTrain(TrainAgent) Option[TrainAgentContainers]
     }
 
     class TrainAgent
     class SimulationAgent {
-        def doStep(dt: Int, EnvironmentCoordinator) SimulationAgent
+        + doStep(dt: Int, EnvironmentCoordinator) SimulationAgent
     }
     class Train
     class Platform {
-        def putTrain(TrainAgent) Option[Platform]
+        + putTrain(TrainAgent) Option[Platform]
     }
     class TrackDirection {
         case Forward, Backward
     }
     <<enum>> TrackDirection
     class Track {
-        def putTrain(TrainAgent, TrackDirection) Option[Track]
+        + putTrain(TrainAgent, TrackDirection) Option[Track]
     }
 
     <<trait>> EnvironmentElement
@@ -766,17 +766,17 @@ classDiagram
     direction LR
     class EnvironmentElement
     class DynamicTimetable {
-        def effectiveTable List [~Station, TrainStationTime~]
-        def arrivalUpdate(time: ClockTime) Option[DynamicTimetable]
-        def departureUpdate(time: ClockTime) Option[DynamicTimetable]
+        + effectiveTable List [~Station, TrainStationTime~]
+        + arrivalUpdate(ClockTime) Option[DynamicTimetable]
+        + departureUpdate(ClockTime) Option[DynamicTimetable]
     }
     class TimeTable
     class RouteEnvironmentElement {
-        def putTrain(TrainAgent, TrackDirection) Option[RouteEnvironmentElement]
+        + putTrain(TrainAgent, TrackDirection) Option[RouteEnvironmentElement]
     }
     class Route
     class StationEnvironmentElement {
-        def putTrain(TrainAgent) Option[StationEnvironmentElement]
+        + putTrain(TrainAgent) Option[StationEnvironmentElement]
     }
     class Station
     class TrainAgentEEWrapper
@@ -827,8 +827,13 @@ classDiagram
         + environmentElements Seq[EnvironmentElements]
     }
     class DynamicTimetableEnvironment {
-        def updateTables(updateFunction, agent, time) Option[DynamicTimetableEnvironment]
+        + updateTables(updateFunction, agent, time) Option[DynamicTimetableEnvironment]
     }
+
+    <<trait>> EnvironmentElement
+    <<trait>> DynamicTimetable
+    <<trait>> Environment
+    <<trait>> DynamicTimetableEnvironment
 
     Environment --o EnvironmentElement
     DynamicTimetable --> EnvironmentElement
@@ -863,6 +868,14 @@ classDiagram
         + putTrain(TrainAgent, (Station, Station)) Option[RouteEnvironment]
     }
 
+    <<trait>> RouteEnvironmentElement
+    <<trait>> StationEnvironmentElement
+    <<trait>> TrainAgentEEWrapper
+    <<trait>> Environment
+    <<trait>> TrainAgentEnvironment 
+    <<trait>> StationEnvironment 
+    <<trait>> RouteEnvironment 
+
     TrainAgentEnvironment --> Environment
     TrainAgentEnvironment ..> TrainAgentEEWrapper: Use
     RouteEnvironment --> TrainAgentEnvironment
@@ -887,9 +900,9 @@ I `SimulationAgents` a loro volta si aggiorneranno in ogni step basandosi sulle 
 ---
 classDiagram
     class EnvironmentsCoordinator {
-        + doStep(dt: Int): EnvironmentsCoordinator
-        + environments(): Seq[Environment[?]]
-        + perceptionFor((simulationAgent: SimulationAgent): Option[Perception]
+        + doStep(dt: Int) EnvironmentsCoordinator
+        + environments() Seq[Environment[?]]
+        + perceptionFor(SimulationAgent) Option[Perception]
     }
     class RailwayEnvironment
 
@@ -897,7 +910,7 @@ classDiagram
 
     class SimulationAgent {
         type EC <: EnvironmentsCoordinator[EC]
-        + doStep(dt: Int, environment: EC): SimulationAgent
+        + doStep(dt: Int, environment: EC) SimulationAgent
     }
 
     <<trait>> EnvironmentsCoordinator
@@ -982,8 +995,8 @@ config:
 classDiagram
     direction BT
     class NotificationService {
-        + stepNotification(data: SimulationData) Unit
-        + simulationEnded(data: SimulationData) Unit
+        + stepNotification(SimulationData) Unit
+        + simulationEnded(SimulationData) Unit
     }
     class TimeProvider {
         + currentTimeMillis() Long
@@ -998,6 +1011,14 @@ classDiagram
 
     class SimulationData
     class Engine
+
+
+    <<trait>>NotificationService
+    <<trait>>TimeProvider 
+    <<trait>>AppState
+    <<trait>>SimulationManager
+    <<trait>>SimulationData
+    <<trait>>Engine
 
     NotificationService --o SimulationManager
     TimeProvider --o SimulationManager
