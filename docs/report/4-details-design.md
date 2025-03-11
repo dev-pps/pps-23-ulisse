@@ -59,6 +59,13 @@ classDiagram
     class SimulationData
     class Engine
 
+    <<Trait>> Station
+    <<Trait>> Route
+    <<Trait>> Train
+    <<Trait>> Timetable
+    <<Trait>> SimulationData
+    <<Trait>> Engine
+
     <<Trait>> AppState
     <<Trait>> StationManager
     <<Trait>> RouteManager
@@ -70,23 +77,23 @@ classDiagram
     <<Trait>> TrainManager
     <<Trait>> TimetableManager
     <<Trait>> SimulationManager
-    Station <--o StationManager: *
-    Route <--o RouteManager: *
-    Train <--o TrainManager: *
-    Timetable <--o TimetableManager: *
+    Station <--o StationManager: 0..*
+    Route <--o RouteManager: 0..*
+    Train <--o TrainManager: 0..*
+    Timetable <--o TimetableManager: 0..*
     SimulationData <--o SimulationManager: 1
     Engine <--o SimulationManager: 1
-    StationManager <--o AppState: 1
-    RouteManager <--o AppState: 1
-    TrainManager <--o AppState: 1
-    TimetableManager <--o AppState: 1
-    SimulationManager <--o AppState: 1
+    StationManager <--* AppState: 1
+    RouteManager <--* AppState: 1
+    TrainManager <--* AppState: 1
+    TimetableManager <--* AppState: 1
+    SimulationManager <--* AppState: 1
 ```
 
 ### EventQueue
 
 La gestione dello stato dell'applicazione è stata implementata a livello _Applicativo_
-dell'architettura esagonale per garantire l'immutabilità dell'AppState all'interno del
+dell'architettura esagonale per garantire l'immutabilità dell'`AppState` all'interno del
 core domain, rispondendo a un requisito di progetto. Questo approccio evita che la
 gestione dell'evoluzione dello stato sia delegata a componenti esterni. In questo
 contesto, l'`EventQueue` opera in modo simile a un event loop, centralizzando il sistema
@@ -139,7 +146,7 @@ classDiagram
     TimetableEventQueue: addCreateTimetableEvent() Unit
     TimetableEventQueue: addUpdateTimetableEvent() Unit
     TimetableEventQueue: addDeleteTimetableEvent() Unit
-    AppState <--* EventQueue: 1
+    AppState <--o EventQueue: 1
     EventQueue --> StationEventQueue
     EventQueue --> RouteEventQueue
     EventQueue --> TrainEventQueue
@@ -149,7 +156,7 @@ classDiagram
 
 ### InputPorts
 
-L’application espone le `InputPorts`, implementate dai rispettivi `Services`,
+L’_application_ espone le `InputPorts`, implementate dai rispettivi `Services`,
 che definiscono gli `UseCase` dell’applicazione. Gli `Adapters` invocano queste
 porte per richiedere operazioni sul dominio, attivando i servizi che, a loro
 volta, pubblicano le operazioni sulla `EventQueue` dedicata al contesto di esecuzione.
@@ -185,12 +192,6 @@ classDiagram
     <<Trait>> TrainEventQueue
     <<Trait>> TimetableEventQueue
     <<Trait>> SimulationEventQueue
-    <<Trait>> StationService
-    <<Trait>> RouteService
-    <<Trait>> TrainServices
-    <<Trait>> TimetableServices
-    <<Trait>> SimulationServices
-    <<Trait>> SimulationInfoServices
     <<Trait>> StationPortsInput
     <<Trait>> RoutePortsInput
     <<Trait>> TrainPortsInput
@@ -221,12 +222,12 @@ classDiagram
     SimulationPortsInput: start() Future
     SimulationPortsInput: stop() Future
     SimulationPortsInput: reset() Future
-    StationEventQueue <--* StationService
-    RouteEventQueue <--* RouteService
-    TrainEventQueue <--* TrainServices
-    TimetableEventQueue <--* TimetableServices
-    SimulationEventQueue <--* SimulationServices
-    SimulationEventQueue <--* SimulationInfoServices
+    StationEventQueue <--* StationService: 1
+    RouteEventQueue <--* RouteService: 1
+    TrainEventQueue <--* TrainServices: 1
+    TimetableEventQueue <--* TimetableServices: 1
+    SimulationEventQueue <--* SimulationServices: 1
+    SimulationEventQueue <--* SimulationInfoServices: 1
     StationPortsInput <|-- StationService
     RoutePortsInput <|-- RouteService
     TrainPortsInput <|-- TrainServices
@@ -236,7 +237,7 @@ classDiagram
 ```
 
 Come conseguenza della gestione immutabile e centralizzata dell’`AppState` nel livello
-_Application_, le implementazioni delle Input Ports espongono operazioni che restituiscono
+_Application_, le implementazioni delle `InputPorts` espongono operazioni che restituiscono
 una `Future`. Questo modello consente di elaborare le richieste esterne in modo asincrono,
 garantendo che l'aggiornamento dello stato avvenga in maniera controllata e non bloccante,
 preservando la coerenza e l'integrità del dominio applicativo.
@@ -252,9 +253,9 @@ dell'esecuzione della simulazione.
 #### Station
 
 Di seguito è riportato il modello concettuale della stazione nella fase di definizione,
-identificata da un identificativo univoco (id) e composta dagli attributi specificati
+identificata da un identificativo univoco `id` e composta dagli attributi specificati
 nel diagramma. Sono inoltre definiti due possibili errori di creazione, modellati
-tramite il tipo Errors, a garanzia della validazione dei dati e della coerenza del dominio.
+tramite il tipo `Errors`, a garanzia della validazione dei dati e della coerenza del dominio.
 
 ```mermaid
 classDiagram
@@ -278,14 +279,14 @@ classDiagram
 
 #### Route
 
-Le Route costituiscono un'entità chiave del dominio e sono identificate da un IdRoute,
+Le `Route` costituiscono un'entità chiave del dominio e sono identificate da un `IdRoute`,
 determinato in funzione della stazione di partenza, della stazione di arrivo e della
 tipologia di percorso. Il modello supporta due categorie principali di route:
-Normale e AV (Alta Velocità).
+`Normale` e `AV` (Alta Velocità).
 La definizione di una Route comporta l'associazione a un insieme di Track omogenee
 rispetto alla tipologia selezionata. Il processo di creazione è vincolato da regole
 di integrità, con la gestione degli errori formalizzata attraverso l'enumerazione
-Errors, che consente di intercettare e rappresentare eventuali anomalie durante la
+`Errors`, che consente di intercettare e rappresentare eventuali anomalie durante la
 fase di validazione.
 
 ```mermaid
@@ -313,18 +314,18 @@ classDiagram
     Route: railsCount Int
     Route: length Double
     Route <|-- RouteImpl
-Route o--> RouteType: 1
-RouteType o--> Technology: 1
-Route .. Errors: use
+    Route *--> RouteType: 1
+    RouteType *--> Technology: 1
+    Route .. Errors: use
 
 ```
 
 #### Train
 
-Il `Train` viene identificato dal suo _name_ e si caratterizza per la sua tecnologia `TrainTechnology` che gli
-conferisce specifiche qualità di movimento come l'accelerazione di partenza/arresto e la massima velocità che poi
-verranno utilizzate per l'elaborazione della `Timetable`. Può comporsi di diversi `Wagon` tutti di una specifica
-capienza, tipologia e lunghezza.
+Il `Train` viene identificato dal suo _name_ e si caratterizza per la sua tecnologia 
+`TrainTechnology` che gli conferisce specifiche qualità di movimento come l'accelerazione 
+di partenza/arresto e la massima velocità che poi verranno utilizzate per l'elaborazione della
+`Timetable`. Può comporsi di diversi `Wagon` tutti di una specifica capienza, tipologia e lunghezza.
 Nel momento della simulazione il treno viene utilizzato nella creazione del `TrainAgent`.
 
 ```mermaid
@@ -458,9 +459,9 @@ classDiagram
 
 ## View
 
-Per lo sviluppo della view, sono stati progettati componenti personalizzati per
+Per lo sviluppo della `view`, sono stati progettati componenti personalizzati per
 migliorare l'esperienza dell'utente, ottimizzando l'interazione con l'interfaccia.
-La progettazione è stata orientata dal principio SRP (Single Responsibility Principle),
+La progettazione è stata orientata dal principio _SRP_ (Single Responsibility Principle),
 con l'obiettivo di ridurre la complessità e la verbosità, delegando a ciascun
 componente una responsabilità chiara e specifica nella gestione della creazione grafica.
 
@@ -500,13 +501,13 @@ classDiagram
 ```
 
 ### Adapters
-La View comunica con la logica di business tramite input adapter, che fungono
+La `View` comunica con la logica di business tramite `InputAdapter`, che fungono
 da intermediari tra l’interfaccia utente e il core applicativo.
 Questi adapter sono progettati per garantire un’integrazione efficiente
 e trasparente, esponendo i servizi dell’applicazione in conformità alle
 InputPort definite a livello applicativo.
 
-Parallelamente, l’applicazione utilizza un SimulationNotificationListener
+Parallelamente, l’applicazione utilizza un `SimulationNotificationListener
 per propagare eventi dal dominio verso la View. In questo contesto, l’adapter
 SimulationNotificationAdapter si occupa di tradurre le notifiche provenienti
 dalla logica di business in un formato compatibile con i componenti grafici,
@@ -542,9 +543,9 @@ classDiagram
     InputAdapterManager: simulationPage SimulationPageAdapter
     InputAdapterManager: simulationInfo SimulationInfoAdapter
     InputAdapterManager <--o GUI: 1
-    InputAdapterManager -- SimulationWorkspace: use
-    InputAdapterManager -- MapWorkspace: use
-    InputAdapterManager -- TrainWorkspace: use
+    InputAdapterManager <.. SimulationWorkspace: use
+    InputAdapterManager <.. MapWorkspace: use
+    InputAdapterManager <.. TrainWorkspace: use
     GUI *--> SimulationWorkspace: 1
     GUI *--> MapWorkspace: 1
     GUI *--> TrainWorkspace: 1
