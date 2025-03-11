@@ -373,7 +373,8 @@ classDiagram
     WagonType ..o Wagon
 ```
 
-### TrainAgents (Behaviour)
+### TrainAgentStates (Behaviour)
+L'entità `StateBehavior` rappresenta lo stato immutabile del `TrainAgent` durante la simulazione. Le informazioni del moto del treno vengono modellate con `MotionData` e vengono aggionrate ad ogni step della simualzione in base allo stato in cui si trova il treno.
 
 ```mermaid
 classDiagram
