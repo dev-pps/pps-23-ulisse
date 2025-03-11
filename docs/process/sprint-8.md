@@ -1,6 +1,6 @@
 # Sprint Planning 7 (3/03 - 7/03)
 
-[Link to backlog](./backlogs/6-backlog)
+[Link to backlog](./backlogs/8-backlog)
 
 ## Sprint Goal
 TODO
