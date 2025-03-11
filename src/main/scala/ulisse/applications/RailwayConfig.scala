@@ -1,6 +1,6 @@
 package ulisse.applications
 
-import ulisse.applications.configs.{MediumRailwayConfig, RailwayBaseConfig}
+import ulisse.applications.configs.{RailwayBaseConfig, RailwayExamplesConfig}
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.dsl.RailwayDsl.*
 import ulisse.entities.route.Routes.RouteType
@@ -96,8 +96,7 @@ object RailwayConfig:
   private val table6 = trainF_AV at h(4).m(0).getOrDefault startFrom stationE thenOnRail
     railAV400 travelsTo stationD thenOnRail
     railAV400 stopsIn stationC waitingForMinutes 5 thenOnRail
-    railAV400 travelsTo stationB thenOnRail
-    railAV400 arrivesTo stationA
+    railAV400 arrivesTo stationB
 
   private val table7 = trainG_AV at h(5).m(0).getOrDefault startFrom stationA thenOnRail
     railAV400 travelsTo stationB thenOnRail
@@ -146,14 +145,14 @@ object RailwayConfig:
     table8 scheduleA table9 scheduleA table10 scheduleA table11 scheduleA table12
 
   private val simpleRailway: AppState  = RailwayBaseConfig.railwayConfig
-  private val mediumRailway: AppState  = MediumRailwayConfig.mediumRailwayConfig
   private val complexRailway: AppState = uploadRailway
+  private val exampleRailway: AppState = RailwayExamplesConfig.exampleRailwayConfig
 
   /** Get the simple railway configuration. */
   def simpleRailwayConfig: AppState = simpleRailway
 
   /** Get the normal railway configuration. */
-  def normalRailwayConfig: AppState = mediumRailway
+  def complexRailwayConfig: AppState = complexRailway
 
   /** Get the complex railway configuration. */
-  def complexRailwayConfig: AppState = complexRailway
+  def exampleRailwayConfig: AppState = exampleRailway
