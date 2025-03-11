@@ -31,7 +31,7 @@ trait StationForm extends Form:
   val yField: ComposedSwing.InfoTextField
 
   /** The tracks field of the form. */
-  val tracks: ComposedSwing.InfoTextField
+  val platforms: ComposedSwing.InfoTextField
 
   /** Attach the creation observer to the form of type [[StationCreationInfo]]. */
   def attachCreation(observer: ClickObserver[StationCreationInfo]): Unit
@@ -53,7 +53,7 @@ trait StationForm extends Form:
     name.text = ""
     xField.text = ""
     yField.text = ""
-    tracks.text = ""
+    platforms.text = ""
     resetSelectedStation()
 
   /** Compiles the form. */
@@ -61,7 +61,7 @@ trait StationForm extends Form:
     name.text = station.name
     xField.text = station.coordinate.x.toString
     yField.text = station.coordinate.y.toString
-    tracks.text = station.numberOfPlatforms.toString
+    platforms.text = station.numberOfPlatforms.toString
 
 /** Companion object of the [[StationForm]]. */
 object StationForm:
@@ -112,14 +112,14 @@ object StationForm:
     override val name: ComposedSwing.InfoTextField   = ComposedSwing createInfoTextField "Name"
     override val xField: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "x"
     override val yField: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "y"
-    override val tracks: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Tracks"
+    override val platforms: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Platforms"
 
     private val layoutButton = ExtendedSwing.SBoxPanel(Orientation.Vertical).transparent()
     private val controlPanel = ExtendedSwing.SFlowPanel().transparent()
     private val saveButton   = ExtendedSwing createFormButtonWith ("Save", Styles.formTrueButtonRect)
     private val deleteButton = ExtendedSwing createFormButtonWith ("Delete", Styles.formFalseButtonRect)
     private val resetButton  = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
-    private val form         = BaseForm("Station", name, xField, yField, tracks)
+    private val form         = BaseForm("Station", name, xField, yField, platforms)
 
     private val creationObservable                = Observers.createObservable[StationCreationInfo]
     private val deletionObservable                = Observers.createObservable[StationCreationInfo]
@@ -136,10 +136,10 @@ object StationForm:
     resetButton attachClick CleanFormEvent(this)
 
     saveButton attach (creationObservable toObserver (_ =>
-      StationCreationInfo(name.text, xField.text, yField.text, tracks.text)
+      StationCreationInfo(name.text, xField.text, yField.text, platforms.text)
     ))
     deleteButton attach (deletionObservable toObserver (_ =>
-      StationCreationInfo(name.text, xField.text, yField.text, tracks.text)
+      StationCreationInfo(name.text, xField.text, yField.text, platforms.text)
     ))
 
     export form._, creationObservable.attachClick as attachCreation, deletionObservable.attachClick as attachDeletion
