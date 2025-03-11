@@ -42,8 +42,8 @@ object SimulationWorkspace:
     simulation attachStartSimulation (SimulationForm PlaySimulationEvent (adapter, this, simulation))
     simulation attachResetSimulation (SimulationForm ResetSimulationEvent (adapter, this, simulation))
     simulation attachSimpleSimulation (SimulationForm SetupSimulationEvent (adapter, this, simulation, Preset.Simple))
-    simulation attachNormalSimulation (SimulationForm SetupSimulationEvent (adapter, this, simulation, Preset.Normal))
-    simulation attachComplexSimulation (SimulationForm SetupSimulationEvent (adapter, this, simulation, Preset.Complex))
+    simulation attachNormalSimulation (SimulationForm SetupSimulationEvent (adapter, this, simulation, Preset.Complex))
+    simulation attachComplexSimulation (SimulationForm SetupSimulationEvent (adapter, this, simulation, Preset.Examples))
 
     export workspace.{component, revalidate}
 

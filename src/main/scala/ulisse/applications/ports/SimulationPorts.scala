@@ -44,4 +44,4 @@ object SimulationPorts:
 
     /** Preset for the simulation. */
     enum Preset:
-      case Simple, Normal, Complex
+      case Simple, Complex, Examples

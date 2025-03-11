@@ -157,8 +157,8 @@ object SimulationForm:
 
     private val settersPanel = ExtendedSwing.SFlowPanel().transparent()
     private val simpleSim    = ExtendedSwing createFormButtonWith ("Simple", Styles.formButtonRect)
-    private val normalSim    = ExtendedSwing createFormButtonWith ("Normal", Styles.formButtonRect)
-    private val complexSim   = ExtendedSwing createFormButtonWith ("Complex", Styles.formButtonRect)
+    private val normalSim    = ExtendedSwing createFormButtonWith ("Complex", Styles.formButtonRect)
+    private val complexSim   = ExtendedSwing createFormButtonWith ("Examples", Styles.formButtonRect)
 
     settersPanel.hGap = space
     settersPanel.contents += simpleSim
@@ -271,7 +271,7 @@ object SimulationForm:
 
     override def showRouteSimulation(route: RouteEnvironmentElement): Unit =
       val stations = s"Stations: ${route.departure.name} - ${route.arrival.name}"
-      val trains   = s"Trains: ${route.trains.size}"
+      val trains   = s"Trains: ${route.trains.size} / ${route.railsCount}"
       val typology = s"Type: ${route.typology}"
       val infoStr  = s"ROUTE: \n$stations \n$trains \n$typology"
       elementInfoArea.setText(infoStr)
