@@ -377,6 +377,7 @@ classDiagram
 
 ```mermaid
 classDiagram
+direction BT
     class TrainAgent
     class StateBehavior {
         <<abstract>>
@@ -498,6 +499,39 @@ classDiagram
     MapWorkspace *--> TimetableForm: 1
     MapWorkspace *--> MapPanel: 1
     TrainWorkspace *--> TrainEditorView: 1
+```
+
+### Timetable View
+L'interfaccia grafica della timetable è composta da una classe *root* la `TimetableView` e due sottoschermate figlie: `EditorTab` e `TimetableViewTab` le quali fanno uso della `TimetableListView` per la visualizzazione delle Timetable (sia per la consultazione che durante la fase di creazione). Le due schermate figlie aderiscono al contratto `TrainsUpdatable` mentre solo la `TimetableViewTab` aderisce anche a `TimetablesUpdatable`.
+
+Il `TimetableViewAdapter` (omesso in questo uml) comunica attraverso questi contratti con le schermate permettendo l'aggiornamento dei dati da visualizzare in modo asincrono.
+
+```mermaid
+classDiagram
+
+orientation RL
+
+  class RequestResultObserver {
+    <<trait>>
+    + showRequestResult(title: String, descr: String)
+  }
+
+  class TimetablesUpdatable {
+   + updateTimetables(tables: List[Timetable])
+  }
+
+  class TrainsUpdatable {
+    def updateNewTrains(trains: List[Train])
+  }
+
+TimetableViewerTab..|> TrainsUpdatable
+EditorTab ..|> TrainsUpdatable
+TimetableViewerTab..|> TimetablesUpdatable
+TimetableView ..|> RequestResultObserver
+TimetableView *--> EditorTab: 1
+TimetableView *--> TimetableViewerTab: 1
+TimetableViewerTab *--> TimetableListView: 1
+EditorTab *--> TimetableListView: 1
 ```
 
 ### Adapters
