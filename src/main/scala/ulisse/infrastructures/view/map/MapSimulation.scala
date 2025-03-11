@@ -75,14 +75,16 @@ object MapSimulation:
         val env                 = route.containers
         val departureCoordinate = route.departure.coordinate
         val arrivalCoordinate   = route.arrival.coordinate
+        val stationDistance     = departureCoordinate.toPoint2D distance arrivalCoordinate.toPoint2D
         env.flatten(rails =>
           val trainsEnv = rails.trains
           trainsEnv.map(train =>
+            val normalizedTrainDistance = train.distanceTravelled * stationDistance / route.length
             val pos = rails.currentDirection map {
               case Tracks.TrackDirection.Forward =>
-                departureCoordinate.toPoint2D computePosition (arrivalCoordinate.toPoint2D, train.distanceTravelled)
+                departureCoordinate.toPoint2D computePosition (arrivalCoordinate.toPoint2D, normalizedTrainDistance)
               case Tracks.TrackDirection.Backward =>
-                arrivalCoordinate.toPoint2D computePosition (departureCoordinate.toPoint2D, train.distanceTravelled)
+                arrivalCoordinate.toPoint2D computePosition (departureCoordinate.toPoint2D, normalizedTrainDistance)
             }
             pos.map((_, train))
           )
