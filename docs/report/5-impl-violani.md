@@ -16,15 +16,11 @@ invece class o case-class.
 ## Sviluppo funzionale ed immutabilità
 Nello sviluppo si è cercato di abbracciare completamente la programmazione funzionale e per fare ciò si è fatto uso di `Option`, `Try` e specialmente di `Either` come tipo di ritorno dei metodi che modificano o aggiornano entità immutabili.
 
-Analizzando per esempio il manager `TimetableManager` qualsiasi metodo che prevede l'aggiunta/cancellazione di una timetable o che tipicamente lancerebbe una eccezione restituisce un `Either[TimetableManagerErrors, TimetableManager]`. In questo modo viene sempre restituito qualcosa, che sia un errore che deve essere gestito o che sia il manager stesso aggiornato.
+Analizzando per esempio il manager `TimetableManager` qualsiasi metodo che prevede l'aggiunta/cancellazione di una timetable o che tipicamente lancerebbe una eccezione restituisce un `Either[TimetableManagerErrors, TimetableManager]`. In questo modo in caso d'errore viene sempre ritornata la causa, mentre in caso di successo della richiesta viene restituito il manager aggiornato. Attraverso `match-case` è possibile distinguere l'errore e agire di conseguenza.
 
-## Train
-
-definizione e sviluppo della entità `Train` e di `TrainTechnology` (sottotipo di `Technology`), le classi come `Wagons` e `Train` non sono così entusiasmanti
-
-## Train Agent
-
-``` mermaid
+## Train Agent FSM
+Nella realizzazione dell'aspetto dinamico del TrainAgent 
+```mermaid
 classDiagram
 direction LR
 
@@ -53,13 +49,9 @@ class Train {
 
   note for StateBehavior "some method have been omitted"
 
-  %% Ereditarietà: TrainAgent estende Train
   Train <|-- TrainAgent : extends
-
-  %% Composizione: TrainAgent ha un'istanza di Train
   TrainAgent *-- Train 
-  TrainAgent *-- StateBehavior 
-
+  TrainAgent *-- StateBehavior
 ```
 `TrainAgent` e il suo comportamento dinamico (FSM) in base ai percepts ricevuti (sviluppati dal collega Federico Bravetti)
   - MotionData: modellazione in una entità dedicata delle informazioni dinamiche del movimento del treno come *velocità*, *accelerazione* e *spazio percorso*.
@@ -70,19 +62,19 @@ class Train {
     Lo stato corrente elabora lo stato successivo in base alle caratteristiche del `Train` associato all'agente, il `dt` e le `TrainAgentPerception` ricevute dall'environment (`RailwayEnvironment`, non rappresentato nell'uml).
 
     Di seguito si mostra il codice del metodo `doStep` del *TrainAgent*:
-    ``` scala 3
+``` scala 3
     override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): TrainAgent =
         import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProviders.given
         val perception: Option[TrainAgentPerception[?]] = simulationEnvironment.perceptionFor[TrainAgent](this)
         copy(state = state.next(this, dt, perception))
-    ```
+```
 
 ### TrainAgentStates
 
 Lo State del TrainAgent è uno `StateBehavior` che come si può vedere dall'UML è una classe astratta in cui i metodi `enoughSpace`, `stationName` e `next` la cui implementazione verrà definita in una classe specifica. Ciascun state behavior è caratterizzato dal *nome* e la *logica di transizione* ad un nuovo stato.
 
 
-``` mermaid
+```mermaid
 classDiagram
 
 direction TB
@@ -139,10 +131,10 @@ Il trait che definisce il metodo di stima è il seguente:
 
 All'interno dell'oggetto `Timetables` viene fornita una implementazione di default, `defaultTimeEstimator`, che considera unicamente velocità del treno più compatibile con quella della rotaia e la lunghezza delle rotaie. Non vengono considerate le accelerazioni.
 
-```scala 
+```scala 3
   given defaultTimeEstimator: TimeEstimator = UnrealTimeEstimator
 ```
-``` scala 
+```scala 3
   /** Default implementation of [[TimeEstimator]]
     * It uses minimum speed between train and rail ones; it doesn't consider train's acceleration and deceleration specs
     */
@@ -160,7 +152,7 @@ All'interno dell'oggetto `Timetables` viene fornita una implementazione di defau
 
 > **NOTA** Anche all'interno di `TimetableManager` è stata definita una *contextual given* per definire la policy di accettazione per una timetable (`AcceptanceTimetablePolicy`) che deve essere salvata.
 
-Di seguito viene mostrato uno schema UML riassuntivo dei trait definiti all'intenro dell'oggetto `Timetables`.
+Di seguito viene mostrato uno schema UML riassuntivo dei trait definiti all'interno dell'oggetto `Timetables` in cui è definito il builder e le classi riguardanti la timetable.
 
 ```mermaid
 ---
@@ -215,7 +207,7 @@ direction BT
 
 ## DSL per la dichiarazione di una Timetable
 
-Per la creazione del DSL (reperibile nel package `dsl`) è stato fatto uso di ***case class***, ***extension method*** e ***costruttori fluenti***. Queste rendono più fluente e leggibile la costruzione di una `Timetable` per un treno mascherando il `TimetableBuilder` sottostante.
+Per la creazione del DSL (reperibile nel package `dsl`) si è fatto uso di ***case class***, ***extension method*** e ***costruttori fluenti***. Queste rendono più fluente e leggibile la costruzione di una `Timetable` per un treno mascherando il `TimetableBuilder` sottostante.
 
 Una volta indicato il treno, l'ora di partenza e la stazione di partenza, occorre specificare le informazioni della route per raggiungere la stazione seguente.
 
