@@ -19,9 +19,9 @@ export default withMermaid(
             sidebar: [
                 {text: 'Report',
                     items: [
-                        {text: 'Introduzione', link: `${reportPath}/0-introduzione`},
-                        {text: 'Processo di sviluppo', link: `${reportPath}/1-processo-di-sviluppo`},
-                        {text: 'Requisiti', link: `${reportPath}/2-requisiti`},
+                        {text: 'Introduzione', link: `${reportPath}/0-intro`},
+                        {text: 'Processo di sviluppo', link: `${reportPath}/1-dev-process`},
+                        {text: 'Requisiti', link: `${reportPath}/2-requirement`},
                         {text: 'Design Architetturale', link: `${reportPath}/3-arch-design`},
                         {text: 'Detailed Design', link: `${reportPath}/4-details-design`},
                         {text: 'Implementation',
@@ -32,7 +32,7 @@ export default withMermaid(
                                 {text: 'Violani Matteo', link: `${reportPath}/5-impl-violani`},
                             ]
                         },
-                        {text: 'Testing', link: `${reportPath}/5-testing`},
+                        {text: 'Testing', link: `${reportPath}/6-testing`},
                     ]
                 },
                 {text: 'Development process artifacts',
