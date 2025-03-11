@@ -3,7 +3,7 @@
   <a href="https://github.com/dev-pps/pps-23-ulisse">
     <img src="/resources/logo.png" style="width: 50%">
   </a>
- <p align="center">
+</p>
 
 ## Obiettivo
 L'obiettivo di questo progetto riguarda lo sviluppo di un simulatore Agent-Based per la simulazione di un sistema ferroviario.

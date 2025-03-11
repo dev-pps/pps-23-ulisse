@@ -50,6 +50,70 @@ classDiagram
    
 ```
 
+```mermaid
+classDiagram
+    direction BT
+    class AppState
+    
+    class StationManager
+    class RouteManager
+    class TrainManager
+    class TimetableManager
+    class SimulationManager
+
+    class Station
+    class Route
+    class Train
+    class Timetable
+    class Simulation
+
+    <<Trait>>AppState
+    <<Trait>>StationManager
+    <<Trait>>RouteManager
+    <<Trait>>TrainManager
+    <<Trait>>TimetableManager
+    <<Trait>>SimulationManager
+    
+    <<Trait>>StationManager
+    <<Trait>>RouteManager
+    <<Trait>>TrainManager
+    <<Trait>>TimetableManager
+    <<Trait>>SimulationManager
+
+    AppState: updateStation(update StationManager => StationManager) AppState
+    AppState: updateRoute(update RouteManager => RouteManager) AppState
+    AppState: createTrain(update (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager) AppState
+    AppState: updateTimetable(update TimetableManager => TimetableManager) AppState
+    AppState: updateSimulationManager(update SimulationManager => SimulationManager) AppState
+
+%%    StationEventQueue: addReadStationManagerEvent(StationManager => Unit) Unit
+%%    StationEventQueue: addUpdateStationManagerEvent(StationManager => StationManager) Unit
+%%    StationEventQueue: addUpdateStationManagersEvent(StationManagers => StationManagers) Unit
+%%  
+%%    RouteEventQueue: addReadRouteEvent(RouteManager => Unit) Unit
+%%    RouteEventQueue: addCreateRouteEvent((StationManager, RouteManager) => (StationManager, RouteManager)) Unit
+%%    RouteEventQueue: addUpdateRouteEvent((StationManager, RouteManager,TimetableManager) => (StationManager, RouteManager, TimetableManager)) Unit
+%%    RouteEventQueue: addDeleteRouteEvent(update (RouteManager, TimetableManager) => (RouteManager, TimetableManager)) Unit
+%%  
+%%    TrainEventQueue: addReadTrainEvent(update (TrainManager, TechnologyManager[TrainTechnology]) => Unit) Unit
+%%    TrainEventQueue: addCreateTrainEvent(update (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager) Unit
+%%    TrainEventQueue: addUpdateTrainEvent(update (TrainManager, TechnologyManager[TrainTechnology], TimetableManager) => (TrainManager, TimetableManager)) Unit
+%%    TrainEventQueue: addDeleteTrainEvent(update (TrainManager, TimetableManager) => (TrainManager, TimetableManager)) Unit
+
+
+    Station --> StationManager
+    Route --> RouteManager
+    Train --> TrainManager
+    Timetable --> TimetableManager
+    Simulation --> SimulationManager
+
+    StationManager --> AppState
+    RouteManager --> AppState
+    TrainManager --> AppState
+    TimetableManager --> AppState
+    SimulationManager --> AppState
+```
+
 ### Descrizione tecnica
 
 Sfruttando la funzione `copy` delle case class di Scala, è possibile creare un nuovo
@@ -252,33 +316,6 @@ appState = CreateAppState || initState set
 
 ### Diagramma
 
-```mermaid
-classDiagram
-    direction BT
-    class EnhancedLook
-    class ShapeEffect
-    class BorderEffect
-    class FontEffect
-    class ImageEffect
-    class PictureEffect
-    class SVGEffect
-    <<Trait>> EnhancedLook
-    <<Trait>> ShapeEffect
-    <<Trait>> BorderEffect
-    <<Trait>> FontEffect
-    <<Trait>> ImageEffect
-    <<Trait>> PictureEffect
-    <<Trait>> SVGEffect
-    
-    ImageEffect <-- PictureEffect
-    ImageEffect <-- SVGEffect
-    EnhancedLook <-- ShapeEffect
-    EnhancedLook <-- BorderEffect
-    EnhancedLook <-- ReleaseObserver
-    EnhancedLook <-- FontEffect
-    EnhancedLook <-- ExitObserver
-    EnhancedLook <-- ImageEffect
-```
 
 ### Descrizione tecnica
 
@@ -323,47 +360,7 @@ trait ShapeEffect extends EnhancedLook:
 
 ### Diagramma
 
-```mermaid
-classDiagram
-    direction BT
-    class ClickObserver~T~ 
-    class ReleaseObserver~T~ 
-    class HoverObserver~T~ 
-    class ExitObserver~T~
-    class MovedObserver~T~
-    class Observer~T~
-    class Observable~T~
-    <<Trait>> ClickObserver
-    <<Trait>> ReleaseObserver
-    <<Trait>> HoverObserver
-    <<Trait>> ExitObserver
-    <<Trait>> MovedObserver
-    <<Trait>> Observer
-    <<Trait>> Observable
 
-    Observable: attach...(data ...Observer[T]) Unit
-    Observable: detach...(data ...Observer[T]) Unit
-    Observable: notify...(data T) Unit
-    Observable: toObserver[I](newData I => T) Observer[I]
-    ClickObserver: onClick(data T) Unit = ()
-    ReleaseObserver: onRelease(data T) Unit = ()
-    HoverObserver: onHover(data T) Unit = ()
-    ExitObserver: onExit(data T) Unit = ()
-    MovedObserver: onMoved(data T) Unit = ()
-    
-    Observer --> ClickObserver
-    Observer --> ReleaseObserver
-    Observer --> HoverObserver
-    Observer --> ExitObserver
-    Observer --> MovedObserver
-    Observable ..|> Observer : transformInto
-    Observable o--> Observer
-    Observable o--> ClickObserver
-    Observable o--> ReleaseObserver
-    Observable o--> HoverObserver
-    Observable o--> ExitObserver
-    Observable o--> MovedObserver
-```
 
 ### Descrizione tecnica
 
