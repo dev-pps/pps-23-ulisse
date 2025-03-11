@@ -382,8 +382,35 @@ classDiagram
     Wagon ..o Train
     WagonType ..o Wagon
 ```
+### TrainAgents (Behaviour)
+
+```mermaid
+classDiagram
+    class TrainAgent
+   class StateBehavior {
+       <<abstract>>
+     + motionData() MotionData *
+     + stateName() String *
+     + enoughSpace(d: Option[Double], train: Train) Boolean *
+     + next(train: Train, dt: Int, p: Percepts) *
+     + shouldStop(ri: TrainRouteInfo, train: Train) Boolean
+     + reset() StateBehavior
+     + withOffsetDistance(offset: Double) StateBehavior
+   }
+   class MotionData {
+     + distanceTravelled: Double 
+     + speed: Double
+     + acceleration: Double
+     + withAcceleration(acc: Double) MotionData
+     + withSpeed(newSpeed: Double) MotionData
+     + withDistanceOffset(offset: Double) MotionData
+   }
+   TrainAgent o.. StateBehavior
+   StateBehavior o.. MotionData
+```
+
 #### Timetable
-L'entità `Timetable` assume un ruolo abbastanza cruciale nella programmazione dei diversi viaggi che i treni devono svolgere durante la simulazione. Attraverso una sequenza di `Station` e di route `Route` viene definita la tabella oraria del treno.
+L'entità `Timetable` assume un ruolo abbastanza cruciale nella programmazione dei diversi viaggi che i treni devono svolgere durante la simulazione. Attraverso una sequenza di `Station` e di route `Route` viene definita la tabella oraria del treno dove per ogni statione viene memorizzato `TrainStationTime`contenente l'ora di arrivo/partenda e minuti di sosta.
 Con questa definizione di viaggio poi, successivamente, vengono ricavate le `DynamicTimetable` necessarie per il corretto funzionamento della simulazione e in modo particolare dei treni.
 Una `Timetable` può essere costruita attraverso il `TimetableBuilder` utilizzando il pattern *Builder Pattern* e attraverso i metodi che espone è possibile ricavare una `PartialTimetable` (una timetable la cui stazione finale non è stata ancora definita) o altrimenti una `Timetable`.
 Si noti nell' UML sottostante che il builder utilizza un `TimeEstimator` ([maggiori dettagli](5-impl-violani.md#timetable)), una strategia specifica per il calcolo degli orari della tabella oraria. 
@@ -424,21 +451,57 @@ direction BT
     TrainTimetableImpl ..|> TrainTimetable : implements
     PartialTrainTimetable ..|> PartialTimetable : implements
     TimetableBuilder ..> TimeEstimator : using
+    TimetableBuilder o.. TrainStationTime
     TimetableBuilder ..> PartialTimetable : creates
     TimetableBuilder ..> TrainTimetable : creates
 ```
 
-### Editor
-Per lo sviluppo dell'editor, sono stati progettati componenti personalizzati per
-migliorare l'esperienza e l'interazione dell'utente, ottimizzando l'interazione con l'interfaccia. 
+## View
+Per lo sviluppo della view, sono stati progettati componenti personalizzati per
+migliorare l'esperienza dell'utente, ottimizzando l'interazione con l'interfaccia. 
 La progettazione è stata orientata dal principio SRP (Single Responsibility Principle), 
 con l'obiettivo di ridurre la complessità e la verbosità, delegando a ciascun 
 componente una responsabilità chiara e specifica nella gestione della creazione grafica.
 
 ```mermaid
+classDiagram
+    direction TB
+    class GUI 
+    class Menu 
+    class Dashboard
 
+    class SimulationWorkspace
+    class MapWorkspace
+    class TrainWorkspace
+    
+    class StationForm
+    class RouteForm
+    class TimetableForm
+    class MapPanel
+    
+    class SimulationForm
+    class MapSimulation
+    
+    class TrainEditorView
+    
+    GUI *--> Menu: 1
+    GUI *--> Dashboard: 1
+    GUI *--> SimulationWorkspace: 1
+    GUI *--> MapWorkspace: 1
+    GUI *--> TrainWorkspace: 1
+    SimulationWorkspace *--> SimulationForm: 1
+    SimulationWorkspace *--> MapSimulation: 1
+    MapWorkspace *--> StationForm: 1
+    MapWorkspace *--> RouteForm: 1
+    MapWorkspace *--> TimetableForm: 1
+    MapWorkspace *--> MapPanel: 1
+    TrainWorkspace *--> TrainEditorView: 1
 ```
 
+### Adapters
+
+
+### Observers
 Per quanto riguarda l'interazione con l'utente, è stato adottato il pattern Observer
 per monitorare gli eventi grafici, come le azioni del mouse sulla GUI. 
 Questo approccio consente di osservare gli eventi in tempo reale e, quando 
@@ -488,12 +551,13 @@ classDiagram
     Observable o--> MovedObserver
 ```
 
-L'editor dell'applicazione è stato progettato per garantire un impatto visivo chiaro
-e migliorato, utilizzando il pattern Decorator. Questo pattern permette di estendere
-i componenti grafici nativi senza modificarne la struttura originale, migliorando
-la resa grafica complessiva. In questo modo, è stato possibile arricchire l'interfaccia
-con funzionalità visive aggiuntive, mantenendo al contempo la modularità e la
-riusabilità dei componenti di base.
+### Decorator
+La View dell'applicazione è stata progettata per garantire un impatto visivo chiaro 
+e migliorato, utilizzando il pattern Decorator. Questo pattern permette di 
+estendere i componenti grafici nativi senza modificarne la struttura originale, 
+migliorando la resa grafica complessiva. In questo modo, è stato possibile 
+arricchire l'interfaccia con funzionalità visive aggiuntive, mantenendo al 
+contempo la modularità e la riusabilità dei componenti di base.
 
 ```mermaid
 classDiagram
@@ -506,6 +570,7 @@ classDiagram
     class ImageEffect
     class PictureEffect
     class SVGEffect
+    <<Trait>>Observable~MouseEvent~
     <<Trait>> EnhancedLook
     <<Trait>> ShapeEffect
     <<Trait>> BorderEffect
@@ -520,7 +585,7 @@ classDiagram
     EnhancedLook <-- BorderEffect
     EnhancedLook <-- FontEffect
     EnhancedLook <-- ImageEffect
-    EnhancedLook o--> Observable
+    EnhancedLook <-- Observable
 ```
 
 
