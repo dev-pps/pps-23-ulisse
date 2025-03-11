@@ -18,6 +18,26 @@ Nello sviluppo si è cercato di abbracciare completamente la programmazione funz
 
 Analizzando per esempio il manager `TimetableManager` qualsiasi metodo che prevede l'aggiunta/cancellazione di una timetable o che tipicamente lancerebbe una eccezione restituisce un `Either[TimetableManagerErrors, TimetableManager]`. In questo modo in caso d'errore viene sempre ritornata la causa, mentre in caso di successo della richiesta viene restituito il manager aggiornato. Attraverso `match-case` è possibile distinguere l'errore e agire di conseguenza.
 
+Di seguito si mostrano gli errori specifici del `TimetableManager`:
+
+```scala 3
+/** Errors that can returned by manager */
+  trait TimetableManagerErrors extends BaseError
+  object TimetableManagerErrors:
+    final case class AcceptanceError(reason: String) extends ErrorMessage(s"Timetable not approved: $reason")
+        with TimetableManagerErrors
+    final case class TimetableNotFound(trainName: String)
+        extends ErrorNotExist(s"No timetables exist for train $trainName") with TimetableManagerErrors
+    final case class DeletionError(descr: String) extends ErrorMessage(s"Delete error: $descr")
+        with TimetableManagerErrors
+    final case class StationNotFound() extends ErrorNotExist(s"some station not found") with TimetableManagerErrors
+    final case class DuplicatedStations(stations: Seq[Station])
+        extends ErrorMessage(s"Timetable has duplicated stations: $stations")
+        with TimetableManagerErrors
+```
+
+## Train
+
 ## Train Agent FSM
 Nella realizzazione dell'aspetto dinamico del TrainAgent 
 ```mermaid
