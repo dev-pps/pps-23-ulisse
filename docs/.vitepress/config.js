@@ -22,7 +22,7 @@ export default withMermaid(
                         {text: 'Introduzione', link: `${reportPath}/0-introduzione`},
                         {text: 'Processo di sviluppo', link: `${reportPath}/1-processo-di-sviluppo`},
                         {text: 'Requisiti', link: `${reportPath}/2-requisiti`},
-                        {text: 'Architectural Design', link: `${reportPath}/3-arch-design`},
+                        {text: 'Design Architetturale', link: `${reportPath}/3-arch-design`},
                         {text: 'Detailed Design', link: `${reportPath}/4-details-design`},
                         {text: 'Implementation',
                             link: `${reportPath}/5-implementation`,
