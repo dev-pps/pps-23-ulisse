@@ -2,13 +2,14 @@
 [Link to backlog](./backlogs/3-backlog)
 
 ## Sprint Goal
-Develop landing page idea capable of navigating through all previous editors
+Sviluppare un'idea di landing page capace di navigare attraverso tutti i precedenti editor
+
 ## Deadline
-The sprint deadline is 31/01/2025.
+La scadenza dello sprint è il 31/01/2025.
 
 ## Sprint Review
-The stakeholder is satisfied of mockup, the resulting customizable GUI demo (with navigation partially working).
+Lo stakeholder è soddisfatto del mockup e della demo della GUI personalizzabile risultante (con navigazione parzialmente funzionante).
 
 ## Sprint Retrospective
-No specific difficulties or problems about process and environment emerged during sprint. 
-Team has acquired enough confidence in using YouTrack tools.
+Durante lo sprint non sono emerse difficoltà o problemi specifici riguardo al processo e all'ambiente.  
+Il team ha acquisito sufficiente confidenza nell'uso degli strumenti di YouTrack.

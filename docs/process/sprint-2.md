@@ -2,16 +2,14 @@
 [Link to backlog](./backlogs/2-backlog)
 
 ## Sprint Goal
-Combine station management with route management
+Combinare la gestione delle Station con la gestione delle Route
 
 ## Deadline
-The sprint deadline is 24/01/2025.
+La scadenza dello sprint è il 24/01/2025.
 
 ## Sprint Review
-The stakeholder is not completely satisfied because only part of the main objective was achieved. 
+Lo stakeholder non è completamente soddisfatto perché solo una parte dell'obiettivo principale è stata raggiunta.
 
 ## Sprint Retrospective
-Overall the internal management was better than in the latest sprint due to a better tracking of working time and
-better group cohesion.
-this week most of the time was spent studying topics related to FP (e.g. immutability and immutable state)
-rather than working on product features
+Nel complesso, la gestione interna è stata migliore rispetto all'ultimo sprint grazie a un miglior monitoraggio del tempo di lavoro e a una maggiore coesione del gruppo.  
+Questa settimana la maggior parte del tempo è stata dedicata allo studio di argomenti legati alla Programmazione Funzionale (ad esempio immutabilità e stato immutabile), piuttosto che al lavoro sulle funzionalità del prodotto.

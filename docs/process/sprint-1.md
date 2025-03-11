@@ -2,30 +2,31 @@
 [Link to backlog](./backlogs/1-backlog)
 
 ## Sprint Goal
-Setup project and provide to stakeholder a demo for Station, Route and Train creation.
+Impostare il progetto e fornire allo stakeholder una demo per la creazione di Station, Route e Train.
 
 ## Deadline
-The sprint deadline is 17/01/2025.
+La scadenza dello sprint è il 17/01/2025.
 
 ## Sprint Review
-Stakeholder is quite satisfied for the demos because most of the goal was achieved except for the overall integration of the developed components.
+Lo stakeholder è abbastanza soddisfatto delle demo, poiché la maggior parte degli obiettivi sono stati raggiunti, ad eccezione dell'integrazione complessiva dei componenti sviluppati.
 
 ## Sprint Retrospective
 
-Most time was spent by team for setting-up project aspects:
-- packages organization and semantic of them
-- decision of architecture to use
-- coordination of work to do
-- alignment of shared entities
+La maggior parte del tempo è stata dedicata dal team all'impostazione degli aspetti del progetto:
+- organizzazione dei pacchetti e il loro significato semantico
+- decisione sull'architettura da utilizzare
+- coordinamento del lavoro da svolgere
+- allineamento delle entità condivise
 
-All the above problems (that slow team work) were solved through meets in presence or in video call. 
-During meets were evaluated different solution considering pros and cons.
-The overall task subdivision of tasks was balanced.
+Tutti i problemi sopra elencati (che hanno rallentato il lavoro del team) sono stati risolti attraverso incontri in presenza o in videochiamata.  
+Durante gli incontri sono state valutate diverse soluzioni, considerando pro e contro.  
+La suddivisione complessiva dei compiti è risultata bilanciata.
 
-Main changes founded to improve teams efficiency are:
-- more fine task subdivision
-- a more clear definition of done
+Le principali modifiche individuate per migliorare l'efficienza del team sono:
+- una suddivisione più dettagliata dei task
+- una definizione più chiara del "Definition of Done"
 
 ### Changes to try
-- immutability
+- immutabilità  
+
 

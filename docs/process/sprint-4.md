@@ -3,15 +3,13 @@
 [Link to backlog](./backlogs/4-backlog)
 
 ## Sprint Goal
-
-Have a fully functional dashboard where stakeholder can use editors.
+Avere una dashboard completamente funzionante dove lo stakeholder possa utilizzare gli editor.
 
 ## Deadline
-
-The sprint deadline is 08/02/2025.
+La scadenza dello sprint è l'08/02/2025.
 
 ## Sprint Review
-Main dashboard and navigation layout is almost complete but are missing simulation page, train timetable form and backend integration.
+La dashboard principale e il layout di navigazione sono quasi completi, ma manca la pagina di Simulation, il form per le Timetable e l'integrazione con il backend.
 
 ## Sprint Retrospective
-Overall sprint organization and task selection and assignment should be better. We underestimate some potential implementation issues like propagation of generics and the advanced usage of scala-swing.
+Nel complesso, l'organizzazione dello sprint, la selezione e l'assegnazione dei compiti dovrebbero essere migliori. Abbiamo sottovalutato alcuni problemi di implementazione, come la propagazione dei generici e l'uso avanzato di scala-swing.
