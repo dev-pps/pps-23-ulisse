@@ -36,10 +36,7 @@ Di seguito si mostrano gli errori specifici del `TimetableManager`:
         with TimetableManagerErrors
 ```
 
-## Train
-
 ## Train Agent FSM
-Nella realizzazione dell'aspetto dinamico del TrainAgent 
 ```mermaid
 classDiagram
 direction LR
@@ -75,6 +72,7 @@ class Train {
 ```
 `TrainAgent` e il suo comportamento dinamico (FSM) in base ai percepts ricevuti (sviluppati dal collega Federico Bravetti)
   - MotionData: modellazione in una entità dedicata delle informazioni dinamiche del movimento del treno come *velocità*, *accelerazione* e *spazio percorso*.
+  
   - `TrainAgentsStates` (concetto base `StateBehavior` con mixins trait per rendere modulare la logica di fermata con metodo `shouldStop` e il calcolo delle distanza di sicurezza fornita dal metodo `enoughSpace` del trait `SpaceManagement`)
   
     Avendo separato il concetto di comportamento (stato della FSM) dalla definzione del TrainAgent quest'ultimmo non ha la responsabilità di valutare quale sia lo stato successivo in cui passare ma è lo stato stesso, che a seguito della chiamata del metodo `next`, restituisce quello nuovo. 
@@ -90,7 +88,7 @@ class Train {
 ```
 
 ### TrainAgentStates
-
+Per l'implementazione dello stato del TrainAgent è stato sfruttato il meccanismo del mixin
 Lo State del TrainAgent è uno `StateBehavior` che come si può vedere dall'UML è una classe astratta in cui i metodi `enoughSpace`, `stationName` e `next` la cui implementazione verrà definita in una classe specifica. Ciascun state behavior è caratterizzato dal *nome* e la *logica di transizione* ad un nuovo stato.
 
 
@@ -98,7 +96,6 @@ Lo State del TrainAgent è uno `StateBehavior` che come si può vedere dall'UML 
 classDiagram
 
 direction TB
-    %% Classi astratte e trait
     class StateBehavior {
         <<abstract class>>
         + stateName() String *
@@ -115,7 +112,6 @@ direction TB
         + enoughSpace(d: Option[Double], train: Train) Boolean
     }
 
-    %% Classi concrete che utilizzano mixin
     class Stopped {
         + motionData MotionData
         + stateName() String
@@ -128,11 +124,9 @@ direction TB
         + next(train: Train, dt: Int, p: Percepts) StateBehavior
     }
 
-    %% Relazioni di ereditarietà e mixin
     StateBehavior <|-- Stopped : extends
     StateBehavior <|-- Running : extends
 
-    %% Mixin evidenziato
     BasicSpaceManagement <|.. Stopped : mixin
     BasicSpaceManagement <|.. Running : mixin
 
@@ -258,3 +252,5 @@ TimetableBuilder(train = AV1000Train, startStation = stationA, departureTime = h
   .stopsIn(stationD, waitTime = 10)(railAV_10)
   .arrivesTo(stationF)(railAV_10)
 ```
+
+## Test with fake entities
