@@ -18,101 +18,11 @@ Di seguito si propone un’analisi più approfondita delle componenti più rilev
 **Obiettivo**: Creare uno stato immutabile dell'applicazione e garantire
 la sua coerenza e integrità.
 
-**Motivazione**: L'adozione di funzioni per la modifica dello stato, anziché
-interventi diretti, promuove una gestione funzionale basata sull'immutabilità
+**Motivazione**: L'adozione di funzioni higher-order per la modifica dello stato,
+anziché interventi diretti, promuove una gestione funzionale basata sull'immutabilità
 e riduce i side effects.
 Questo approccio semplifica il testing e garantisce un controllo più rigoroso
 e una maggiore coerenza nella gestione dello stato.
-
-### Diagramma
-
-Di seguito è mostrata una rappresentazione parziale delle classi che compongono `AppState`.
-
-```mermaid
-classDiagram
-    direction BT
-    class AppState
-    class StationManager
-    class RouteManager
-    class TrainManager
-    <<Trait>> AppState
-    <<Trait>> StationManager    
-    <<Trait>> RouteManager
-    <<Trait>> TrainManager
-   
-    AppState : updateStationManager(update StationManager => StationManager) AppState
-    AppState : updateRouteManager(update RouteManager => RouteManager) AppState
-    AppState : updateTrainManager(update TrainManager => TrainManager) AppState
-    
-    StationManager --o AppState
-    RouteManager --o AppState
-    TrainManager --o AppState
-   
-```
-
-```mermaid
-classDiagram
-    direction BT
-    class AppState
-    
-    class StationManager
-    class RouteManager
-    class TrainManager
-    class TimetableManager
-    class SimulationManager
-
-    class Station
-    class Route
-    class Train
-    class Timetable
-    class Simulation
-
-    <<Trait>>AppState
-    <<Trait>>StationManager
-    <<Trait>>RouteManager
-    <<Trait>>TrainManager
-    <<Trait>>TimetableManager
-    <<Trait>>SimulationManager
-    
-    <<Trait>>StationManager
-    <<Trait>>RouteManager
-    <<Trait>>TrainManager
-    <<Trait>>TimetableManager
-    <<Trait>>SimulationManager
-
-    AppState: updateStation(update StationManager => StationManager) AppState
-    AppState: updateRoute(update RouteManager => RouteManager) AppState
-    AppState: createTrain(update (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager) AppState
-    AppState: updateTimetable(update TimetableManager => TimetableManager) AppState
-    AppState: updateSimulationManager(update SimulationManager => SimulationManager) AppState
-
-%%    StationEventQueue: addReadStationManagerEvent(StationManager => Unit) Unit
-%%    StationEventQueue: addUpdateStationManagerEvent(StationManager => StationManager) Unit
-%%    StationEventQueue: addUpdateStationManagersEvent(StationManagers => StationManagers) Unit
-%%  
-%%    RouteEventQueue: addReadRouteEvent(RouteManager => Unit) Unit
-%%    RouteEventQueue: addCreateRouteEvent((StationManager, RouteManager) => (StationManager, RouteManager)) Unit
-%%    RouteEventQueue: addUpdateRouteEvent((StationManager, RouteManager,TimetableManager) => (StationManager, RouteManager, TimetableManager)) Unit
-%%    RouteEventQueue: addDeleteRouteEvent(update (RouteManager, TimetableManager) => (RouteManager, TimetableManager)) Unit
-%%  
-%%    TrainEventQueue: addReadTrainEvent(update (TrainManager, TechnologyManager[TrainTechnology]) => Unit) Unit
-%%    TrainEventQueue: addCreateTrainEvent(update (TrainManager, TechnologyManager[TrainTechnology]) => TrainManager) Unit
-%%    TrainEventQueue: addUpdateTrainEvent(update (TrainManager, TechnologyManager[TrainTechnology], TimetableManager) => (TrainManager, TimetableManager)) Unit
-%%    TrainEventQueue: addDeleteTrainEvent(update (TrainManager, TimetableManager) => (TrainManager, TimetableManager)) Unit
-
-
-    Station --> StationManager
-    Route --> RouteManager
-    Train --> TrainManager
-    Timetable --> TimetableManager
-    Simulation --> SimulationManager
-
-    StationManager --> AppState
-    RouteManager --> AppState
-    TrainManager --> AppState
-    TimetableManager --> AppState
-    SimulationManager --> AppState
-```
 
 ### Descrizione tecnica
 
@@ -138,44 +48,6 @@ lo stato dell'applicazione (`AppState`) dell'esterno, preservando l'immutabilit�
 dell'architettura esagonale, implementando un sistema di comunicazione robusto e
 scalabile, che assicura una gestione funzionale della creazione e dell'aggiornamento
 dello stato dell'applicazione.
-// dire high-order type
-
-### Diagramma
-
-La definizione di una coda dedicata per ciascun concetto di `Service` consente di aderire
-ai principi di *Single Responsibility SRP* e *Dependency Inversion DIP*, assicurando
-alta coesione e basso accoppiamento. Questo approccio favorisce la modularità e migliora
-la scalabilità dell'architettura.  
-Di seguito è riportata una porzione delle classi coinvolte.
-
-```mermaid
-classDiagram
-    class AppState
-    class EventQueue
-    class StationEventQueue
-    class RouteEventQueue
-    class TrainEventQueue
-    class StationService
-    class RouteService
-    class TrainService
-    <<Trait>> EventQueue
-    <<Trait>> StationEventQueue
-    <<Trait>> RouteEventQueue
-    <<Trait>> TrainEventQueue
-    <<Trait>> StationService
-    <<Trait>> RouteService
-    <<Trait>> TrainService
-    EventQueue: LinkedBlockingQueue[AppState => AppState] events
-    EventQueue: startProcessing(initState AppState) Unit
-
-    EventQueue *--> AppState
-    StationEventQueue <-- EventQueue
-    RouteEventQueue <-- EventQueue
-    TrainEventQueue <-- EventQueue
-    StationService *--> StationEventQueue
-    RouteService *--> RouteEventQueue
-    TrainService *--> TrainEventQueue
-```
 
 ### Descrizione tecnica
 
@@ -183,8 +55,8 @@ L'`EventQueue` è una coda bloccante di funzioni che aggiornano lo stato dell'ap
 Il metodo `startProcessing` utilizza` LazyList.continually` per estrarre continuamente
 eventi dalla coda. Ogni evento, rappresentato da una funzione, viene applicato
 allo stato corrente tramite `foldLeft`, producendo una nuova versione immutabile dello
-stato ad ogni iterazione.
-// dire high-order type
+stato ad ogni iterazione. Questo approccio è reso possibile dall'aggiornamento
+di `AppState` tramite l'uso di funzioni _higher-order_.
 
 ```Scala 3
 override def startProcessing(initState: AppState): Unit =
@@ -201,23 +73,14 @@ di validità definiti.
 una costruzione sicura e funzionale dell'entità, sfruttando le capacità di Scala
 per la gestione degli errori e la validazione dei dati in modo dichiarativo.
 
-### Diagramma
-
-Di seguito sono riportate alcune funzionalità per la modifica e la
-validazione dei campi di `Route`.
-
-```mermaid
-classDiagram
-    class Route
-    Route: withArrival(arrival Station) Either[RouteError, Route]
-    Route: withRailsCount(railsCount Int) Either[RouteError, Route]
-    Route: withLength(length Double) Either[RouteError, Route]
-```
-
 ### Descrizione tecnica
 
-// Alias per il tipo di error
-Spiegare che
+Per implementare il sistema di validazione, è stato utilizzato il tipo `Either`,
+che consente di gestire in modo funzionale ed espressivo i possibili errori.
+Il companion object di `Route` espone il metodo apply, che accetta i parametri
+necessari per la creazione di una Route e restituisce un `Either[RouteError, Route]`,
+rappresentando l'entità `Route` in caso di successo o un `RouteError` ovvero lista
+di errori in caso di fallimento.
 
 ```scala 3
 type RouteError = NonEmptyChain[Errors]
@@ -227,6 +90,12 @@ object Route:
             railsCount: Int, length: Double): Either[RouteError, Route] =
     validateAndCreateRoute(departure, arrival, typeRoute, railsCount, length)
 ```
+
+La funzione `validateAndCreateRoute` si occupa di validare i parametri di input
+concatenando i risultati Either ottenuti nelle singole funzioni di validazione tramite
+l'operatore `mapN` di `cats`. Questo permette di creare una `Route` solo se tutti
+i controlli vengono superati, permette anche di avere una lista di errori in
+caso di fallimento.
 
 ```scala 3
 private def validateRoute[T](departure: Station, arrival: Station,
@@ -241,6 +110,9 @@ private def validateRoute[T](departure: Station, arrival: Station,
   .mapN(creation(_, _, typeRoute, _, _))
 ```
 
+La concatenazione delle singole funzioni di validazione è resa possibile dall'uso
+della libreria `cats`, che fornisce l'operatore `traverse` per combinare i risultati.
+
 ```scala 3
 extension [A, E](value: A)
   def cond(f: A => Boolean, error: E): Either[E, A] =
@@ -250,13 +122,18 @@ extension [A, E](value: A)
     f.map(value.cond).traverse(_.toValidatedNec).map(_ => value).toEither
 ```
 
-## DSL per la creazione di entità infrastrutturali: `Station` `Route` `Train`
+## DSL per la creazione di entità infrastrutturali
 
-**Obiettivo**
+**Obiettivo**: Creare un Domain-Specific Language (DSL) per la creazione di una
+infrastruttura ferroviaria, che permetta di definire in modo dichiarativo le stazioni,
+le rotte, i treni e le timetable.
 
-**Motivazione**
+**Motivazione**: Ottenere un sistema di creazione dichiarativo e funzionale,
+che permetta di definire in modo chiaro e conciso le entità infrastrutturali,
 
 ### Diagramma
+
+Di seguito vengono evidenziate le operazioni che è possibile effettuare tramite il DSL.
 
 ```mermaid
 flowchart LR
@@ -273,6 +150,12 @@ flowchart LR
 ```
 
 ### Descrizione tecnica
+
+Tramite l'uso di implicit class è possibile definire il punto di partenza del DSL
+in modo preciso. E l'uso di extension method permette di definire in modo
+conciso le operazioni che è possibile effettuare sullo stato dell'applicazione.
+Inoltre l'uso di extension method permette avere la definizione del DSL più leggibile,
+dividendo la creazione dello stato in più parti e le operazioni che si possono effettuare.
 
 ```scala 3
 object CreateAppState:
@@ -295,37 +178,46 @@ object CreateAppState:
   CreateAppState || state put trainA put trainB
 ```
 
+Grazie all'uso di `given Conversion` è possibile convertire in modo automatico
+il DSL in uno stato dell'applicazione.
+
 ```scala 3
 given Conversion[AppStateDSL, AppState] = _.appState
 ```
+
+Un esempio di utilizzo del DSL per la creazione di un sistema ferroviario è il seguente:
 
 ```scala 3
 val initState = AppState()
 appState = CreateAppState || initState set
   stationA set stationB set stationC set stationD set stationE set
-  routeFG link routeGA link routeAB link routeBC link routeCD link
+  routeBA link routeEA link routeAB link routeBE link routeCD link
   trainA_AV put trainB_AV put trainC_AV put trainD_AV scheduleA
-  table9 scheduleA table10 scheduleA table11 scheduleA table12
+  table1 scheduleA table2 scheduleA table3 scheduleA table4
 ```
 
 ## Toolkit per la Customizzazione Visiva dell'UI: `EnhancedLook`
 
-**Obiettivo**
+**Obiettivo**: Creare un toolkit per la personalizzazione grafica degli elementi
 
-**Motivazione**
-
-### Diagramma
-
+**Motivazione**: Fornire un sistema di personalizzazione grafica per gli elementi, che
+consenta di definire in modo dichiarativo l'aspetto visivo degli oggetti grafici.
 
 ### Descrizione tecnica
+
+Grazie all'uso di trait e mixin, è possibile definire un sistema di personalizzazione
+grafica per i componenti dell'interfaccia utente. Il trait `EnhancedLook` viene esteso
+da un tipo `Component`, che rappresenta un componente grafico di `Swing`.
+Inoltre, l'uso della `self-type` annotation consente di rafforzare i vincoli sui
+tipi che possono estendere il trait EnhancedLook, garantendo una maggiore coesione
+e sicurezza nel design.
+
+L'estensione del trait `Component` con `EnhancedLook` permette di avere accesso al
+metodo `paintComponent` per personalizzare l'aspetto grafico dei componenti di Swing.
 
 ```scala 3
 trait EnhancedLook extends Component:
   self: Component =>
-
-  def updateGraphics(): Unit =
-    revalidate()
-    repaint()
 
   protected def paintLook(g: Graphics2D): Unit = ()
 
@@ -336,8 +228,12 @@ trait EnhancedLook extends Component:
     super.paintComponent(g)
 ```
 
+Un esempio di utilizzo del trait `EnhancedLook` per personalizzare l'aspetto del
+rettangolo di un componente è il seguente:
+
 ```scala 3
 trait ShapeEffect extends EnhancedLook:
+  self: Component =>
   private var _rect: Styles.Rect = Styles.defaultRect
   private val currentColor: CurrentColor = CurrentColor(rectPalette.background)
 
@@ -352,40 +248,75 @@ trait ShapeEffect extends EnhancedLook:
 
 ### Pattern
 
+Rivisitazione del pattern Decorator per la personalizzazione grafica dei componenti
+dell'interfaccia utente, sfruttando le funzionalità di Scala per la definizione di
+trait e mixin. Utilizzando i trait insieme alla `self-type annotation`, è possibile
+modulare e comporre comportamenti grafici distinti, consentendo la creazione di
+effetti visivi complessi attraverso la combinazione di decorator.
+
 ## Event system dei componenti grafici: `Observable` `Observer`
 
-**Obiettivo**
+**Obiettivo**: Progettare un sistema di gestione degli eventi che si attivi a
+seguito dell'interazione con i componenti grafici dell'interfaccia utente,
+propagando l'evento iniziale o generando nuovi eventi, tutti attivati
+dalla stessa azione dell'utente.
 
-**Motivazione**
-
-### Diagramma
-
-
+**Motivazione**: Progettare un sistema di comunicazione robusto e scalabile
+che garantisca la propagazione degli eventi generati dall'interazione con i componenti
+grafici, implementando un meccanismo per la trasformazione degli eventi originali
+in nuovi eventi, consentendo una gestione modulare e separata degli stessi.
 
 ### Descrizione tecnica
 
-// export e Diagramma gia fatto per l'observable
+Utilizzando le funzioni higher-order di Scala, è possibile implementare un sistema
+di adattamento tra un `Observable` e un `Observer`, consentendo la propagazione degli
+eventi generati dall'interazione con i componenti grafici come nuovi eventi specifici.
+Questo è reso possibile tramite l'uso del metodo `toObserver`, che trasforma un dato
+di tipo `I` in un tipo `T` tramite una funzione di mappatura, adattando dinamicamente
+l'osservatore all'evento desiderato.
 
 ```scala 3
+trait Observer[T]
+
+trait Observable[T]
+
 def toObserver[I](newData: I => T): Observer[I]
 ```
 
-### Pattern
+In questo modo è stato possibile creare `Observable` definiti in un entità
+del dominio ma innescati dagli `Observable` dei componenti grafici.
 
-### testing della route adapter
+## Testing
 
-### testing dell'architettura
+Di seguito si riportano alcune considerazioni sul testing del codice sviluppato.
 
-**Obiettivo**
+### RouteInputAdapter
 
-**Motivazione**
+Il `RouteInputAdapter` è stato testato utilizzando la libreria `ScalaTest`,
+definendo i test come scenari di interazione dell'utente. I test, inclusi nel
+modulo RouteAdapterTest, coprono vari casi d'uso, tra cui:
 
-### Diagramma
+<p align="center">
+  <a href="https://github.com/dev-pps/pps-23-ulisse">
+    <img src="/resources/implementation/buizo/routeInputAdapter.png" style="width: 50%">
+  </a>
+</p>
 
-### Descrizione tecnica
+### Architettura
 
-### Pattern
+L'architettura esagonale del progetto è stata validata utilizzando la libreria `ArchUnit`,
+verificando esclusivamente i sorgenti creati dal team di sviluppo.
 
-### Testing
+```scala 3
+"hexagonal architecture" should "be entities -> applications -> adapters" in :
+  val rule = Architectures
+    .onionArchitecture
+    .domainModels(Packages.ENTITIES)
+    .applicationServices(Packages.APPLICATIONS)
+    .adapter("adapters", Packages.ADAPTERS)
+    .ignoreDependency(DescribedPredicate.alwaysTrue(), resideInAPackage(Packages.INFRASTRUCTURES))
+    .ignoreDependency(resideInAPackage(Packages.INFRASTRUCTURES), DescribedPredicate.alwaysTrue())
+    .allowEmptyShould(true)
 
-### Criticità
+  rule.check(IMPORT_ONLY_CLASSES_CREATED)
+```
