@@ -304,5 +304,23 @@ private given overflowStrategy: TimeBuildStrategy with
 ```
 nel primo caso l'orario viene formattato secondo il formato 24, nel secondo caso invece vengono accumulati anche gli eccessi.
 
+## Runner for Test
+L'utilizzo di una LazyList collegata ad una ConcurrentQueue permette di rappresentare il cambiamento dello stato come una sequenza di trasformazioni di quest'ultimo. 
+In questo modo si ha una migliore integrazione con lo stile funzionale e inoltre risulta più semplice poter navigare tra gli stati passati semplificando le operazioni di debug, caratteristica che non si sarebbe pouta ottenere andando ad utilizzare una semplice refernza concorrente.
+```scala 3
+def runAll[S](initialState: S, queue: LinkedBlockingQueue[S => S]): List[S] =
+val elements = java.util.ArrayList[S => S]()
+queue.drainTo(elements)
+elements.asScala.toList.scanLeft(initialState)((state, event) => event(state))
+```
+```scala 3
+"correctly apply all transformations from the queue to the initial state" in:
+val queue = LinkedBlockingQueue[String => String]()
+queue.add(_ + "A")
+queue.add(_ + "B")
+queue.add(_ + "C")
+runAll("", queue) shouldEqual List("", "A", "AB", "ABC")
+```
 
-
+Immutabilità naturale – In un contesto funzionale, gli stati sono immutabili. Una lazy list permette di rappresentare la sequenza degli stati senza modificarli direttamente, ma piuttosto generando il nuovo stato a partire dal precedente.
+Backtracking e Time Travel – Grazie alla persistenza dei dati, è possibile navigare tra gli stati passati senza ricomputarli da zero, utile per debugging o simulazioni.
