@@ -35,6 +35,7 @@ object TimetableViewModel:
   extension (t: Timetable)
     def toTimetableEntries: List[TimetableEntry] =
       extension [T](t: Option[T])
+        @SuppressWarnings(Array("org.wartremover.warts.ToString"))
         private def optionString: Option[String] = t.map(_.toString)
 
       t.table.map((station, times) =>
