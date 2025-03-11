@@ -500,6 +500,50 @@ classDiagram
 
 ### Adapters
 
+```mermaid
+classDiagram
+  direction BT
+  class GUI
+
+  class SimulationNotificationListener
+  class SimulationNotificationAdapter
+  class SimulationPortsOutput
+  
+  class SimulationWorkspace
+  class MapWorkspace
+  class TrainWorkspace
+
+  class SimulationForm
+  class MapSimulation
+  class InputAdapterManager
+
+  <<Trait>> InputAdapterManager
+  <<Trait>> SimulationNotificationListener
+  
+  SimulationNotificationListener: updateData(data SimulationData) Unit
+  SimulationNotificationListener: endSimulation(data SimulationData) Unit
+  
+  InputAdapterManager: train TrainViewAdapter
+  InputAdapterManager: train TrainViewAdapter
+  InputAdapterManager: timetable TimetableViewAdapter
+  InputAdapterManager: station StationEditorAdapter
+  InputAdapterManager: route RouteAdapter
+  InputAdapterManager: simulationPage SimulationPageAdapter
+  InputAdapterManager: simulationInfo SimulationInfoAdapter
+  InputAdapterManager <--o GUI: 1
+  InputAdapterManager -- SimulationWorkspace: use
+  InputAdapterManager -- MapWorkspace: use
+  InputAdapterManager -- TrainWorkspace: use
+  GUI *--> SimulationWorkspace: 1
+  GUI *--> MapWorkspace: 1
+  GUI *--> TrainWorkspace: 1
+  SimulationWorkspace *--> MapSimulation: 1
+  SimulationWorkspace *--> SimulationForm: 1
+  SimulationNotificationListener <-- MapSimulation
+  SimulationNotificationAdapter o--> SimulationNotificationListener
+  SimulationPortsOutput <-- SimulationNotificationAdapter 
+
+```
 
 ### Observers
 Per quanto riguarda l'interazione con l'utente, è stato adottato il pattern Observer
@@ -570,7 +614,7 @@ classDiagram
     class ImageEffect
     class PictureEffect
     class SVGEffect
-    <<Trait>>Observable~MouseEvent~
+    <<Trait>> Observable~MouseEvent~
     <<Trait>> EnhancedLook
     <<Trait>> ShapeEffect
     <<Trait>> BorderEffect
