@@ -7,3 +7,4 @@
 ![An image](/resources/architecture/RailwayEnvironment.svg)
 ![An image](/resources/architecture/SimulationEngineWithManager.svg)
 
+scelte rilevanti, pattern di progettazione, organizzazione del codice -- corredato da pochi ma efficaci diagrammi
