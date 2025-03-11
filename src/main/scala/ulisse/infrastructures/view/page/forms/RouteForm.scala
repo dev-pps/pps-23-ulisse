@@ -31,7 +31,7 @@ trait RouteForm extends Form:
   val routeType: ComposedSwing.InfoTextField
 
   /** The rails field of the form. */
-  val rails: ComposedSwing.InfoTextField
+  val tracks: ComposedSwing.InfoTextField
 
   /** The length field of the form. */
   val length: ComposedSwing.InfoTextField
@@ -122,7 +122,7 @@ object RouteForm:
     override val departureStation: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Departure Station"
     override val arrivalStation: ComposedSwing.InfoTextField   = ComposedSwing createInfoTextField "Arrival Station"
     override val routeType: ComposedSwing.InfoTextField        = ComposedSwing createInfoTextField "Type"
-    override val rails: ComposedSwing.InfoTextField            = ComposedSwing createInfoTextField "Rails"
+    override val tracks: ComposedSwing.InfoTextField            = ComposedSwing createInfoTextField "Track"
     override val length: ComposedSwing.InfoTextField           = ComposedSwing createInfoTextField "Length"
 
     private val layoutButton = ExtendedSwing.SBoxPanel(Orientation.Vertical).transparent()
@@ -131,7 +131,7 @@ object RouteForm:
     private val deleteButton = ExtendedSwing createFormButtonWith ("Delete", Styles.formFalseButtonRect)
     private val resetButton  = ExtendedSwing createFormButtonWith ("Reset", Styles.formButtonRect)
 
-    private val form = BaseForm("Route", departureStation, arrivalStation, routeType, rails, length)
+    private val form = BaseForm("Route", departureStation, arrivalStation, routeType, tracks, length)
 
     private var _departure: Option[Station]   = Option.empty
     private var _arrival: Option[Station]     = Option.empty
@@ -151,10 +151,10 @@ object RouteForm:
     resetButton attachClick CleanFormEvent(this)
 
     saveButton attach (creationObservable toObserver (_ =>
-      RouteCreationInfo(departure, arrival, routeType.text, rails.text, length.text)
+      RouteCreationInfo(departure, arrival, routeType.text, tracks.text, length.text)
     ))
     deleteButton attach (deletionObservable toObserver (_ =>
-      RouteCreationInfo(departure, arrival, routeType.text, rails.text, length.text)
+      RouteCreationInfo(departure, arrival, routeType.text, tracks.text, length.text)
     ))
 
     export form._, creationObservable.attachClick as attachCreation, deletionObservable.attachClick as attachDeletion
@@ -183,7 +183,7 @@ object RouteForm:
       departure = route.departure.some
       arrival = route.arrival.some
       routeType.text = route.typology.toString
-      rails.text = route.railsCount.toString
+      tracks.text = route.railsCount.toString
       length.text = route.length.toString
 
     override def cleanForm(): Unit =
@@ -193,5 +193,5 @@ object RouteForm:
       departureStation.text = ""
       arrivalStation.text = ""
       routeType.text = ""
-      rails.text = ""
+      tracks.text = ""
       length.text = ""

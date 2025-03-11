@@ -19,9 +19,9 @@ export default withMermaid(
             sidebar: [
                 {text: 'Report',
                     items: [
-                        {text: 'Intro', link: `${reportPath}/0-intro`},
-                        {text: 'Develop process', link: `${reportPath}/1-dev-process`},
-                        {text: 'Requirements', link: `${reportPath}/2-requirements`},
+                        {text: 'Introduzione', link: `${reportPath}/0-introduzione`},
+                        {text: 'Processo di sviluppo', link: `${reportPath}/1-processo-di-sviluppo`},
+                        {text: 'Requisiti', link: `${reportPath}/2-requisiti`},
                         {text: 'Architectural Design', link: `${reportPath}/3-arch-design`},
                         {text: 'Detailed Design', link: `${reportPath}/4-details-design`},
                         {text: 'Implementation',
