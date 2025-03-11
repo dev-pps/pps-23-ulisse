@@ -36,61 +36,59 @@ Di seguito si mostrano gli errori specifici del `TimetableManager`:
         with TimetableManagerErrors
 ```
 
-## Train Agent FSM
-```mermaid
-classDiagram
-direction LR
-
-class Train {
-  + name() String
-  + techType() TrainTechnology
-  + wagon() Wagon
-  + length() Int
-  + lengthSize() Int
-  + maxSpeed() Int
-  + capacity() Int
-  }
-
-  class TrainAgent {
-    + state StateBehavior
-    + motionData MotionData
-    + distanceTravelled Double
-    + resetDistanceTravelled TrainAgent
-    + updateDistanceTravelled(distanceDelta: Double) TrainAgent
-  }
-
-  class StateBehavior {
-    <<trait>>
-    + next(agent: TrainAgent, dt: Int, p: Percepts) StateBehavior
-  }
-
-  note for StateBehavior "some method have been omitted"
-
-  Train <|-- TrainAgent : extends
-  TrainAgent *-- Train 
-  TrainAgent *-- StateBehavior
-```
-`TrainAgent` e il suo comportamento dinamico (FSM) in base ai percepts ricevuti (sviluppati dal collega Federico Bravetti)
-  - MotionData: modellazione in una entità dedicata delle informazioni dinamiche del movimento del treno come *velocità*, *accelerazione* e *spazio percorso*.
-  
-  - `TrainAgentsStates` (concetto base `StateBehavior` con mixins trait per rendere modulare la logica di fermata con metodo `shouldStop` e il calcolo delle distanza di sicurezza fornita dal metodo `enoughSpace` del trait `SpaceManagement`)
-  
-    Avendo separato il concetto di comportamento (stato della FSM) dalla definzione del TrainAgent quest'ultimmo non ha la responsabilità di valutare quale sia lo stato successivo in cui passare ma è lo stato stesso, che a seguito della chiamata del metodo `next`, restituisce quello nuovo. 
-
-    Lo stato corrente elabora lo stato successivo in base alle caratteristiche del `Train` associato all'agente, il `dt` e le `TrainAgentPerception` ricevute dall'environment (`RailwayEnvironment`, non rappresentato nell'uml).
-
-    Di seguito si mostra il codice del metodo `doStep` del *TrainAgent*:
-``` scala 3
-    override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): TrainAgent =
-        import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProviders.given
-        val perception: Option[TrainAgentPerception[?]] = simulationEnvironment.perceptionFor[TrainAgent](this)
-        copy(state = state.next(this, dt, perception))
-```
-
 ### TrainAgentStates
-Per l'implementazione dello stato del TrainAgent è stato sfruttato il meccanismo del mixin
-Lo State del TrainAgent è uno `StateBehavior` che come si può vedere dall'UML è una classe astratta in cui i metodi `enoughSpace`, `stationName` e `next` la cui implementazione verrà definita in una classe specifica. Ciascun state behavior è caratterizzato dal *nome* e la *logica di transizione* ad un nuovo stato.
+Come già introdotto del capitolo di design il comportamento del `TrainAgent` è stato modellato come FSM. La classe astratta `StateBehavior` rappresenta la classe base per la creazione di un nuovo stato della FSM. Di seguito viene riportata la definizione della classe `StateBehavior`:
 
+``` scala 3
+abstract class StateBehavior:
+    def motionData: MotionData
+    def stateName: String
+    def enoughSpace(d: Option[Double], train: Train): Boolean
+    def shouldStop(ri: TrainRouteInfo, train: Train): Boolean =
+      !enoughSpace(ri.trainAheadDistance, train) || !ri.arrivalStationIsFree
+
+    def reset(): StateBehavior = Stopped(MotionDatas.emptyMotionData)
+
+    def withOffsetDistance(offset: Double): StateBehavior = this match
+      case Stopped(md) => Stopped(md.withDistanceOffset(offset))
+      case Running(md) => Running(md.withDistanceOffset(offset))
+
+    def next(train: Train, dt: Int, p: Percepts): StateBehavior
+```
+Attraverso il meccanismo dei mixins trait è stato possibile rendere modulare la logica di stop basato sulla distanza del treno . Il metodo `shouldStop` utilizza il metodo astratto `enoughSpace` che viene implementato dal trait `BasicSpaceManagement`.
+
+Al momento sono stati definiti solo i due stati `Running` e `Stopped` ma è possbile definirne altri semplicemente creando una classe che estende `StateBehavior` mixandola, ad esempio, con il comportamento `BasicSpaceManagement` mostrato in seguito.
+
+```scala 3
+ trait BasicSpaceManagement extends StateBehavior:
+    private val defaultSpaceLimit = 20
+    def enoughSpace(d: Option[Double], train: Train): Boolean =
+      d.forall { availableSpace => availableSpace >= defaultSpaceLimit }
+```
+
+Viene mostrata inoltre anche la definizione dello stato `Stopped` a titolo esemplificativo:
+
+```scala 3
+final case class Stopped(motionData: MotionData)
+      extends StateBehavior with BasicSpaceManagement:
+    override def stateName: String = "Stopped"
+
+    override def next(train: Train, dt: Int, p: Percepts): StateBehavior =
+      p.map {
+        // train on route have no train ahead or arrival station is free
+        case TrainPerceptionInRoute(p) if !shouldStop(p, train) =>
+          val speed = Math.min(p.routeTypology.technology.maxSpeed, train.maxSpeed)
+          Running(motionData.withSpeed(speed).updated(dt))
+        // train stopped in station starts and run on route
+        case TrainPerceptionInStation(p) if p.hasToMove && p.routeTrackIsFree =>
+          Running(motionData.withSpeed(train.maxSpeed).updated(dt))
+        case _ => this
+      }.getOrElse(this)
+```
+
+Si noti come, in questo modo, il `TrainAgent` sia totalmente all'oscuro di come venga elaborato lo stato successivo se non chiamare il metodo `next` che restituisce uno stato nuovo in via del tutto immutabile. 
+
+Ciascuno stato è caratterizzato dalla *logica di transizione* interna che elabora lo stato successivo sulla base delle caratteristiche del `Train` associato all'agente, del `dt` e dei `TrainAgentPerception` ricevuti dall'environment `RailwayEnvironment` (non rappresentato nell'uml).
 
 ```mermaid
 classDiagram
@@ -132,6 +130,14 @@ direction TB
 
 ```
 
+
+Di seguito si mostra il codice del metodo `doStep` del *TrainAgent*:
+``` scala 3
+override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): TrainAgent =
+    import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProviders.given
+    val perception: Option[TrainAgentPerception[?]] = simulationEnvironment.perceptionFor[TrainAgent](this)
+    copy(state = state.next(this, dt, perception))
+```
 
 ## Timetable
 Nella costruzione della `Timetable` si è fatto uso del meccanismo delle **given instance** per  il calcolo del tempo stimato di arrivo (*ETA - Estimation Time of Arrivial*) in una stazione conoscendo l'orario di partenza di quella precendete, la velocità del treno e le caratteristiche della route su cui viaggia.
@@ -252,5 +258,3 @@ TimetableBuilder(train = AV1000Train, startStation = stationA, departureTime = h
   .stopsIn(stationD, waitTime = 10)(railAV_10)
   .arrivesTo(stationF)(railAV_10)
 ```
-
-## Test with fake entities
