@@ -70,7 +70,6 @@ object TrainAgents:
       override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): TrainAgent =
         import ulisse.entities.simulation.environments.railwayEnvironment.PerceptionProviders.given
         val perception: Option[TrainAgentPerception[?]] = simulationEnvironment.perceptionFor[TrainAgent](this)
-        println(perception)
         copy(state = state.next(this, dt, perception))
 
       override def distanceTravelled: Double = state.motionData.distanceTravelled
