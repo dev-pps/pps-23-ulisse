@@ -124,16 +124,18 @@ extension [A, E](value: A)
 
 ## DSL per la creazione di entità infrastrutturali
 
-**Obiettivo**: Creare un Domain-Specific Language (DSL) per la creazione di una
-infrastruttura ferroviaria, che permetta di definire in modo dichiarativo le stazioni,
-le rotte, i treni e le timetable.
+**Obiettivo**: È stato sviluppato un Domain-Specific Language (DSL) per la
+definizione dello stato complessivo dell'infrastruttura ferroviaria,
+insieme a DSL specifici per ciascun componente, come stazioni, rotte e treni,
+permettendo di definire in modo dichiarativo e separato ciascun elemento.
 
-**Motivazione**: Ottenere un sistema di creazione dichiarativo e funzionale,
-che permetta di definire in modo chiaro e conciso le entità infrastrutturali,
+**Motivazione**: Ottenere un sistemi di creazione dichiarativi e funzionali,
+che permetta di definire in modo chiaro e conciso l'infrastruttura e le sue entità.
 
 ### Diagramma
 
-Di seguito vengono evidenziate le operazioni che è possibile effettuare tramite il DSL.
+Di seguito vengono evidenziate le operazioni che è possibile effettuare nel DSL per
+la creazione dello stato dell'infrastuttura ferroviaria.
 
 ```mermaid
 flowchart TB
@@ -147,6 +149,16 @@ flowchart TB
     F --> B
     G --> B
     B -->|Create| AppState
+```
+
+In questo diagramma viene illustrata la logica del DSL per ciascun componente
+dell'infrastruttura, utilizzando come esempio la definizione dell'entità "Station".
+
+```mermaid
+flowchart LR
+    A[CreateStation] -->|name| B(StationDSL)
+    B -->|at| C[StationWithCoord]
+    C -->|platforms| D[Station]
 ```
 
 ### Descrizione tecnica
@@ -178,11 +190,32 @@ object CreateAppState:
   CreateAppState || state put trainA put trainB
 ```
 
-Grazie all'uso di `given Conversion` è possibile convertire in modo automatico
+E grazie all'uso di `given Conversion` è possibile convertire in modo automatico
 il DSL in uno stato dell'applicazione.
 
 ```scala 3
 given Conversion[AppStateDSL, AppState] = _.appState
+```
+
+Di seguito viene mostrato come l'impiego delle `case class` permetta di definire
+in modo fluido le diverse fasi del processo di creazione del DSL, concatenando le
+entità e accumulando i parametri necessari per comporre infine il componente
+desiderato. Come esempio, viene riportata la creazione del DSL per l'entità Station.
+
+```scala 3
+object CreateStation:
+  final case class StationDSL(name: String)
+
+  final case class StationWithCoord(name: String, coordinate: Coordinate)
+
+  extension (station: StationDSL)
+    infix def at(coord: (Int, Int)): StationWithCoord = StationWithCoord(station.name, Coordinate(coord._1, coord._2))
+
+  extension (station: StationWithCoord)
+    infix def platforms(capacity: Int): Station = Station(station.name, station.coordinate, capacity)
+
+  implicit class StationOps(start: CreateStation.type):
+    infix def ->(name: String): StationDSL = StationDSL(name)
 ```
 
 Un esempio di utilizzo del DSL per la creazione di un sistema ferroviario è il seguente:
@@ -315,8 +348,8 @@ assicurando la copertura dei principali casi d'uso.
 
 ### Architettura
 
-La conformità dell'architettura esagonale è stata verificata attraverso l'utilizzo 
-di `ArchUnit`, applicando le regole di validazione esclusivamente ai moduli e 
+La conformità dell'architettura esagonale è stata verificata attraverso l'utilizzo
+di `ArchUnit`, applicando le regole di validazione esclusivamente ai moduli e
 ai sorgenti sviluppati internamente dal team.
 
 ```scala 3
