@@ -38,15 +38,15 @@ object RailwayBaseConfig:
 
   private val trainA_AV = CreateTrain -> "AV1" technology highSpeed wagon UseType.Passenger capacity 2 count 1
   private val trainB_AV = CreateTrain -> "AV2" technology highSpeed wagon UseType.Passenger capacity 2 count 1
-  private val trainN_NR = CreateTrain -> "NR1" technology normal wagon UseType.Passenger capacity 2 count 1
   private val trainC_AV = CreateTrain -> "AV3" technology highSpeed wagon UseType.Passenger capacity 3 count 1
+  private val trainD_AV = CreateTrain -> "AV4" technology highSpeed wagon UseType.Passenger capacity 2 count 1
 
   import ulisse.dsl.TimetableDSL.*
 
   private val table1 = trainA_AV at h(0).m(
     0
   ).getOrDefault startFrom stationA thenOnRail railAV400 travelsTo stationB thenOnRail railAV400 arrivesTo stationC
-  private val table2 = trainN_NR at h(1).m(
+  private val table2 = trainD_AV at h(1).m(
     0
   ).getOrDefault startFrom stationA thenOnRail railN400 travelsTo stationB thenOnRail railN400 arrivesTo stationC
   private val table3 = trainB_AV at h(2).m(
@@ -68,6 +68,6 @@ object RailwayBaseConfig:
   ).getOrDefault startFrom stationE thenOnRail railN400 travelsTo stationF thenOnRail railN400 arrivesTo stationD
 
   mediumRailway =
-    CreateAppState || mediumRailway set stationA set stationB set stationC set stationD set stationE set stationF link routeAB link routeBC link routeCD link routeDE link routeEF put trainA_AV put trainB_AV put trainN_NR put trainC_AV scheduleA table1 scheduleA table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table10
+    CreateAppState || mediumRailway set stationA set stationB set stationC set stationD set stationE set stationF link routeAB link routeBC link routeCD link routeDE link routeEF put trainA_AV put trainB_AV put trainD_AV put trainC_AV scheduleA table1 scheduleA table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table10
 
   def railwayConfig: AppState = mediumRailway

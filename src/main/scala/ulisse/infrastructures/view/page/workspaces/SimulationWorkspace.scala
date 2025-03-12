@@ -74,4 +74,5 @@ object SimulationWorkspace:
 
     override def endSimulation(data: SimulationData): Unit =
       refreshMap(data)
+      adapter.reset()
       simulation.reset()
