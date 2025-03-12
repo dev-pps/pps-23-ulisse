@@ -1,15 +1,16 @@
-# Implemnentazione - Manuel Buizo
+# Implementazione - Manuel Buizo
 
 Il codice implementato durante l’esecuzione del progetto è stato prevalentemente indirizzato alle seguenti aree
 funzionali:
 
 - Gestione dell’immutabilità e dei meccanismi di aggiornamento dello stato dell’applicazione
+
 - Implementazione dell’entry point e gestione delle porte di comunicazione con i componenti applicativi
-- Progettazione, costruzione e validazione delle entità route
+- Progettazione, costruzione e validazione delle entità `Route`
 - Definizione e creazione degli elementi infrastrutturali tramite Domain-Specific Language (DSL)
 - Progettazione e implementazione dell’interfaccia grafica utente (GUI), inclusa la visualizzazione della mappa e la
   gestione degli eventi interattivi
-- Rendering grafico della simulazione, comprensivo di stazioni route e train
+- Rendering grafico della simulazione, comprensivo di Stazioni Route e Train
 
 Di seguito si propone un’analisi più approfondita delle componenti più rilevanti.
 
@@ -18,18 +19,12 @@ Di seguito si propone un’analisi più approfondita delle componenti più rilev
 **Obiettivo**: Creare uno stato immutabile dell'applicazione e garantire
 la sua coerenza e integrità.
 
-**Motivazione**: L'adozione di funzioni higher-order per la modifica dello stato,
-anziché interventi diretti, promuove una gestione funzionale basata sull'immutabilità
-e riduce i side effects.
+**Motivazione**: L'adozione di funzioni *higher-order* per la modifica dello stato, anziché tramite interventi diretti, promuove una gestione funzionale basata sull'immutabilità e riduce i side effects.
 Questo approccio semplifica il testing e garantisce un controllo più rigoroso
 e una maggiore coerenza nella gestione dello stato.
 
 ### Descrizione tecnica
-
-Sfruttando la funzione `copy` delle case class di Scala, è possibile creare un nuovo
-stato dell'applicazione a partire da uno stato precedente, modificando solo le parti
-interessate. Le funzioni di aggiornamento dello stato, definite all'interno della classe
-`AppState`, accettano come argomento una funzione che modifica i componenti interessati.
+ Le funzioni di aggiornamento dello stato, definite all'interno della classe `AppState`, accettano come argomento una funzione che modifica i componenti interessati sfruttando la funzione `copy`.
 
 ```Scala 3
 override def updateStationManager(update: StationManager => StationManager): AppState =
@@ -42,17 +37,17 @@ override def updateRoute(update: RouteManager => RouteManager): AppState =
 ## Entry point e Porte dell'Architettura Esagonale: `EventQueue`
 
 **Obiettivo**: Implementare un sistema di comunicazione per leggere e aggiornare
-lo stato dell'applicazione (`AppState`) dell'esterno, preservando l'immutabilità.
+lo stato dell'applicazione (`AppState`) dall'esterno, preservando l'immutabilità.
 
 **Motivazione**: Gestire in modo efficiente e sicuro le interazioni tramite le porte
 dell'architettura esagonale, implementando un sistema di comunicazione robusto e
-scalabile, che assicura una gestione funzionale della creazione e dell'aggiornamento
+scalabile, che assicuri una gestione funzionale della creazione e dell'aggiornamento
 dello stato dell'applicazione.
 
 ### Descrizione tecnica
 
-L'`EventQueue` è una coda bloccante di funzioni che aggiornano lo stato dell'applicazione.
-Il metodo `startProcessing` utilizza` LazyList.continually` per estrarre continuamente
+L'`EventQueue` è una coda concorrente di funzioni che aggiornano lo stato dell'applicazione.
+Il metodo `startProcessing` utilizza la `LazyList.continually` per estrarre continuamente
 eventi dalla coda. Ogni evento, rappresentato da una funzione, viene applicato
 allo stato corrente tramite `foldLeft`, producendo una nuova versione immutabile dello
 stato ad ogni iterazione. Questo approccio è reso possibile dall'aggiornamento
@@ -66,7 +61,7 @@ override def startProcessing(initState: AppState): Unit =
 ## Entità route: `Route`
 
 **Obiettivo**: Progettare e implementare le entità che rappresentano i percorsi
-tra le stazioni, assicurando che la creazione delle rotte avvenga secondo vincoli
+tra le stazioni, assicurando che la creazione delle Route avvenga secondo vincoli
 di validità definiti.
 
 **Motivazione**: Definire un sistema per la creazione delle `Route` che garantisca
@@ -79,7 +74,7 @@ Per implementare il sistema di validazione, è stato utilizzato il tipo `Either`
 che consente di gestire in modo funzionale ed espressivo i possibili errori.
 Il companion object di `Route` espone il metodo apply, che accetta i parametri
 necessari per la creazione di una Route e restituisce un `Either[RouteError, Route]`,
-rappresentando l'entità `Route` in caso di successo o un `RouteError` ovvero lista
+restituendo l'entità `Route` in caso di successo o un `RouteError` ovvero una lista
 di errori in caso di fallimento.
 
 ```scala 3
@@ -125,12 +120,11 @@ extension [A, E](value: A)
 ## DSL per la creazione di entità infrastrutturali
 
 **Obiettivo**: È stato sviluppato un Domain-Specific Language (DSL) per la
-definizione dello stato complessivo dell'infrastruttura ferroviaria,
-insieme a DSL specifici per ciascun componente, come stazioni, rotte e treni,
+definizione dello stato iniziale dell'infrastruttura ferroviaria,
+insieme a DSL specifici per ciascun componente, come `Station`, `Route` e `Train`,
 permettendo di definire in modo dichiarativo e separato ciascun elemento.
 
-**Motivazione**: Ottenere un sistemi di creazione dichiarativi e funzionali,
-che permetta di definire in modo chiaro e conciso l'infrastruttura e le sue entità.
+**Motivazione**: Ottenere dei sistemi di creazione dichiarativi e funzionali, che permettano di definire in modo chiaro e conciso l'infrastruttura e le sue entità.
 
 ### Diagramma
 
@@ -152,7 +146,7 @@ flowchart TB
 ```
 
 In questo diagramma viene illustrata la logica del DSL per ciascun componente
-dell'infrastruttura, utilizzando come esempio la definizione dell'entità "Station".
+dell'infrastruttura, utilizzando come esempio la definizione dell'entità `Station`.
 
 ```mermaid
 flowchart LR
@@ -163,11 +157,8 @@ flowchart LR
 
 ### Descrizione tecnica
 
-Tramite l'uso di implicit class è possibile definire il punto di partenza del DSL
-in modo preciso. E l'uso di extension method permette di definire in modo
-conciso le operazioni che è possibile effettuare sullo stato dell'applicazione.
-Inoltre l'uso di extension method permette avere la definizione del DSL più leggibile,
-dividendo la creazione dello stato in più parti e le operazioni che si possono effettuare.
+Tramite l'uso di *implicit class* è possibile definire il punto di partenza del DSL
+in modo preciso, inoltre l'uso di extension method ha permesso di definire in modo conciso, migliorandone la leggibilità, le operazioni che è possibile effettuare sullo stato dell'applicazione.
 
 ```scala 3
 object CreateAppState:
@@ -190,17 +181,16 @@ object CreateAppState:
   CreateAppState || state put trainA put trainB
 ```
 
-E grazie all'uso di `given Conversion` è possibile convertire in modo automatico
-il DSL in uno stato dell'applicazione.
+Grazie all'uso di *given Conversion* è possibile convertire in modo automatico il DSL in uno stato dell'applicazione.
 
 ```scala 3
 given Conversion[AppStateDSL, AppState] = _.appState
 ```
 
-Di seguito viene mostrato come l'impiego delle `case class` permetta di definire
-in modo fluido le diverse fasi del processo di creazione del DSL, concatenando le
+Di seguito viene mostrato come l'impiego delle *case class * permetta di definire
+in modo fluente le diverse fasi del processo di creazione del DSL, concatenando le
 entità e accumulando i parametri necessari per comporre infine il componente
-desiderato. Come esempio, viene riportata la creazione del DSL per l'entità Station.
+desiderato. Come esempio, viene riportata la creazione del DSL per l'entità `Station`.
 
 ```scala 3
 object CreateStation:
@@ -238,11 +228,11 @@ consenta di definire in modo dichiarativo l'aspetto visivo degli oggetti grafici
 
 ### Descrizione tecnica
 
-Grazie all'uso di trait e mixin, è possibile definire un sistema di personalizzazione
+Grazie all'uso di *trait* e *mixin*, è possibile definire un sistema di personalizzazione
 grafica per i componenti dell'interfaccia utente. Il trait `EnhancedLook` viene esteso
 da un tipo `Component`, che rappresenta un componente grafico di `Swing`.
-Inoltre, l'uso della `self-type` annotation consente di rafforzare i vincoli sui
-tipi che possono estendere il trait EnhancedLook, garantendo una maggiore coesione
+Inoltre, l'uso della *self-type* annotation consente di rafforzare i vincoli sui
+tipi che possono estendere il trait `EnhancedLook`, garantendo una maggiore coesione
 e sicurezza nel design.
 
 L'estensione del trait `Component` con `EnhancedLook` permette di avere accesso al
@@ -281,10 +271,9 @@ trait ShapeEffect extends EnhancedLook:
 
 ### Pattern
 
-Rivisitazione del pattern Decorator per la personalizzazione grafica dei componenti
+Rivisitazione del pattern *Decorator* per la personalizzazione grafica dei componenti
 dell'interfaccia utente, sfruttando le funzionalità di Scala per la definizione di
-trait e mixin. Utilizzando i trait insieme alla `self-type annotation`, è possibile
-modulare e comporre comportamenti grafici distinti, consentendo la creazione di
+*trait* e *mixin*. Utilizzando i trait insieme alla *self-type*, è possibile comporre comportamenti grafici in modo modulare, consentendo la creazione di
 effetti visivi complessi attraverso la combinazione di decorator.
 
 ## Event system dei componenti grafici: `Observable` `Observer`
@@ -301,7 +290,7 @@ in nuovi eventi, consentendo una gestione modulare e separata degli stessi.
 
 ### Descrizione tecnica
 
-Utilizzando le funzioni higher-order di Scala, è possibile implementare un sistema
+Utilizzando le funzioni *higher-order* di Scala, è possibile implementare un sistema
 di adattamento tra un `Observable` e un `Observer`, consentendo la propagazione degli
 eventi generati dall'interazione con i componenti grafici come nuovi eventi specifici.
 Questo è reso possibile tramite l'uso del metodo `toObserver`, che trasforma un dato
@@ -326,7 +315,7 @@ Di seguito si riportano alcune considerazioni sul testing del codice sviluppato.
 ### RouteInputAdapter
 
 Il `RouteInputAdapter` è stato sottoposto a una suite di test definiti secondo la
-logica delle user story, modellando scenari di interazione utente per verificare la
+logica delle *user story*, modellando scenari di interazione utente per verificare la
 correttezza funzionale e la coerenza rispetto ai requisiti applicativi.
 Questo approccio ha facilitato la validazione dei flussi di utilizzo reali,
 assicurando la copertura dei principali casi d'uso.
@@ -367,7 +356,7 @@ ai sorgenti sviluppati internamente dal team.
 ```
 
 È stata implementata una suite di test architetturali, finalizzata a verificare
-la conformità delle convenzioni di naming delle classi all'interno dei rispettivi
+la conformità delle convenzioni di *naming* delle classi all'interno dei rispettivi
 package. Questo controllo garantisce l'aderenza alle regole di organizzazione
 del progetto e preserva la coerenza strutturale dell'architettura del dominio.
 

@@ -1,22 +1,26 @@
 # Implementazione di Violani Matteo
 
 ## Parti implementate
-Il mio contributo in questo progetto ha previsto lo sviluppo delle parti seguendo l'approccio TDD comportando il conseguente sviluppo dei relativi test. 
+Il mio contributo in questo progetto ha previsto lo sviluppo delle parti seguendo l'approccio TDD comportando il conseguente sviluppo dei relativi test.
 
-- __Train__: sviluppo delle entità `Train`, `Wagons` and `TrainTechnology`, dei relativi manager `TrainManager` e `TechnologyManager` e del `TrainService` con relativa porta `TrainPorts`.
-- __TrainAgent__: sviluppo dell'entità dinamica della simulazione `TrainAgent` con collaborazione del collega Bravetti per l'allineamento e uso delle *percepts* del treno (`TrainAgentPerception`) ricevute dall'`RailwayEnvironment` da lui sviluppate all'interno dell'agente e delle sotto entità sviluppate.
-- __TrainAgentState__: parte integrante del `TrainAgent` riguardante la dinamica del suo comportamento durante la simulazione e dell'aggiornamento dei dati dinamici `MotionData` anch'essi sviluppati.
-- __Timetable__: sviluppo della definizione della tabella oraria statica del treno `Timetable` con annessa implementazione del `TimetableManager` e del servizio di `TimetableService` per la loro gestione. Per questa entità è stato anche definito un DSL per la creazione di una Timetable per un treno.
-- __Times__: implementazione delle entità `ClockTime` e `Time` (con integrazioni di Federico Bravetti) per rappresentare il concetto di tempo con sfumature diverse  sia all'interno della simulazione che nella definizione delle tabelle orarie del treno.
-- **Interfaccia utente** per la costruzione delle *Timetable* e creazione dei *Train*
+- __Train__: sviluppo delle entità `Train`, `Wagons` and `TrainTechnology`, dei relativi manager `TrainManager` e `TechnologyManager` e del `TrainService` con relativa `TrainPorts`.
 
-Nello sviluppo del codice si è cercato di massimizzare l'uso di `trait` insieme al `companion-object` tenendo nascoste le effettive implementazioni sviluppate usando
-invece class o case-class.
+- __TrainAgentState__: parte integrante del `TrainAgent` riguardante la dinamica del suo comportamento durante la simulazione e dell'aggiornamento dei dati dinamici `MotionData` anch'essi sviluppati. Durante lo sviluppo c'è stata una costante collaborazione con il collega Bravetti per l'allineamento e uso delle `TrainAgentPerception` da lui sviluppate.
+
+- __Timetable__: sviluppo della `Timetable` del treno corredata dal DSL, il relativo manager `TimetableManager` e servizio `TimetableService`.
+
+- __Times__: implementazione delle entità `ClockTime` e `Time` (con integrazioni di Bravetti) per rappresentare il concetto di tempo con sfumature diverse in base al contesto di utilizzo.
+
+- **Interfaccia utente**: sviluppo dell'interfaccia grafica per la gestione dei treni `TrainEditorView` e componente custom `TrainListView` per la visualizzazione, per la gestione delle Timetable la `TimetableView` e le sotto schermate `EditorTab` e `TimetableViewerTab`. Infine sono stati sviluppati tutti i relativi `TimetableViewAdapter` e `TrainViewAdapter`.
+
+- **DeployReportSite**: configurazione del deploy di questo report su github-pages.
+
+Nello sviluppo del codice si è cercato di massimizzare l'uso di `trait` insieme al `companion-object` tenendo nascoste le effettive implementazioni sviluppate usando invece *class* o *case-class*.
 
 ## Sviluppo funzionale ed immutabilità
 Nello sviluppo si è cercato di abbracciare completamente la programmazione funzionale e per fare ciò si è fatto uso di `Option`, `Try` e specialmente di `Either` come tipo di ritorno dei metodi che modificano o aggiornano entità immutabili.
 
-Analizzando per esempio il manager `TimetableManager` qualsiasi metodo che prevede l'aggiunta/cancellazione di una timetable o che tipicamente lancerebbe una eccezione restituisce un `Either[TimetableManagerErrors, TimetableManager]`. In questo modo in caso d'errore viene sempre ritornata la causa, mentre in caso di successo della richiesta viene restituito il manager aggiornato. Attraverso `match-case` è possibile distinguere l'errore e agire di conseguenza.
+Analizzando per esempio il manager `TimetableManager` qualsiasi metodo che prevede l'aggiunta/cancellazione di una Timetable o che tipicamente lancerebbe una eccezione restituisce un `Either[TimetableManagerErrors, TimetableManager]`. In questo modo in caso d'errore viene sempre ritornata la causa, mentre in caso di successo della richiesta viene restituito il manager aggiornato. Attraverso `match-case` è possibile distinguere l'errore e agire di conseguenza.
 
 Di seguito si mostrano gli errori specifici del `TimetableManager`:
 
@@ -37,7 +41,7 @@ Di seguito si mostrano gli errori specifici del `TimetableManager`:
 ```
 
 ### TrainAgentStates
-Come già introdotto del capitolo di design il comportamento del `TrainAgent` è stato modellato come FSM. La classe astratta `StateBehavior` rappresenta la classe base per la creazione di un nuovo stato della FSM. Di seguito viene riportata la definizione della classe `StateBehavior`:
+Come già introdotto nel capitolo di design, il comportamento del `TrainAgent` è stato modellato come macchina a stati finiti (FSM). La classe astratta `StateBehavior` rappresenta la classe base per la creazione di un nuovo stato della FSM. Di seguito viene riportata la definizione della classe `StateBehavior`:
 
 ``` scala 3
 abstract class StateBehavior:
@@ -55,9 +59,9 @@ abstract class StateBehavior:
 
     def next(train: Train, dt: Int, p: Percepts): StateBehavior
 ```
-Attraverso il meccanismo dei mixins trait è stato possibile rendere modulare la logica di stop basato sulla distanza del treno . Il metodo `shouldStop` utilizza il metodo astratto `enoughSpace` che viene implementato dal trait `BasicSpaceManagement`.
+Attraverso il meccanismo dei *mixin* è stato possibile rendere modulare la logica di stop basato sulla distanza del treno. Il metodo `shouldStop` utilizza il metodo astratto `enoughSpace` che viene implementato dal trait `BasicSpaceManagement`.
 
-Al momento sono stati definiti solo i due stati `Running` e `Stopped` ma è possbile definirne altri semplicemente creando una classe che estende `StateBehavior` mixandola, ad esempio, con il comportamento `BasicSpaceManagement` mostrato in seguito.
+Al momento sono stati definiti solo i due stati `Running` e `Stopped` che estendendono `StateBehavior` con il comportamento `BasicSpaceManagement`. Di seguito se ne mostra il codice:
 
 ```scala 3
  trait BasicSpaceManagement extends StateBehavior:
@@ -65,8 +69,6 @@ Al momento sono stati definiti solo i due stati `Running` e `Stopped` ma è poss
     def enoughSpace(d: Option[Double], train: Train): Boolean =
       d.forall { availableSpace => availableSpace >= defaultSpaceLimit }
 ```
-
-Viene mostrata inoltre anche la definizione dello stato `Stopped` a titolo esemplificativo:
 
 ```scala 3
 final case class Stopped(motionData: MotionData)
@@ -86,9 +88,9 @@ final case class Stopped(motionData: MotionData)
       }.getOrElse(this)
 ```
 
-Si noti come, in questo modo, il `TrainAgent` sia totalmente all'oscuro di come venga elaborato lo stato successivo se non chiamare il metodo `next` che restituisce uno stato nuovo in via del tutto immutabile. 
+Si noti come, in questo modo, il `TrainAgent` sia totalmente all'oscuro di come venga elaborato lo stato successivo, e si deve solamente limitare a chiamare il metodo `next` che restituisce il nuovo stato immutabile.
 
-Ciascuno stato è caratterizzato dalla *logica di transizione* interna che elabora lo stato successivo sulla base delle caratteristiche del `Train` associato all'agente, del `dt` e dei `TrainAgentPerception` ricevuti dall'environment `RailwayEnvironment` (non rappresentato nell'uml).
+Il metodo `next` definisce la *logica di transizione* dello stato. Al suo interno vengono elaborate le informazioni utili come le caratteristiche del `Train` associato all'agente, il `dt` e le `TrainAgentPerception` ricevute dal `RailwayEnvironment` (non rappresentato nell'uml) per restituire lo stato successivo.
 
 ```mermaid
 classDiagram
@@ -140,7 +142,7 @@ override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): TrainAg
 ```
 
 ## Timetable
-Nella costruzione della `Timetable` si è fatto uso del meccanismo delle **given instance** per  il calcolo del tempo stimato di arrivo (*ETA - Estimation Time of Arrivial*) in una stazione conoscendo l'orario di partenza di quella precendete, la velocità del treno e le caratteristiche della route su cui viaggia.
+Nella costruzione della `Timetable` si è fatto uso del meccanismo delle *given instance* per il calcolo dell'orario di arrivo stimato (*ETA - Estimation Time of Arrivial*) in una stazione conoscendo l'orario di partenza di quella precendete, la velocità del treno e le caratteristiche della route su cui viaggia.
 
 Il trait che definisce il metodo di stima è il seguente:
 ``` scala
@@ -149,7 +151,7 @@ Il trait che definisce il metodo di stima è il seguente:
     def ETA(lastTime: Option[StationTime], railInfo: RailInfo, train: Train): Option[ClockTime]
 ```
 
-All'interno dell'oggetto `Timetables` viene fornita una implementazione di default, `defaultTimeEstimator`, che considera unicamente velocità del treno più compatibile con quella della rotaia e la lunghezza delle rotaie. Non vengono considerate le accelerazioni.
+All'interno dell'oggetto `Timetables` viene fornita una implementazione di default, l' `UnrealTimeEstimator`, che considera sia disponibile la rotaia migliore rispetto al treno e la lunghezza delle rotaie. Non vengono considerate le accelerazioni del treno.
 
 ```scala 3
   given defaultTimeEstimator: TimeEstimator = UnrealTimeEstimator
@@ -170,9 +172,7 @@ All'interno dell'oggetto `Timetables` viene fornita una implementazione di defau
       yield arrivingTime
 ```
 
-> **NOTA** Anche all'interno di `TimetableManager` è stata definita una *contextual given* per definire la policy di accettazione per una timetable (`AcceptanceTimetablePolicy`) che deve essere salvata.
-
-Di seguito viene mostrato uno schema UML riassuntivo dei trait definiti all'interno dell'oggetto `Timetables` in cui è definito il builder e le classi riguardanti la timetable.
+> **NOTA** Anche all'interno di `TimetableManager` è stata definita un *contextual given* per definire la policy di accettazione per una timetable (`AcceptanceTimetablePolicy`) che deve essere salvata.
 
 ```mermaid
 ---
@@ -227,9 +227,9 @@ direction BT
 
 ## DSL per la dichiarazione di una Timetable
 
-Per la creazione del DSL (reperibile nel package `dsl`) si è fatto uso di ***case class***, ***extension method*** e ***costruttori fluenti***. Queste rendono più fluente e leggibile la costruzione di una `Timetable` per un treno mascherando il `TimetableBuilder` sottostante.
+Per la creazione del DSL (reperibile nel package `dsl`) si è fatto uso di *case class** e *extension method*. Queste rendono più fluente e leggibile la costruzione di una `Timetable` per un treno mascherando il `TimetableBuilder` sottostante.
 
-Una volta indicato il treno, l'ora di partenza e la stazione di partenza, occorre specificare le informazioni della route per raggiungere la stazione seguente.
+Una volta indicato il treno, l'ora di partenza e la stazione di partenza, occorre specificare le informazioni della route per raggiungere la stazione successiva.
 
 > _train_name_ **at** _clock_time_ **startFrom** _station1_ **thenOnRail** _rail_info1_ [**stopsIn** or **travelsTo**] _station2_ **thenOnRail** ... _rail_infoX_ **arrivesTo** _stationY_
 > 
@@ -239,6 +239,37 @@ In una stazione è possibile:
 
 Per finalizzare la costruzione basta indicare la stazione di arrivo con "**arrivesTo** _stationF_"
 
+Di seguito si riporta la definizione delle enxtension method e case class che compongono il dsl:
+
+```scala 3
+object TimetableDSL:
+  case class InitTable(train: Train, departureTime: ClockTime):
+    def startFrom(startStation: Station): TimetableBuilder = TimetableBuilder(train, startStation, departureTime)
+
+  case class TravelOnRailInfo(railInfo: RailInfo, builder: TimetableBuilder)
+  case class TravelRailInfoStation(railInfo: RailInfo, station: Station, builder: TimetableBuilder)
+
+  extension (train: Train)
+    def at(departureTime: ClockTime): InitTable = InitTable(train, departureTime)
+
+  extension (builder: TimetableBuilder)
+    infix def thenOnRail(railInfo: RailInfo): TravelOnRailInfo = TravelOnRailInfo(railInfo, builder)
+
+  extension (tri: TravelOnRailInfo)
+    infix def stopsIn(station: Station): TravelRailInfoStation =
+      TravelRailInfoStation(tri.railInfo, station, tri.builder)
+
+    infix def travelsTo(station: Station): TimetableBuilder =
+      tri.builder.transitIn(station)(tri.railInfo)
+
+    infix def arrivesTo(station: Station): Timetable =
+      tri.builder.arrivesTo(station)(tri.railInfo)
+
+  extension (tris: TravelRailInfoStation)
+    infix def waitingForMinutes(waitTime: WaitTime): TimetableBuilder =
+      tris.builder.stopsIn(tris.station, waitTime)(tris.railInfo)
+
+```
 Di seguito si mostra il codice per la costruzione di una *timetable* utilizando il DSL creato e la corrispettiva costruzione con il builder.
 
 Risultato finale ottenuto grazie al dsl.
