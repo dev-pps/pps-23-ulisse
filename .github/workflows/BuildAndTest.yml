@@ -1,7 +1,8 @@
 name: Build and Test
 on:
   push:
-    branches-ignore: [main, docs/report]
+    branches-ignore:
+    - main
   workflow_dispatch:
 
 jobs:
