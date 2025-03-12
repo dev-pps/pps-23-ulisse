@@ -258,3 +258,58 @@ TimetableBuilder(train = AV1000Train, startStation = stationA, departureTime = h
   .stopsIn(stationD, waitTime = 10)(railAV_10)
   .arrivesTo(stationF)(railAV_10)
 ```
+## Time e ClockTime 
+L'entità `ClockTime` è una specializzazione di `Time` con le seguenti caratteristiche:
+- le ore possono assumere valori compresi tra `0` e `23`
+- i minuti possono assumere valori compresi tra `0` e `59`
+
+Come si può vedere nel costruttore di `ClockTime` sottostante, solo in caso di valori validi l'entità viene creata, diversamente viene restituito un `ClockTimeErrors` che può essere `InvalidHours` o `InvalidMinutes`.
+
+```scala 3
+def apply(h: Hour, m: Minute): Either[ClockTimeErrors, ClockTime] =
+  val time = Id(Time(0, 0, 0)) overflowSum Id(Time(h, m, ignoredSecondValue))
+  for
+    h <- ValidationUtils.validateRange(h, minDayHours, maxDayHours, InvalidHours(time))
+    m <- ValidationUtils.validateRange(m, minDayMinutes, maxDayMinutes, InvalidMinutes(time))
+  yield ClockTimeImpl(h, m)
+```
+
+Oltre al costruttore viene fornito l'extension method `getOrDefault` permette di restituire un `ClockTime` di default calcolato secondo la strategia `DefaultTimeStrategy` fornita dal contesto.
+
+Di seguito si riporta il codice:
+``` scala 3
+  trait DefaultTimeStrategy:
+    /** Given a `currentTime` returns a default one. */
+    def defaultTime(currentTime: Time): Time
+
+  private object FixedTimeDefault extends DefaultTimeStrategy:
+    override def defaultTime(currentTime: Time): Time = Time(0, 0, ignoredSecondValue)
+
+  /** Default given instance of DefaultTimeStrategy */
+  given predefinedDefaultTime: DefaultTimeStrategy = FixedTimeDefault
+
+  extension (time: Either[ClockTimeErrors, ClockTime])
+    /** Returns a default ClockTime using [[DefaultTimeStrategy]] for calculation of default ClockTime. */
+    def getOrDefault(using dts: DefaultTimeStrategy): ClockTime =
+      time match
+        case Left(e) =>
+          val dTime = dts.defaultTime(e.time)
+          ClockTimeImpl(dTime.h, dTime.m)
+        case Right(ct) => ct
+```
+
+Si è cercato di rendere la costruzione di un `ClockTime` più leggibile e intuitiva cercando di creare, senza successo, un piccolo DSL per ottenere un risultato simile a `HH h MM m` con `HH` e `MM` i valori.
+
+Di seguito viene mostrata l'implementazione provata:
+
+```scala 3
+object FluentDeclaration:
+  case class HoursBuilder(hours: Int)
+
+  infix def h(h: Int): HoursBuilder = HoursBuilder(h)
+
+  extension (hb: HoursBuilder)
+    /** Returns ClockTime with `minutes` and previous given hours */
+    def m(minutes: Int): Either[ClockTimeErrors, ClockTime] = ClockTime(hb.hours, minutes)
+
+```

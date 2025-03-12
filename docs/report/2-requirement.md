@@ -6,11 +6,11 @@ Si vuole sviluppare un simulatore di reti ferroviarie, progettato per offrire un
 ambiente dedicato a test ed analisi. Le principali finalità includono:
 
 - Stima del comportamento del sistema: analizzare e prevedere le prestazioni del sistema ferroviario 
-in relazione a diverse configurazioni operative.
+in relazione a diverse configurazioni operative
 - Test di prototipi: consentire la verifica sperimentale di nuove configurazioni e soluzioni progettuali 
-prima della loro implementazione reale.
+prima della loro implementazione reale
 - Ottimizzazione delle prestazioni: fornire dei KPI per valutare l'efficienza della rete, 
-ad esempio riportando i ritardi accumulati.
+ad esempio riportando i ritardi accumulati
 
 ### Modello di dominio
 Gli elementi principali del sistema sono:
@@ -20,7 +20,8 @@ Gli elementi principali del sistema sono:
 - **Technology**: tecnologia utilizzata da un Train o da una Route
 - **Route**: tratta fra due Station, che può contenere una o più Track
 - **Track**: collegamento fisico tra due Station
-- **Timetable**: definizione degli orari di partenza-arrivo-attesa di un Train
+- **Direction**: verso corrente di percorrenza di una Track
+- **Timetable**: definizione degli orari di partenza-attesa-arrivo di un Train
 - **Statistics**: dati relativi alla Simulation (ritardi, occupazione Station, ...)
 - **Railway**: aggregazione di Station e Route
 - **Simulation**: esecuzione di un determinato scenario in una Railway

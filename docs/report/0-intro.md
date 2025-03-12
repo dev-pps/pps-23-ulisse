@@ -6,7 +6,7 @@
 </p>
 
 ## Obiettivo
-L'obiettivo di questo progetto riguarda lo sviluppo di un simulatore Agent-Based per la simulazione di un sistema ferroviario.
+L'obiettivo di questo progetto riguarda lo sviluppo di un simulatore *Agent-Based* per la simulazione di un sistema ferroviario.
 Nel simulatore è possibile definire:
  - la struttura della rete ferroviaria, composta da stazioni e tratte
  - i treni disponibili nel sistema

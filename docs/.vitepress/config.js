@@ -25,7 +25,6 @@ export default withMermaid(
                         {text: 'Design Architetturale', link: `${reportPath}/3-arch-design`},
                         {text: 'Detailed Design', link: `${reportPath}/4-details-design`},
                         {text: 'Implementation',
-                            link: `${reportPath}/5-implementation`,
                             items: [
                                 {text: 'Bravetti Federico', link: `${reportPath}/5-impl-bravetti`},
                                 {text: 'Montesinos Buizo Julio Manuel', link: `${reportPath}/5-impl-buizo`},

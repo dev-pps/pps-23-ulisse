@@ -1,6 +1,6 @@
 # Implementazione Federico Bravetti
 Il codice prodotto durante lo svolgimento del progetto riguarda prevalentemente le seguente parti:
-- **Station**: Implementazioni delle stazioni con relativo `StationManager` e `StationService`
+- **Station**: Implementazioni delle stazioni con relativo `StationManager` e `StationService`, utilizzando `VallidatedNec` per gestire contemporaneamente tutti gli errori di validazione evitando la dinamica fail-fast 
 - **Simulation Environment**: implementazione dell'ambiente di simulazione comprese tutte le entità dinamiche costruite estendendo le componenti statiche, in particolare:
   - **Platform & Track**: implementazione delle piattaforme e dei binari, necessari a contenere e gestire i `TrainAgent`.
   - **StationEnvironmentElement & StationEnvironment**: implementazione delle `Station` come elementi dell'ambiente composte da `Platform` e relativo ambiente per la loro gestione.
