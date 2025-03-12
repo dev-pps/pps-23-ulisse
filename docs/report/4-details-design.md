@@ -371,21 +371,26 @@ Si noti che nell' UML sottostante il builder utilizza un
 
 ```mermaid
 ---
-title: TimetableBuilders
+title: Entities defined inside Timetables object
 config:
   class:
     hideEmptyMembersBox: true
 ---
 
 classDiagram
-    direction BT
+direction BT
 
+    class TimeEstimator {
+        <<trait>>
+        + def ETA(lastTime: Option[Time], railInfo: RailInfo, train: Train) Option[ClockTime]
+    }
+    
     class PartialTimetable {
         <<trait>>
         + train() Train
         + startStation() Station
         + departureTime() ClockTime
-        + table() ListMap[Station, Time]
+        + table() ListMap[Station,Time]
     }
 
     class TrainTimetable {
@@ -402,14 +407,19 @@ classDiagram
         + getPartialTimetable(): PartialTimetable
     }
 
+    class UnrealTimeEstimator {
+      <<defaultTimeEstimator>>
+    }
+
     TrainTimetable --|> PartialTimetable
-    TrainTimetableImpl ..|> TrainTimetable: implements
-    PartialTrainTimetable ..|> PartialTimetable: implements
-    TimetableBuilder ..> TimeEstimator: using
-    TimetableBuilder o.. TrainStationTime
-    TimetableBuilder ..> PartialTimetable: creates
-    TimetableBuilder ..> TrainTimetable: creates
+    TrainTimetableImpl ..|> TrainTimetable : implements
+    PartialTrainTimetable ..|> PartialTimetable : implements
+    TimetableBuilder ..> TimeEstimator : using
+    TimetableBuilder ..> PartialTimetable : creates
+    TimetableBuilder ..> TrainTimetable : creates
+    UnrealTimeEstimator ..|> TimeEstimator : implements
 ```
+
 
 ## View
 
