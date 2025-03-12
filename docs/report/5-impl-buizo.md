@@ -1,4 +1,4 @@
-# Manuel Buizo
+# Implemnentazione - Manuel Buizo
 
 Il codice implementato durante l’esecuzione del progetto è stato prevalentemente indirizzato alle seguenti aree
 funzionali:
@@ -136,9 +136,8 @@ che permetta di definire in modo chiaro e conciso le entità infrastrutturali,
 Di seguito vengono evidenziate le operazioni che è possibile effettuare tramite il DSL.
 
 ```mermaid
-flowchart LR
+flowchart TB
     A[CreateAppState] -->|AppState| B(AppStateDSL)
-    B -->|Create| AppState
     B -->|set| D[AppState + Station]
     B -->|link| E[AppState + Route]
     B -->|put| F[AppState + Train]
@@ -147,6 +146,7 @@ flowchart LR
     E --> B
     F --> B
     G --> B
+    B -->|Create| AppState
 ```
 
 ### Descrizione tecnica
@@ -292,20 +292,32 @@ Di seguito si riportano alcune considerazioni sul testing del codice sviluppato.
 
 ### RouteInputAdapter
 
-Il `RouteInputAdapter` è stato testato utilizzando la libreria `ScalaTest`,
-definendo i test come scenari di interazione dell'utente. I test, inclusi nel
-modulo RouteAdapterTest, coprono vari casi d'uso, tra cui:
+Il `RouteInputAdapter` è stato sottoposto a una suite di test definiti secondo la
+logica delle user story, modellando scenari di interazione utente per verificare la
+correttezza funzionale e la coerenza rispetto ai requisiti applicativi.
+Questo approccio ha facilitato la validazione dei flussi di utilizzo reali,
+assicurando la copertura dei principali casi d'uso.
 
-<p align="center">
-  <a href="https://github.com/dev-pps/pps-23-ulisse">
-    <img src="/resources/implementation/buizo/routeInputAdapter.png" style="width: 50%">
-  </a>
-</p>
+```scala 3
+"User" when :
+  "insert invalid data for saving and deletion" should :
+    "notify an error not choose departure" in :
+      for route <- validateRoute
+        yield
+          val creationInfo = route.toCreationInfo.copy(departure = None)
+          val saveError = adapter.save(Option.empty, creationInfo)
+          val deleteError = adapter.delete(creationInfo)
+          updateState()
+          val error = Left(Chain(RouteAdapter.Errors.NotChooseDeparture))
+          Await result(saveError, Duration.Inf) mustBe error
+          Await result(deleteError, Duration.Inf) mustBe error
+```
 
 ### Architettura
 
-L'architettura esagonale del progetto è stata validata utilizzando la libreria `ArchUnit`,
-verificando esclusivamente i sorgenti creati dal team di sviluppo.
+La conformità dell'architettura esagonale è stata verificata attraverso l'utilizzo 
+di `ArchUnit`, applicando le regole di validazione esclusivamente ai moduli e 
+ai sorgenti sviluppati internamente dal team.
 
 ```scala 3
 "hexagonal architecture" should "be entities -> applications -> adapters" in :
@@ -317,6 +329,31 @@ verificando esclusivamente i sorgenti creati dal team di sviluppo.
     .ignoreDependency(DescribedPredicate.alwaysTrue(), resideInAPackage(Packages.INFRASTRUCTURES))
     .ignoreDependency(resideInAPackage(Packages.INFRASTRUCTURES), DescribedPredicate.alwaysTrue())
     .allowEmptyShould(true)
+
+  rule.check(IMPORT_ONLY_CLASSES_CREATED)
+```
+
+È stata implementata una suite di test architetturali, finalizzata a verificare
+la conformità delle convenzioni di naming delle classi all'interno dei rispettivi
+package. Questo controllo garantisce l'aderenza alle regole di organizzazione
+del progetto e preserva la coerenza strutturale dell'architettura del dominio.
+
+Di seguito uno snippet di codice che valida la corretta nomenclatura delle classi
+all’interno del package `useCases`:
+
+```scala 3
+private def endingNameRulePossible(rootPackage: String, firstEnding: String, otherEnding: String*): ArchRule =
+  otherEnding.foldLeft(ArchRuleDefinition
+                         .classes
+                         .that
+                         .resideInAPackage(rootPackage)
+                         .should.haveSimpleNameEndingWith(firstEnding))(_.orShould haveSimpleNameEndingWith _)
+             .allowEmptyShould(true)
+
+"classes of useCases package" should "have Manager as the ending in the name" in :
+  val serviceEndingName = "Service"
+  val servicesEndingName = "Services"
+  val rule = endingNameRulePossible(Packages.USE_CASES, servicesEndingName, serviceEndingName)
 
   rule.check(IMPORT_ONLY_CLASSES_CREATED)
 ```
