@@ -58,13 +58,13 @@ object RailwayConfig:
   private val trainF_AV = CreateTrain -> "AV6" technology highSpeed wagon UseType.Passenger capacity 2 count 1
   private val trainG_AV = CreateTrain -> "AV7" technology highSpeed wagon UseType.Passenger capacity 2 count 1
   private val trainH_AV = CreateTrain -> "AV8" technology highSpeed wagon UseType.Passenger capacity 2 count 11
-  private val trainN_NR = CreateTrain -> "NR4" technology normal wagon UseType.Passenger capacity 2 count 1
-  private val trainO_NR = CreateTrain -> "NR5" technology normal wagon UseType.Passenger capacity 2 count 1
-  private val trainP_NR = CreateTrain -> "NR6" technology normal wagon UseType.Passenger capacity 2 count 1
-  private val trainQ_NR = CreateTrain -> "NR7" technology normal wagon UseType.Passenger capacity 2 count 1
-  private val trainR_NR = CreateTrain -> "NR8" technology normal wagon UseType.Passenger capacity 2 count 1
-  private val trainS_NR = CreateTrain -> "NR9" technology normal wagon UseType.Passenger capacity 2 count 1
-  private val trainT_NR = CreateTrain -> "NR10" technology normal wagon UseType.Passenger capacity 2 count 1
+  private val trainN_AV = CreateTrain -> "AV4" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainO_AV = CreateTrain -> "AV5" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainP_AV = CreateTrain -> "AV6" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainQ_AV = CreateTrain -> "AV7" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainR_AV = CreateTrain -> "AV8" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainS_AV = CreateTrain -> "AV9" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainT_AV = CreateTrain -> "AV10" technology highSpeed wagon UseType.Passenger capacity 2 count 1
 
   import ulisse.dsl.TimetableDSL.*
   private val table1 = trainA_AV at h(0).m(0).getOrDefault startFrom stationA thenOnRail
@@ -110,24 +110,24 @@ object RailwayConfig:
     railAV400 stopsIn stationD waitingForMinutes 15 thenOnRail
     railAV400 arrivesTo stationC
 
-  private val table9 = trainN_NR at h(2).m(30).getOrDefault startFrom stationA thenOnRail
+  private val table9 = trainN_AV at h(2).m(30).getOrDefault startFrom stationA thenOnRail
     railN400 travelsTo stationB thenOnRail
     railN400 stopsIn stationC waitingForMinutes 5 thenOnRail
     railN400 travelsTo stationD thenOnRail
     railN400 arrivesTo stationE
 
-  private val table10 = trainO_NR at h(3).m(30).getOrDefault startFrom stationF thenOnRail
+  private val table10 = trainO_AV at h(3).m(30).getOrDefault startFrom stationF thenOnRail
     railN400 travelsTo stationG thenOnRail
     railN400 travelsTo stationA thenOnRail
     railN400 stopsIn stationB waitingForMinutes 10 thenOnRail
     railN400 arrivesTo stationC
 
-  private val table11 = trainP_NR at h(4).m(30).getOrDefault startFrom stationE thenOnRail
+  private val table11 = trainP_AV at h(4).m(30).getOrDefault startFrom stationE thenOnRail
     railN400 travelsTo stationH thenOnRail
     railN400 travelsTo stationF thenOnRail
     railN400 arrivesTo stationG
 
-  private val table12 = trainQ_NR at h(5).m(30).getOrDefault startFrom stationJ thenOnRail
+  private val table12 = trainQ_AV at h(5).m(30).getOrDefault startFrom stationJ thenOnRail
     railN400 travelsTo stationI thenOnRail
     railN400 travelsTo stationH thenOnRail
     railN400 stopsIn stationG waitingForMinutes 10 thenOnRail
@@ -139,8 +139,8 @@ object RailwayConfig:
     routeDE link routeEH link routeHF link routeHG link routeHB link
     routeBI link routeID link routeJE link routeIJ link routeIH put
     trainA_AV put trainB_AV put trainC_AV put trainD_AV put trainE_AV put
-    trainF_AV put trainG_AV put trainH_AV put trainN_NR put trainO_NR put
-    trainP_NR put trainQ_NR put trainR_NR put trainS_NR put trainT_NR scheduleA table1 scheduleA
+    trainF_AV put trainG_AV put trainH_AV put trainN_AV put trainO_AV put
+    trainP_AV put trainQ_AV put trainR_AV put trainS_AV put trainT_AV scheduleA table1 scheduleA
     table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7 scheduleA
     table8 scheduleA table9 scheduleA table10 scheduleA table11 scheduleA table12
 
