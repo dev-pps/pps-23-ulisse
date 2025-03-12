@@ -17,6 +17,19 @@ class RouteServiceTest extends AnyFlatSpec with Matchers:
 
   private def updateState() = runAll(initState, eventQueue.events)
 
+  "routes on service" should "return the routes from the route manager" in:
+    val result = routeService.routes
+    updateState()
+    Await result (result, Duration.Inf) must be(List.empty[RouteTest])
+
+  "save route and read routes on service" should "return the route from the route manager" in:
+    validateRoute foreach (route =>
+      val saveResult = routeService save route
+      val readResult = routeService.routes
+      updateState()
+      Await result (readResult, Duration.Inf) must be(List(route))
+    )
+
   "save route on service" should "add a valid route to the route manager" in:
     validateRoute foreach (route =>
       val result = routeService save route
