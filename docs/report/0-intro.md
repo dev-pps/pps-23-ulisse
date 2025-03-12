@@ -20,7 +20,12 @@ Un'ulteriore sfida riguarda la scelta di implementare il sistema in modo immutab
 sfuttando ove possibile i vantaggi dei costrutti funzionali di Scala (e.g. Type Class, Extension method, Mixin, Parametri contestuali), 
 riducendo al minimo i side-effect implementando anche una gestione degli errori basata su Option/Either e Validated piuttosto che su eccezioni.
 ## Demo
-//TODO add demo gif
+<div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+  <video width="640" height="480" controls>
+    <source src="/demo/demo.mp4" type="video/mp4">
+  </video>
+</div>
+
 ## Autori
 - [Federico Bravetti](https://github.com/Fede802)
 - [Manuel Buizo](https://github.com/JBmanu)

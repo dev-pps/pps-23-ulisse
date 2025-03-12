@@ -42,6 +42,13 @@ This project is a **train simulation** system that allows users to create and ma
 The simulation allows users to visually **track the movement** of trains along their routes in real-time, providing a dynamic representation of the network. Additionally, users can monitor the performance of the railway system through **statistics**, enabling them to observe how the network behaves and possibly make adjustments for optimization.
 
 With this simulation, users can experiment with various scenarios, gain valuable insights and better understand the dynamics of a train network.
+
+<div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+  <video width="640" height="480" controls>
+    <source src="docs/public/resources/demo/demo.mp4" type="video/mp4">
+  </video>
+</div>
+
 ### Built With
 
 - Scala 3
