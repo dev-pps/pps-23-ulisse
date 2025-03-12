@@ -21,7 +21,7 @@ sfuttando ove possibile i vantaggi dei costrutti funzionali di Scala (e.g. Type 
 riducendo al minimo i side-effect implementando anche una gestione degli errori basata su Option/Either e Validated piuttosto che su eccezioni.
 ## Demo
 <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-  <video width="640" height="480" controls loop autoplay>
+  <video width="640" height="480" loop autoplay>
     <source src="/resources/demo/demo.mp4" type="video/mp4">
   </video>
 </div>
