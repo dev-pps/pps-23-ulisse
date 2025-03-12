@@ -1,4 +1,4 @@
-# Sprint Planning 7 (3/03 - 7/03)
+# Sprint Planning 8 (3/03 - 7/03)
 
 [Link to backlog](./backlogs/8-backlog)
 
