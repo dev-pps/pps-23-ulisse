@@ -14,10 +14,10 @@ Nel simulatore è possibile definire:
 
 Infine si può avviare la simulazione a partire dal sistema definito potendo:
  - visualizzare l'evoluzione del sistema nel tempo 
- - valutare le prestazioni del sistema attraverso l'analisi delle statistiche prodotte.
+ - valutare le prestazioni del sistema attraverso l'analisi delle statistiche prodotte
 
 Un'ulteriore sfida riguarda la scelta di implementare il sistema in modo immutabile, 
-sfuttando ove possibile i vantaggi dei costrutti funzionali di Scala (e.g. Type Class, Extension methods, Mixins, Parametri contestuali), 
+sfuttando ove possibile i vantaggi dei costrutti funzionali di Scala (e.g. Type Class, Extension method, Mixin, Parametri contestuali), 
 riducendo al minimo i side-effect implementando anche una gestione degli errori basata su Option/Either e Validated piuttosto che su eccezioni.
 ## Demo
 //TODO add demo gif
