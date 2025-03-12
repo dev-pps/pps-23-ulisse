@@ -19,7 +19,7 @@ trait DrawImageTiled extends DrawImage
 object DrawImageTiled:
 
   /** Default dimension for the image. */
-  private val defaultRouteDimension: Dimension = new Dimension(12, 12)
+  private val defaultRouteDimension: Dimension = new Dimension(8, 8)
 
   /** Create a new [[DrawImageTiled]]. */
   def apply(start: Point, end: Point, dimension: Dimension, color: Color): DrawImageTiled =
