@@ -1,3 +1,14 @@
+## [1.42.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.41.0...v1.42.0) (2025-03-12)
+
+### Features
+
+* done adpater in details design ([956b269](https://github.com/dev-pps/pps-23-ulisse/commit/956b269dce56636edb88b4ab2d36a04184c59c53))
+
+### Bug Fixes
+
+* **Examples:** let example simulation finish ([b563867](https://github.com/dev-pps/pps-23-ulisse/commit/b563867eb2f065734e86e68fae9a40e26e3e6ec4))
+* **Train:** fix rendering position ([6b5636c](https://github.com/dev-pps/pps-23-ulisse/commit/6b5636c6656def2d91f44327f4be486c35b5e389))
+
 ## [1.41.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.40.0...v1.41.0) (2025-03-10)
 
 ### Features
