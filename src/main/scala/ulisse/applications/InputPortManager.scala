@@ -34,6 +34,25 @@ object InputPortManager:
   ): InputPortManager =
     new InputPortManagerImpl(eventQueue, simulationInput, simulationInfo)
 
+  /** Creates a new instance of the input port manager. */
+  def create(
+      eventQueue: EventQueue,
+      station: StationPorts.Input,
+      route: RoutePorts.Input,
+      train: TrainPorts.Input,
+      timetable: TimetablePorts.Input,
+      simulation: SimulationPorts.Input,
+      simulationInfo: SimulationInfoPorts.Input
+  ): InputPortManager = InputPortManagerImpl(
+    eventQueue,
+    station,
+    route,
+    train,
+    timetable,
+    simulation,
+    simulationInfo
+  )
+
   private case class InputPortManagerImpl(
       eventQueue: EventQueue,
       station: StationPorts.Input,

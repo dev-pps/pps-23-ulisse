@@ -8,6 +8,7 @@ import ulisse.infrastructures.view.components.decorators.SwingEnhancements.{Enha
 import ulisse.infrastructures.view.components.styles.Styles
 
 import java.awt.FlowLayout
+import java.awt.event.{ComponentAdapter, ComponentEvent}
 import javax.swing.{JLayeredPane, JTextArea}
 import scala.swing.*
 
@@ -19,6 +20,13 @@ object ExtendedSwing:
   case class SLayeredPanel private (private val layeredPane: JLayeredPane) extends BorderPanel with EnhancedLook:
     def this() = this(JLayeredPane())
     layout(Component.wrap(layeredPane)) = BorderPanel.Position.Center
+
+    private val resizeListener = new ComponentAdapter {
+      override def componentResized(e: ComponentEvent): Unit =
+        layeredPane.setBounds(0, 0, e.getComponent.getWidth, e.getComponent.getHeight)
+        updateGraphics()
+    }
+    peer addComponentListener resizeListener
 
     /** Adds a component to the layered panel. */
     def add(component: Component): Unit =

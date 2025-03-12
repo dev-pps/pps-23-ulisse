@@ -26,6 +26,16 @@ class RouteTest extends AnyFlatSpec with Matchers:
   import RouteTest.*
   val validateRoute: ValidationRoute = Route(departure, arrival, routeType, railsCount, pathLength)
 
+  "unapply route" should "return all parameters" in:
+    validateRoute match
+      case Right(Route(departure, arrival, routeType, railsCount, pathLength)) =>
+        departure mustBe departure
+        arrival mustBe arrival
+        routeType mustBe routeType
+        railsCount mustBe railsCount
+        pathLength mustBe pathLength
+      case Left(errors) => fail(errors.mkMsgErrors)
+
   "create routes" should "set core parameters: typology, railsCount, path" in:
     validateRoute match
       case Left(errors) => fail(errors.mkMsgErrors)
