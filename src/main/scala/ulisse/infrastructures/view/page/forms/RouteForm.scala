@@ -122,7 +122,7 @@ object RouteForm:
     override val departureStation: ComposedSwing.InfoTextField = ComposedSwing createInfoTextField "Departure Station"
     override val arrivalStation: ComposedSwing.InfoTextField   = ComposedSwing createInfoTextField "Arrival Station"
     override val routeType: ComposedSwing.InfoTextField        = ComposedSwing createInfoTextField "Type"
-    override val tracks: ComposedSwing.InfoTextField           = ComposedSwing createInfoTextField "Track"
+    override val tracks: ComposedSwing.InfoTextField           = ComposedSwing createInfoTextField "Tracks"
     override val length: ComposedSwing.InfoTextField           = ComposedSwing createInfoTextField "Length"
 
     private val layoutButton = ExtendedSwing.SBoxPanel(Orientation.Vertical).transparent()
