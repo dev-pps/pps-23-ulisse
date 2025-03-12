@@ -1,3 +1,13 @@
+## [2.0.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.42.0...v2.0.0) (2025-03-12)
+
+### ⚠ BREAKING CHANGES
+
+* **Ulisse:** new version
+
+### Features
+
+* **Ulisse:** new version ([2e96bf3](https://github.com/dev-pps/pps-23-ulisse/commit/2e96bf3ff56285af80f6a4935bf496a22b165c09))
+
 ## [1.42.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.41.0...v1.42.0) (2025-03-12)
 
 ### Features
