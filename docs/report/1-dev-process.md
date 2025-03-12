@@ -9,11 +9,11 @@ con il fine di garantire una gestione agile e iterativa delle attività progettu
 Durante l’intero ciclo di vita del progetto, la qualità del processo è migliorata parallelamente alla crescita del team di sviluppo, che ha affrontato con successo le sfide progettuali, rafforzando nel tempo la propria sinergia e coesione.
 
 ### Ruoli
-**Product Owner**: Manuel J. Buizo, responsabile del monitoraggio del progresso del progetto, dell’allineamento rispetto agli obiettivi aziendali e del coordinamento del team di sviluppo e sviluppatore.
+**Product Owner**: Manuel J. Buizo, responsabile del monitoraggio del progresso del progetto, dell’allineamento rispetto agli obiettivi aziendali e del coordinamento del team di sviluppo, e sviluppatore.
 
-**Scrum Master**: Matteo Violani, il cui ruolo è quello di verificare la corretta applicazione della metodologia scrum e di aiutare a rimuovere gli impedimenti che il Team e il Product Owner hanno identificato durante il processo di sviluppo e sviluppatore.
+**Scrum Master**: Matteo Violani, il cui ruolo è quello di verificare la corretta applicazione della metodologia scrum e di aiutare a rimuovere gli impedimenti che il Team e il Product Owner hanno identificato durante il processo di sviluppo, e sviluppatore.
 
-**Stakeholder**: Federico Bravetti, committente e responsabile della qualità e usabilità del prodotto e sviluppatore.
+**Stakeholder**: Federico Bravetti, committente e responsabile della qualità e usabilità del prodotto, e sviluppatore.
 
 ### Meeting
 Le tipologie di meeting utilizzate sono le seguenti:
@@ -24,7 +24,7 @@ più appropriate per il progetto, in base alle necessità tecniche e agli obiett
 business a lungo termine.
 
 
-- **Sprint review e retrospettiva**: durante lo sprint review vengono presentati i risultati raggiunti allo stakeholder e una volta ispezionati vengono idenitificati i possibili miglioramenti. Successivamente si passa alla retrospettiva dove vengono pianificati modi per incrementare la qualità e l’efficacia del team.
+- **Sprint review e retrospettiva**: durante lo sprint review vengono presentati i risultati raggiunti allo stakeholder e una volta ispezionati vengono identificati i possibili miglioramenti. Successivamente si passa alla retrospettiva dove vengono pianificati modi per incrementare la qualità del processo e l’efficacia del team.
 
 
 - **Sprint planning**: meeting di pianificazione in cui vengono selezionate le attività da svolgere nel prossimo sprint e ne viene definito il goal.
@@ -38,12 +38,12 @@ e analizzare meglio alcuni aspetti progettuali.
 
 
 ### Youtrack
-Per la gestione del Product Backlog, degli sprint e delle attività da svolgere, è stato scelto YouTrack.
+Per la gestione del Product Backlog, degli sprint e delle attività da svolgere, è stato scelto lo strumento YouTrack.
 Durante ogni Sprint Planning sono state create le nuove issues da svolgere nello sprint, in particolare:
-- le issue più rilevanti vengono immediatamente assegnate ai membri del team
-- le issue rimanenenti sono seleazionate in autonomia dai membri che hanno completato i propri task
-- le issue rimaste incomplete nello sprint precedente vengono trasferite nello sprint corrente
-- se necessario le issue più complesse venivano suddivise successivamente in task più piccoli
+- le issue più rilevanti sono state immediatamente assegnate ai membri del team
+- le issue rimanenenti sono state seleazionate in autonomia dai membri che hanno completato i propri task
+- le issue rimaste incomplete nello sprint precedente sono state trasferite nello sprint corrente
+- se necessario le issue più complesse sono state suddivise successivamente in task più piccoli
 
 ## DVCS
 Per quanto riguarda l'utilizzo di Git e GitHub, è stato deciso di adottare il modello GitFlow, 
@@ -55,7 +55,7 @@ rebase degli altri branch, in modo da avere una storia dei commit lineare.
 ### Conventional commit
 Per la scrittura del messaggio di commit è stata utilizzata la convenzione [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). 
 Inoltre per rafforzare l'adesione a questa convenzione è stato impostato un commit-msg 
-hook tramite build del progetto (effettuato con sbt) e rafforzata definitivamente con una pipeline di CI/CD.
+hook tramite build del progetto e poi rafforzata definitivamente con una pipeline di CI/CD.
 
 ### Conventional branch
 Per la denominazione dei branch è stata utilizzata la convenzione [Conventional Branch](https://conventional-branch.github.io/).
@@ -127,9 +127,9 @@ In particolare, sono stati definiti i seguenti workflow:
 
 - DeployReportSite: generazione della documentazione con rispettiva scaladoc e coverage, con upload su GitHub Pages
 
-- Release: rilascio della nuova versione del progetto su GitHub utilizzando il tool Semantic Release, comprendendo la generazione e l'inclusione del jar del progetto tra gli asset della release.
+- Release: rilascio della nuova versione del progetto su GitHub utilizzando il tool Semantic Release, comprendendo la generazione e l'inclusione del jar del progetto tra gli asset di quest'ultima.
 
 >NOTA: la pipeline di release è attiva solo in seguito all'accettazione di una pr su main, mentre la pipeline DeployReportSite è attiva solo in main e nei branch docs/*.
 
 ## Report
-Per il report del progetto è stato utilizzato VitePress, un generatore di siti statici basato su Vue.js che ha permesso la generazione e caricamento su GithubPages del report in modo semplice e veloce utilizzando file Markdown.
+Per il report del progetto è stato utilizzato VitePress, un generatore di siti statici basato su Vue.js che ha permesso la generazione e caricamento su Github Pages del report in modo semplice e veloce, utilizzando file Markdown.

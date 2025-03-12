@@ -1,9 +1,9 @@
 ﻿
 # Requisiti 
-
+Di seguito viene definita la vision del progetto e i diversi requisiti che dovrà soddisfare.
 ## Business
 Si vuole sviluppare un simulatore di reti ferroviarie, progettato per offrire un 
-ambiente dedicato a test e analisi. Le principali finalità includono:
+ambiente dedicato a test ed analisi. Le principali finalità includono:
 
 - Stima del comportamento del sistema: analizzare e prevedere le prestazioni del sistema ferroviario 
 in relazione a diverse configurazioni operative.
@@ -18,8 +18,8 @@ Gli elementi principali del sistema sono:
 - **Platform**: rotaia all'interno della Station
 - **Train**: veicolo su rotaia che trasporta persone o merci
 - **Technology**: tecnologia utilizzata da un Train o da una Route
-- **Route**: tratta fra due Station, può contenere una o più Track
-- **Track**: collegamento fisico tra due station
+- **Route**: tratta fra due Station, che può contenere una o più Track
+- **Track**: collegamento fisico tra due Station
 - **Timetable**: definizione degli orari di partenza-arrivo-attesa di un Train
 - **Statistics**: dati relativi alla Simulation (ritardi, occupazione Station, ...)
 - **Railway**: aggregazione di Station e Route
@@ -31,13 +31,12 @@ Gli elementi principali del sistema sono:
 ### Utente
 - L'utente deve poter interagire con l'applicazione tramite un'interfaccia 
 - L'utente deve poter creare una nuova Railway o modificarne una esistente potendo specificare e combinare 
-liberamente le varie Station e Route, definendo i Train e le Timetable (ossia un'insieme di Route valide e un 
-orario di partenza)
+liberamente le varie Station e Route, definendo anche i Train e le Timetable
 - L'utente deve poter vedere l'esecuzione della Simulation una volta avviata
 - L'utente deve poter vedere statistiche/info di un Train, Station e Route durante la Simulation
 - L'utente deve poter vedere le Timetable programmate per un Train
 - L'utente deve poter avviare, mettere in pausa o fare il reset della Simulation
-- L'utente deve poter visualizzare gli errori/avvisi della simulazioni/interazioni con la gui
+- L'utente deve poter visualizzare gli errori e avvisi prodotti dal sistema
 
 ### Sistema
 - Il sistema deve poter visualizzare la Railway
@@ -45,18 +44,17 @@ orario di partenza)
 - Il sistema deve poter gestire la crezione/modifica/rimozione di Station, Route, Timetable e Train
 - Il sistema deve poter gestire l'esecuzione della Simulation
   - evitando la sovrapposizione dei Train in una Route
-  - riconoscimento della presenza di ritardi
+  - riconoscendo la presenza di ritardi
 - Il sistema deve poter gestire il calcolo delle statistiche relative alla Simulation
 - Il sistema deve poter controllare la correttezza del setup della Simulation
 - Il sistema deve poter replicare una stessa Simulation
 - Il sistema deve poter gestire errori e avvisi
 
 ## Non funzionali
-- Usabilità: l'interfaccia grafica deve essere semplice e intuitiva. 
+- Usabilità: l'interfaccia grafica deve essere semplice e intuitiva
 - Robustezza: l'applicazione deve gestire setup errati
-- Affidabilià: l'applicazione deve essere stabile, evitando crash.
-- Testabilità: devono essere presenti test per verificare il corretto funzionamento del sistema 
-(testare i singoli elementi/ interazioni/ sistema)
+- Affidabilià: l'applicazione deve essere stabile, evitando crash
+- Testabilità: devono essere presenti test per verificare il corretto funzionamento del sistema
 - Manutenibilità: il codice deve essere ben strutturato e ben documentato
 - Estendibilità: il progetto deve favorire la personalizzazione e l'aggiunta di funzionalità
 - Portabilità: l'applicazione può essere eseguita su più sistemi operativi
@@ -70,13 +68,14 @@ orario di partenza)
 - SBT assembly (FAT jar) 2.3.0 
 - Scaladoc
 - Scalafmt 2.5.2
-- archUnit 1.3.0
-- wartremover 3.2.5
-- semantic release
+- ArchUnit 1.3.0
+- Wartremover 3.2.5
+- Semantic release
 - Scoverage 2.2.2
 - Immutabilità dell'applicazione
 
 ## Opzionali
+- introduzione di randomness controllata all'interno della simulazione
 - scelta della tipologia di alimentazione del Train e gestione dell'autonomia
 - ottimizzazione/ricerca dinamica del percoso più veloce (vengono definite solo le Station dove si ferma 
 il Train e il resto dei percosi è gestito da un sistema di balancing del traffico)
@@ -86,4 +85,4 @@ sarà mostrata diversamente da una Station libera)
 - mostrare dei box con delle statistiche sopra le entità della Simulation
 - gestione personalizzabile della strategia decisionale dei Train (e.g. criteri di priorità per 
 la selezione di una Track)
-- gestione di eventi esterni (pioggia, neve, scioperi, ecc...) eventi che influiscono su porzioni della Railway
+- gestione di eventi esterni che influiscono su porzioni della Railway (e.g. pioggia, neve, scioperi, ecc...)
