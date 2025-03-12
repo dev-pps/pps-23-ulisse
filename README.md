@@ -45,7 +45,7 @@ With this simulation, users can experiment with various scenarios, gain valuable
 
  <p align="center">
   <a href="https://github.com/dev-pps/pps-23-ulisse">
-    <img src="./docs/public/resources/demo/demoGif.gif" alt="Logo" width="320" height="240" />
+    <img src="./docs/public/resources/demo/demoGif.gif" alt="Logo" width="640" height="410" />
   </a>
 
 ### Built With
