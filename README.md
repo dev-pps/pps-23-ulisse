@@ -43,11 +43,10 @@ The simulation allows users to visually **track the movement** of trains along t
 
 With this simulation, users can experiment with various scenarios, gain valuable insights and better understand the dynamics of a train network.
 
-<div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-  <video width="640" height="480" controls>
-    <source src="docs/public/resources/demo/demo.mp4" type="video/mp4">
-  </video>
-</div>
+ <p align="center">
+  <a href="https://github.com/dev-pps/pps-23-ulisse">
+    <img src="./docs/public/resources/demo/demoGif.gif" alt="Logo" width="320" height="240" />
+  </a>
 
 ### Built With
 
