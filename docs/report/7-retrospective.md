@@ -1,7 +1,6 @@
 # Retrospettiva
 
-
-al termine dello sviluppo del progetto il team si ritiene complessivamente soddisfatto del laoro svolto, del risultato ottenuto e delle scelte chiave effettuate per superare situazioni di criticità. Di seguito sono riportati alcune considerazioni a posteriori rispetto all'adozione della metodikigia SCRUM
+Al termine dello sviluppo del progetto il team si ritiene complessivamente soddisfatto del laoro svolto, del risultato ottenuto e delle scelte chiave effettuate per superare situazioni di criticità. Di seguito sono riportati alcune considerazioni a posteriori rispetto all'adozione della metodikigia SCRUM
 Durante il progetto, è stata adottata la scelta di sprint della durata di una settimana, con l’obiettivo di rendere il processo di sviluppo più efficiente. Tuttavia, questa decisione ha avuto l’effetto opposto, generando una maggiore pressione sul team. Il tempo limitato per completare i task ha portato a scelte di design più approssimative e a un accumulo di debito tecnico. Questo evidenzia come, anche in un contesto agile, una pianificazione solida e una progettazione accurata siano essenziali per ridurre il rischio di produrre codice di bassa qualità o difficile da integrare.
 
 D’altra parte, il processo di sviluppo adottato ha favorito la collaborazione e la comunicazione costante tra i membri del team, migliorando la sinergia del gruppo. Questo aspetto è stato particolarmente importante considerando che si trattava della prima esperienza di lavoro insieme.
