@@ -23,6 +23,15 @@ class TrainTest extends AnyFlatSpec:
       length = length
     )
 
+  "unapply" should "provide train name, technology, wagon info and length" in:
+    train match
+      case Trains.Train(name, techType, wagon, length) =>
+        name should be("3905")
+        techType should be(technology)
+        wagon should be(wagonInfo)
+        length should be(5)
+      case _ => fail("Train unapply failed")
+
   "A Train" should "provide overall capacity and length depending wagon specs" in:
     train.name should be("3905")
     train.wagon.use should be(UseType.Passenger)
@@ -37,3 +46,6 @@ class TrainTest extends AnyFlatSpec:
   it should "provide how many meters train is long" in:
     val expectedMeterSize = length * Wagons.UseType.Passenger.lengthSize
     train.lengthSize should be(expectedMeterSize)
+
+  it should "be different if not a train" in:
+    train equals "not a train" should be(false)
