@@ -32,10 +32,6 @@ object SimulationWorkspace:
     private val mapPanel: MapSimulation    = MapSimulation()
     private val simulation: SimulationForm = SimulationForm()
 
-    private val minUpdate = 10
-    @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    private var lastUpdate = 0L
-
     workspace.workPanel.layout(mapPanel) = Position.Center
     workspace.menuPanel.layout(simulation.component) = Position.East
 
@@ -54,7 +50,6 @@ object SimulationWorkspace:
           updateData(data)
           simulation setEngineConfiguration engine.configuration
       ))
-      lastUpdate = System.currentTimeMillis()
 
     private def refreshMap(data: SimulationData): Unit =
       Swing.onEDT:
@@ -67,10 +62,7 @@ object SimulationWorkspace:
         simulation.showSimulationData(data)
 
     override def updateData(data: SimulationData): Unit =
-      val now = System.currentTimeMillis()
-      if now - lastUpdate > minUpdate then
-        lastUpdate = now
-        refreshMap(data)
+      refreshMap(data)
 
     override def endSimulation(data: SimulationData): Unit =
       refreshMap(data)
