@@ -17,10 +17,12 @@ class CoordinateTest extends AnyFlatSpec with Matchers:
   "check equals coordinates" should "be same x and y" in:
     val other = Coordinate(x, y)
     coordinate === other should be(true)
+    coordinate equals other should be(true)
 
   "check different coordinates" should "have different x or y" in:
     val other = Coordinate(x + 1, y + 1)
     coordinate === other should be(false)
+    coordinate equals other should be(false)
 
   "check distance between coordinates" should "be the Euclidean distance" in:
     val x1       = x
