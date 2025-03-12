@@ -11,22 +11,24 @@ import ulisse.adapters.input.{
   StationEditorAdapter,
   TrainViewAdapter
 }
+import ulisse.applications.ports.{SimulationInfoPorts, SimulationPorts}
+import ulisse.applications.{EventQueue, InputPortManager}
 
 class InputAdapterManagerTest extends AnyFlatSpec with Matchers:
 
   "create input adapter manager" should "create input adapter manager" in:
-    val station        = mock[StationEditorAdapter]
-    val route          = mock[RouteAdapter]
-    val train          = mock[TrainViewAdapter]
-    val timetable      = mock[TimetableViewAdapter]
-    val simulationPage = mock[SimulationPageAdapter]
-    val simulationInfo = mock[SimulationInfoAdapter]
-    val inputAdapterManager =
-      InputAdapterManager.create(station, route, train, timetable, simulationPage, simulationInfo)
+    val eventQueue       = mock[EventQueue]
+    val simulation       = mock[SimulationPorts.Input]
+    val simulationInfo   = mock[SimulationInfoPorts.Input]
+    val inputPortManager = InputPortManager(eventQueue, simulation, simulationInfo)
 
-    inputAdapterManager.station mustBe station
-    inputAdapterManager.route mustBe route
-    inputAdapterManager.train mustBe train
-    inputAdapterManager.timetable mustBe timetable
-    inputAdapterManager.simulationPage mustBe simulationPage
-    inputAdapterManager.simulationInfo mustBe simulationInfo
+    val simulationPageAdp   = mock[SimulationPageAdapter]
+    val simulationInfoAdp   = mock[SimulationInfoAdapter]
+    val inputAdapterManager = InputAdapterManager(inputPortManager, simulationPageAdp, simulationInfoAdp)
+
+    inputAdapterManager.station mustBe a[StationEditorAdapter]
+    inputAdapterManager.route mustBe a[RouteAdapter]
+    inputAdapterManager.train mustBe a[TrainViewAdapter]
+    inputAdapterManager.timetable mustBe a[TimetableViewAdapter]
+    inputAdapterManager.simulationPage mustBe simulationPageAdp
+    inputAdapterManager.simulationInfo mustBe simulationInfoAdp

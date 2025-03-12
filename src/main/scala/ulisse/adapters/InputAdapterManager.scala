@@ -35,17 +35,6 @@ object InputAdapterManager:
   ): InputAdapterManager =
     new InputAdapterManagerImpl(ports, simulationAdapter, simulationInfoAdapter)
 
-  /** Creates a new instance of the input adapter manager. */
-  def create(
-      stations: StationEditorAdapter,
-      routes: RouteAdapter,
-      trains: TrainViewAdapter,
-      timetables: TimetableViewAdapter,
-      simulationPage: SimulationPageAdapter,
-      simulationInfoAdapter: SimulationInfoAdapter
-  ): InputAdapterManager =
-    InputAdapterManagerImpl(stations, routes, trains, timetables, simulationPage, simulationInfoAdapter)
-
   private final case class InputAdapterManagerImpl(
       station: StationEditorAdapter,
       route: RouteAdapter,

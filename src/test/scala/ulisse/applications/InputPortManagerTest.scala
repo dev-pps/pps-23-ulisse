@@ -4,22 +4,19 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar.mock
 import ulisse.applications.ports.*
+import ulisse.applications.useCases.{RouteService, StationService, TimetableService, TrainService}
 
 class InputPortManagerTest extends AnyFlatSpec with Matchers:
 
   "create input port manager" should "create input port manager" in:
-    val queue            = mock[EventQueue]
-    val station          = mock[StationPorts.Input]
-    val route            = mock[RoutePorts.Input]
-    val train            = mock[TrainPorts.Input]
-    val timetable        = mock[TimetablePorts.Input]
+    val eventQueue       = mock[EventQueue]
     val simulation       = mock[SimulationPorts.Input]
     val simulationInfo   = mock[SimulationInfoPorts.Input]
-    val inputPortManager = InputPortManager.create(queue, station, route, train, timetable, simulation, simulationInfo)
+    val inputPortManager = InputPortManager(eventQueue, simulation, simulationInfo)
 
-    inputPortManager.station mustBe station
-    inputPortManager.route mustBe route
-    inputPortManager.train mustBe train
-    inputPortManager.timetable mustBe timetable
+    inputPortManager.station mustBe StationService(eventQueue)
+    inputPortManager.route mustBe RouteService(eventQueue)
+    inputPortManager.train mustBe TrainService(eventQueue)
+    inputPortManager.timetable mustBe TimetableService(eventQueue)
     inputPortManager.simulation mustBe simulation
     inputPortManager.simulationInfo mustBe simulationInfo
