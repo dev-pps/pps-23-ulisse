@@ -1,34 +1,21 @@
-[//]: # (![An image]&#40;/resources/architecture/staticEntitiesManagers.svg&#41;)
-
-[//]: # (![An image]&#40;/resources/architecture/queuingsystem.svg&#41;)
-
-[//]: # (![An image]&#40;/resources/architecture/EnvironmentElementsArchitecture.svg&#41;)
-
-[//]: # (![An image]&#40;/resources/architecture/EnvironmentArchitecture.svg&#41;)
-
-[//]: # (![An image]&#40;/resources/architecture/RailwayEnvironment.svg&#41;)
-
-[//]: # (![An image]&#40;/resources/architecture/SimulationEngineWithManager.svg&#41;)
-
 # Organizzazione del codice
-
-![An image](/resources/architecture/packages.svg)
 
 Il codice è organizzato in 6 package principali:
 
-- entities: contiene le classi che rappresentano le entità del dominio, modellando gli oggetti principali.
+![An image](/resources/architecture/packages.svg)
+
+- entities: contiene le classi che rappresentano le entità del dominio
 - applications: include le classi che implementano la logica di business:
-    - managers: gestiscono e coordinano le entità in base ai requisiti applicativi.
-    - ports: definiscono le interfacce attraverso cui la logica di business comunica con l'esterno.
-    - useCases: implementano le porte di input, offrendo i servizi esposti dall'applicazione.
-    - events: definiscono le regole e le operazioni per l'aggiornamento dello stato dell'applicazione.
-- adapters: contiene i componenti che fungono da interfacce tra la logica di business e i sistemi esterni, facilitando
-  la comunicazione tra il core e i componenti periferici.
-- infrastructures: racchiude le classi responsabili della gestione della visualizzazione grafica e della definizione di
-  tempo.
-- DSL: include le classi che forniscono un linguaggio specifico per la creazione delle entità dell'applicazione e per la
+    - managers: gestiscono e coordinano le entità in base ai requisiti applicativi
+    - ports: definiscono le interfacce attraverso cui la logica di business interagisce con l'esterno
+    - useCases: implementano le porte di input, offrendo i servizi esposti dall'applicazione
+    - events: definiscono le regole e le operazioni per l'aggiornamento dello stato dell'applicazione
+- adapters: contiene i componenti che fungono da interfacce tra la logica di business e i sistemi esterni, adattando
+  la comunicazione tra il core e i componenti periferici
+- infrastructures: racchiude le classi responsabili della gestione della visualizzazione grafica e l'utility che fornisce le informazioni sul tempo corrente
+- DSL: include le classi che forniscono un linguaggio specifico per la creazione di entità dell'applicazione e per la
   definizione dell'intera railway, semplificando la configurazione del dominio applicativo.
-- utils: contiene le classi di utilità che offrono funzioni di supporto, astraggendo operazioni comuni necessarie per il
+- utils: contiene le classi di utilità che offrono funzioni di supporto, estraendo operazioni comuni necessarie per il
   funzionamento del sistema.
 
 ## Architettura
@@ -39,7 +26,7 @@ All’interno dell’_Application_, la gestione dello stato è delegata ai
 `Managers`, ognuno responsabile di un aggregato specifico di entità di dominio.
 Ogni manager implementa le operazioni di persistenza, aggiornamento e
 cancellazione, assicurando l’integrità dei dati e la gestione degli errori
-secondo le regole e le invarianti del dominio applicativo.
+secondo le regole e gli invarianti del dominio applicativo.
 
 ```mermaid
 classDiagram
@@ -92,8 +79,8 @@ classDiagram
 
 ### EventQueue
 
-La gestione dello stato dell'applicazione è stata implementata a livello _Applicativo_
-dell'architettura esagonale per garantire l'immutabilità dell'`AppState` all'interno del
+Lo stato dell'applicazione viene gestito a livello _Applicativo_
+dell'architettura esagonale. per garantire l'immutabilità dell'`AppState` all'interno del
 core domain, rispondendo a un requisito di progetto. Questo approccio evita che la
 gestione dell'evoluzione dello stato sia delegata a componenti esterni. In questo
 contesto, l'`EventQueue` opera in modo simile a un event loop, centralizzando il sistema
