@@ -32,5 +32,4 @@ object GUI:
 
     contents = pageManager.component
     pageManager.revalidate()
-    resizable = false
     visible = true
