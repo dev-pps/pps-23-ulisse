@@ -1,4 +1,4 @@
-# Ulisse - A Train Simulator
+# Ulisse - The train simulator
  <br/>
  <p align="center">
   <a href="https://github.com/dev-pps/pps-23-ulisse">
