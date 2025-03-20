@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/dev-pps/pps-23-ulisse/compare/v2.0.0...v2.0.1) (2025-03-20)
+
+### Bug Fixes
+
+* resizable frame restored ([1831bb1](https://github.com/dev-pps/pps-23-ulisse/commit/1831bb1dabe40ec61884d7d901aa77d3b3f5c581))
+
 ## [2.0.0](https://github.com/dev-pps/pps-23-ulisse/compare/v1.42.0...v2.0.0) (2025-03-12)
 
 ### ⚠ BREAKING CHANGES
