@@ -311,8 +311,6 @@ Il `Train` viene identificato dal suo _name_ e si caratterizza per la sua tecnol
 di partenza/arresto e la massima velocità che poi verranno utilizzate per l'elaborazione delle
 `Timetable`. Può comporsi di diversi `Wagon` tutti con una specifica capienza, tipologia e lunghezza.
 
-TODO: QUI SCRIVERE CHE IL MANAGER SPECIFICO DEFINISCE GLI ERRORI
-
 ```mermaid
 classDiagram
     direction BT
