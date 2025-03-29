@@ -64,7 +64,7 @@ object TrainAgentPerceptions:
 
   /** Represent train agent perception type of [[Perception]] that is sent by environment
     *
-    * It wraps [[TrainAgentPerceptionData]] and TODO finire
+    * It wraps [[TrainAgentPerceptionData]].
     */
   trait TrainAgentPerception[PD <: PerceptionData] extends Perception[PD]
 
