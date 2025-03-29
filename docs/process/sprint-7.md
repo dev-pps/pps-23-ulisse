@@ -6,7 +6,7 @@
 Fornire allo stakeholder l'applicazione funzionante con le funzionalità base di simulazione e di setup della simulazione.
 
 ## Deadline
-La scadenza dello sprint è il 21/02/2025
+La scadenza dello sprint è il 28/02/2025
 
 ## Sprint Review
 Lo stakeholder è moderatamente soddisfatto poiché solo parte dell'applicazione risulta funzionanante e integrata.
