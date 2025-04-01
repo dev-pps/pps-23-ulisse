@@ -34,7 +34,7 @@ object MapElement:
     val imagePath = ImagePath.station
     MapElementSimple(
       station,
-      DrawImageSimple.createAt(imagePath, station.coordinate.toPoint),
+      DrawImageSimple(imagePath, station.coordinate.toPoint, new Dimension(40, 40)),
       station.name
     )
 
