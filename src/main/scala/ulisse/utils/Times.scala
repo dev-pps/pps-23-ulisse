@@ -168,12 +168,16 @@ object Times:
   given TimeConstructor[Time] with
     def construct(h: Int, m: Int, s: Int): Time = Time(h, m, s)
 
+  /** Time constructor for Option[Time] */
+  given optionTimeConstructor: TimeConstructor[Option[Time]] with
+    def construct(h: Int, m: Int, s: Int): Option[Time] = Some(Time(h, m, s))
+
   /** Time constructor for ClockTime */
   given TimeConstructor[ClockTime] with
     def construct(h: Int, m: Int, s: Int): ClockTime = ClockTime(h, m).getOrDefault
 
   /** Time constructor for Option[ClockTime] */
-  given TimeConstructor[Option[ClockTime]] with
+  given optionClockTimeConstructor: TimeConstructor[Option[ClockTime]] with
     def construct(h: Int, m: Int, s: Int): Option[ClockTime] = ClockTime(h, m).toOption
 
   /** Time constructor for Either[ClockTimeErrors, ClockTime] */

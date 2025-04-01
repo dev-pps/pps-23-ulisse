@@ -1,6 +1,6 @@
-package ulisse.applications
+package ulisse.applications.configs
 
-import ulisse.applications.configs.{RailwayBaseConfig, RailwayExamplesConfig}
+import ulisse.applications.AppState
 import ulisse.applications.managers.TechnologyManagers.TechnologyManager
 import ulisse.dsl.RailwayDsl.*
 import ulisse.entities.route.Routes.RouteType
@@ -11,14 +11,14 @@ import ulisse.utils.Times.FluentDeclaration.h
 
 /** Configuration for the railway. */
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
-object RailwayConfig:
+object RailwayComplexConfig extends RailwayConfig:
 
   private val highSpeed         = TrainTechnology("AV", 300, 2.0, 1.0)
   private val normal            = TrainTechnology("Normal", 160, 1, 0.5)
   private val technologyManager = TechnologyManager(List(highSpeed, normal))
 
-  private val initAppState: AppState  = AppState.withTechnology(technologyManager)
-  private var uploadRailway: AppState = initAppState
+  private val initAppState: AppState   = AppState.withTechnology(technologyManager)
+  private var complexRailway: AppState = initAppState
 
   private val stationA = CreateStation -> "A" at (314, 263) platforms 2
   private val stationB = CreateStation -> "B" at (528, 147) platforms 2
@@ -133,7 +133,7 @@ object RailwayConfig:
     railN400 stopsIn stationG waitingForMinutes 10 thenOnRail
     railN400 arrivesTo stationA
 
-  uploadRailway = CreateAppState || uploadRailway set stationA set stationB set stationC set stationD set stationE set
+  complexRailway = CreateAppState || complexRailway set stationA set stationB set stationC set stationD set stationE set
     stationF set stationG set stationH set stationI set stationJ link
     routeFG link routeGA link routeAB link routeBC link routeCD link
     routeDE link routeEH link routeHF link routeHG link routeHB link
@@ -144,15 +144,4 @@ object RailwayConfig:
     table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7 scheduleA
     table8 scheduleA table9 scheduleA table10 scheduleA table11 scheduleA table12
 
-  private val simpleRailway: AppState  = RailwayBaseConfig.railwayConfig
-  private val complexRailway: AppState = uploadRailway
-  private val exampleRailway: AppState = RailwayExamplesConfig.exampleRailwayConfig
-
-  /** Get the simple railway configuration. */
-  def simpleRailwayConfig: AppState = simpleRailway
-
-  /** Get the normal railway configuration. */
-  def complexRailwayConfig: AppState = complexRailway
-
-  /** Get the complex railway configuration. */
-  def exampleRailwayConfig: AppState = exampleRailway
+  def config: AppState = complexRailway

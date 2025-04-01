@@ -11,13 +11,13 @@ import ulisse.utils.Times.FluentDeclaration.h
 
 /** Base configuration for the railway. */
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
-object RailwayBaseConfig:
+object RailwayBaseConfig extends RailwayConfig:
   private val highSpeed         = TrainTechnology("AV", 300, 2.0, 1.0)
   private val normal            = TrainTechnology("Normal", 160, 1, 0.5)
   private val technologyManager = TechnologyManager(List(highSpeed, normal))
 
-  private val initAppState: AppState  = AppState.withTechnology(technologyManager)
-  private var mediumRailway: AppState = initAppState
+  private val initAppState: AppState = AppState.withTechnology(technologyManager)
+  private var baseRailway: AppState  = initAppState
 
   private val stationA = CreateStation -> "A" at (314, 263) platforms 2
   private val stationB = CreateStation -> "B" at (528, 147) platforms 2
@@ -52,7 +52,6 @@ object RailwayBaseConfig:
   private val table3 = trainB_AV at h(2).m(0).getOrDefault startFrom stationC thenOnRail
     railAV400 travelsTo stationB thenOnRail
     railAV400 arrivesTo stationA
-
   private val table4 = trainC_AV at h(3).m(0).getOrDefault startFrom stationD thenOnRail
     railAV400 travelsTo stationE thenOnRail
     railN400 arrivesTo stationF
@@ -62,12 +61,11 @@ object RailwayBaseConfig:
   private val table6 = trainA_AV at h(6).m(0).getOrDefault startFrom stationB thenOnRail
     railAV400 travelsTo stationC thenOnRail
     railAV400 arrivesTo stationD
-
-  private val table10 = trainC_AV at h(5).m(0).getOrDefault startFrom stationE thenOnRail
+  private val table7 = trainC_AV at h(5).m(0).getOrDefault startFrom stationE thenOnRail
     railN400 travelsTo stationF thenOnRail
     railN400 arrivesTo stationD
 
-  mediumRailway =
-    CreateAppState || mediumRailway set stationA set stationB set stationC set stationD set stationE set stationF link routeAB link routeBC link routeCD link routeDE link routeEF put trainA_AV put trainB_AV put trainD_AV put trainC_AV scheduleA table1 scheduleA table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table10
+  baseRailway =
+    CreateAppState || baseRailway set stationA set stationB set stationC set stationD set stationE set stationF link routeAB link routeBC link routeCD link routeDE link routeEF put trainA_AV put trainB_AV put trainD_AV put trainC_AV scheduleA table1 scheduleA table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7
 
-  def railwayConfig: AppState = mediumRailway
+  def config: AppState = baseRailway

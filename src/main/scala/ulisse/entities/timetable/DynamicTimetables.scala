@@ -34,18 +34,23 @@ object DynamicTimetables:
     def currentDelay: Option[Time] =
       (currentRoute, nextRoute) match
         case (Some((ds, _)), _) =>
-          effectiveTable.find(_._1 == ds).flatMap(_._2.departure) underflowSub table(ds).stationTime.departure
+          effectiveTable.find(_._1 == ds).flatMap(_._2.departure).map(_.asTime) underflowSub table(
+            ds
+          ).stationTime.departure.map(_.asTime)
         case (_, Some((ds, _))) =>
-          effectiveTable.find(_._1 == ds).flatMap(_._2.arriving) underflowSub table(ds).stationTime.arriving
-        case _ => effectiveTable.lastOption.flatMap(_._2.arriving) underflowSub arrivingTime
+          effectiveTable.find(_._1 == ds).flatMap(_._2.arriving).map(_.asTime) underflowSub table(
+            ds
+          ).stationTime.arriving.map(_.asTime)
+        case _ =>
+          effectiveTable.lastOption.flatMap(_._2.arriving).map(_.asTime) underflowSub arrivingTime.map(_.asTime)
 
     /** The delay in a station. */
     def delayIn(station: Station): Option[Time] =
       (table.get(station).map(_.stationTime), effectiveTable.find(_._1 == station).map(_._2)) match
         case (Some(TrainStationTime(_, _, Some(departure))), Some(TrainStationTime(_, _, Some(effectiveDeparture)))) =>
-          Some(Id(effectiveDeparture) underflowSub departure)
+          Some(Id(effectiveDeparture.asTime) underflowSub departure.asTime)
         case (Some(TrainStationTime(Some(arrival), _, _)), Some(TrainStationTime(Some(effectiveArrival), _, _))) =>
-          Some(Id(effectiveArrival) underflowSub arrival)
+          Some(Id(effectiveArrival.asTime) underflowSub arrival.asTime)
         case _ => None
 
     /** The next departure time. */

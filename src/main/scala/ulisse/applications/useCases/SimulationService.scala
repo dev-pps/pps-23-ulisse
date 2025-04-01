@@ -1,6 +1,6 @@
 package ulisse.applications.useCases
 
-import ulisse.applications.RailwayConfig
+import ulisse.applications.configs.RailwayConfig
 import ulisse.applications.events.SimulationEventQueue
 import ulisse.applications.managers.SimulationManager
 import ulisse.applications.ports.SimulationPorts
