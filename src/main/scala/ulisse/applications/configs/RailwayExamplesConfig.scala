@@ -11,7 +11,7 @@ import ulisse.utils.Times.FluentDeclaration.h
 
 /** Base configuration for the railway. */
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
-object RailwayExamplesConfig:
+object RailwayExamplesConfig extends RailwayConfig:
 
   private val highSpeed         = TrainTechnology("AV", 300, 2.0, 1.0)
   private val normal            = TrainTechnology("Normal", 160, 1, 0.5)
@@ -70,4 +70,4 @@ object RailwayExamplesConfig:
   examplesConfig =
     CreateAppState || examplesConfig set stationA set stationB set stationC set stationD set stationE set stationF set stationG set stationH link routeAB link routeCD link routeEF link routeGH put trainA_AV put trainB_NR put trainC_AV put trainD_NR put trainE_AV put trainF_NR put trainG_AV put trainH_NR scheduleA table1 scheduleA table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7 scheduleA table8
 
-  def exampleRailwayConfig: AppState = examplesConfig
+  def config: AppState = examplesConfig

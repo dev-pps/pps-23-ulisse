@@ -8,18 +8,18 @@ import ulisse.entities.simulation.data.SimulationData
 
 class SimulationNotificationAdapterTest extends AnyWordSpec with Matchers:
   private val simulationData            = mock[SimulationData]
-  private val mockedSimulationPage      = mock[SimulationNotificationListener]
+  private val mockedSimulationListener  = mock[SimulationNotificationListener]
   private val otherMockedSimulationPage = mock[SimulationNotificationListener]
   private val simulationNotificationAdapter =
-    SimulationNotificationAdapter(mockedSimulationPage, otherMockedSimulationPage)
+    SimulationNotificationAdapter(mockedSimulationListener, otherMockedSimulationPage)
 
   "SimulationNotificationAdapter" should:
-    "call updateData on every SimulationPage when stepNotification is triggered" in:
+    "call updateData on every SimulationListener when stepNotification is triggered" in:
       simulationNotificationAdapter.stepNotification(simulationData)
-      verify(mockedSimulationPage).updateData(simulationData)
+      verify(mockedSimulationListener).updateData(simulationData)
       verify(otherMockedSimulationPage).updateData(simulationData)
 
-    "call endSimulation on every SimulationPage when simulationEnded is triggered" in:
+    "call endSimulation on every SimulationListener when simulationEnded is triggered" in:
       simulationNotificationAdapter.simulationEnded(simulationData)
-      verify(mockedSimulationPage).endSimulation(simulationData)
+      verify(mockedSimulationListener).endSimulation(simulationData)
       verify(otherMockedSimulationPage).endSimulation(simulationData)

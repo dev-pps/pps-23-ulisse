@@ -103,7 +103,16 @@ object RailwayEnvironment:
         case (_, Some(station)) => stationUpdateFunction(station, agent, time)
         case _                  => None
 
-    private def swapFromRouteToStation(agent: TrainAgent): Option[RailwayEnvironmentImpl] =
+    private def routeUpdateFunction(
+        route: RouteEnvironmentElement,
+        agent: TrainAgent,
+        time: Time
+    ): Option[RailwayEnvironmentImpl] =
+      agent.distanceTravelled match
+        case d if d >= route.length => swapFromRouteToStation(agent, time)
+        case _ => routeEnvironment.updateTrain(agent).map(updatedRoutes => copy(time, routeEnvironment = updatedRoutes))
+
+    private def swapFromRouteToStation(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
       for
         updatedRoutes <- routeEnvironment.removeTrain(agent)
         (updatedTimetables, currentRoute) <-
@@ -111,20 +120,16 @@ object RailwayEnvironment:
         updatedStations <- stationEnvironment.putTrain(agent, currentRoute._2)
       yield copy(time, updatedStations, updatedRoutes, updatedTimetables)
 
-    private def routeUpdateFunction(
-        route: RouteEnvironmentElement,
-        agent: TrainAgent,
-        time: Time
-    ): Option[RailwayEnvironmentImpl] =
-      agent.distanceTravelled match
-        case d if d >= route.length => swapFromRouteToStation(agent)
-        case _ => routeEnvironment.updateTrain(agent).map(updatedRoutes => copy(time, routeEnvironment = updatedRoutes))
-
     private def stationUpdateFunction(
         station: StationEnvironmentElement,
         agent: TrainAgent,
         time: Time
     ): Option[RailwayEnvironmentImpl] =
+      agent.distanceTravelled match
+        case 0 => Some(this)
+        case _ => swapFromStationToRoute(agent, time)
+
+    private def swapFromStationToRoute(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
       for
         updatedStations <- stationEnvironment.removeTrain(agent)
         (updatedTimetables, nextRoute) <-

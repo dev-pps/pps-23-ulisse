@@ -2,7 +2,6 @@ package ulisse.entities.train
 
 import ulisse.entities.train.MotionDatas.MotionData
 import ulisse.entities.train.TrainAgentPerceptions.*
-import ulisse.entities.train.TrainAgents.TrainAgent
 import ulisse.entities.train.Trains.Train
 
 /** Containing definition of [[StateBehavior]] concept for a TrainAgent and
