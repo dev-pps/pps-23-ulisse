@@ -47,33 +47,25 @@ object RailwayExamplesConfig:
   private val routeGH   = CreateRoute   -> stationG -> stationH on railAV400.typeRoute tracks 2 length railAV400.length
   import ulisse.dsl.TimetableDSL.*
 
-  private val table1 = trainA_AV at h(0).m(
-    0
-  ).getOrDefault startFrom stationA thenOnRail railN400 arrivesTo stationB
-  private val table2 = trainB_NR at h(0).m(
-    0
-  ).getOrDefault startFrom stationB thenOnRail railN400 arrivesTo stationA
+  private val table1 = trainA_AV at h(0).m(0).getOrDefault startFrom stationA thenOnRail
+    railN400 arrivesTo stationB
+  private val table2 = trainB_NR at h(0).m(0).getOrDefault startFrom stationB thenOnRail
+    railN400 arrivesTo stationA
 
-  private val table3 = trainC_AV at h(0).m(
-    0
-  ).getOrDefault startFrom stationC thenOnRail railN400 arrivesTo stationD
-  private val table4 = trainD_NR at h(0).m(
-    0
-  ).getOrDefault startFrom stationD thenOnRail railN400 arrivesTo stationC
+  private val table3 = trainC_AV at h(0).m(0).getOrDefault startFrom stationC thenOnRail
+    railN400 arrivesTo stationD
+  private val table4 = trainD_NR at h(0).m(0).getOrDefault startFrom stationD thenOnRail
+    railN400 arrivesTo stationC
 
-  private val table5 = trainE_AV at h(0).m(
-    0
-  ).getOrDefault startFrom stationE thenOnRail railN400 arrivesTo stationF
-  private val table6 = trainF_NR at h(0).m(
-    0
-  ).getOrDefault startFrom stationF thenOnRail railN400 arrivesTo stationE
+  private val table5 = trainE_AV at h(0).m(0).getOrDefault startFrom stationE thenOnRail
+    railN400 arrivesTo stationF
+  private val table6 = trainF_NR at h(0).m(0).getOrDefault startFrom stationF thenOnRail
+    railN400 arrivesTo stationE
 
-  private val table7 = trainG_AV at h(0).m(
-    0
-  ).getOrDefault startFrom stationG thenOnRail railAV400 arrivesTo stationH
-  private val table8 = trainH_NR at h(0).m(
-    0
-  ).getOrDefault startFrom stationH thenOnRail railAV400 arrivesTo stationG
+  private val table7 = trainG_AV at h(0).m(0).getOrDefault startFrom stationG thenOnRail
+    railAV400 arrivesTo stationH
+  private val table8 = trainH_NR at h(0).m(0).getOrDefault startFrom stationH thenOnRail
+    railAV400 arrivesTo stationG
 
   examplesConfig =
     CreateAppState || examplesConfig set stationA set stationB set stationC set stationD set stationE set stationF set stationG set stationH link routeAB link routeCD link routeEF link routeGH put trainA_AV put trainB_NR put trainC_AV put trainD_NR put trainE_AV put trainF_NR put trainG_AV put trainH_NR scheduleA table1 scheduleA table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7 scheduleA table8
