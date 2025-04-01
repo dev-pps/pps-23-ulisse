@@ -1,3 +1,9 @@
+## [2.0.2](https://github.com/dev-pps/pps-23-ulisse/compare/v2.0.1...v2.0.2) (2025-04-01)
+
+### Bug Fixes
+
+* formatting timetable code creation, station size in editor ([aafd8b1](https://github.com/dev-pps/pps-23-ulisse/commit/aafd8b138284bb758b980e211f0823d3b0b104bb))
+
 ## [2.0.1](https://github.com/dev-pps/pps-23-ulisse/compare/v2.0.0...v2.0.1) (2025-03-20)
 
 ### Bug Fixes
