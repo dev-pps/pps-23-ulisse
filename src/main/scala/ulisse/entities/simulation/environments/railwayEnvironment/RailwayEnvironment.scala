@@ -126,7 +126,7 @@ object RailwayEnvironment:
         time: Time
     ): Option[RailwayEnvironmentImpl] =
       agent.distanceTravelled match
-        case 0 => Some(this)
+        case 0 => Some(copy(time))
         case _ => swapFromStationToRoute(agent, time)
 
     private def swapFromStationToRoute(agent: TrainAgent, time: Time): Option[RailwayEnvironmentImpl] =
