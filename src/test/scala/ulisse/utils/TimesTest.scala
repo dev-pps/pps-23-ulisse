@@ -60,6 +60,7 @@ class TimesTest extends AnyWordSpec with Matchers:
       h(0).m(59) + h(0).m(59) should be(h(1).m(58))
       h(23).m(59) + h(0).m(1) should be(h(0).m(0))
       h(23).m(59) + h(23).m(59) should be(h(23).m(58))
+      Id(Time(-2, -2, 0)) + Id(Time(1, 1, 0)) should be(Time(22, 59, 0))
 
     "be added with overflow to another ClockTimes" in:
       Id(Time(23, 59, 0)) overflowSum Id(Time(0, 10, 5)) shouldBe Id(Time(24, 9, 5))
