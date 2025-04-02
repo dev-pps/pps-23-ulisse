@@ -89,9 +89,6 @@ object Times:
         m <- ValidationUtils.validateRange(m, minDayMinutes, maxDayMinutes, InvalidMinutes(time))
       yield ClockTimeImpl(h, m)
 
-    /** Unapply methods returning tuple with hours and minutes. */
-    def unapply(ct: ClockTime): (Hour, Minute) = (ct.h, ct.m)
-
     /** Creates new ClockTime. In case of some creation error is returned a
       * default ClockTime using a [[DefaultTimeStrategy]]
       */
