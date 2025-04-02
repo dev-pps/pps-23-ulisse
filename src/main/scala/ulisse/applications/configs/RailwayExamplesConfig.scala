@@ -9,7 +9,7 @@ import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.entities.train.Wagons.UseType
 import ulisse.utils.Times.FluentDeclaration.h
 
-/** Base configuration for the railway. */
+/** Example configuration for the railway. */
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
 object RailwayExamplesConfig extends RailwayConfig:
 
@@ -48,14 +48,14 @@ object RailwayExamplesConfig extends RailwayConfig:
 
   private val stationI   = CreateStation -> "I" at (600, 450) platforms 2
   private val stationJ   = CreateStation -> "J" at (600, 750) platforms 2
-  private val trainI_AV  = CreateTrain   -> "AVI" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainI_AV  = CreateTrain   -> "AV5" technology highSpeed wagon UseType.Passenger capacity 2 count 1
   private val routeIJ_N  = CreateRoute   -> stationI -> stationJ on railN400.typeRoute tracks 1 length railN400.length
   private val routeIJ_AV = CreateRoute   -> stationI -> stationJ on railAV400.typeRoute tracks 1 length railAV400.length
 
   private val stationK   = CreateStation -> "K" at (800, 450) platforms 2
   private val stationL   = CreateStation -> "L" at (800, 750) platforms 2
-  private val trainK_AV  = CreateTrain   -> "AVK" technology highSpeed wagon UseType.Passenger capacity 2 count 1
-  private val trainL_AV  = CreateTrain   -> "AVL" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainK_AV  = CreateTrain   -> "AV6" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainL_AV  = CreateTrain   -> "AV7" technology highSpeed wagon UseType.Passenger capacity 2 count 1
   private val routeKL_N  = CreateRoute   -> stationK -> stationL on railN400.typeRoute tracks 1 length railN400.length
   private val routeKL_AV = CreateRoute   -> stationK -> stationL on railAV400.typeRoute tracks 1 length railAV400.length
 
@@ -86,7 +86,6 @@ object RailwayExamplesConfig extends RailwayConfig:
 
   private val table10 = trainK_AV at h(0).m(0).getOrDefault startFrom stationK thenOnRail
     railN400 arrivesTo stationL
-
   private val table11 = trainL_AV at h(0).m(0).getOrDefault startFrom stationK thenOnRail
     railAV400 arrivesTo stationL
 

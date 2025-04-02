@@ -23,8 +23,7 @@ object RailwayBaseConfig extends RailwayConfig:
   private val stationB = CreateStation -> "B" at (528, 147) platforms 2
   private val stationC = CreateStation -> "C" at (803, 219) platforms 3
   private val stationD = CreateStation -> "D" at (927, 444) platforms 3
-
-  private val stationE = CreateStation -> "E" at (700, 500) platforms 2
+  private val stationE = CreateStation -> "E" at (700, 500) platforms 3
   private val stationF = CreateStation -> "F" at (600, 600) platforms 3
 
   private val railN400  = RailInfo(length = 400, typeRoute = RouteType.Normal)
@@ -34,39 +33,42 @@ object RailwayBaseConfig extends RailwayConfig:
   private val routeBC = CreateRoute -> stationB -> stationC on railN400.typeRoute tracks 2 length railN400.length
   private val routeCD = CreateRoute -> stationC -> stationD on railAV400.typeRoute tracks 2 length railAV400.length
   private val routeDE = CreateRoute -> stationD -> stationE on railAV400.typeRoute tracks 2 length railAV400.length
-  private val routeEF = CreateRoute -> stationE -> stationF on railN400.typeRoute tracks 2 length railN400.length
+  private val routeEF = CreateRoute -> stationE -> stationF on railN400.typeRoute tracks 3 length railN400.length
+  private val routeDF = CreateRoute -> stationD -> stationF on railAV400.typeRoute tracks 2 length railAV400.length
 
   private val trainA_AV = CreateTrain -> "AV1" technology highSpeed wagon UseType.Passenger capacity 2 count 1
   private val trainB_AV = CreateTrain -> "AV2" technology highSpeed wagon UseType.Passenger capacity 2 count 1
   private val trainC_AV = CreateTrain -> "AV3" technology highSpeed wagon UseType.Passenger capacity 3 count 1
   private val trainD_AV = CreateTrain -> "AV4" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainE_AV = CreateTrain -> "AV5" technology highSpeed wagon UseType.Passenger capacity 2 count 1
+  private val trainF_AV = CreateTrain -> "AV6" technology highSpeed wagon UseType.Passenger capacity 2 count 1
 
   import ulisse.dsl.TimetableDSL.*
 
-  private val table1 = trainA_AV at h(0).m(0).getOrDefault startFrom stationB thenOnRail
+  private val table1 = trainA_AV at h(8).m(0).getOrDefault startFrom stationB thenOnRail
     railN400 stopsIn stationC waitingForMinutes 60 thenOnRail
     railN400 travelsTo stationD thenOnRail
     railAV400 arrivesTo stationE
-  private val table2 = trainD_AV at h(10).m(0).getOrDefault startFrom stationA thenOnRail
+  private val table2 = trainD_AV at h(18).m(0).getOrDefault startFrom stationA thenOnRail
     railAV400 travelsTo stationB thenOnRail
     railN400 arrivesTo stationC
-  private val table3 = trainB_AV at h(11).m(0).getOrDefault startFrom stationC thenOnRail
+  private val table3 = trainB_AV at h(19).m(0).getOrDefault startFrom stationC thenOnRail
     railN400 travelsTo stationB thenOnRail
     railAV400 arrivesTo stationA
-  private val table4 = trainC_AV at h(12).m(0).getOrDefault startFrom stationD thenOnRail
+  private val table4 = trainC_AV at h(20).m(0).getOrDefault startFrom stationD thenOnRail
     railAV400 travelsTo stationE thenOnRail
     railN400 arrivesTo stationF
-  private val table5 = trainB_AV at h(13).m(0).getOrDefault startFrom stationF thenOnRail
+  private val table5 = trainE_AV at h(21).m(0).getOrDefault startFrom stationF thenOnRail
     railN400 travelsTo stationE thenOnRail
     railAV400 arrivesTo stationD
-  private val table6 = trainA_AV at h(14).m(0).getOrDefault startFrom stationB thenOnRail
+  private val table6 = trainA_AV at h(22).m(0).getOrDefault startFrom stationB thenOnRail
     railN400 travelsTo stationC thenOnRail
     railAV400 arrivesTo stationD
-  private val table7 = trainC_AV at h(15).m(0).getOrDefault startFrom stationE thenOnRail
+  private val table7 = trainF_AV at h(23).m(0).getOrDefault startFrom stationE thenOnRail
     railN400 travelsTo stationF thenOnRail
     railAV400 arrivesTo stationD
 
   baseRailway =
-    CreateAppState || baseRailway set stationA set stationB set stationC set stationD set stationE set stationF link routeAB link routeBC link routeCD link routeDE link routeEF put trainA_AV put trainB_AV put trainD_AV put trainC_AV scheduleA table1 scheduleA table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7
+    CreateAppState || baseRailway set stationA set stationB set stationC set stationD set stationE set stationF link routeAB link routeBC link routeCD link routeDE link routeEF link routeDF put trainA_AV put trainB_AV put trainC_AV put trainD_AV put trainE_AV put trainF_AV scheduleA table1 scheduleA table2 scheduleA table3 scheduleA table4 scheduleA table5 scheduleA table6 scheduleA table7
 
   def config: AppState = baseRailway

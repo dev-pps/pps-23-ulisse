@@ -9,7 +9,7 @@ import ulisse.entities.train.Trains.TrainTechnology
 import ulisse.entities.train.Wagons.UseType
 import ulisse.utils.Times.FluentDeclaration.h
 
-/** Configuration for the railway. */
+/** Complex Configuration for the railway. */
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
 object RailwayComplexConfig extends RailwayConfig:
 
@@ -68,38 +68,38 @@ object RailwayComplexConfig extends RailwayConfig:
 
   import ulisse.dsl.TimetableDSL.*
   private val table1 = trainA_AV at h(0).m(0).getOrDefault startFrom stationA thenOnRail
-    railAV400 stopsIn stationB waitingForMinutes 5 thenOnRail
-    railAV400 travelsTo stationC thenOnRail
-    railAV400 stopsIn stationD waitingForMinutes 10 thenOnRail
-    railAV400 arrivesTo stationE
+    railN400 stopsIn stationB waitingForMinutes 5 thenOnRail
+    railN400 travelsTo stationC thenOnRail
+    railN400 stopsIn stationD waitingForMinutes 10 thenOnRail
+    railN400 arrivesTo stationE
 
   private val table2 = trainB_AV at h(1).m(0).getOrDefault startFrom stationD thenOnRail
-    railAV400 stopsIn stationC waitingForMinutes 5 thenOnRail
-    railAV400 travelsTo stationB thenOnRail
-    railAV400 arrivesTo stationA
+    railN400 stopsIn stationC waitingForMinutes 5 thenOnRail
+    railN400 travelsTo stationB thenOnRail
+    railN400 arrivesTo stationA
 
   private val table3 = trainC_AV at h(3).m(0).getOrDefault startFrom stationF thenOnRail
     railAV400 travelsTo stationH thenOnRail
-    railN400 travelsTo stationG thenOnRail
-    railAV400 arrivesTo stationA
+    railAV400 travelsTo stationG thenOnRail
+    railN400 arrivesTo stationA
 
   private val table4 = trainD_AV at h(2).m(0).getOrDefault startFrom stationA thenOnRail
-    railAV400 travelsTo stationG thenOnRail
-    railN400 stopsIn stationH waitingForMinutes 20 thenOnRail
+    railN400 travelsTo stationG thenOnRail
+    railAV400 stopsIn stationH waitingForMinutes 20 thenOnRail
     railAV400 arrivesTo stationF
 
   private val table5 = trainE_AV at h(2).m(0).getOrDefault startFrom stationA thenOnRail
-    railAV400 travelsTo stationG thenOnRail
-    railN400 travelsTo stationH thenOnRail
+    railN400 travelsTo stationG thenOnRail
+    railAV400 travelsTo stationH thenOnRail
     railAV400 arrivesTo stationF
 
   private val table6 = trainF_AV at h(4).m(0).getOrDefault startFrom stationE thenOnRail
-    railAV400 travelsTo stationD thenOnRail
-    railAV400 stopsIn stationC waitingForMinutes 5 thenOnRail
-    railAV400 arrivesTo stationB
+    railN400 travelsTo stationD thenOnRail
+    railN400 stopsIn stationC waitingForMinutes 5 thenOnRail
+    railN400 arrivesTo stationB
 
   private val table7 = trainG_AV at h(5).m(0).getOrDefault startFrom stationA thenOnRail
-    railAV400 travelsTo stationB thenOnRail
+    railN400 travelsTo stationB thenOnRail
     railAV400 travelsTo stationI thenOnRail
     railAV400 stopsIn stationJ waitingForMinutes 10 thenOnRail
     railAV400 arrivesTo stationE
@@ -108,7 +108,7 @@ object RailwayComplexConfig extends RailwayConfig:
     railAV400 travelsTo stationH thenOnRail
     railAV400 travelsTo stationI thenOnRail
     railAV400 stopsIn stationD waitingForMinutes 15 thenOnRail
-    railAV400 arrivesTo stationC
+    railN400 arrivesTo stationC
 
   private val table9 = trainN_AV at h(2).m(30).getOrDefault startFrom stationA thenOnRail
     railN400 travelsTo stationB thenOnRail
@@ -124,13 +124,13 @@ object RailwayComplexConfig extends RailwayConfig:
 
   private val table11 = trainP_AV at h(4).m(30).getOrDefault startFrom stationE thenOnRail
     railN400 travelsTo stationH thenOnRail
-    railN400 travelsTo stationF thenOnRail
+    railAV400 travelsTo stationF thenOnRail
     railN400 arrivesTo stationG
 
   private val table12 = trainQ_AV at h(5).m(30).getOrDefault startFrom stationJ thenOnRail
-    railN400 travelsTo stationI thenOnRail
-    railN400 travelsTo stationH thenOnRail
-    railN400 stopsIn stationG waitingForMinutes 10 thenOnRail
+    railAV400 travelsTo stationI thenOnRail
+    railAV400 travelsTo stationH thenOnRail
+    railAV400 stopsIn stationG waitingForMinutes 10 thenOnRail
     railN400 arrivesTo stationA
 
   complexRailway = CreateAppState || complexRailway set stationA set stationB set stationC set stationD set stationE set
