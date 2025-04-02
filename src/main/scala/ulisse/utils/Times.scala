@@ -191,68 +191,52 @@ object Times:
 
   /** Implicit conversion from time to ClockTime */
   given [M[_]: Functor]: Conversion[M[Time], M[ClockTime]] = _.map(t => ClockTime(t.h, t.m).getOrDefault)
-  extension [M[_]: Monad, T <: Time](time: M[T])
+  extension [M[_]: Monad, T <: Time](time1: M[T])
     /** Adds two times */
     @targetName("add")
     def +(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
-      extractAndPerform(time, time2): (t, t2) =>
-        calculateSum(t, t2)
+      extractAndPerform(time1, time2): (t1, t2) =>
+        val secondsInADay = Time.secondsInMinute * Time.minutesInHour * Time.hoursInDay
+        buildOverflowTimeFromSeconds(adaptTimeUnitToBound(t1.toSeconds + t2.toSeconds, secondsInADay))
 
     /** Adds two times with overflow */
     def overflowSum(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
-      extractAndPerform(time, time2): (t, t2) =>
-        calculateOverflowSum(t, t2)
+      extractAndPerform(time1, time2): (t1, t2) =>
+        buildOverflowTimeFromSeconds(t1.toSeconds + t2.toSeconds)
 
     /** Subtracts two times with underflow */
     def underflowSub(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
-      extractAndPerform(time, time2): (t, t2) =>
-        calculateUnderflowSub(t, t2)
+      extractAndPerform(time1, time2): (t1, t2) =>
+        buildOverflowTimeFromSeconds(t1.toSeconds - t2.toSeconds)
 
   /** Returns true if predicate on the two provided `ClockTime` is satisfied */
   private def checkCondition(
-      t: Either[ClockTimeErrors, ClockTime],
+      t1: Either[ClockTimeErrors, ClockTime],
       t2: Either[ClockTimeErrors, ClockTime]
   )(predicate: Int => Boolean): Boolean =
-    val res = extractAndPerform(t, t2): (t, t2) =>
-      Right(predicate(summon[Ordering[ClockTime]].compare(t, t2)))
+    val res = extractAndPerform(t1, t2): (t1, t2) =>
+      Right(predicate(summon[Ordering[ClockTime]].compare(t1, t2)))
     res.getOrElse(false)
 
-  extension (time: ClockTime)
+  extension (time1: ClockTime)
     @targetName("add")
     def ++(time2: Either[ClockTimeErrors, ClockTime]): Either[ClockTimeErrors, ClockTime] =
-      extractAndPerform(Right(time), time2): (t, t2) =>
-        calculateSum(t, t2)
+      Right(time1) + time2
 
     @targetName("greaterEquals")
     def >=(time2: ClockTime): Boolean =
-      summon[Ordering[ClockTime]].compare(time, time2) >= 0
+      summon[Ordering[ClockTime]].compare(time1, time2) >= 0
 
     @targetName("greater")
     def >(time2: ClockTime): Boolean =
-      summon[Ordering[ClockTime]].compare(time, time2) > 0
+      summon[Ordering[ClockTime]].compare(time1, time2) > 0
 
     @targetName("equals")
     def ===(time2: ClockTime): Boolean =
-      summon[Ordering[ClockTime]].compare(time, time2) == 0
+      summon[Ordering[ClockTime]].compare(time1, time2) == 0
 
   private def adaptTimeUnitToBound(timeUnit: Int, timeBound: Int): Int =
     ((timeUnit % timeBound) + timeBound) % timeBound
-
-  private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
-      using constructor: TimeConstructor[M[T]]
-  ): M[T] =
-    val secondsInADay = Time.secondsInMinute * Time.minutesInHour * Time.hoursInDay
-    buildOverflowTimeFromSeconds(adaptTimeUnitToBound(time1.toSeconds + time2.toSeconds, secondsInADay))
-
-  private def calculateOverflowSum[M[_]: Monad, T <: Time](time1: T, time2: T)(using
-      constructor: TimeConstructor[M[T]]
-  ): M[T] =
-    buildOverflowTimeFromSeconds(time1.toSeconds + time2.toSeconds)
-
-  private def calculateUnderflowSub[M[_]: Monad, T <: Time](time1: T, time2: T)(using
-      constructor: TimeConstructor[M[T]]
-  ): M[T] =
-    buildOverflowTimeFromSeconds(time1.toSeconds - time2.toSeconds)
 
   private def buildOverflowTimeFromSeconds[M[_]: Monad, T <: Time](seconds: Int)(using
       constructor: TimeConstructor[M[T]]

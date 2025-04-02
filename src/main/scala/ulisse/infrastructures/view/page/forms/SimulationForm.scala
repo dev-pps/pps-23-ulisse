@@ -251,8 +251,8 @@ object SimulationForm:
 
       val simuTime       = s"Simulation time: ${info.millisecondsElapsed.toTime}"
       val envTime        = s"Environment time: ${info.simulationEnvironment.time}"
-      val cumDelay       = s"Cumulative delay: ${info.simulationEnvironment.cumulativeDelay}"
-      val avgDelay       = s"Average delay: ${info.simulationEnvironment.averageDelay}"
+      val cumDelay       = info.simulationEnvironment.cumulativeDelay.buildTimeString("Cumulative delay")
+      val avgDelay       = info.simulationEnvironment.averageDelay.buildTimeString("Average delay")
       val trainInStation = s"Train in stations: $trainInStationPerc %"
       val trainOnRoute   = s"Train on route: $trainInRoutePerc %"
       val stationLoad    = s"Station load: $statLoadPerc %"
@@ -271,9 +271,10 @@ object SimulationForm:
 
     override def showRouteSimulation(route: RouteEnvironmentElement): Unit =
       val stations = s"Stations: ${route.departure.name} - ${route.arrival.name}"
+      val length   = s"Length: ${route.length}"
       val trains   = s"Trains: ${route.trains.size} / ${route.railsCount}"
       val typology = s"Type: ${route.typology}"
-      val infoStr  = s"ROUTE: \n$stations \n$trains \n$typology"
+      val infoStr  = s"ROUTE: \n$stations \n$length \n$trains \n$typology"
       elementInfoArea.setText(infoStr)
 
     override def showTrainSimulation(trainInfo: TrainAgentInfo, position: Point2D.Double): Unit =
@@ -288,3 +289,7 @@ object SimulationForm:
       elementInfoArea.setText(infoStr)
 
     override def component[T >: Component]: T = mainPanel
+
+    extension (time: Time)
+      private def buildTimeString(prefix: String): String =
+        s"$prefix: ${if time.toSeconds < 0 then "-" else ""}${Time.secondsToOverflowTime(math.abs(time.toSeconds))}"

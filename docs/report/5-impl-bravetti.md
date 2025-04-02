@@ -224,30 +224,23 @@ Per gestire la simulazione è stato necessario introdurre un tipo `Time` essendo
 In particolare, per quanto riguarda l'aggiornamento del tempo dell'ambiente si vuole trattare il tempo in modo ciclico, mentre negli altri due casi
 si vuole tenere conto di eventuali overflow/underflow e accumulare i valori in eccesso nel campo delle ore.
 
-Per ottenere un risultato `DRY` è stato utilizzato il pattern `Strategy` in combinazione con i parametri contestuali per determinare la stategia da utilizzare.
+Per ottenere un risultato `DRY` è stato utilizzato il pattern `Strategy` in combinazione con i parametri contestuali per determinare il costruttore da utilizzare.
 
 >NOTA: Oltre a gestire le diverse stategie di somma si è dovuta gestire anche la possibilità che i tempi siano wrappati in tipi Higher-Order come Option o Either.
 
 Di seguito sono riportate le implementazioni delle operazioni di somma.
 ```scala 3
-extension [M[_]: Monad, T <: Time](time: M[T])
+extension [M[_]: Monad, T <: Time](time1: M[T])
   def +(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
-    extractAndPerform(time, time2): (t, t2) =>
-      calculateSum(t, t2)
+    extractAndPerform(time1, time2): (t1, t2) =>
+      val secondsInADay = Time.secondsInMinute * Time.minutesInHour * Time.hoursInDay
+      buildOverflowTimeFromSeconds(adaptTimeUnitToBound(t1.toSeconds + t2.toSeconds, secondsInADay))
 
   def overflowSum(time2: M[T])(using constructor: TimeConstructor[M[T]]): M[T] =
-    extractAndPerform(time, time2): (t, t2) =>
-      calculateOverflowSum(t, t2)
+    extractAndPerform(time1, time2): (t1, t2) =>
+      buildOverflowTimeFromSeconds(t1.toSeconds + t2.toSeconds)
 ```
-Essendo in generale i tempi incapsulati prima è necessario spacchettarli, per questo è stata definita la funzione `extractAndPerform`.
-```scala 3
-private def extractAndPerform[M[_]: Monad, T <: Time, R](t1: M[T],t2: M[T])(f: (T, T) => M[R]): M[R] =
-    for
-        time1 <- t1
-        time2 <- t2
-        result   <- f(time1, time2)
-    yield result
-```
+
 Dovendo mantenere la coerenza con il tipo di ritorno è stato definita la Type Class `TimeConstructor` così da fornire il costruttore specifico per il tempo a seconda della situazione.
 ```scala 3
 sealed trait TimeConstructor[T]:
@@ -259,19 +252,24 @@ given TimeConstructor[Time] with
   def construct(h: Int, m: Int, s: Int): Time = Time(h, m, s)
 ```
 
-Successivamente sono riportate le implementazioni delle operazioni di somma.
+Inoltre essendo in generale i tempi incapsulati prima è necessario spacchettarli, per questo è stata definita la funzione `extractAndPerform`.
 ```scala 3
-private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
-  using constructor: TimeConstructor[M[T]]): M[T] =
-  val secondsInADay = Time.secondsInMinute * Time.minutesInHour * Time.hoursInDay
-  buildOverflowTimeFromSeconds(adaptTimeUnitToBound(time1.toSeconds + time2.toSeconds, secondsInADay))
-
-private def calculateOverflowSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
-  using constructor: TimeConstructor[M[T]]): M[T] =
-  buildOverflowTimeFromSeconds(time1.toSeconds + time2.toSeconds)
+private def extractAndPerform[M[_]: Monad, T <: Time, R](t1: M[T],t2: M[T])(f: (T, T) => M[R]): M[R] =
+    for
+        time1 <- t1
+        time2 <- t2
+        result   <- f(time1, time2)
+    yield result
 ```
 
-La funzione `buildOverflowTimeFromSeconds`, riportata di seguito, permette di costruire un nuovo oggetto `Time` a partire dal numero di secondi (adattandoli al formato `h:m:s`) ed accumulando eventuali eccessi nel campo delle ore.
+La funzione `adaptTimeUnitToBound` esegue una classica operazione di normalizzazione che garantisce che il valore `timeUnit` appartenga all'intervallo `[0, timeBound-1]`, nello specifico in corrispondenza del rappresentante della classe di resto `mod timeBound`.
+```scala 3
+  private def adaptTimeUnitToBound(timeUnit: Int, timeBound: Int): Int =
+    ((timeUnit % timeBound) + timeBound) % timeBound
+```
+Così facendo si garantisce che i secondi complessivi risultanti non saranno soggetti ad overflow al momento della conversione in `Time` e l'orario risultante sarà coerente sia in presenza di secondi positivi che negativi.
+
+Infine la funzione `buildOverflowTimeFromSeconds`, riportata di seguito, permette di costruire un nuovo oggetto `Time` a partire dal numero di secondi (adattandoli al formato `h:m:s`) ed accumulando eventuali eccessi nel campo delle ore.
 ```scala 3
   private def buildTimeFromSeconds[M[_]: Monad, T <: Time](seconds: Int)
     (using constructor: TimeConstructor[M[T]]): M[T] =
@@ -281,13 +279,6 @@ La funzione `buildOverflowTimeFromSeconds`, riportata di seguito, permette di co
       seconds % Time.secondsInMinute
     )
 ```
-
-La funzione `adaptTimeUnitToBound` esegue una classica operazione di normalizzazione che garantisce che il valore `timeUnit` appartenga all'intervallo `[0, timeBound-1]`, nello specifico in corrispondenza del rappresentante della classe di resto `mod timeBound`.
-```scala 3
-  private def adaptTimeUnitToBound(timeUnit: Int, timeBound: Int): Int =
-    ((timeUnit % timeBound) + timeBound) % timeBound
-```
-Così facendo si garantisce che i secondi complessivi risultanti non saranno soggetti ad overflow al momento della conversione in `Time` e l'orario risultante sarà coerente sia in presenza di secondi positivi che negativi.
 
 ## Runner for Test
 L'utilizzo di una LazyList collegata ad una ConcurrentQueue permette di rappresentare il cambiamento dello stato come una sequenza di trasformazioni di quest'ultimo. 
