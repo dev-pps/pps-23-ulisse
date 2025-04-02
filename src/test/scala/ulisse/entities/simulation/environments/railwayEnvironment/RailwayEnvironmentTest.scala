@@ -4,6 +4,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import ulisse.entities.route.RouteEnvironmentElement
 import ulisse.entities.route.Tracks.TrackDirection
+import ulisse.entities.simulation.environments.railwayEnvironment
 import ulisse.entities.simulation.environments.railwayEnvironment.ConfigurationDataTest.{
   routesEE,
   stationsEE,
@@ -21,25 +22,26 @@ import ulisse.entities.train.Wagons.Wagon
 import ulisse.utils.Times.Time
 
 import scala.Seq
-class RailwayDslTest extends AnyWordSpec with Matchers:
+class RailwayEnvironmentTest extends AnyWordSpec with Matchers:
   private val dt = 1
 
-  private final case class FakeTrainAgent(train: Train, state: StateBehavior) extends TrainAgent:
+  private final case class FakeTrainAgent(train: Train, state: StateBehavior, stepDistance: Int) extends TrainAgent:
     export train.*
     export state.motionData
     override def resetDistanceTravelled: TrainAgent =
-      FakeTrainAgent(train, state.reset())
+      copy(state = state.reset())
     override def updateDistanceTravelled(distanceDelta: Double): TrainAgent =
-      this.copy(train, state.withOffsetDistance(distanceDelta))
+      copy(state = state.withOffsetDistance(distanceDelta))
     override def doStep(dt: Int, simulationEnvironment: RailwayEnvironment): TrainAgent =
-      updateDistanceTravelled(routesEE.map(_.length).foldLeft(0.0)(math.max))
+      updateDistanceTravelled(stepDistance)
     override def distanceTravelled: Double = state.motionData.distanceTravelled
 
-  private val initialState   = Stopped(emptyMotionData)
-  private val trainAgent3905 = FakeTrainAgent(train3905, initialState)
-  private val trainAgent3906 = FakeTrainAgent(train3906, initialState)
-  private val trainAgent3907 = FakeTrainAgent(train3907, initialState)
-  private val trainAgents    = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
+  private val initialState        = Stopped(emptyMotionData)
+  private val defaultStepDistance = routesEE.map(_.length).foldLeft(0.0)(math.max).ceil.toInt
+  private val trainAgent3905      = FakeTrainAgent(train3905, initialState, defaultStepDistance)
+  private val trainAgent3906      = FakeTrainAgent(train3906, initialState, 0)
+  private val trainAgent3907      = FakeTrainAgent(train3907, initialState, defaultStepDistance)
+  private val trainAgents         = Seq(trainAgent3905, trainAgent3906, trainAgent3907)
 
   private val cd = ConfigurationData(
     stationsEE,
@@ -48,7 +50,8 @@ class RailwayDslTest extends AnyWordSpec with Matchers:
     timetables
   )
 
-  private val env = RailwayEnvironment.default(cd)
+  private given env: RailwayEnvironment = RailwayEnvironment.default(cd)
+
   extension (env: RailwayEnvironment)
     private def doSteps(steps: Int): RailwayEnvironment =
       (0 until steps).foldLeft(env)((e, _) => e.doStep(dt))
@@ -78,19 +81,21 @@ class RailwayDslTest extends AnyWordSpec with Matchers:
     env.timetables shouldBe cd.timetablesByTrain.values.flatten
     env.dynamicTimetableEnvironment.dynamicTimetablesByTrain shouldBe cd.timetablesByTrain
 
-  private def extractInfo(
-      numStep: Int,
-      r: DynamicTimetable => Option[(Station, Station)]
-  ): (DynamicTimetable, StationEnvironmentElement, Seq[(RouteEnvironmentElement, TrackDirection)]) =
-    trainAgent3905.currentInfo(env.doSteps(numStep), r) match
-      case Some(
-            dtt: DynamicTimetable,
-            see: StationEnvironmentElement,
-            rInfo: Seq[(RouteEnvironmentElement, TrackDirection)]
-          ) =>
-        print(dtt)
-        (dtt, see, rInfo)
-      case _ => fail()
+  extension (trainAgent: TrainAgent)
+    private def extractInfo(
+        numStep: Int,
+        r: DynamicTimetable => Option[(Station, Station)]
+    )(using
+        env: RailwayEnvironment
+    ): (DynamicTimetable, StationEnvironmentElement, Seq[(RouteEnvironmentElement, TrackDirection)]) =
+      trainAgent.currentInfo(env.doSteps(numStep), r) match
+        case Some(
+              dtt: DynamicTimetable,
+              see: StationEnvironmentElement,
+              rInfo: Seq[(RouteEnvironmentElement, TrackDirection)]
+            ) =>
+          (dtt, see, rInfo)
+        case _ => fail()
 
   private def matchRouteInfo(
       d: Station,
@@ -155,7 +160,7 @@ class RailwayDslTest extends AnyWordSpec with Matchers:
         env.doStep(10).time shouldBe Time(0, 0, 10)
 
       "move train into route" in:
-        val (dtt, see, rInfo) = extractInfo(1, _.currentRoute)
+        val (dtt, see, rInfo) = trainAgent3905.extractInfo(1, _.currentRoute)
         validateRoute(dtt, 0, rInfo, see)
         see.trains.contains(trainAgent3905) shouldBe false
         rInfo.map(_._1).collectTrains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)
@@ -164,11 +169,17 @@ class RailwayDslTest extends AnyWordSpec with Matchers:
           case _                          => fail()
 
       "move train into station" in:
-        val (dtt, see, rInfo) = extractInfo(2, _.nextRoute)
+        val (dtt, see, rInfo) = trainAgent3905.extractInfo(2, _.nextRoute)
         validateRoute(dtt, 1, rInfo, see)
         see.trains.contains(trainAgent3905) shouldBe true
         rInfo.map(_._1).collectTrains.contains(trainAgent3905) shouldBe false
         see.trains.find(_ == trainAgent3905).map(_.distanceTravelled) shouldBe Some(0.0)
+
+      "do not move train in a route if it has not moved" in:
+        val (dtt, see, rInfo) = trainAgent3906.extractInfo(1, _.nextRoute)
+        see.trains.contains(trainAgent3906) shouldBe true
+        rInfo.map(_._1).collectTrains.contains(trainAgent3906) shouldBe false
+        see.trains.find(_ == trainAgent3906).map(_.distanceTravelled) shouldBe Some(0.0)
 
       "change schedule" in:
         trainAgent3905.completeCurrentTimetable(env).flatMap(

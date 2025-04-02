@@ -263,47 +263,31 @@ Successivamente sono riportate le implementazioni delle operazioni di somma.
 ```scala 3
 private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
   using constructor: TimeConstructor[M[T]]): M[T] =
-    given TimeBuildStrategy = defaultStrategy
-    buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
+  val secondsInADay = Time.secondsInMinute * Time.minutesInHour * Time.hoursInDay
+  buildOverflowTimeFromSeconds(adaptTimeUnitToBound(time1.toSeconds + time2.toSeconds, secondsInADay))
 
 private def calculateOverflowSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
   using constructor: TimeConstructor[M[T]]): M[T] =
-    given TimeBuildStrategy = overflowStrategy
-    buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
+  buildOverflowTimeFromSeconds(time1.toSeconds + time2.toSeconds)
 ```
-La funzione `buildTimeFromSeconds`, riportata di seguito, permette di costruire un nuovo oggetto `Time` a partire dal numero di secondi a seconda della particolare strategia.
 
+La funzione `buildOverflowTimeFromSeconds`, riportata di seguito, permette di costruire un nuovo oggetto `Time` a partire dal numero di secondi (adattandoli al formato `h:m:s`) ed accumulando eventuali eccessi nel campo delle ore.
 ```scala 3
   private def buildTimeFromSeconds[M[_]: Monad, T <: Time](seconds: Int)
-    (using constructor: TimeConstructor[M[T]])
-    (using buildStrategy: TimeBuildStrategy): M[T] =
-  constructor.construct.tupled(buildStrategy.buildTimeValue(
-    seconds / (Time.secondsInMinute * Time.minutesInHour),
-    seconds / Time.secondsInMinute,
-    seconds
-  ))
-```
-Questa funzione adatta il tempo in secondi al formato `h:m:s` accumulando di default gli eccessi nel campo delle ore, poi utilizzando la stategia contestuale determina il risultato finale.
-
-Per la strategia è stata definita la seguente Type Class
-```scala 3
-private trait TimeBuildStrategy:
-  def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int)
-```
-E le seguenti strategie di costruzione:
-```scala 3
-private given defaultStrategy: TimeBuildStrategy with
-  def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int) =
-    (
-      ((h % Time.hoursInDay) + Time.hoursInDay)           % Time.hoursInDay,
-      ((m % Time.minutesInHour) + Time.minutesInHour)     % Time.minutesInHour,
-      ((s % Time.secondsInMinute) + Time.secondsInMinute) % Time.secondsInMinute
+    (using constructor: TimeConstructor[M[T]]): M[T] =
+    constructor.construct.tupled(
+      seconds / (Time.secondsInMinute * Time.minutesInHour),
+      seconds / Time.secondsInMinute % Time.minutesInHour,
+      seconds % Time.secondsInMinute
     )
-
-private given overflowStrategy: TimeBuildStrategy with
-  def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int) = (h, m % Time.minutesInHour, s % Time.secondsInMinute)
 ```
-nel primo caso l'orario viene formattato secondo il formato 24, nel secondo caso invece vengono accumulati anche gli eccessi.
+
+La funzione `adaptTimeUnitToBound` esegue una classica operazione di normalizzazione che garantisce che il valore `timeUnit` appartenga all'intervallo `[0, timeBound-1]`, nello specifico in corrispondenza del rappresentante della classe di resto `mod timeBound`.
+```scala 3
+  private def adaptTimeUnitToBound(timeUnit: Int, timeBound: Int): Int =
+    ((timeUnit % timeBound) + timeBound) % timeBound
+```
+Così facendo si garantisce che i secondi complessivi risultanti non saranno soggetti ad overflow al momento della conversione in `Time` e l'orario risultante sarà coerente sia in presenza di secondi positivi che negativi.
 
 ## Runner for Test
 L'utilizzo di una LazyList collegata ad una ConcurrentQueue permette di rappresentare il cambiamento dello stato come una sequenza di trasformazioni di quest'ultimo. 

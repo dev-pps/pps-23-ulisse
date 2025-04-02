@@ -1,4 +1,4 @@
-package ulisse
+package ulisse.dsl
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.{must, mustBe}

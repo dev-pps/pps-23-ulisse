@@ -15,7 +15,6 @@ import ulisse.utils.Times.{ClockTime, Time}
 
 object DynamicTimetableTest:
   val timetable1: Timetable = defaultTimeTable(train3905)
-
   val timetable2: Timetable =
     TimetableBuilder(
       train = train3905,

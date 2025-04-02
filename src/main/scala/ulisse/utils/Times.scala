@@ -2,7 +2,9 @@ package ulisse.utils
 
 import cats.syntax.all.*
 import cats.{Functor, Id, Monad}
+import ulisse.utils.CollectionUtils.updateWhen
 import ulisse.utils.Errors.{BaseError, ErrorMessage}
+import ulisse.utils.OptionUtils.when
 import ulisse.utils.Times.FluentDeclaration.h
 
 import scala.annotation.targetName
@@ -43,6 +45,9 @@ object Times:
   object Time:
     /** Creates a `Time` instance. */
     def apply(h: Hour, m: Minute, s: Second): Time = TimeImpl(h, m, s)
+
+    /** Unapply methods returning tuple with hours, minutes and seconds. */
+    def unapply(t: Time): (Hour, Minute, Second) = (t.h, t.m, t.s)
 
     /** Creates a `Time` instance from seconds and go beyond 24h if is needed. */
     def secondsToOverflowTime(s: Second): Time = Id(Time(0, 0, s)) overflowSum Time(0, 0, 0)
@@ -230,43 +235,30 @@ object Times:
     def ===(time2: ClockTime): Boolean =
       summon[Ordering[ClockTime]].compare(time, time2) == 0
 
-  private trait TimeBuildStrategy:
-    def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int)
-
-  private given defaultStrategy: TimeBuildStrategy with
-    def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int) =
-      (
-        ((h % Time.hoursInDay) + Time.hoursInDay)           % Time.hoursInDay,
-        ((m % Time.minutesInHour) + Time.minutesInHour)     % Time.minutesInHour,
-        ((s % Time.secondsInMinute) + Time.secondsInMinute) % Time.secondsInMinute
-      )
-
-  private given overflowStrategy: TimeBuildStrategy with
-    def buildTimeValue(h: Int, m: Int, s: Int): (Int, Int, Int) = (h, m % Time.minutesInHour, s % Time.secondsInMinute)
+  private def adaptTimeUnitToBound(timeUnit: Int, timeBound: Int): Int =
+    ((timeUnit % timeBound) + timeBound) % timeBound
 
   private def calculateSum[M[_]: Monad, T <: Time](time1: T, time2: T)(
       using constructor: TimeConstructor[M[T]]
   ): M[T] =
-    given TimeBuildStrategy = defaultStrategy
-    buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
+    val secondsInADay = Time.secondsInMinute * Time.minutesInHour * Time.hoursInDay
+    buildOverflowTimeFromSeconds(adaptTimeUnitToBound(time1.toSeconds + time2.toSeconds, secondsInADay))
 
   private def calculateOverflowSum[M[_]: Monad, T <: Time](time1: T, time2: T)(using
       constructor: TimeConstructor[M[T]]
   ): M[T] =
-    given TimeBuildStrategy = overflowStrategy
-    buildTimeFromSeconds(time1.toSeconds + time2.toSeconds)
+    buildOverflowTimeFromSeconds(time1.toSeconds + time2.toSeconds)
 
   private def calculateUnderflowSub[M[_]: Monad, T <: Time](time1: T, time2: T)(using
       constructor: TimeConstructor[M[T]]
   ): M[T] =
-    given TimeBuildStrategy = overflowStrategy
-    buildTimeFromSeconds(time1.toSeconds - time2.toSeconds)
+    buildOverflowTimeFromSeconds(time1.toSeconds - time2.toSeconds)
 
-  private def buildTimeFromSeconds[M[_]: Monad, T <: Time](seconds: Int)(using
+  private def buildOverflowTimeFromSeconds[M[_]: Monad, T <: Time](seconds: Int)(using
       constructor: TimeConstructor[M[T]]
-  )(using buildStrategy: TimeBuildStrategy): M[T] =
-    constructor.construct.tupled(buildStrategy.buildTimeValue(
+  ): M[T] =
+    constructor.construct.tupled(
       seconds / (Time.secondsInMinute * Time.minutesInHour),
-      seconds / Time.secondsInMinute,
-      seconds
-    ))
+      seconds / Time.secondsInMinute % Time.minutesInHour,
+      seconds                        % Time.secondsInMinute
+    )
