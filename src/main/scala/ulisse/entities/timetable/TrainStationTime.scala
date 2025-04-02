@@ -1,6 +1,6 @@
 package ulisse.entities.timetable
 
-import ulisse.utils.Times.ClockTime
+import ulisse.utils.Times.{ClockTime, Time}
 import ulisse.utils.Times.FluentDeclaration.h
 
 private type WaitTime = Int
@@ -39,6 +39,6 @@ object TrainStationTime:
     val departure =
       for
         a <- arriving
-        u <- (a ++ h(0).m(waitTime.getOrElse(0))).toOption
+        u <- (a ++ Time(0, waitTime.getOrElse(0), 0).toClockTime).toOption
       yield u
     TrainStationTime(arriving = arriving, waitTime = waitTime, departure = departure)

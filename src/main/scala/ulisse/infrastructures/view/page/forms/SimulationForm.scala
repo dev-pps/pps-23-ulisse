@@ -264,8 +264,8 @@ object SimulationForm:
       val StationEnvironmentInfo(env, cumulativeDelay, averageDelay) = station
       val stationName                                                = s"STATION [${env.name}]:"
       val trains   = s"Trains: ${env.trains.size} / ${env.numberOfPlatforms}"
-      val cumDelay = s"Cumulative Delay: $cumulativeDelay"
-      val avgDelay = s"Average Delay: $averageDelay "
+      val cumDelay = cumulativeDelay.buildTimeString("Cumulative delay")
+      val avgDelay = averageDelay.buildTimeString("Average delay")
       val infoStr  = s"$stationName \n$trains \n$cumDelay \n$avgDelay"
       elementInfoArea.setText(infoStr)
 

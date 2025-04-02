@@ -151,9 +151,10 @@ object Times:
     yield res
 
   extension (time: Time)
-    /** Returns `time` into ClockTime. It returns Left if given Time */
+    /** Returns `time` into ClockTime. It returns Left if given Time is invalid */
     def toClockTime: Either[ClockTimeErrors, ClockTime] =
-      h(time.h).m(time.m)
+      val normalizedTime = Time.secondsToTime(time.toSeconds)
+      h(normalizedTime.h).m(normalizedTime.m)
 
   extension (time: Either[ClockTimeErrors, ClockTime])
     def greaterEqThan(time2: Either[ClockTimeErrors, ClockTime]): Boolean =
