@@ -1,3 +1,9 @@
+## [2.0.3](https://github.com/dev-pps/pps-23-ulisse/compare/v2.0.2...v2.0.3) (2025-04-08)
+
+### Bug Fixes
+
+* editing station ([b4ac338](https://github.com/dev-pps/pps-23-ulisse/commit/b4ac338c51a50510f419c4311171b1a35542bf34))
+
 ## [2.0.2](https://github.com/dev-pps/pps-23-ulisse/compare/v2.0.1...v2.0.2) (2025-04-01)
 
 ### Bug Fixes
