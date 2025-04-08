@@ -117,13 +117,21 @@ object RouteManagers:
           case (_, Right(_))    => Errors.AlreadyExist.asLeft
           case (_, _)           => copy(manager - oldRoute.id + (newRoute.id -> newRoute)).asRight
 
+      private def modifyAutomaticBy(
+          oldStation: Station,
+          newStation: Station,
+          filter: (Route, Station) => Boolean,
+          transform: (Route, Station) => Route
+      ): RouteManager =
+        val routeWithStation = routes filter (route => filter(route, oldStation))
+        val newRoute = routeWithStation.map(route => transform(route, newStation)).map(route => route.id -> route).toMap
+        copy(manager -- routeWithStation.map(_.id) ++ newRoute)
+
       override def modifyAutomaticByDeparture(oldStation: Station, newStation: Station): RouteManager =
-        copy(manager -- (routes filter (_ isDeparture oldStation) map (_.id)) ++
-          routes.filter(_ isDeparture oldStation).map(route => route.id -> (route changeAutomaticDeparture newStation)))
+        modifyAutomaticBy(oldStation, newStation, _ isDeparture _, _ changeAutomaticDeparture _)
 
       override def modifyAutomaticByArrival(oldStation: Station, newStation: Station): RouteManager =
-        copy(manager -- (routes filter (_ isArrival oldStation) map (_.id)) ++
-          routes.filter(_ isArrival oldStation).map(route => route.id -> (route changeAutomaticArrival newStation)))
+        modifyAutomaticBy(oldStation, newStation, _ isArrival _, _ changeAutomaticArrival _)
 
       override def deleteBy(id: IdRoute): Either[Errors, RouteManager] =
         findBy(id).map(_ => copy(manager - id).asRight) getOrElse Errors.NotExist.asLeft

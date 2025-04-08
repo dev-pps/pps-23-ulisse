@@ -44,6 +44,9 @@ object PageManager:
   private case class TrainButtonEvents(pageManager: PageManager) extends Observers.Observer[MouseEvent]:
     override def onClick(data: MouseEvent): Unit = pageManager.showTrain()
 
+  private case class ResetSimulation(workspaceManager: WorkspaceManager) extends Observers.Observer[MouseEvent]:
+    override def onClick(data: MouseEvent): Unit = workspaceManager.resetSimulation()
+
   private case class PageManagerImpl(menu: Menu, dashboard: Dashboard, workspaceManager: WorkspaceManager)
       extends PageManager:
 
@@ -57,9 +60,14 @@ object PageManager:
     workspaceManager.hide()
 
     menu.attachNewIcon(NewButtonEvents(this))
+
+    dashboard.attachMap(ResetSimulation(workspaceManager))
+    dashboard.attachTrain(ResetSimulation(workspaceManager))
+
     dashboard.attachSimulation(SimulationButtonEvents(this))
     dashboard.attachMap(MapButtonEvents(this))
     dashboard.attachTrain(TrainButtonEvents(this))
+
     mainPanel.revalidate()
 
     export mainPanel.revalidate
