@@ -18,6 +18,9 @@ trait SimulationWorkspace extends Workspace with SimulationNotificationListener:
   /** Updates the simulation data. */
   def initSimulation(): Unit
 
+  /** Resets the simulation. */
+  def resetSimulation(): Unit
+
 /** Companion object of the [[SimulationWorkspace]]. */
 object SimulationWorkspace:
 
@@ -50,6 +53,9 @@ object SimulationWorkspace:
           updateData(data)
           simulation setEngineConfiguration engine.configuration
       ))
+
+    override def resetSimulation(): Unit =
+      simulation.reset()
 
     private def refreshMap(data: SimulationData): Unit =
       Swing.onEDT:

@@ -121,6 +121,8 @@ class RouteManagerTest extends AnyFlatSpec with Matchers:
       newArrivalRoute   <- newManagerChangeArrival find route
     yield
       newManagerChangeDeparture.size mustBe singleElementManager.size
+      newManagerChangeArrival.size mustBe singleElementManager.size
+
       route changeAutomaticDeparture newDeparture mustBe newDepartureRoute
       route changeAutomaticArrival newArrival mustBe newArrivalRoute
 

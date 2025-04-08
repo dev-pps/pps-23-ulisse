@@ -89,6 +89,16 @@ class RouteTest extends AnyFlatSpec with Matchers:
       newRoute.departure mustBe newDeparture
       newRoute.isValid mustBe true
 
+  "restore route with automatic departure" should "change routes departure" in:
+    val newDeparture: Station = Station("Firenze", departure.coordinate, 2)
+    for route <- validateRoute
+    yield
+      val newRoute     = route changeAutomaticDeparture newDeparture
+      val restoreRoute = newRoute changeAutomaticDeparture departure
+      newRoute.departure mustBe newDeparture
+      restoreRoute mustBe route
+      newRoute.isValid mustBe true
+
   "route with arrival" should "change routes arrival" in:
     val newArrival: Station = Station("Bologna", arrival.coordinate, 2)
     for
@@ -102,6 +112,16 @@ class RouteTest extends AnyFlatSpec with Matchers:
     yield
       val newRoute = route changeAutomaticArrival newArrival
       newRoute.arrival mustBe newArrival
+      newRoute.isValid mustBe true
+
+  "restore route with automatic arrival" should "change routes arrival" in:
+    val newArrival: Station = Station("Bologna", arrival.coordinate, 2)
+    for route <- validateRoute
+    yield
+      val newRoute     = route changeAutomaticArrival newArrival
+      val restoreRoute = newRoute changeAutomaticArrival arrival
+      newRoute.arrival mustBe newArrival
+      restoreRoute mustBe route
       newRoute.isValid mustBe true
 
   "route with typology" should "change routes typology" in:

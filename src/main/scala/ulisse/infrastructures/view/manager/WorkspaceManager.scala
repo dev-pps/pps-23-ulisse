@@ -19,6 +19,9 @@ trait WorkspaceManager extends ComposedSwing:
   /** Shows the train workspace. */
   def showTrain(): Unit
 
+  /** Resets the simulation. */
+  def resetSimulation(): Unit
+
 object WorkspaceManager:
 
   /** Creates a new instance of the workspace manager with the given [[SimulationWorkspace]], [[MapWorkspace]], and [[TrainWorkspace]]. */
@@ -48,5 +51,7 @@ object WorkspaceManager:
     override def showSimulation(): Unit = { showWorkspace(simulation); simulation.initSimulation() }
     override def showMap(): Unit        = { showWorkspace(map); map.initMap() }
     override def showTrain(): Unit      = showWorkspace(train)
+
+    override def resetSimulation(): Unit = simulation.resetSimulation()
 
     override def component[T >: Component]: T = mainPanel
