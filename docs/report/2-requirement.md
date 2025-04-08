@@ -42,7 +42,7 @@ liberamente le varie Station e Route, definendo anche i Train e le Timetable
 ### Sistema
 - Il sistema deve poter visualizzare la Railway
 - Il sistema deve poter visualizzare le infomazioni delle entità della Simulation
-- Il sistema deve poter gestire la crezione/modifica/rimozione di Station, Route, Timetable e Train
+- Il sistema deve poter gestire la creazione/modifica/rimozione di Station, Route, Timetable e Train
 - Il sistema deve poter gestire l'esecuzione della Simulation
   - evitando la sovrapposizione dei Train in una Route
   - riconoscendo la presenza di ritardi
@@ -79,7 +79,7 @@ liberamente le varie Station e Route, definendo anche i Train e le Timetable
 - introduzione di randomness controllata all'interno della simulazione
 - scelta della tipologia di alimentazione del Train e gestione dell'autonomia
 - ottimizzazione/ricerca dinamica del percoso più veloce (vengono definite solo le Station dove si ferma 
-il Train e il resto dei percosi è gestito da un sistema di balancing del traffico)
+il Train e il resto dei percorsi è gestito da un sistema di balancing del traffico)
 - selezione del tipo di sosta in una Station (breve/lunga)
 - cambiare colore agli elementi della Railway a seconda del loro stato(e.g. se una Station è quasi piena 
 sarà mostrata diversamente da una Station libera) 
