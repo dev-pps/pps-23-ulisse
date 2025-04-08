@@ -83,12 +83,12 @@ classDiagram
 Lo stato dell'applicazione viene gestito nel livello applicativo
 dell'architettura esagonale. Questo approccio evita che la
 gestione dell'evoluzione dello stato immutabile sia delegata a componenti esterni. In questo
-contesto, l'`EventQueue` opera in modo simile a un event loop, centralizzando il sistema
+contesto, l'`EventQueue` opera in modo simile ad un event loop, centralizzando il sistema
 degli aggiornamenti e mantenendo la coerenza dello stato.
 
 L’`EventQueue` si occupa della gestione dello stato dell’`AppState`, esponendo, in conformità
-ai principi di _SRP_ e _ISP_, interfacce contestuali che delimitano le operazioni disponibili
-per ciascun ambito di dominio. Ogni vista specializzata sull’EventQueue consente
+ai principi di _SRP_ e _ISP_, interfacce specifiche che delimitano le operazioni disponibili
+per ogni porzione di dominio. Ogni vista specializzata sull’EventQueue consente
 l’esecuzione esclusiva delle azioni pertinenti a un particolare aggregato, garantendo
 un accesso controllato e una chiara separazione delle responsabilità nella modifica
 dello stato applicativo.
@@ -267,7 +267,7 @@ Le `Route` costituiscono un'entità chiave del dominio e sono identificate da un
 determinato in funzione della stazione di partenza, della stazione di arrivo e della
 tipologia del percorso. Il modello supporta due categorie principali di route:
 `Normale` e `AV` (Alta Velocità).
-La definizione di una Route comporta l'associazione a un insieme di Track omogenee
+La definizione di una Route comporta l'associazione ad un insieme di Track omogenee
 rispetto alla tipologia selezionata. Il processo di creazione è vincolato da regole
 di integrità, con la gestione degli errori formalizzata attraverso l'enumerazione
 `Errors`, che consente di intercettare e rappresentare eventuali anomalie durante la
@@ -360,10 +360,10 @@ classDiagram
 
 L'entità `Timetable` assume un ruolo cruciale per la programmazione dei diversi viaggi che i treni devono
 svolgere durante la simulazione. Attraverso una sequenza di `Station` e di `Route` viene definita la tabella
-oraria del treno dove per ogni statione viene memorizzato un `TrainStationTime`contenente l'ora di arrivo/partenza e gli eventuali minuti di sosta.
+oraria del treno dove per ogni station viene memorizzato un `TrainStationTime`contenente l'ora di arrivo/partenza e gli eventuali minuti di sosta.
 
 Una `Timetable` può essere costruita attraverso il `TimetableBuilder` utilizzando il *Builder Pattern* e
-attraverso i metodi che espone è possibile ricavare una `PartialTimetable`o, quando viene la fornita la stazione terminale, una `Timetable`.
+attraverso i metodi che espone è possibile ricavare una `PartialTimetable`o, quando viene la fornita la stazione finale, una `Timetable`.
 Si noti che nell' UML sottostante il builder utilizza un
 `TimeEstimator` che fornisce una strategia specifica per il calcolo degli orari ([maggiori dettagli](5-impl-violani.md#timetable)).
 

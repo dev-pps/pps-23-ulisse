@@ -1,4 +1,4 @@
-# Implementazione - Manuel Buizo
+# Implementazione - Buizo Manuel 
 
 Il codice implementato durante l’esecuzione del progetto è stato prevalentemente indirizzato alle seguenti aree
 funzionali:

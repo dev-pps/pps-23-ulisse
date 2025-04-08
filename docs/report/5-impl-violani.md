@@ -1,4 +1,4 @@
-# Implementazione di Violani Matteo
+# Implementazione - Violani Matteo
 
 ## Parti implementate
 Il mio contributo in questo progetto ha previsto lo sviluppo delle parti seguendo l'approccio TDD comportando il conseguente sviluppo dei relativi test.
@@ -239,7 +239,7 @@ In una stazione è possibile:
 
 Per finalizzare la costruzione basta indicare la stazione di arrivo con "**arrivesTo** _stationF_"
 
-Di seguito si riporta la definizione delle enxtension method e case class che compongono il dsl:
+Di seguito si riporta la definizione delle extension method e case class che compongono il dsl:
 
 ```scala 3
 object TimetableDSL:

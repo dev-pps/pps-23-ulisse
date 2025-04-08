@@ -1,6 +1,6 @@
 # Processo di sviluppo
 Di seguito vengono illustrate la metodologia di sviluppo adottata, il sistema 
-di versionamento con le relative convenzioni utilizzate, e le pipeline di CI/CD implementate.
+di versionamento con le relative convenzioni utilizzate e le pipeline di CI/CD implementate.
 
 ## Metodologia
 È stato adottato un processo di sviluppo SCRUM-inspired come suggerito, 
@@ -41,7 +41,7 @@ e analizzare meglio alcuni aspetti progettuali.
 Per la gestione del Product Backlog, degli sprint e delle attività da svolgere, è stato scelto lo strumento YouTrack.
 Durante ogni Sprint Planning sono state create le nuove issues da svolgere nello sprint, in particolare:
 - le issue più rilevanti sono state immediatamente assegnate ai membri del team
-- le issue rimanenenti sono state seleazionate in autonomia dai membri che hanno completato i propri task
+- le issue rimanenenti sono state selezionate in autonomia dai membri che hanno completato i propri task
 - le issue rimaste incomplete nello sprint precedente sono state trasferite nello sprint corrente
 - se necessario le issue più complesse sono state suddivise successivamente in task più piccoli
 
@@ -70,7 +70,7 @@ una maggiore awareness riguardo lo stato del progetto. La revisione del codice h
 facilitato il confronto e l'apprendimento continuo tra i membri del team.
 
 ## Definition of Done
-Una feature è considerata finita ed integrabile in `main`, se soddisfa i seguenti criteri:
+Una feature è considerata finita ed integrabile in `main` se soddisfa i seguenti criteri:
 - Sono eseguite con successo le pipeline di CI/CD, che controllano:
   - building del progetto
   - testing del progetto 
@@ -91,7 +91,7 @@ Il processo di sviluppo con TDD prevede tre passaggi principali:
 componente o della funzionalità. Poiché l'implementazione non è ancora presente, 
 il test fallisce inizialmente.
 
-2. Fase Green(implementation): successivamente, si procede con l'implementazione 
+2. Fase Green (implementation): successivamente, si procede con l'implementazione 
 del componente o della funzionalità, in modo da garantire che il test precedentemente 
 scritto venga superato con successo.
 
